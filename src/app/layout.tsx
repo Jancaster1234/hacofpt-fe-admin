@@ -1,6 +1,12 @@
+// src/app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
+
+import { SidebarProvider } from "@/context/SidebarContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import AdminLayout from "@/layout/AdminLayout"; // Import AdminLayout as a client component
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -9,6 +15,11 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const outfit = Outfit({
+  variable: "--font-outfit-sans",
   subsets: ["latin"],
 });
 
@@ -25,9 +36,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} antialiased dark:bg-gray-900`}
       >
-        {children}
+        <ThemeProvider>
+          <SidebarProvider>
+            <AdminLayout>{children}</AdminLayout>{" "}
+            {/* Render AdminLayout here */}
+          </SidebarProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
