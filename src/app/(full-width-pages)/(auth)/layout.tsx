@@ -1,3 +1,4 @@
+// src/app/(full-width-pages)/(auth)/layout.tsx
 import GridShape from "@/components/common/GridShape";
 import ThemeTogglerTwo from "@/components/common/ThemeTogglerTwo";
 

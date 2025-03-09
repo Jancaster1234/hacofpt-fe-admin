@@ -1,3 +1,4 @@
+// src/components/ecommerce/RecentOrders.tsx
 import {
   Table,
   TableBody,

@@ -1,3 +1,4 @@
+// src/components/form/input/Checkbox.tsx
 import type React from "react";
 
 interface CheckboxProps {

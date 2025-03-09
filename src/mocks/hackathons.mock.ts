@@ -1,3 +1,4 @@
+// src/mocks/hackathons.mock.ts
 import { Hackathon } from "@/types/entities/hackathon";
 
 export const hackathonsMock: Hackathon[] = [

@@ -1,3 +1,4 @@
+// src/components/form/input/FileInput.tsx
 import React, { FC } from "react";
 
 interface FileInputProps {

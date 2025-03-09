@@ -1,3 +1,4 @@
+// src/components/form/form-elements/DefaultInputs.tsx
 "use client";
 import React, { useState } from "react";
 import ComponentCard from "../../common/ComponentCard";

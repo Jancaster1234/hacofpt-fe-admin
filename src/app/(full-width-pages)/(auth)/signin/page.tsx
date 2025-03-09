@@ -1,3 +1,4 @@
+// src/app/(full-width-pages)/(auth)/signin/page.tsx
 import SignInForm from "@/components/auth/SignInForm";
 import { Metadata } from "next";
 

@@ -1,3 +1,4 @@
+// src/app/(full-width-pages)/(error-pages)/error-404/page.tsx
 import GridShape from "@/components/common/GridShape";
 import { Metadata } from "next";
 import Image from "next/image";

@@ -1,3 +1,4 @@
+// src/components/ecommerce/MonthlySalesChart.tsx
 "use client";
 import { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";

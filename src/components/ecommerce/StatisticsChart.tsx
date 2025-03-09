@@ -1,3 +1,4 @@
+// src/components/ecommerce/StatisticsChart.tsx
 "use client";
 import React from "react";
 // import Chart from "react-apexcharts";

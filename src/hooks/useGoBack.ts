@@ -1,3 +1,4 @@
+// src/hooks/useGoBack.ts
 import { useRouter } from "next/navigation";
 
 const useGoBack = () => {

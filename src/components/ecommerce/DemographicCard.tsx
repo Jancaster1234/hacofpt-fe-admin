@@ -1,3 +1,4 @@
+// src/components/ecommerce/DemographicCard.tsx
 "use client";
 import Image from "next/image";
 
