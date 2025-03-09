@@ -41,7 +41,6 @@ export default function RootLayout({
         <ThemeProvider>
           <SidebarProvider>
             <AdminLayout>{children}</AdminLayout>{" "}
-            {/* Render AdminLayout here */}
           </SidebarProvider>
         </ThemeProvider>
       </body>
