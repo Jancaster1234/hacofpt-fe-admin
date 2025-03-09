@@ -22,4 +22,5 @@ export type Hackathon = {
   maximumTeamMembers: number;
   numberOfRounds: number; // New: Number of rounds in the hackathon
   rounds: Round[]; // New: Directly linking rounds
+  createdByUserId: string;
 };
