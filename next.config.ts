@@ -1,31 +1,17 @@
 import type { NextConfig } from "next";
 
+// next.config.js
 const nextConfig: NextConfig = {
   experimental: {
     turbo: {
       rules: {
-        "*.svg": ["@svgr/webpack"],
+        "*.svg": {
+          loaders: ["@svgr/webpack"],
+          as: "*.js",
+        },
       },
     },
   },
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.svg$/,
-      issuer: /\.[jt]sx?$/,
-      use: [
-        {
-          loader: "@svgr/webpack",
-          options: {
-            svgo: true, // Enables SVG optimization
-            svgoConfig: {
-              plugins: [{ removeViewBox: false }], // Ensure viewBox is not removed
-            },
-          },
-        },
-      ],
-    });
-    return config;
-  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
