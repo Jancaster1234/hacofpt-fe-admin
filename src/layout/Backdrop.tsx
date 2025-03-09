@@ -1,4 +1,3 @@
-// src/layout/Backdrop.tsx
 import { useSidebar } from "@/context/SidebarContext";
 import React from "react";
 
