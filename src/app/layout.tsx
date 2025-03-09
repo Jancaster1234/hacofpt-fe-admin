@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { SidebarProvider } from "@/context/SidebarContext";
 import { ThemeProvider } from "@/context/ThemeContext";
-
+import AuthProvider from "@/context/AuthProvider";
 const outfit = Outfit({
   variable: "--font-outfit-sans",
   subsets: ["latin"],
@@ -18,9 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.variable} dark:bg-gray-900`}>
-        <ThemeProvider>
-          <SidebarProvider>{children}</SidebarProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>
+            <SidebarProvider>{children}</SidebarProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

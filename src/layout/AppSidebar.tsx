@@ -1,20 +1,19 @@
 // src/layout/AppSidebar.tsx
 "use client";
-import React, { useEffect, useRef, useState,useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
+import { useAuth } from "@/hooks/useAuth_v0";
+import { UserRole } from "@/types/entities/users";
 import {
-  BoxCubeIcon,
   CalenderIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
   ListIcon,
   PageIcon,
-  PieChartIcon,
-  PlugInIcon,
   TableIcon,
   UserCircleIcon,
 } from "../icons/index";
@@ -24,6 +23,7 @@ type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
+  allowedRoles?: UserRole[]; // ✅ Restrict based on roles
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
@@ -31,32 +31,66 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
+    allowedRoles: ["Admin"],
     subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   {
     icon: <CalenderIcon />,
     name: "Calendar",
+    allowedRoles: ["Admin", "Organizer", "Mentor", "Judge"],
     path: "/calendar",
   },
   {
     icon: <UserCircleIcon />,
     name: "User Profile",
+    allowedRoles: [
+      "Admin",
+      "Organizer",
+      "Judge",
+      "Mentor",
+      "TeamLeader",
+      "TeamMember",
+    ],
     path: "/profile",
   },
 
   {
     name: "Forms",
     icon: <ListIcon />,
+    allowedRoles: [
+      "Admin",
+      "Organizer",
+      "Judge",
+      "Mentor",
+      "TeamLeader",
+      "TeamMember",
+    ],
     subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
   },
   {
     name: "Tables",
     icon: <TableIcon />,
+    allowedRoles: [
+      "Admin",
+      "Organizer",
+      "Judge",
+      "Mentor",
+      "TeamLeader",
+      "TeamMember",
+    ],
     subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
   },
   {
     name: "Pages",
     icon: <PageIcon />,
+    allowedRoles: [
+      "Admin",
+      "Organizer",
+      "Judge",
+      "Mentor",
+      "TeamLeader",
+      "TeamMember",
+    ],
     subItems: [
       { name: "Blank Page", path: "/blank", pro: false },
       { name: "404 Error", path: "/error-404", pro: false },
@@ -64,40 +98,26 @@ const navItems: NavItem[] = [
   },
 ];
 
-const othersItems: NavItem[] = [
-  {
-    icon: <PieChartIcon />,
-    name: "Charts",
-    subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false },
-    ],
-  },
-  {
-    icon: <BoxCubeIcon />,
-    name: "UI Elements",
-    subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
-    ],
-  },
-  {
-    icon: <PlugInIcon />,
-    name: "Authentication",
-    subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
-    ],
-  },
-];
+const othersItems: NavItem[] = [];
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const { user } = useAuth();
+  const userRole = user?.role; // Get the logged-in user's role
+
+  const filteredNavItems = navItems.filter(
+    (item) =>
+      !item.allowedRoles || item.allowedRoles.includes(userRole as UserRole)
+  );
+
+  const filteredOthersItems = othersItems.filter(
+    (item) =>
+      !item.allowedRoles || item.allowedRoles.includes(userRole as UserRole)
+  );
+
+  console.log("User Role in AppSidebar:", userRole);
+  console.log("Filtered Nav Items in AppSidebar:", filteredNavItems);
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -235,7 +255,7 @@ const AppSidebar: React.FC = () => {
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // const isActive = (path: string) => path === pathname;
-   const isActive = useCallback((path: string) => path === pathname, [pathname]);
+  const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
   useEffect(() => {
     // Check if the current path matches any submenu item
@@ -261,7 +281,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [pathname,isActive]);
+  }, [pathname, isActive]);
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened
@@ -354,7 +374,7 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {renderMenuItems(filteredNavItems, "main")}
             </div>
 
             <div className="">
@@ -371,7 +391,7 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(othersItems, "others")}
+              {renderMenuItems(filteredOthersItems, "others")}
             </div>
           </div>
         </nav>
