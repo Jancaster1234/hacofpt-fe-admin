@@ -40,7 +40,7 @@ export default function UserDropdown() {
             width={44}
             height={44}
             src={
-              user.avatarUrl ||
+              user?.avatarUrl ||
               "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"
             }
             alt="User"
@@ -48,7 +48,7 @@ export default function UserDropdown() {
         </span>
 
         <span className="block mr-1 font-medium text-theme-sm">
-          {user.lastName + " " + user.firstName}
+          {user?.lastName + " " + user?.firstName}
         </span>
 
         <svg
@@ -78,10 +78,10 @@ export default function UserDropdown() {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {user.lastName + " " + user.firstName}
+            {user?.lastName + " " + user?.firstName}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            {user.email}
+            {user?.email}
           </span>
         </div>
 
