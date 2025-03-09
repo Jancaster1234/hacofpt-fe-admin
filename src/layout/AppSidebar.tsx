@@ -12,12 +12,7 @@ import {
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  ListIcon,
-  PageIcon,
-  TableIcon,
-  UserCircleIcon,
 } from "../icons/index";
-import SidebarWidget from "./SidebarWidget";
 interface AppSidebarProps {
   user: User;
 }
@@ -39,65 +34,69 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
+    name: "Hackathon",
+    allowedRoles: ["Admin"],
+    path: "/admin-hackathon-management",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "User",
+    allowedRoles: ["Admin"],
+    path: "/user-management",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Organization",
+    allowedRoles: ["Admin"],
+    path: "/organization-management",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Organizer Hackathon",
+    allowedRoles: ["Organizer"],
+    path: "/organizer-hackathon-management",
+  },
+  {
+    icon: <CalenderIcon />,
     name: "Calendar",
     allowedRoles: ["Admin", "Organizer", "Mentor", "Judge"],
     path: "/calendar",
   },
   {
-    icon: <UserCircleIcon />,
-    name: "User Profile",
-    allowedRoles: [
-      "Admin",
-      "Organizer",
-      "Judge",
-      "Mentor",
-      "TeamLeader",
-      "TeamMember",
-    ],
-    path: "/profile",
-  },
-
-  {
-    name: "Forms",
-    icon: <ListIcon />,
-    allowedRoles: [
-      "Admin",
-      "Organizer",
-      "Judge",
-      "Mentor",
-      "TeamLeader",
-      "TeamMember",
-    ],
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+    icon: <CalenderIcon />,
+    name: "Kanban board",
+    allowedRoles: ["Admin", "Organizer", "Mentor", "Judge"],
+    path: "/kanban-board",
   },
   {
-    name: "Tables",
-    icon: <TableIcon />,
-    allowedRoles: [
-      "Admin",
-      "Organizer",
-      "Judge",
-      "Mentor",
-      "TeamLeader",
-      "TeamMember",
-    ],
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
+    icon: <CalenderIcon />,
+    name: "Chat",
+    allowedRoles: ["Admin", "Organizer", "Judge", "Mentor"],
+    path: "/chat",
   },
   {
-    name: "Pages",
-    icon: <PageIcon />,
-    allowedRoles: [
-      "Admin",
-      "Organizer",
-      "Judge",
-      "Mentor",
-      "TeamLeader",
-      "TeamMember",
-    ],
-    subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
-    ],
+    icon: <CalenderIcon />,
+    name: "Inbox",
+    allowedRoles: ["Admin", "Organizer", "Judge", "Mentor"],
+    path: "/inbox",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Grading Submission",
+    allowedRoles: ["Judge"],
+    path: "/grading-submission",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Send Notification",
+    allowedRoles: ["Admin", "Organizer"],
+    path: "/send-notification",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Blog",
+    allowedRoles: ["Admin"],
+    path: "/blog-management",
   },
 ];
 
@@ -378,26 +377,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ user }) => {
               </h2>
               {renderMenuItems(filteredNavItems, "main")}
             </div>
-
-            <div className="">
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Others"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
-              {renderMenuItems(filteredOthersItems, "others")}
-            </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
       </div>
     </aside>
   );

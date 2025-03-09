@@ -8,6 +8,7 @@ import Backdrop from "@/layout/Backdrop";
 import React from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AdminLayout({
   children,
@@ -19,18 +20,19 @@ export default function AdminLayout({
 
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
 
-  // Ensure user is authenticated before rendering
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) {
+      console.warn("🔹 User not authenticated. Redirecting to /signin...");
+      router.push("/signin");
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
     return (
       <div className="flex justify-center items-center h-screen">
         Loading...
       </div>
-    );
-  }
-
-  if (!user) {
-    router.push("/signin");
-    return null; // Prevent rendering
+    ); // Show a loading state while checking auth
   }
 
   // Dynamic class for main content margin based on sidebar state
