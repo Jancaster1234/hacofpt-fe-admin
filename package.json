@@ -10,6 +10,10 @@
     "dev-without-turbo": "cross-env NEXT_PRIVATE_TURBOPACK=0 next dev -p 4000"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.66.8",
+    "@types/jsonwebtoken": "^9.0.9",
+    "jsonwebtoken": "^9.0.2",
+    "zustand": "^5.0.3",
     "@fullcalendar/core": "^6.1.15",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
