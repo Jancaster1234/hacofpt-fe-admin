@@ -6,16 +6,14 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import { UserRole } from "@/types/entities/users";
-import { User } from "@/types/entities/users";
+import { useAuth } from "@/hooks/useAuth_v0";
+
 import {
   CalenderIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
 } from "../icons/index";
-interface AppSidebarProps {
-  user: User;
-}
 
 type NavItem = {
   name: string;
@@ -102,10 +100,11 @@ const navItems: NavItem[] = [
 
 const othersItems: NavItem[] = [];
 
-const AppSidebar: React.FC<AppSidebarProps> = ({ user }) => {
+const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
-  const userRole = user?.role; // Get the logged-in user's role
+  const { user } = useAuth();
+  const userRole = user?.role;
 
   const filteredNavItems = navItems.filter(
     (item) =>

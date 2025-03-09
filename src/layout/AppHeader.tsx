@@ -7,13 +7,8 @@ import { useSidebar } from "@/context/SidebarContext";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef } from "react";
-import { User } from "@/types/entities/users";
 
-interface AppHeaderProps {
-  user: User;
-}
-
-const AppHeader: React.FC<AppHeaderProps> = ({ user }) => {
+const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
@@ -175,7 +170,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ user }) => {
             {/* <!-- Notification Menu Area --> */}
           </div>
           {/* <!-- User Area --> */}
-          <UserDropdown user={user} />
+          <UserDropdown />
         </div>
       </div>
     </header>

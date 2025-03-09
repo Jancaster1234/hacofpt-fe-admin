@@ -5,13 +5,12 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { User } from "@/types/entities/users";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth_v0";
 
-export default function UserDropdown({ user }: { user: User }) {
+export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  const { logout } = useAuth(); // Get logout function
+  const { user, logout } = useAuth(); // Get logout function
   const router = useRouter();
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
