@@ -6,13 +6,32 @@ import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import React from "react";
+import { useAuth } from "@/hooks/useAuth_v0";
+import { useRouter } from "next/navigation";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+
+  // Ensure user is authenticated before rendering
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!user) {
+    router.push("/signin");
+    return null; // Prevent rendering
+  }
 
   // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = isMobileOpen
@@ -24,16 +43,18 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen xl:flex">
       {/* Sidebar and Backdrop */}
-      <AppSidebar />
+      <AppSidebar user={user} />
       <Backdrop />
       {/* Main Content Area */}
       <div
         className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}
       >
         {/* Header */}
-        <AppHeader />
+        <AppHeader user={user} />
         {/* Page Content */}
-        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
+        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+          {children}
+        </div>
       </div>
     </div>
   );
