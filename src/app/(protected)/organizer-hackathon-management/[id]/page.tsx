@@ -7,7 +7,7 @@ import HackathonBanner from "./_components/HackathonBanner";
 import HackathonTabs from "./_components/HackathonTabs";
 import HackathonOverview from "./_components/HackathonOverview";
 import { Hackathon } from "@/types/entities/hackathon"; // Import type
-
+import EditSaveButtons from "./_components/EditSaveButtons";
 type HackathonProps = {
   params: { id: string }; //Keep this to access the dynamic route param
 };
@@ -16,7 +16,7 @@ type HackathonProps = {
 
 // This function should be memoized to avoid fetching the same data multiple times
 async function getHackathon(id: string): Promise<Hackathon> {
-  const res = await fetch(`http://localhost:3000/api/hackathon/${id}`, {
+  const res = await fetch(`http://localhost:4000/api/hackathon/${id}`, {
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Failed to fetch hackathon data");
@@ -42,6 +42,8 @@ export default async function HackathonDetail({ params }: HackathonProps) {
   const hackathon = await getHackathon(id);
   return (
     <div className="container mx-auto p-4 sm:p-6">
+      {/* Edit & Save Buttons */}
+      <EditSaveButtons hackathonId={id} initialHackathonData={hackathon} />
       <HackathonBanner
         bannerImageUrl={hackathon.bannerImageUrl}
         altText={hackathon.title}

@@ -8,6 +8,7 @@ import SearchSortBar from "./_components/SearchSortBar";
 import Pagination from "./_components/Pagination";
 import { Hackathon } from "@/types/entities/hackathon";
 import { useQuery } from "@tanstack/react-query";
+import CreateHackathonModal from "./_components/CreateHackathonModal";
 
 // TODO: {lv2} Research: add Metadata solution for client components
 // export const metadata: Metadata = {
@@ -40,6 +41,7 @@ export default function HackathonPage() {
     organizations: [],
   });
   const [page, setPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const {
     data: hackathons = [],
     error,
@@ -93,6 +95,12 @@ export default function HackathonPage() {
         {/* Sidebar Filters */}
         <div className="w-1/4">
           <Filters selectedFilters={filters} onFilterChange={setFilters} />
+          <button
+            className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+            onClick={() => setIsModalOpen(true)}
+          >
+            + Create a Hackathon
+          </button>
         </div>
 
         {/* Main Content */}
@@ -107,6 +115,11 @@ export default function HackathonPage() {
             itemsPerPage={ITEMS_PER_PAGE}
           />
         </div>
+
+        {/* Modal Component */}
+        {isModalOpen && (
+          <CreateHackathonModal onClose={() => setIsModalOpen(false)} />
+        )}
       </div>
     </div>
   );
