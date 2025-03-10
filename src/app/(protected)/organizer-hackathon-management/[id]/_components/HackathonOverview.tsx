@@ -30,7 +30,9 @@ export default function HackathonOverview({
   const router = useRouter();
   const userHackathons = user ? getMockUserHackathons(user.id) : null;
   const isEnrolled = userHackathons?.hackathons.some(
-    (h) => h.hackathon.id === id
+    (h) =>
+      h.hackathon.id === id &&
+      (h.role === "TeamLeader" || h.role === "TeamMember")
   );
   return (
     <div className="p-4 sm:p-6 bg-white border border-gray-200 rounded-lg shadow">

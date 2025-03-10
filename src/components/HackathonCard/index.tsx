@@ -10,7 +10,7 @@ type HackathonCardProps = {
 export default function HackathonCard({ hackathon }: HackathonCardProps) {
   return (
     <Link
-      href={`/hackathon/${hackathon.id}`}
+      href={`/organizer-hackathon-management/${hackathon.id}`}
       className="block bg-white shadow-md rounded-lg overflow-hidden transition-transform hover:scale-105"
     >
       <div className="relative w-full h-48">
