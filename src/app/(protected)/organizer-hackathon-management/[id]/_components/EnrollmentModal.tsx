@@ -1,4 +1,4 @@
-// src/app/hackathon/[id]/_components/EnrollmentModal.tsx
+// src/app/(protected)/organizer-hackathon-management/[id]/_components/EnrollmentModal.tsx
 import { useState } from "react";
 
 type EnrollmentModalProps = {

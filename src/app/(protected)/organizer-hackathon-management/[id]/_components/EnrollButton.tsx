@@ -1,1 +1,1 @@
-// src/app/hackathon/[id]/_components/EnrollButton.tsx
+// src/app/(protected)/organizer-hackathon-management/[id]/_components/EnrollButton.tsx

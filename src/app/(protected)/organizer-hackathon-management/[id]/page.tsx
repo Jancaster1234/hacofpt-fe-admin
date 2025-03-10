@@ -1,4 +1,4 @@
-// src/app/hackathon/[id]/page.tsx
+// src/app/(protected)/organizer-hackathon-management/[id]/page.tsx
 
 // TODO: [Lv1] check if should cache the page server side and revalidate
 // TODO: [Lv1] check if nextjs able to cache this page client-side

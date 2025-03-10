@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/_components/EditHackathonModal.tsx
 "use client";
 
 import { useState } from "react";

@@ -1,4 +1,4 @@
-// src/app/hackathon/_components/Filters.tsx
+// src/app/(protected)/organizer-hackathon-management/_components/Filters.tsx
 "use client";
 
 const categories = [
