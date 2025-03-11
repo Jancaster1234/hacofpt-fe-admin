@@ -1,5 +1,7 @@
 // src/types/entities/hackathon.ts
 import { Round } from "./round";
+import { Team } from "./team";
+import { UserHackathon } from "./userHackathon";
 export type Hackathon = {
   id: string;
   title: string;
@@ -23,4 +25,6 @@ export type Hackathon = {
   numberOfRounds: number; // New: Number of rounds in the hackathon
   rounds: Round[]; // New: Directly linking rounds
   createdByUserId: string;
+  // users: UserHackathon[]; // Many-to-many relationship with users
+  // teams: Team[]; // A hackathon has many teams
 };

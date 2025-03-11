@@ -1,5 +1,6 @@
 // src/types/entities/users.ts
-
+import { Team } from "./team";
+import { UserHackathon } from "./userHackathon";
 export type UserRole =
   | "Admin"
   | "Organizer"
@@ -28,4 +29,6 @@ export type User = {
   experienceLevel?: "Beginner" | "Intermediate" | "Advanced"; // Helps categorize users
   createdAt: string;
   updatedAt: string;
+  // hackathons: UserHackathon[]; // Many-to-many relationship with hackathons
+  // teams: Team[]; // A user can be in many teams
 };

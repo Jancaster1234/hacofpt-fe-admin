@@ -2,7 +2,7 @@
 export type RoundMarkCriteria = {
   id: string;
   roundId: string;
-  criteria: string;
+  criterionName: string;
   maxScore: number;
   note?: string;
 };

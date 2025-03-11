@@ -36,8 +36,8 @@ export const hackathonsMock: Hackathon[] = [
         hackathonId: "1",
         roundNumber: 1,
         markCriteria: [
-          { id: "1", roundId: "1", criteria: "Innovation", maxScore: 10 },
-          { id: "2", roundId: "1", criteria: "Feasibility", maxScore: 10 },
+          { id: "1", roundId: "1", criterionName: "Innovation", maxScore: 10 },
+          { id: "2", roundId: "1", criterionName: "Feasibility", maxScore: 10 },
         ],
       },
       {
@@ -45,8 +45,18 @@ export const hackathonsMock: Hackathon[] = [
         hackathonId: "1",
         roundNumber: 2,
         markCriteria: [
-          { id: "3", roundId: "2", criteria: "Implementation", maxScore: 15 },
-          { id: "4", roundId: "2", criteria: "Presentation", maxScore: 10 },
+          {
+            id: "3",
+            roundId: "2",
+            criterionName: "Implementation",
+            maxScore: 15,
+          },
+          {
+            id: "4",
+            roundId: "2",
+            criterionName: "Presentation",
+            maxScore: 10,
+          },
         ],
       },
     ],
@@ -84,11 +94,11 @@ export const hackathonsMock: Hackathon[] = [
         hackathonId: "2",
         roundNumber: 1,
         markCriteria: [
-          { id: "5", roundId: "3", criteria: "Creativity", maxScore: 10 },
+          { id: "5", roundId: "3", criterionName: "Creativity", maxScore: 10 },
           {
             id: "6",
             roundId: "3",
-            criteria: "Technical Complexity",
+            criterionName: "Technical Complexity",
             maxScore: 10,
           },
         ],
@@ -132,13 +142,13 @@ export const hackathonsMock: Hackathon[] = [
           {
             id: "9",
             roundId: "5",
-            criteria: "Penetration Testing",
+            criterionName: "Penetration Testing",
             maxScore: 15,
           },
           {
             id: "10",
             roundId: "5",
-            criteria: "Defensive Strategy",
+            criterionName: "Defensive Strategy",
             maxScore: 10,
           },
         ],
@@ -181,13 +191,13 @@ export const hackathonsMock: Hackathon[] = [
           {
             id: "9",
             roundId: "5",
-            criteria: "Penetration Testing",
+            criterionName: "Penetration Testing",
             maxScore: 15,
           },
           {
             id: "10",
             roundId: "5",
-            criteria: "Defensive Strategy",
+            criterionName: "Defensive Strategy",
             maxScore: 10,
           },
         ],
@@ -227,8 +237,13 @@ export const hackathonsMock: Hackathon[] = [
         hackathonId: "5",
         roundNumber: 1,
         markCriteria: [
-          { id: "11", roundId: "6", criteria: "User Experience", maxScore: 10 },
-          { id: "12", roundId: "6", criteria: "Security", maxScore: 15 },
+          {
+            id: "11",
+            roundId: "6",
+            criterionName: "User Experience",
+            maxScore: 10,
+          },
+          { id: "12", roundId: "6", criterionName: "Security", maxScore: 15 },
         ],
       },
     ],
@@ -270,13 +285,13 @@ export const hackathonsMock: Hackathon[] = [
           {
             id: "13",
             roundId: "7",
-            criteria: "Smart Contract Security",
+            criterionName: "Smart Contract Security",
             maxScore: 10,
           },
           {
             id: "14",
             roundId: "7",
-            criteria: "Decentralization",
+            criterionName: "Decentralization",
             maxScore: 10,
           },
         ],
@@ -319,13 +334,13 @@ export const hackathonsMock: Hackathon[] = [
           {
             id: "15",
             roundId: "8",
-            criteria: "Impact on Healthcare",
+            criterionName: "Impact on Healthcare",
             maxScore: 10,
           },
           {
             id: "16",
             roundId: "8",
-            criteria: "Technical Feasibility",
+            criterionName: "Technical Feasibility",
             maxScore: 10,
           },
         ],
@@ -366,8 +381,18 @@ export const hackathonsMock: Hackathon[] = [
         hackathonId: "8",
         roundNumber: 1,
         markCriteria: [
-          { id: "17", roundId: "9", criteria: "AI Integration", maxScore: 10 },
-          { id: "18", roundId: "9", criteria: "User Engagement", maxScore: 10 },
+          {
+            id: "17",
+            roundId: "9",
+            criterionName: "AI Integration",
+            maxScore: 10,
+          },
+          {
+            id: "18",
+            roundId: "9",
+            criterionName: "User Engagement",
+            maxScore: 10,
+          },
         ],
       },
     ],
