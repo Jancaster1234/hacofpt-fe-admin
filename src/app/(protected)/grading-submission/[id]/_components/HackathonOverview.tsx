@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/_components/HackathonOverview.tsx
+// src/app/(protected)/grading-submission/[id]/_components/HackathonOverview.tsx
 "use client";
 import { useState } from "react";
 import EnrollmentModal from "./EnrollmentModal";

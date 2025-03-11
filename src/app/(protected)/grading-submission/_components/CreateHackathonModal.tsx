@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/_components/CreateHackathonModal.tsx
+// src/app/(protected)/grading-submission/_components/CreateHackathonModal.tsx
 import { useState } from "react";
 
 interface CreateHackathonModalProps {

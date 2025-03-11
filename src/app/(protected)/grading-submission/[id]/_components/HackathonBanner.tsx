@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/_components/HackathonBanner.tsx
+// src/app/(protected)/grading-submission/[id]/_components/HackathonBanner.tsx
 
 import Image from "next/image";
 

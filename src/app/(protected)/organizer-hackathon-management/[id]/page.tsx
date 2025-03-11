@@ -8,6 +8,8 @@ import HackathonTabs from "./_components/HackathonTabs";
 import HackathonOverview from "./_components/HackathonOverview";
 import { Hackathon } from "@/types/entities/hackathon"; // Import type
 import EditSaveButtons from "./_components/EditSaveButtons";
+import ResourceManagementButton from "./_components/ResourceManagementButton";
+
 type HackathonProps = {
   params: { id: string }; //Keep this to access the dynamic route param
 };
@@ -43,7 +45,11 @@ export default async function HackathonDetail({ params }: HackathonProps) {
   return (
     <div className="container mx-auto p-4 sm:p-6">
       {/* Edit & Save Buttons */}
-      <EditSaveButtons hackathonId={id} initialHackathonData={hackathon} />
+      <div className="flex gap-4 mb-4">
+        <EditSaveButtons hackathonId={id} initialHackathonData={hackathon} />
+        <ResourceManagementButton hackathonId={id} />
+      </div>
+
       <HackathonBanner
         bannerImageUrl={hackathon.bannerImageUrl}
         altText={hackathon.title}

@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/page.tsx
+// src/app/(protected)/grading-submission/page.tsx
 "use client";
 import { Metadata } from "next";
 import { useState, useMemo } from "react";

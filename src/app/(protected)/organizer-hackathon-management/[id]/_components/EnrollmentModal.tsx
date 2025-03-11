@@ -26,9 +26,11 @@ export default function EnrollmentModal({
     field: "email" | "phone",
     value: string
   ) => {
-    const updatedTeam = [...teamMembers];
-    updatedTeam[index][field] = value;
-    setTeamMembers(updatedTeam);
+    setTeamMembers((prev) =>
+      prev.map((member, i) =>
+        i === index ? { ...member, [field]: value } : member
+      )
+    );
   };
 
   const addMember = () => {
@@ -49,7 +51,7 @@ export default function EnrollmentModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center  z-[9999]">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <h2 className="text-xl font-semibold mb-4">Enroll in Hackathon</h2>
 
@@ -88,6 +90,10 @@ export default function EnrollmentModal({
           </div>
         ) : (
           <div>
+            <p className="text-gray-600 mb-4 text-center">
+              Your team must have between {minTeam} and {maxTeam} members.
+            </p>
+
             {teamMembers.map((member, index) => (
               <div key={index} className="mb-2 flex gap-2">
                 <input

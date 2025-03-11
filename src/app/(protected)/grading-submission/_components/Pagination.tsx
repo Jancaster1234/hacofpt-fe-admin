@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/_components/Pagination.tsx
+// src/app/(protected)/grading-submission/_components/Pagination.tsx
 "use client";
 
 type PaginationProps = {

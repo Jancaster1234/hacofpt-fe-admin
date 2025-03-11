@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/_components/EditHackathonModal.tsx
+// src/app/(protected)/grading-submission/[id]/_components/EditHackathonModal.tsx
 "use client";
 
 import React, { useState } from "react";
