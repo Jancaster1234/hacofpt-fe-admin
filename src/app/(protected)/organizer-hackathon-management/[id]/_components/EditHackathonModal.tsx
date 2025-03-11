@@ -28,7 +28,7 @@ export default function EditHackathonModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-1 p-4">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-99999 p-4">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
         <h2 className="text-lg font-bold mb-4">Edit Hackathon</h2>
 

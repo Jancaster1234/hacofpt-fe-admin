@@ -44,7 +44,7 @@ export default function CreateHackathonModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-99999">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
         <h2 className="text-lg font-bold mb-4">Create a Hackathon</h2>
 
