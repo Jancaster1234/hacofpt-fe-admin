@@ -95,12 +95,6 @@ export default function HackathonPage() {
         {/* Sidebar Filters */}
         <div className="w-1/4">
           <Filters selectedFilters={filters} onFilterChange={setFilters} />
-          <button
-            className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
-            onClick={() => setIsModalOpen(true)}
-          >
-            + Create a Hackathon
-          </button>
         </div>
 
         {/* Main Content */}

@@ -70,6 +70,7 @@ export default async function HackathonDetail({ params }: HackathonProps) {
           participant: hackathon.participant,
           documentation: hackathon.documentation,
           contact: hackathon.contact,
+          mark_criteria: "",
         }}
       />
     </div>

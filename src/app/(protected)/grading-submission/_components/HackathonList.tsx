@@ -1,5 +1,5 @@
 // src/app/(protected)/grading-submission/_components/HackathonList.tsx
-import HackathonCard from "@/components/HackathonCard";
+import HackathonCard from "./HackathonCard";
 import { Hackathon } from "@/types/entities/hackathon";
 
 // TODO: {Lv2} Instead of hardcoding the grid layout inside HackathonList.tsx, pass the pass the number value as a prop
