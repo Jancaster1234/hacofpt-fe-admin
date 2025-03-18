@@ -1,56 +1,39 @@
 // src/lib/exportExcel.ts
 "use client";
 
-import { Column } from "@tanstack/react-table";
-import { utils, writeFile } from "xlsx";
+import {Column} from "@tanstack/react-table";
+import {utils, writeFile} from "xlsx";
 
-/**
- * Transforms table data for Excel export, excluding specified columns.
- */
-export function exportExcelData<T extends Record<string, any>>(
-  rows: T[],
-  columns: Column<T, unknown>[],
-  excludeColumns: string[]
-): Record<string, any>[] {
-  const transformedData: Record<string, any>[] = [];
-  const columnMapping: Record<string, string> = {};
-
-  columns.forEach((col) => {
-    const colId = col.id ?? col.columnDef.id;
-    if (colId && !excludeColumns.includes(colId)) {
-      columnMapping[colId] = String(col.columnDef.header ?? colId);
+export function exportExcelData<T>(rows: T[], columns: Column<T>[], excludeColumns: string[]): T[] {
+    const data: T[] = [];
+    const naming: { [k: string]: any } = {};
+    for (let i = 0; i < columns.length; i++) {
+        const col = columns[i];
+        if (excludeColumns.length > 0 && excludeColumns.includes(col.id)) {
+            continue;
+        }
+        naming[col.id] = col.columnDef.header;
     }
-  });
-
-  rows.forEach((row) => {
-    const formattedRow: Record<string, any> = {};
-    Object.keys(row).forEach((key) => {
-      if (columnMapping[key]) {
-        formattedRow[columnMapping[key]] = row[key];
-      }
+    rows.forEach(item=>{
+        const obj = item as {[K:string]: any};
+        const tempObj: { [k: string]: any } = {};
+        for (const objKey in obj) {
+            if (Object.hasOwn(naming,objKey)) {
+                tempObj[naming[objKey]] = obj[objKey];
+            }
+        }
+        data.push(tempObj as T);
     });
-    transformedData.push(formattedRow);
-  });
-
-  return transformedData;
+    return data;
 }
 
-/**
- * Exports JSON data to an Excel file.
- */
 export function exportExcel<T>(data: T[], exportFilename: string) {
-  if (typeof window === "undefined") {
-    console.error("exportExcel should only be used on the client side.");
-    return;
-  }
-
-  try {
-    const workbook = utils.book_new();
-    const worksheet = utils.json_to_sheet(data);
-    utils.book_append_sheet(workbook, worksheet, "Exported Data");
-    writeFile(workbook, `${exportFilename}.xlsx`);
-  } catch (error) {
-    console.error("Excel export error:", error);
-    alert("Failed to export Excel file. See console for details.");
-  }
+    try {
+        const wb = utils.book_new();
+        const ws = utils.json_to_sheet(data);
+        utils.book_append_sheet(wb, ws, "Exported");
+        writeFile(wb, exportFilename.concat(".xlsx"));
+    } catch (ex: any) {
+        alert(ex.message);
+    }
 }
