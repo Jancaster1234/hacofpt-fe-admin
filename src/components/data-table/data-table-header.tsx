@@ -98,7 +98,7 @@ export function DataTableHeader<T>({
           <div className={"flex flex-row items-center space-x-1"}>
             {column.getIsPinned() === false ? (
               <Tooltip>
-                <TooltipTrigger>
+                <TooltipTrigger asChild>
                   <GripVerticalIcon
                     className="h-4 w-4 text-slate-500"
                     aria-hidden="false"
@@ -157,7 +157,7 @@ export function DataTableHeader<T>({
               </TooltipContent>
             </Tooltip>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <FilterPopover header={header} />
               </TooltipTrigger>
               <TooltipContent>
@@ -165,7 +165,7 @@ export function DataTableHeader<T>({
               </TooltipContent>
             </Tooltip>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 {column.getIsPinned() ? (
                   <PinOffIcon
                     className="h-4 w-4 text-slate-500"
