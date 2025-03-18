@@ -14,14 +14,10 @@ export const DataTableStoreProvider = ({
   ...props
 }: PropsWithChildren<IDataTableStore>) => {
   const storeRef = useRef<DataTableStoreType | null>(null);
-
   if (!storeRef.current) {
     storeRef.current = createDataTableStore({ ...props });
   }
-
   return (
-    <DataTableProvider value={storeRef.current}>
-      {children}
-    </DataTableProvider>
+    <DataTableProvider value={storeRef.current}>{children}</DataTableProvider>
   );
 };

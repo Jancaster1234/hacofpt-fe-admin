@@ -1,10 +1,10 @@
 // src/store/dataTableStore.ts
+"use client";
+
 import { createContext, useContext } from "react";
-import { combine } from "zustand/middleware";
-import {
-  createStore as createZustandStore,
-  useStore as useZustandStore,
-} from "zustand";
+import { createStore } from "zustand";
+import { useStoreWithEqualityFn } from "zustand/traditional";
+
 import {
   TDataTableAddDataProps,
   TDataTableContextMenuProps,
@@ -31,43 +31,55 @@ const getDefaultState = (): IDataTableStore => ({
   dataValidationProps: [],
 });
 
-export const createDataTableStore = (preloadedState: IDataTableStore) => {
-  return createZustandStore(
-    combine({ ...getDefaultState(), ...preloadedState }, (set, get, store) => ({
-      toggleSelection: () => {
-        set((prev) => ({
-          isSelecting: !prev.isSelecting,
-        }));
-      },
+export const createDataTableStore = (
+  preloadedState: Partial<IDataTableStore> = {}
+) => {
+  return createStore<
+    IDataTableStore & {
+      toggleSelection: () => void;
       setExtraProps: (
-        exportProps: TDataTableExportProps | undefined,
-        contextMenuProps: TDataTableContextMenuProps | undefined,
-        addDataProps: TDataTableAddDataProps<any> | undefined,
-        editDataProps: TDataTableEditDataProps<any> | undefined,
-        dataValidationProps: TDataTableDataValidation[] | undefined
-      ) => {
-        set(() => ({
-          exportProps,
-          contextMenuProps,
-          addDataProps,
-          editDataProps,
-          dataValidationProps: dataValidationProps ?? [],
-        }));
-      },
-    }))
-  );
+        exportProps?: TDataTableExportProps,
+        contextMenuProps?: TDataTableContextMenuProps,
+        addDataProps?: TDataTableAddDataProps<any>,
+        editDataProps?: TDataTableEditDataProps<any>,
+        dataValidationProps?: TDataTableDataValidation[]
+      ) => void;
+    }
+  >((set) => ({
+    ...getDefaultState(),
+    ...preloadedState,
+    toggleSelection: () =>
+      set((state) => ({ isSelecting: !state.isSelecting })),
+    setExtraProps: (
+      exportProps,
+      contextMenuProps,
+      addDataProps,
+      editDataProps,
+      dataValidationProps
+    ) => {
+      set(() => ({
+        exportProps,
+        contextMenuProps,
+        addDataProps,
+        editDataProps,
+        dataValidationProps: dataValidationProps ?? [],
+      }));
+    },
+  }));
 };
 
 export type DataTableStoreType = ReturnType<typeof createDataTableStore>;
 type DataTableStoreInterface = ReturnType<DataTableStoreType["getState"]>;
 
-const zustandContext = createContext<DataTableStoreType | null>(null);
-export const DataTableProvider = zustandContext.Provider;
+const DataTableContext = createContext<DataTableStoreType | null>(null);
+export const DataTableProvider = DataTableContext.Provider;
 
 export const useDataTableStore = <T>(
   selector: (state: DataTableStoreInterface) => T
 ) => {
-  const store = useContext(zustandContext);
-  if (!store) throw new Error("Language Store is missing the provider");
-  return useZustandStore(store, selector);
+  const store = useContext(DataTableContext);
+  if (!store) {
+    throw new Error("DataTableStore is missing the provider");
+  }
+  return useStoreWithEqualityFn(store, selector);
 };

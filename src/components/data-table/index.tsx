@@ -16,7 +16,7 @@ import {
 } from "@tanstack/react-table";
 import { useDataTableStore } from "@/store/dataTableStore";
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import { fuzzyFilter } from "@/lib/utils";
 import {
   closestCenter,
@@ -66,50 +66,51 @@ declare module "@tanstack/react-table" {
   }
 }
 
-export function AdvancedDataTable<T>(props: IAdvancedDataTable<T>) {
-  const { columns, data, id } = props;
+export function AdvancedDataTable<T>({
+  columns,
+  data,
+  id,
+  ...props
+}: IAdvancedDataTable<T>) {
   if (_.isEmpty(id.trim())) {
-    throw new Error(
-      "AdvancedDataTable required field missing `id`. Must be an unique identifier"
-    );
+    throw new Error("AdvancedDataTable requires a unique `id` field.");
   }
-  const { isSelecting, setExtraProps } = useDataTableStore((state) => ({
-    ...state,
-  }));
+  const { isSelecting, setExtraProps } = useDataTableStore((state) => state);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [columnPinning, setColumnPinning] = useState({});
-  const [columnOrder, setColumnOrder] = useState<string[]>(() =>
+  const [columnOrder, setColumnOrder] = useState(() =>
     columns.map((c) => c.id!)
   );
-  const [internalColumns, setInternalColumns] = useState<ColumnDef<T>[]>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState({});
 
-  useEffect(() => {
-    if (isSelecting) {
-      setInternalColumns(columns);
-    } else {
-      setInternalColumns(
-        columns
-          .filter((item) => item.id !== "select")
-          .map((item) => ({ ...item, size: item.size ?? 200 }))
-      );
-    }
+  const internalColumns = useMemo(() => {
+    return isSelecting
+      ? columns
+      : columns
+          .filter((col) => col.id !== "select")
+          .map((col) => ({ ...col, size: col.size ?? 200 }));
   }, [columns, isSelecting]);
 
   useEffect(() => {
     setExtraProps(
-      props?.exportProps,
-      props?.contextMenuProps,
-      props?.addDataProps,
-      props?.editDataProps,
-      props?.dataValidationProps
+      props.exportProps,
+      props.contextMenuProps,
+      props.addDataProps,
+      props.editDataProps,
+      props.dataValidationProps
     );
-  }, [props]);
+  }, [
+    props.exportProps,
+    props.contextMenuProps,
+    props.addDataProps,
+    props.editDataProps,
+    props.dataValidationProps,
+  ]);
 
   const table = useReactTable({
-    data: data,
+    data,
     columns: internalColumns,
     state: {
       columnFilters,
@@ -157,9 +158,7 @@ export function AdvancedDataTable<T>(props: IAdvancedDataTable<T>) {
     useSensor(KeyboardSensor, {})
   );
 
-  const isFiltered =
-    table.getState().columnFilters.length > 0 ||
-    !!table.getState().globalFilter;
+  const isFiltered = columnFilters.length > 0 || globalFilter !== "";
   const isRowSelected =
     table.getIsSomeRowsSelected() || table.getIsAllRowsSelected();
 
@@ -170,7 +169,7 @@ export function AdvancedDataTable<T>(props: IAdvancedDataTable<T>) {
     estimateSize: (index) => visibleColumns[index].getSize(),
     getScrollElement: () => tableContainerRef.current,
     horizontal: true,
-    overscan: 50,
+    overscan: 10,
   });
   const rowVirtualizer = useVirtualizer({
     count: table.getRowModel().rows.length,
@@ -181,7 +180,7 @@ export function AdvancedDataTable<T>(props: IAdvancedDataTable<T>) {
       navigator.userAgent.indexOf("Firefox") === -1
         ? (element) => element?.getBoundingClientRect().height
         : undefined,
-    overscan: 100,
+    overscan: 20,
   });
   const virtualColumns = columnVirtualizer.getVirtualItems();
   let virtualPaddingLeft: number | undefined;

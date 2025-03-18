@@ -2,47 +2,36 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { FilterFn, SortingFn, sortingFns } from "@tanstack/table-core";
-import {
-  compareItems,
-  rankItem,
-  RankingInfo,
-} from "@tanstack/match-sorter-utils";
+import { compareItems, rankItem } from "@tanstack/match-sorter-utils";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const fuzzyFilter: FilterFn<unknown> = (
-  row,
-  columnId,
-  value,
-  addMeta
-) => {
-  const itemRank = rankItem(row.getValue<string>(columnId), value);
+export const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  // Rank the item
+  const itemRank = rankItem(row.getValue(columnId), value);
 
+  // Store the itemRank info
   addMeta({
     itemRank,
   });
 
+  // Return if the item should be filtered in/out
   return itemRank.passed;
 };
 
-export const fuzzySort: SortingFn<unknown> = (rowA, rowB, columnId) => {
-  const metaA = rowA.columnFiltersMeta[columnId] as
-    | { itemRank: RankingInfo }
-    | undefined;
-  const metaB = rowB.columnFiltersMeta[columnId] as
-    | { itemRank: RankingInfo }
-    | undefined;
-
+export const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
   let dir = 0;
 
-  if (metaA?.itemRank && metaB?.itemRank) {
-    dir = compareItems(metaA.itemRank, metaB.itemRank);
+  // Only sort by rank if the column has ranking information
+  if (rowA.columnFiltersMeta[columnId]) {
+    dir = compareItems(
+      rowA.columnFiltersMeta[columnId]?.itemRank!,
+      rowB.columnFiltersMeta[columnId]?.itemRank!
+    );
   }
 
+  // Provide an alphanumeric fallback for when the item ranks are equal
   return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
 };
-
-export type FuzzyFilter = typeof fuzzyFilter;
-export type FuzzySort = typeof fuzzySort;

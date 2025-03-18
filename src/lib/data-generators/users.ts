@@ -1,4 +1,4 @@
-// src/lib/makeData.ts
+// src/lib/data-generators/users.ts
 import { faker } from "@faker-js/faker";
 import { User, UserRole, UserStatus } from "@/types/entities/users";
 
