@@ -8,7 +8,7 @@ import {
   TDataTableEditDataProps,
   TDataTableExportProps,
 } from "@/types/dataTable";
-import { VirtualItem, Virtualizer } from "@tanstack/virtual-core";
+// Removed the Virtualizer import since we no longer need it
 
 export interface IAdvancedDataTable<T> {
   id: string;
@@ -51,12 +51,9 @@ export interface IDataTableCellEdit<T> {
   cell: Cell<T, unknown>;
 }
 
+// Updated IDataTableBody interface without virtualization properties
 export interface IDataTableBody<T> {
   table: Table<T>;
   columnOrder: string[];
   onClick?: (prop: T) => void;
-  rowVirtualizer: Virtualizer<HTMLDivElement, Element>;
-  virtualPaddingLeft: number | undefined;
-  virtualPaddingRight: number | undefined;
-  virtualColumns: VirtualItem[];
 }

@@ -50,7 +50,6 @@ import _ from "lodash";
 import { IAdvancedDataTable } from "@/interface/IDataTable";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { DataTableAddRow } from "@/components/data-table/data-table-add-row";
-import { useVirtualizer } from "@tanstack/react-virtual";
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData, TValue> {
@@ -84,6 +83,7 @@ export function AdvancedDataTable<T>({
   );
   const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState({});
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const internalColumns = useMemo(() => {
     return isSelecting
@@ -107,6 +107,7 @@ export function AdvancedDataTable<T>({
     props.addDataProps,
     props.editDataProps,
     props.dataValidationProps,
+    setExtraProps,
   ]);
 
   const table = useReactTable({
@@ -161,37 +162,6 @@ export function AdvancedDataTable<T>({
   const isFiltered = columnFilters.length > 0 || globalFilter !== "";
   const isRowSelected =
     table.getIsSomeRowsSelected() || table.getIsAllRowsSelected();
-
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-  const visibleColumns = table.getVisibleLeafColumns();
-  const columnVirtualizer = useVirtualizer({
-    count: visibleColumns.length,
-    estimateSize: (index) => visibleColumns[index].getSize(),
-    getScrollElement: () => tableContainerRef.current,
-    horizontal: true,
-    overscan: 10,
-  });
-  const rowVirtualizer = useVirtualizer({
-    count: table.getRowModel().rows.length,
-    estimateSize: () => 33,
-    getScrollElement: () => tableContainerRef.current,
-    measureElement:
-      typeof window !== "undefined" &&
-      navigator.userAgent.indexOf("Firefox") === -1
-        ? (element) => element?.getBoundingClientRect().height
-        : undefined,
-    overscan: 20,
-  });
-  const virtualColumns = columnVirtualizer.getVirtualItems();
-  let virtualPaddingLeft: number | undefined;
-  let virtualPaddingRight: number | undefined;
-
-  if (columnVirtualizer && virtualColumns?.length) {
-    virtualPaddingLeft = virtualColumns[0]?.start ?? 0;
-    virtualPaddingRight =
-      columnVirtualizer.getTotalSize() -
-      (virtualColumns[virtualColumns.length - 1]?.end ?? 0);
-  }
 
   if (props?.isLoading) {
     return <DataTableSkeleton columnCount={5} />;
@@ -249,42 +219,25 @@ export function AdvancedDataTable<T>({
                   style={{ display: "flex", width: "100%" }}
                   key={headerGroup.id}
                 >
-                  {virtualPaddingLeft ? (
-                    <TableHead
-                      style={{ display: "flex", width: virtualPaddingLeft }}
-                    />
-                  ) : null}
                   <SortableContext
                     items={columnOrder}
                     strategy={horizontalListSortingStrategy}
                   >
-                    {virtualColumns.map((vc) => {
-                      const header = headerGroup.headers[vc.index];
-                      return (
-                        <DataTableHeader
-                          table={table}
-                          key={header.id}
-                          header={header}
-                        />
-                      );
-                    })}
+                    {headerGroup.headers.map((header) => (
+                      <DataTableHeader
+                        table={table}
+                        key={header.id}
+                        header={header}
+                      />
+                    ))}
                   </SortableContext>
-                  {virtualPaddingRight ? (
-                    <TableHead
-                      style={{ display: "flex", width: virtualPaddingRight }}
-                    />
-                  ) : null}
                 </TableRow>
               ))}
             </TableHeader>
             <DataTableBody
-              virtualColumns={virtualColumns}
-              virtualPaddingLeft={virtualPaddingLeft}
-              virtualPaddingRight={virtualPaddingRight}
-              rowVirtualizer={rowVirtualizer}
-              onClick={props?.onRowClick}
               table={table}
               columnOrder={columnOrder}
+              onClick={props?.onRowClick}
             />
           </Table>
         </div>
