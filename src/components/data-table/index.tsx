@@ -233,7 +233,7 @@ export function AdvancedDataTable<T>({
           style={{
             overflow: "auto",
             position: "relative",
-            height: "480px",
+            height: "unset",
           }}
         >
           <Table style={{ display: "grid", width: table.getCenterTotalSize() }}>

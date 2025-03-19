@@ -14,7 +14,7 @@ export default function AdminPage() {
   useEffect(() => {
     // Simulate loading
     const tmo = setTimeout(() => {
-      setUsers(generateFakeUsers(5));
+      setUsers(generateFakeUsers(500));
       setIsLoading(false);
       clearTimeout(tmo);
     }, 1500);
