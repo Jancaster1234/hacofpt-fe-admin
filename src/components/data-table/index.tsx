@@ -178,15 +178,15 @@ export function AdvancedDataTable<T>({
         <div className={"flex flex-row items-center justify-between"}>
           <div className={"flex flex-row items-center"}>
             <DataTableInput
-              value={globalFilter ?? ""}
-              onChange={(value) => setGlobalFilter(String(value))}
+              value={globalFilter}
+              onChange={setGlobalFilter}
               className="p-2 font-lg border border-block"
               placeholder="Filter anything..."
             />
           </div>
           <div className={"flex flex-row items-center"}>
             <DataTableAddRow />
-            <DataTableSelections table={table} />
+            <DataTableSelections setRowSelection={setRowSelection} />
             <DataTableColumnVisibility table={table} />
             <SlashIcon className={"w-4 h-4 text-slate-500"} />
             {props?.exportProps && (
@@ -242,7 +242,19 @@ export function AdvancedDataTable<T>({
           </Table>
         </div>
         <div className="h-2" />
-        <DataTablePagination table={table} />
+        <DataTablePagination
+          pageIndex={table.getState().pagination.pageIndex}
+          pageSize={table.getState().pagination.pageSize}
+          pageCount={table.getPageCount()}
+          canPreviousPage={table.getCanPreviousPage()}
+          canNextPage={table.getCanNextPage()}
+          setPageIndex={table.setPageIndex}
+          setPageSize={table.setPageSize}
+          previousPage={table.previousPage}
+          nextPage={table.nextPage}
+          selectedRowCount={table.getFilteredSelectedRowModel().rows.length}
+          totalFilteredRows={table.getFilteredRowModel().rows.length}
+        />
       </div>
       {(isFiltered || isRowSelected) && (
         <DataTableFloatingBar<T>

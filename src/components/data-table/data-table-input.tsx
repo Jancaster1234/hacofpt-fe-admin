@@ -5,35 +5,40 @@ import * as React from "react";
 import { InputHTMLAttributes, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 
+interface DataTableInputProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+  value: string;
+  onChange: (value: string) => void;
+  debounce?: number;
+}
+
 export function DataTableInput({
-  value: initialValue,
+  value,
   onChange,
   debounce = 500,
   ...props
-}: {
-  value: string | number;
-  onChange: (value: string | number) => void;
-  debounce?: number;
-} & Omit<InputHTMLAttributes<HTMLInputElement>, "onChange">) {
-  const [value, setValue] = useState(initialValue);
+}: DataTableInputProps) {
+  const [internalValue, setInternalValue] = useState(value);
 
   useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
+    setInternalValue(value);
+  }, [value]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(value);
+      if (internalValue !== value) {
+        onChange(internalValue);
+      }
     }, debounce);
 
     return () => clearTimeout(timeout);
-  }, [value]);
+  }, [internalValue]);
 
   return (
     <Input
       {...props}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
+      value={internalValue}
+      onChange={(e) => setInternalValue(e.target.value)}
     />
   );
 }
