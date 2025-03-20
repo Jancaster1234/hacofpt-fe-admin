@@ -14,7 +14,6 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { useDataTableStore } from "@/store/dataTableStore";
 import * as React from "react";
 import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import { fuzzyFilter } from "@/lib/utils";
@@ -50,7 +49,7 @@ import _ from "lodash";
 import { IAdvancedDataTable } from "@/interface/IDataTable";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { DataTableAddRow } from "@/components/data-table/data-table-add-row";
-
+import { useDataTableStore } from "@/store/dataTableStore";
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData, TValue> {
     filterVariant?: "text" | "range" | "select" | "date";
@@ -69,6 +68,12 @@ export function AdvancedDataTable<T>({
   columns,
   data,
   id,
+  addDataProps,
+  editDataProps,
+  exportProps,
+  contextMenuProps,
+  dataValidationProps,
+  onRowClick,
   ...props
 }: IAdvancedDataTable<T>) {
   if (_.isEmpty(id.trim())) {
@@ -95,18 +100,18 @@ export function AdvancedDataTable<T>({
 
   useEffect(() => {
     setExtraProps(
-      props.exportProps,
-      props.contextMenuProps,
-      props.addDataProps,
-      props.editDataProps,
-      props.dataValidationProps
+      exportProps,
+      contextMenuProps,
+      addDataProps,
+      editDataProps,
+      dataValidationProps
     );
   }, [
-    props.exportProps,
-    props.contextMenuProps,
-    props.addDataProps,
-    props.editDataProps,
-    props.dataValidationProps,
+    exportProps,
+    contextMenuProps,
+    addDataProps,
+    editDataProps,
+    dataValidationProps,
     setExtraProps,
   ]);
 
@@ -141,6 +146,8 @@ export function AdvancedDataTable<T>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
   });
+
+  console.log("🔵 [AdvancedDataTable] Table instance recreated:", table);
 
   function onDragEnd(event: DragEndEvent) {
     const { active, over } = event;
@@ -189,10 +196,10 @@ export function AdvancedDataTable<T>({
             <DataTableSelections setRowSelection={setRowSelection} />
             <DataTableColumnVisibility table={table} />
             <SlashIcon className={"w-4 h-4 text-slate-500"} />
-            {props?.exportProps && (
+            {exportProps && (
               <DataTableExport
                 table={table}
-                onUserExport={props.exportProps.onUserExport}
+                onUserExport={exportProps.onUserExport}
               />
             )}
           </div>
@@ -237,7 +244,7 @@ export function AdvancedDataTable<T>({
             <DataTableBody
               table={table}
               columnOrder={columnOrder}
-              onClick={props?.onRowClick}
+              onClick={onRowClick}
             />
           </Table>
         </div>
