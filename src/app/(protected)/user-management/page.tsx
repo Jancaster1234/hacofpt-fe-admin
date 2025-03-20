@@ -15,7 +15,7 @@ import {
   editDataProps,
   contextMenuProps,
 } from "./tableConfig";
-
+import { DataTableStoreProvider } from "@/context/dataTableStoreProvider";
 export default function AdminPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,19 +31,21 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">User Management</h1>
-      <AdvancedDataTable<User>
-        id="user-management-table"
-        columns={userColumns}
-        data={users}
-        isLoading={isLoading}
-        exportProps={exportProps}
-        actionProps={actionProps}
-        addDataProps={addDataProps}
-        editDataProps={editDataProps}
-        dataValidationProps={userDataValidationProps}
-        contextMenuProps={contextMenuProps}
-        onRowClick={(row) => console.log("Row clicked", row)}
-      />
+      <DataTableStoreProvider isSelecting={false}>
+        <AdvancedDataTable<User>
+          id="user-management-table"
+          columns={userColumns}
+          data={users}
+          isLoading={isLoading}
+          exportProps={exportProps}
+          actionProps={actionProps}
+          addDataProps={addDataProps}
+          editDataProps={editDataProps}
+          dataValidationProps={userDataValidationProps}
+          contextMenuProps={contextMenuProps}
+          onRowClick={(row) => console.log("Row clicked", row)}
+        />
+      </DataTableStoreProvider>
     </div>
   );
 }

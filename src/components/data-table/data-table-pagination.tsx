@@ -30,6 +30,7 @@ export function DataTablePagination({
   totalFilteredRows,
   pageSizeOptions = [10, 20, 30, 40, 50, 100],
 }) {
+  console.log("🟢 [DataTablePagination] re-rendered");
   return (
     <div className="flex w-full flex-col-reverse items-center justify-between gap-4 overflow-auto p-1 sm:flex-row sm:gap-8">
       {selectedRowCount > 0 ? (

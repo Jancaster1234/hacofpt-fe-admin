@@ -60,7 +60,7 @@ export function DataTableAddRow() {
           Create New
         </Button>
       </SheetTrigger>
-      <SheetContent className={"space-y-2 overflow-y-auto"}>
+      <SheetContent className={"space-y-2 overflow-y-auto z-99999"}>
         <SheetHeader>
           <SheetTitle>{title ?? "Create a new record in the list"}</SheetTitle>
           {!_.isEmpty(description) && (
