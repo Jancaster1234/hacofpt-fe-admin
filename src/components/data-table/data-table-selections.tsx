@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { ListChecksIcon, ListXIcon } from "lucide-react";
 import { useDataTableStore } from "@/store/dataTableStore";
 
-interface DataTableSelectionsProps<T> {
+interface DataTableSelectionsProps {
   setRowSelection: (state: Record<string, boolean>) => void;
 }
 
-export function DataTableSelections<T>({
+export function DataTableSelections({
   setRowSelection,
-}: DataTableSelectionsProps<T>) {
+}: DataTableSelectionsProps) {
   const { toggleSelection, isSelecting } = useDataTableStore((state) => ({
     ...state,
   }));
