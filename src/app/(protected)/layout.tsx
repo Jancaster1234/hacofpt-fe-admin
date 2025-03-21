@@ -43,6 +43,8 @@ export default function AdminLayout({
     ? "lg:ml-[290px]"
     : "lg:ml-[90px]";
 
+  const sidebarWidth = isMobileOpen ? 0 : isExpanded || isHovered ? 290 : 90;
+
   return (
     <Providers>
       <div className="min-h-screen xl:flex">
@@ -56,7 +58,13 @@ export default function AdminLayout({
           {/* Header */}
           <AppHeader />
           {/* Page Content */}
-          <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+          <div
+            className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6"
+            style={{
+              width: `calc(100vw - ${sidebarWidth}px - 1rem )`, // 3rem = padding (p-6 ~ 1.5rem each side)
+              maxWidth: "1536px", // or whatever your --breakpoint-2xl is
+            }}
+          >
             {children}
           </div>
         </div>
