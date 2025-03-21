@@ -113,7 +113,7 @@ export function DataTableHeader<T>({
             ) : null}
             <Tooltip>
               <TooltipTrigger asChild>
-                {isPlaceholder ? null : (
+                {!isPlaceholder && column.getCanSort() ? (
                   <Button
                     asChild // Ensure this does not create a nested <button>
                     onClick={() => column.toggleSorting()}
@@ -150,6 +150,10 @@ export function DataTableHeader<T>({
                       )}
                     </span>
                   </Button>
+                ) : (
+                  <span>
+                    {flexRender(column.columnDef.header, header.getContext())}
+                  </span>
                 )}
               </TooltipTrigger>
               <TooltipContent>
@@ -264,6 +268,7 @@ export function DataTableHeader<T>({
 function FilterPopover<T>({ header }: { header: Header<T, unknown> }) {
   const { column } = header;
   const { filterVariant } = column.columnDef.meta ?? {};
+  if (!column.getCanFilter()) return null;
   return (
     <Popover>
       <PopoverTrigger asChild>

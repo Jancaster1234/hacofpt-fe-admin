@@ -4,6 +4,7 @@ import { User } from "@/types/entities/users";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import Image from "next/image";
 import {
   Tooltip,
   TooltipTrigger,
@@ -40,14 +41,18 @@ export const userColumns: ColumnDef<User>[] = [
     header: "Avatar",
     cell: ({ row }) => (
       <Avatar>
-        <img
+        <Image
           src={row.original.avatarUrl || "/default-avatar.png"}
           alt="Avatar"
+          width={40}
+          height={40}
+          className="rounded-full"
         />
       </Avatar>
     ),
     enableSorting: false,
-    size: 50,
+    enableColumnFilter: false,
+    size: 100,
   },
   {
     accessorKey: "firstName",
