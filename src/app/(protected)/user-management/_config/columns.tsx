@@ -1,4 +1,4 @@
-// src/components/columns/users.tsx
+// src/app/(protected)/user-management/_config/columns.tsx
 import { ColumnDef, Table } from "@tanstack/react-table";
 import { User } from "@/types/entities/users";
 import { Avatar } from "@/components/ui/avatar";

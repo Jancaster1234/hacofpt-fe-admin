@@ -1,4 +1,4 @@
-// src/app/(protected)/user-management/validationConfig.ts
+// src/app/(protected)/user-management/_config/validationConfig.ts
 import { z } from "zod";
 import { TDataTableDataValidation } from "@/types/dataTable";
 import { faker } from "@faker-js/faker";

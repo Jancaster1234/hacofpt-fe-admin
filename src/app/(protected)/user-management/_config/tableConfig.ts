@@ -1,4 +1,4 @@
-// src/app/(protected)/user-management/tableConfig.ts
+// src/app/(protected)/user-management/_config/tableConfig.ts
 import { User } from "@/types/entities/users";
 import {
   TDataTableAddDataProps,

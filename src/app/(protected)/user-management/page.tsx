@@ -6,17 +6,17 @@ import { useState, useEffect } from "react";
 import { User } from "@/types/entities/users";
 import { generateFakeUsers } from "@/lib/data-generators/users";
 import { AdvancedDataTable } from "@/components/data-table";
-import { userColumns } from "@/components/columns/users";
-import { userDataValidationProps } from "./validationConfig";
+import { userColumns } from "./_config/columns";
+import { userDataValidationProps } from "./_config/validationConfig";
 import {
   exportProps,
   actionProps,
   addDataProps,
   editDataProps,
   contextMenuProps,
-} from "./tableConfig";
+} from "./_config/tableConfig";
 import { DataTableStoreProvider } from "@/context/dataTableStoreProvider";
-export default function AdminPage() {
+export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
