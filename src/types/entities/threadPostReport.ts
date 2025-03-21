@@ -2,7 +2,7 @@ import { AuditCreatedBase } from "./auditCreatedBase";
 import { ThreadPost } from "./threadPost";
 import { User } from "./user";
 
-export type ThreadPostReportStatus = "PENDING" | "REVIEWED" | "REJECTED"; // Adjust according to your enum
+export type ThreadPostReportStatus = "PENDING" | "REVIEWED" | "DISMISSED"; // Adjust according to your enum
 
 export type ThreadPostReport = {
   id: string;

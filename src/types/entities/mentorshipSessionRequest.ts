@@ -3,11 +3,13 @@ import { Hackathon } from "./hackathon";
 import { User } from "./user";
 import { Team } from "./team";
 
-export type MentorshipSessionStatus =
-  | "Pending"
-  | "Approved"
-  | "Rejected"
-  | "Completed";
+export enum MentorshipSessionStatus {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  DELETED = "deleted",
+  COMPLETED = "completed",
+}
 
 export type MentorshipSessionRequest = {
   id: string;

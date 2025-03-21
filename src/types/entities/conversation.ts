@@ -3,7 +3,10 @@ import { Team } from "./team";
 import { ConversationUser } from "./conversationUser";
 import { Message } from "./message";
 
-export type ConversationType = "DIRECT" | "GROUP" | "CHANNEL"; // Adjust according to your enum
+export enum ConversationType {
+  PRIVATE = "PRIVATE",
+  PUBLIC = "PUBLIC",
+}
 
 export type Conversation = {
   id: string;

@@ -3,7 +3,7 @@ import { User } from "./user";
 import { Device } from "./device";
 import { FileUrl } from "./fileUrl";
 
-export type UserDeviceStatus = "ACTIVE" | "RETURNED" | "EXPIRED"; // Adjust to your enum
+export type UserDeviceStatus = "ASSIGNED" | "RETURNED" | "LOST" | "DAMAGED"; // Adjust to your enum
 
 export type UserDevice = {
   id: string;

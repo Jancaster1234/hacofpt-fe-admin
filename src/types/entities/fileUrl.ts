@@ -1,6 +1,6 @@
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { Submission } from "./submission";
-import { Message } from "./conversation";
+import { Message } from "./message";
 import { Task } from "./task";
 import { ScheduleEvent } from "./scheduleEvent";
 import { SponsorshipHackathonDetail } from "./sponsorshipHackathonDetail";

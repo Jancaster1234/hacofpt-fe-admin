@@ -5,8 +5,12 @@ import { FileUrl } from "./fileUrl";
 export type DeviceQualityStatus =
   | "EXCELLENT"
   | "GOOD"
+  | "FAIR"
   | "DAMAGED"
-  | "NEEDS_REPAIR"; // Adjust to your enum
+  | "NEEDS_REPAIR"
+  | "REPAIRING"
+  | "REPAIRED"
+  | "LOST";
 
 export type UserDeviceTrack = {
   id: string;

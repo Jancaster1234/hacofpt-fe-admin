@@ -2,7 +2,11 @@ import { AuditBase } from "./auditBase";
 import { ScheduleEvent } from "./scheduleEvent";
 import { User } from "./user";
 
-export type ScheduleEventStatus = "PENDING" | "CONFIRMED" | "DECLINED"; // Adjust according to your enum
+export enum ScheduleEventStatus {
+  INVITED = "INVITED",
+  CONFIRMED = "CONFIRMED",
+  DECLINED = "DECLINED",
+}
 
 export type ScheduleEventAttendee = {
   id: string;

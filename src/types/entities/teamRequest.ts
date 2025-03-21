@@ -2,13 +2,20 @@ import { AuditCreatedBase } from "./auditCreatedBase";
 import { Hackathon } from "./hackathon";
 import { User } from "./user";
 import { TeamRequestMember } from "./teamRequestMember";
-import { Status } from "./statusEnums"; // If you have a centralized enum
+
+export enum TeamRequestStatus {
+  PENDING = "pending",
+  UNDER_REVIEW = "under_review",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  CANCELED = "canceled",
+}
 
 export type TeamRequest = {
   id: string;
   hackathon?: Hackathon;
   hackathonId?: string;
-  status: Status;
+  status: TeamRequestStatus;
   confirmationDeadline: string;
   note: string;
   reviewedBy?: User;

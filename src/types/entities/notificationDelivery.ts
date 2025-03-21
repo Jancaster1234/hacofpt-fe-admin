@@ -1,8 +1,19 @@
 import { AuditBase } from "./auditBase";
 import { Notification } from "./notification";
 
-export type NotificationMethod = "EMAIL" | "SMS" | "IN_APP"; // Adjust to match your enum
-export type NotificationStatus = "PENDING" | "SENT" | "FAILED"; // Adjust as needed
+export enum NotificationMethod {
+  IN_APP = "IN_APP",
+  EMAIL = "EMAIL",
+  PUSH = "PUSH",
+  SMS = "SMS",
+  WEB = "WEB",
+}
+
+export enum NotificationStatus {
+  PENDING = "PENDING",
+  SENT = "SENT",
+  FAILED = "FAILED",
+}
 
 export type NotificationDelivery = {
   id: string;

@@ -1,7 +1,12 @@
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { User } from "./user";
 
-export type BlogPostStatus = "Draft" | "Published" | "Archived";
+export enum BlogPostStatus {
+  DRAFT = "DRAFT",
+  PENDING_REVIEW = "PENDING_REVIEW",
+  PUBLISHED = "PUBLISHED",
+  REJECTED = "REJECTED",
+}
 
 export type BlogPost = {
   id: string;

@@ -2,7 +2,11 @@ import { AuditCreatedBase } from "./auditCreatedBase";
 import { Round } from "./round";
 import { Location } from "./location";
 
-export type RoundLocationType = "VENUE" | "ONLINE" | "HYBRID"; // Example — adjust based on your enum definition
+export enum RoundLocationType {
+  ONLINE = "ONLINE",
+  OFFLINE = "OFFLINE",
+  HYBRID = "HYBRID",
+}
 
 export type RoundLocation = {
   id: string;

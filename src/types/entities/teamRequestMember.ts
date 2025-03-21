@@ -1,7 +1,13 @@
 import { AuditBase } from "./auditBase";
 import { TeamRequest } from "./teamRequest";
 import { User } from "./user";
-import { Status } from "./statusEnums";
+
+export enum TeamRequestMemberStatus {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  NO_RESPONSE = "no_response",
+}
 
 export type TeamRequestMember = {
   id: string;
@@ -9,6 +15,6 @@ export type TeamRequestMember = {
   teamRequestId?: string;
   user?: User;
   userId?: string;
-  status: Status;
+  status: TeamRequestMemberStatus;
   respondedAt: string;
 } & AuditBase;
