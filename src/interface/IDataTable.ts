@@ -24,7 +24,8 @@ export interface IAdvancedDataTable<T> {
   contextMenuProps?: TDataTableContextMenuProps;
   onRowClick?: (prop: T) => void;
   isLoading?: boolean;
-  dataValidationProps?: TDataTableDataValidation[];
+  addDataValidationProps?: TDataTableDataValidation[];
+  editDataValidationProps?: TDataTableDataValidation[];
 }
 
 export interface DataTablePaginationProps<TData> {

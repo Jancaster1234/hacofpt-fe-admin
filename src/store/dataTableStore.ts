@@ -19,7 +19,8 @@ export interface IDataTableStore {
   contextMenuProps?: TDataTableContextMenuProps;
   addDataProps?: TDataTableAddDataProps<any>;
   editDataProps?: TDataTableEditDataProps<any>;
-  dataValidationProps?: TDataTableDataValidation[];
+  addDataValidationProps?: TDataTableDataValidation[]; // Separate validation for Add
+  editDataValidationProps?: TDataTableDataValidation[]; // Separate validation for Edit
 }
 
 const getDefaultState = (): IDataTableStore => ({
@@ -28,7 +29,8 @@ const getDefaultState = (): IDataTableStore => ({
   contextMenuProps: undefined,
   addDataProps: undefined,
   editDataProps: undefined,
-  dataValidationProps: [],
+  addDataValidationProps: [], // Default empty array for Add validation
+  editDataValidationProps: [], // Default empty array for Edit validation
 });
 
 export const createDataTableStore = (
@@ -42,7 +44,8 @@ export const createDataTableStore = (
         contextMenuProps?: TDataTableContextMenuProps,
         addDataProps?: TDataTableAddDataProps<any>,
         editDataProps?: TDataTableEditDataProps<any>,
-        dataValidationProps?: TDataTableDataValidation[]
+        addDataValidationProps?: TDataTableDataValidation[],
+        editDataValidationProps?: TDataTableDataValidation[]
       ) => void;
     }
   >((set) => ({
@@ -55,14 +58,16 @@ export const createDataTableStore = (
       contextMenuProps,
       addDataProps,
       editDataProps,
-      dataValidationProps
+      addDataValidationProps,
+      editDataValidationProps
     ) => {
       set(() => ({
         exportProps,
         contextMenuProps,
         addDataProps,
         editDataProps,
-        dataValidationProps: dataValidationProps ?? [],
+        addDataValidationProps: addDataValidationProps ?? [],
+        editDataValidationProps: editDataValidationProps ?? [],
       }));
     },
   }));

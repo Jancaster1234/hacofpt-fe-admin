@@ -72,7 +72,8 @@ export function AdvancedDataTable<T>({
   editDataProps,
   exportProps,
   contextMenuProps,
-  dataValidationProps,
+  addDataValidationProps,
+  editDataValidationProps,
   onRowClick,
   ...props
 }: IAdvancedDataTable<T>) {
@@ -104,14 +105,16 @@ export function AdvancedDataTable<T>({
       contextMenuProps,
       addDataProps,
       editDataProps,
-      dataValidationProps
+      addDataValidationProps,
+      editDataValidationProps
     );
   }, [
     exportProps,
     contextMenuProps,
     addDataProps,
     editDataProps,
-    dataValidationProps,
+    addDataValidationProps,
+    editDataValidationProps,
     setExtraProps,
   ]);
 

@@ -7,7 +7,10 @@ import { User } from "@/types/entities/users";
 import { generateFakeUsers } from "@/lib/data-generators/users";
 import { AdvancedDataTable } from "@/components/data-table";
 import { userColumns } from "./_config/columns";
-import { userDataValidationProps } from "./_config/validationConfig";
+import {
+  addDataValidationProps,
+  editDataValidationProps,
+} from "./_config/validationConfig";
 import {
   exportProps,
   actionProps,
@@ -41,7 +44,8 @@ export default function UserManagementPage() {
           actionProps={actionProps}
           addDataProps={addDataProps}
           editDataProps={editDataProps}
-          dataValidationProps={userDataValidationProps}
+          addDataValidationProps={addDataValidationProps}
+          editDataValidationProps={editDataValidationProps}
           contextMenuProps={contextMenuProps}
           onRowClick={(row) => console.log("Row clicked", row)}
         />

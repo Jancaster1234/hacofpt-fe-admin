@@ -164,5 +164,6 @@ export const userColumns: ColumnDef<User>[] = [
       </Tooltip>
     ),
     enableSorting: false,
+    size: 100,
   },
 ];

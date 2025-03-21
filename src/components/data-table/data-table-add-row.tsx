@@ -24,7 +24,7 @@ export function DataTableAddRow() {
   const { title, description, onSubmitNewData, schemas } = useDataTableStore(
     (state) => ({
       ...state.addDataProps,
-      schemas: state.dataValidationProps,
+      schemas: state.addDataValidationProps,
     })
   );
   const getFormSchema = () => {
