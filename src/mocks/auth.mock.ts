@@ -1,5 +1,5 @@
 // src/mocks/auth.mock.ts
-import { User } from "@/types/entities/users";
+import { User } from "@/types/entities/user";
 
 export const mockUsers: User[] = [
   {

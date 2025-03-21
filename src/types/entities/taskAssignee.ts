@@ -1,12 +1,11 @@
 import { AuditBase } from "./auditBase";
+import { Task } from "./task";
 import { User } from "./user";
-import { Hackathon } from "./hackathon";
 
-export type UserHackathon = {
+export type TaskAssignee = {
   id: string;
+  task?: Task;
+  taskId?: string;
   user?: User;
   userId?: string;
-  hackathon?: Hackathon;
-  hackathonId?: string;
-  role: string;
 } & AuditBase;

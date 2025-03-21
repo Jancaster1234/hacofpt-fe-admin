@@ -1,7 +1,19 @@
 // src/types/entities/hackathon.ts
+import { AuditCreatedBase } from "./auditCreatedBase";
 import { Round } from "./round";
-import { Team } from "./team";
+import { TeamHackathon } from "./teamHackathon";
+import { HackathonResult } from "./hackathonResult";
 import { UserHackathon } from "./userHackathon";
+import { TeamRequest } from "./teamRequest";
+import { IndividualRegistrationRequest } from "./individualRegistrationRequest";
+import { MentorshipRequest } from "./mentorshipRequest";
+import { MentorshipSessionRequest } from "./mentorshipSessionRequest";
+import { SponsorshipHackathon } from "./sponsorshipHackathon";
+import { Device } from "./device";
+import { Feedback } from "./feedback";
+
+export type HackathonStatus = "DRAFT" | "OPEN" | "ONGOING" | "CLOSED"; // Update this enum based on your actual Status enum if different
+
 export type Hackathon = {
   id: string;
   title: string;
@@ -14,17 +26,23 @@ export type Hackathon = {
   endDate: string;
   information: string;
   description: string;
-  participant: string;
   documentation: string[]; // document public URLs
   contact: string;
   category: string; // New: Used for category filtering
   organization: string; // New: Used for organization filtering
   enrollmentStatus: string;
+  status: HackathonStatus;
   minimumTeamMembers: number;
   maximumTeamMembers: number;
-  numberOfRounds: number; // New: Number of rounds in the hackathon
-  rounds: Round[]; // New: Directly linking rounds
-  createdByUserId: string;
-  // users: UserHackathon[]; // Many-to-many relationship with users
-  // teams: Team[]; // A hackathon has many teams
-};
+  rounds: Round[];
+  teamHackathons: TeamHackathon[];
+  hackathonResults: HackathonResult[];
+  userHackathons: UserHackathon[];
+  teamRequests: TeamRequest[];
+  individualRegistrationRequests: IndividualRegistrationRequest[];
+  mentorshipRequests: MentorshipRequest[];
+  mentorshipSessionRequests: MentorshipSessionRequest[];
+  sponsorshipHackathons: SponsorshipHackathon[];
+  devices: Device[];
+  feedbacks: Feedback[];
+} & AuditCreatedBase;

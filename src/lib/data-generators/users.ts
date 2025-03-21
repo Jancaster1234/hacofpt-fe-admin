@@ -1,6 +1,6 @@
 // src/lib/data-generators/users.ts
 import { faker } from "@faker-js/faker";
-import { User, UserRole, UserStatus } from "@/types/entities/users";
+import { User, UserRole, UserStatus } from "@/types/entities/user";
 
 export function generateFakeUser(): User {
   return {

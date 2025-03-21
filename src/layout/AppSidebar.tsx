@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
-import { UserRole } from "@/types/entities/users";
+import { UserRole } from "@/types/entities/user";
 import { useAuth } from "@/hooks/useAuth_v0";
 
 import {

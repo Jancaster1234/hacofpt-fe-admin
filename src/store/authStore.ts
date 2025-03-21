@@ -1,6 +1,6 @@
 // src/store/authStore.ts
 import { create } from "zustand";
-import { User } from "@/types/entities/users";
+import { User } from "@/types/entities/user";
 
 interface AuthState {
   user: User | null;

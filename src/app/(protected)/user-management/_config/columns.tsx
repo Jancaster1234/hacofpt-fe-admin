@@ -1,6 +1,6 @@
 // src/app/(protected)/user-management/_config/columns.tsx
 import { ColumnDef, Table } from "@tanstack/react-table";
-import { User } from "@/types/entities/users";
+import { User } from "@/types/entities/user";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";

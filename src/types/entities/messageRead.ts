@@ -1,12 +1,11 @@
 import { AuditBase } from "./auditBase";
+import { Message } from "./message";
 import { User } from "./user";
-import { Hackathon } from "./hackathon";
 
-export type UserHackathon = {
+export type MessageRead = {
   id: string;
+  message?: Message;
+  messageId?: string;
   user?: User;
   userId?: string;
-  hackathon?: Hackathon;
-  hackathonId?: string;
-  role: string;
 } & AuditBase;

@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User } from "@/types/entities/users";
+import { User } from "@/types/entities/user";
 import { generateFakeUsers } from "@/lib/data-generators/users";
 import { AdvancedDataTable } from "@/components/data-table";
 import { userColumns } from "./_config/columns";

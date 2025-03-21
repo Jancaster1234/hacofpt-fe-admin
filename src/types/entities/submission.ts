@@ -1,13 +1,16 @@
-// src/types/entities/submission.ts
-import { JudgeFeedback } from "./judgeFeedback";
+import { AuditCreatedBase } from "./auditCreatedBase";
+import { Round } from "./round";
+import { FileUrl } from "./fileUrl";
+import { JudgeSubmission } from "./judgeSubmission";
+
+export type SubmissionStatus = "DRAFT" | "SUBMITTED" | "REVIEWED"; // adjust to your actual enum values
 
 export type Submission = {
   id: string;
-  teamId: string;
-  roundId: string;
-  files: string[]; // URLs of submitted files
-  submittedBy: string; // User ID of submitter
-  submittedAt: string; // Timestamp
-  score?: number; // Optional, will be filled after evaluation
-  judgeNotes?: JudgeFeedback[]; // Feedback from judges
-};
+  round?: Round;
+  roundId?: string;
+  fileUrls: FileUrl[];
+  judgeSubmissions: JudgeSubmission[];
+  status: SubmissionStatus;
+  submittedAt: string;
+} & AuditCreatedBase;

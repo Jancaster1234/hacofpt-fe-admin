@@ -1,5 +1,5 @@
 // src/app/(protected)/user-management/_config/tableConfig.ts
-import { User } from "@/types/entities/users";
+import { User } from "@/types/entities/user";
 import {
   TDataTableAddDataProps,
   TDataTableEditDataProps,

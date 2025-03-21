@@ -1,0 +1,24 @@
+import { AuditCreatedBase } from "./auditCreatedBase";
+import { Hackathon } from "./hackathon";
+import { Round } from "./round";
+import { RoundLocation } from "./roundLocation";
+
+export type DeviceStatus =
+  | "AVAILABLE"
+  | "IN_USE"
+  | "DAMAGED"
+  | "REPAIR"
+  | "RETIRED"; // Adjust according to your enum
+
+export type Device = {
+  id: string;
+  hackathon?: Hackathon;
+  hackathonId?: string;
+  round?: Round;
+  roundId?: string;
+  roundLocation?: RoundLocation;
+  roundLocationId?: string;
+  name: string;
+  description?: string;
+  status: DeviceStatus;
+} & AuditCreatedBase;
