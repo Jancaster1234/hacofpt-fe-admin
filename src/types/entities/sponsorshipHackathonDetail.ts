@@ -1,5 +1,6 @@
 import { AuditBase } from "./auditBase";
 import { SponsorshipHackathon } from "./sponsorshipHackathon";
+import { FileUrl } from "./fileUrl";
 
 export type SponsorshipDetailStatus = "PLANNED" | "COMPLETED" | "CANCELLED"; // Adjust based on your enum
 
@@ -12,4 +13,5 @@ export type SponsorshipHackathonDetail = {
   status: SponsorshipDetailStatus;
   timeFrom: string;
   timeTo: string;
+  fileUrls: FileUrl[];
 } & AuditBase;

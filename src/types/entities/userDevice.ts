@@ -1,6 +1,7 @@
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { User } from "./user";
 import { Device } from "./device";
+import { FileUrl } from "./fileUrl";
 
 export type UserDeviceStatus = "ACTIVE" | "RETURNED" | "EXPIRED"; // Adjust to your enum
 
@@ -13,4 +14,5 @@ export type UserDevice = {
   timeFrom: string; // ISO date
   timeTo: string; // ISO date
   status: UserDeviceStatus;
+  fileUrls: FileUrl[];
 } & AuditCreatedBase;

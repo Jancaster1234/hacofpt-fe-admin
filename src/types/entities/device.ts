@@ -2,6 +2,7 @@ import { AuditCreatedBase } from "./auditCreatedBase";
 import { Hackathon } from "./hackathon";
 import { Round } from "./round";
 import { RoundLocation } from "./roundLocation";
+import { FileUrl } from "./fileUrl";
 
 export type DeviceStatus =
   | "AVAILABLE"
@@ -21,4 +22,5 @@ export type Device = {
   name: string;
   description?: string;
   status: DeviceStatus;
+  fileUrls: FileUrl[];
 } & AuditCreatedBase;

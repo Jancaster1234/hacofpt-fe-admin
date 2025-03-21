@@ -1,5 +1,6 @@
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { Schedule } from "./schedule";
+import { FileUrl } from "./fileUrl";
 import { ScheduleEventAttendee } from "./scheduleEventAttendee";
 import { ScheduleEventReminder } from "./scheduleEventReminder";
 
@@ -14,6 +15,7 @@ export type ScheduleEvent = {
   endTime: string;
   isRecurring: boolean;
   recurrenceRule: string;
+  fileUrls: FileUrl[];
   attendees?: ScheduleEventAttendee[];
   reminders?: ScheduleEventReminder[];
 } & AuditCreatedBase;
