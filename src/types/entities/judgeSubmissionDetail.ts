@@ -9,5 +9,5 @@ export type JudgeSubmissionDetail = {
   roundMarkCriterion?: RoundMarkCriterion;
   roundMarkCriterionId?: string;
   score: number;
-  note: string;
+  note?: string;
 } & AuditBase;

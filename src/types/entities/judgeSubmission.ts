@@ -9,7 +9,7 @@ export type JudgeSubmission = {
   judgeId?: string;
   submission?: Submission;
   submissionId?: string;
-  score: number;
-  note: string;
+  score?: number;
+  note?: string;
   judgeSubmissionDetails: JudgeSubmissionDetail[];
 } & AuditBase;

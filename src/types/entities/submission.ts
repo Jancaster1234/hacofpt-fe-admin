@@ -13,4 +13,5 @@ export type Submission = {
   judgeSubmissions: JudgeSubmission[];
   status: SubmissionStatus;
   submittedAt: string;
+  finalScore?: number;
 } & AuditCreatedBase;
