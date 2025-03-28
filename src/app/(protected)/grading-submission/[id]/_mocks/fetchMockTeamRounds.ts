@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_mocks/fetchMockTeamRounds.ts
+// src/app/(protected)/grading-submission/[id]/_mocks/fetchMockTeamRounds.ts
 import { TeamRound } from "@/types/entities/teamRound";
 
 export const fetchMockTeamRounds = (

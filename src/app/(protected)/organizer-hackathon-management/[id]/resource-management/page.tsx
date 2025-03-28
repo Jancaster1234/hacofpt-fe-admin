@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/page.tsx
 "use client";
 
 import React, { useState, use } from "react";

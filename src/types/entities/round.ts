@@ -7,12 +7,7 @@ import { JudgeRound } from "./judgeRound";
 import { TeamRound } from "./teamRound";
 import { RoundLocation } from "./roundLocation";
 
-export enum RoundStatus {
-  UPCOMING = "UPCOMING",
-  ONGOING = "ONGOING",
-  COMPLETED = "COMPLETED",
-  CANCELLED = "CANCELLED",
-}
+export type RoundStatus = "UPCOMING" | "ONGOING" | "COMPLETED" | "CANCELLED";
 
 export type Round = {
   id: string;

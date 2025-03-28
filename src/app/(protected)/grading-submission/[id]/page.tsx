@@ -1,69 +1,147 @@
 // src/app/(protected)/grading-submission/[id]/page.tsx
+"use client";
 
-// TODO: [Lv1] check if should cache the page server side and revalidate
-// TODO: [Lv1] check if nextjs able to cache this page client-side
-import { Metadata } from "next";
-import HackathonBanner from "./_components/HackathonBanner";
-import HackathonTabs from "./_components/HackathonTabs";
-import HackathonOverview from "./_components/HackathonOverview";
-import { Hackathon } from "@/types/entities/hackathon"; // Import type
-type HackathonProps = {
-  params: { id: string }; //Keep this to access the dynamic route param
-};
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth_v0";
+import { fetchMockRounds } from "./_mocks/fetchMockRounds";
+import { fetchMockTeamRounds } from "./_mocks/fetchMockTeamRounds";
+import { fetchMockSubmissions } from "./_mocks/fetchMockSubmissions";
+import { Round } from "@/types/entities/round";
+import { TeamRound } from "@/types/entities/teamRound";
+import { Submission } from "@/types/entities/submission";
+import Link from "next/link";
 
-// TODO: [Lv1] check if memoization is enabled by default, without the need of enable force-cache
+export default function GradingSubmissionPage() {
+  const { user } = useAuth();
+  const [rounds, setRounds] = useState<Round[]>([]);
+  const [activeRoundId, setActiveRoundId] = useState<string | null>(null);
+  const [teamRounds, setTeamRounds] = useState<TeamRound[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-// This function should be memoized to avoid fetching the same data multiple times
-async function getHackathon(id: string): Promise<Hackathon> {
-  const res = await fetch(`http://localhost:4000/api/hackathon/${id}`, {
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error("Failed to fetch hackathon data");
-  return res.json();
-}
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) return;
 
-//`params` is necessary here for fetching metadata dynamically, SEO purposes
-export async function generateMetadata({
-  params,
-}: HackathonProps): Promise<Metadata> {
-  // Await the params object
-  const id = (await params).id;
-  const hackathon = await getHackathon(id);
-  return {
-    title: hackathon.title,
-    description: hackathon.description,
+      try {
+        const fetchedRounds = await fetchMockRounds("hackathon1");
+        setRounds(fetchedRounds);
+
+        if (fetchedRounds.length > 0) {
+          setActiveRoundId(fetchedRounds[0].id);
+        }
+
+        const teamRoundsPromises = fetchedRounds.map((round) =>
+          fetchMockTeamRounds(user.id, round.id)
+        );
+        const allTeamRounds = await Promise.all(teamRoundsPromises);
+        setTeamRounds(allTeamRounds.flat());
+
+        const submissionsPromises = allTeamRounds
+          .flat()
+          .map((teamRound) =>
+            teamRound.team.teamMembers.map((member) =>
+              fetchMockSubmissions(member.user.id, teamRound.round.id)
+            )
+          )
+          .flat();
+
+        const allSubmissions = await Promise.all(submissionsPromises);
+        setSubmissions(allSubmissions.flat());
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user]);
+
+  const renderTeamSubmissions = (roundId: string) => {
+    const teamSubmissionMap = new Map<string, Submission>();
+    submissions
+      .filter((submission) => submission.round.id === roundId)
+      .forEach((submission) => {
+        teamSubmissionMap.set(submission.createdBy.id, submission);
+      });
+
+    const roundTeams = teamRounds
+      .filter((tr) => tr.round.id === roundId)
+      .map((tr) => tr.team);
+
+    return (
+      <table className="w-full text-sm text-left">
+        <thead className="bg-gray-100 border-b">
+          <tr>
+            <th className="p-3">Team</th>
+            <th className="p-3">Total Score</th>
+            <th className="p-3">Submission</th>
+            <th className="p-3">Mark</th>
+          </tr>
+        </thead>
+        <tbody>
+          {roundTeams.map((team) => {
+            const submission = teamSubmissionMap.get(
+              team.teamMembers[0]?.user.id
+            );
+            return (
+              <tr key={team.id} className="border-b hover:bg-gray-50">
+                <td className="p-3">{team.name}</td>
+                <td className="p-3">
+                  {submission?.finalScore
+                    ? `${submission.finalScore.toFixed(1)}/100`
+                    : "Not marked"}
+                </td>
+                <td className="p-3">
+                  <a href="#" className="text-blue-600 hover:underline">
+                    Download
+                  </a>
+                </td>
+                <td className="p-3">
+                  {submission && (
+                    <Link
+                      href={`/grading-submission/${submission.round.id}/submission/${submission.id}/judge-submission`}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Mark
+                    </Link>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    );
   };
-}
 
-export default async function HackathonDetail({ params }: HackathonProps) {
-  // Await the params object
-  const id = (await params).id;
-  const hackathon = await getHackathon(id);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <div className="container mx-auto p-4 sm:p-6">
-      <HackathonBanner
-        bannerImageUrl={hackathon.bannerImageUrl}
-        altText={hackathon.title}
-      />
-      <HackathonOverview
-        title={hackathon.title}
-        subtitle={hackathon.subtitle}
-        date={hackathon.enrollStartDate}
-        enrollmentCount={hackathon.enrollmentCount}
-        id={id}
-        minimumTeamMembers={hackathon.minimumTeamMembers}
-        maximumTeamMembers={hackathon.maximumTeamMembers}
-      />
-      <HackathonTabs
-        content={{
-          information: hackathon.information,
-          description: hackathon.description,
-          participant: hackathon.participant,
-          documentation: hackathon.documentation,
-          contact: hackathon.contact,
-          submission: [],
-        }}
-      />
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Hackathon Submissions</h1>
+
+      <div className="flex border-b mb-4">
+        {rounds.map((round) => (
+          <button
+            key={round.id}
+            onClick={() => setActiveRoundId(round.id)}
+            className={`px-4 py-2 ${
+              activeRoundId === round.id
+                ? "border-b-2 border-blue-500 text-blue-600"
+                : "text-gray-500"
+            }`}
+          >
+            {round.roundTitle}
+          </button>
+        ))}
+      </div>
+
+      {activeRoundId && renderTeamSubmissions(activeRoundId)}
     </div>
   );
 }

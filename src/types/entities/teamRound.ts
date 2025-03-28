@@ -13,7 +13,7 @@ export type TeamRoundStatus =
 
 export type TeamRound = {
   id: string;
-  team?: Team;
+  team?: Partial<Team>;
   teamId?: string;
   round?: Round;
   roundId?: string;

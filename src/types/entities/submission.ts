@@ -10,8 +10,8 @@ export type Submission = {
   id: string;
   round?: Round;
   roundId?: string;
-  fileUrls: FileUrl[];
-  judgeSubmissions: JudgeSubmission[];
+  fileUrls: Partial<FileUrl>[];
+  judgeSubmissions: Partial<JudgeSubmission>[];
   status: SubmissionStatus;
   submittedAt: string;
   finalScore?: number;

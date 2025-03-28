@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_mocks/fetchMockRounds.ts
+// src/app/(protected)/grading-submission/[id]/_mocks/fetchMockRounds.ts
 import { Round } from "@/types/entities/round";
 
 export const fetchMockRounds = (hackathonId: string): Promise<Round[]> => {

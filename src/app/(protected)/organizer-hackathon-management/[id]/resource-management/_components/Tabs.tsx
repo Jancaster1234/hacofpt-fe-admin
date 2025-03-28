@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Tabs.tsx
 interface TabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
