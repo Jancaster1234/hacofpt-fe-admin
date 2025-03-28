@@ -1,3 +1,4 @@
+// src/types/entities/judgeRound.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { User } from "./user";
 import { Round } from "./round";

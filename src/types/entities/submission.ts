@@ -1,3 +1,4 @@
+// src/types/entities/submission.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { Round } from "./round";
 import { FileUrl } from "./fileUrl";

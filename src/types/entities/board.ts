@@ -1,3 +1,4 @@
+// src/types/entities/board.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { User } from "./user";
 import { Team } from "./team";

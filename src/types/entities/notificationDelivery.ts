@@ -1,3 +1,4 @@
+// src/types/entities/notificationDelivery.ts
 import { AuditBase } from "./auditBase";
 import { Notification } from "./notification";
 

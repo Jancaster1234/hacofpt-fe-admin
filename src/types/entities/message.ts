@@ -1,3 +1,4 @@
+// src/types/entities/message.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { Conversation } from "./conversation";
 import { FileUrl } from "./fileUrl";

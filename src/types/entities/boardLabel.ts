@@ -1,3 +1,4 @@
+// src/types/entities/boardLabel.ts
 import { AuditBase } from "./auditBase";
 import { Board } from "./board";
 

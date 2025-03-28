@@ -1,3 +1,4 @@
+// src/types/entities/scheduleEventReminder.ts
 import { AuditBase } from "./auditBase";
 import { ScheduleEvent } from "./scheduleEvent";
 import { User } from "./user";

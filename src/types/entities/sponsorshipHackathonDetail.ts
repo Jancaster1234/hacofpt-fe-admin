@@ -1,3 +1,4 @@
+// src/types/entities/sponsorshipHackathonDetail.ts
 import { AuditBase } from "./auditBase";
 import { SponsorshipHackathon } from "./sponsorshipHackathon";
 import { FileUrl } from "./fileUrl";

@@ -1,4 +1,4 @@
-// src/types/entities/users.ts
+// src/types/entities/user.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { UserHackathon } from "./userHackathon";
 import { UserTeam } from "./userTeam";
@@ -27,6 +27,8 @@ import { ThreadPostReport } from "./threadPostReport";
 import { Feedback } from "./feedback";
 import { Notification } from "./notification";
 import { Team } from "./team";
+import { MentorTeam } from "./mentorTeam";
+import { MentorTeamLimit } from "./mentorTeamLimit";
 
 export type UserRole =
   | "Admin"
@@ -62,40 +64,42 @@ export type User = {
   skills?: string[]; // Helps with team formation & mentorship matching
   experienceLevel?: "Beginner" | "Intermediate" | "Advanced"; // Helps categorize users
   status?: UserStatus;
-  createdUsers: User[];
-  userRoles: UserRole[];
-  userHackathons: UserHackathon[];
-  userTeams: UserTeam[];
-  organizedHackathons: Hackathon[];
-  leadTeams: Team[];
-  createdMentorshipRequests: MentorshipRequest[];
-  mentorshipRequestsAsMentor: MentorshipRequest[];
-  evaluatedMentorshipRequests: MentorshipRequest[];
-  createdMentorshipSessionRequests: MentorshipSessionRequest[];
-  mentorshipSessionRequestsAsMentor: MentorshipSessionRequest[];
-  evaluatedMentorshipSessionRequests: MentorshipSessionRequest[];
-  judgeRounds: JudgeRound[];
-  judgeSubmissions: JudgeSubmission[];
-  teamRequests: TeamRequest[];
-  individualRegistrationRequests: IndividualRegistrationRequest[];
-  conversationUsers: ConversationUser[];
-  sentMessages: Message[];
-  boards: Board[];
-  boardLists: BoardList[];
-  boardUsers: BoardUser[];
-  tasks: Task[];
-  taskAssignees: TaskAssignee[];
-  taskComments: TaskComment[];
-  schedules: Schedule[];
-  scheduleEvents: ScheduleEvent[];
-  scheduleEventAttendees: ScheduleEventAttendee[];
-  userDevices: UserDevice[];
-  blogPosts: BlogPost[];
-  reviewedBlogPosts: BlogPost[];
-  sponsorships: Sponsorship[];
-  reportedThreadPosts: ThreadPostReport[];
-  reviewedThreadReports: ThreadPostReport[];
-  receivedFeedbacks: Feedback[];
-  createdFeedbacks: Feedback[];
-  receivedNotifications: Notification[];
+  createdUsers?: User[];
+  userRoles?: UserRole[];
+  userHackathons?: UserHackathon[];
+  userTeams?: UserTeam[];
+  organizedHackathons?: Hackathon[];
+  leadTeams?: Team[];
+  createdMentorshipRequests?: MentorshipRequest[];
+  mentorshipRequestsAsMentor?: MentorshipRequest[];
+  evaluatedMentorshipRequests?: MentorshipRequest[];
+  createdMentorshipSessionRequests?: MentorshipSessionRequest[];
+  mentorshipSessionRequestsAsMentor?: MentorshipSessionRequest[];
+  evaluatedMentorshipSessionRequests?: MentorshipSessionRequest[];
+  judgeRounds?: JudgeRound[];
+  judgeSubmissions?: JudgeSubmission[];
+  teamRequests?: TeamRequest[];
+  individualRegistrationRequests?: IndividualRegistrationRequest[];
+  conversationUsers?: ConversationUser[];
+  sentMessages?: Message[];
+  boards?: Board[];
+  boardLists?: BoardList[];
+  boardUsers?: BoardUser[];
+  tasks?: Task[];
+  taskAssignees?: TaskAssignee[];
+  taskComments?: TaskComment[];
+  schedules?: Schedule[];
+  scheduleEvents?: ScheduleEvent[];
+  scheduleEventAttendees?: ScheduleEventAttendee[];
+  userDevices?: UserDevice[];
+  blogPosts?: BlogPost[];
+  reviewedBlogPosts?: BlogPost[];
+  sponsorships?: Sponsorship[];
+  reportedThreadPosts?: ThreadPostReport[];
+  reviewedThreadReports?: ThreadPostReport[];
+  receivedFeedbacks?: Feedback[];
+  createdFeedbacks?: Feedback[];
+  receivedNotifications?: Notification[];
+  mentorTeams?: MentorTeam[];
+  mentorTeamLimits?: MentorTeamLimit[];
 } & AuditCreatedBase;

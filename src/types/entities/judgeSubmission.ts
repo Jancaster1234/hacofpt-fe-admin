@@ -1,3 +1,4 @@
+// src/types/entities/judgeSubmission.ts
 import { AuditBase } from "./auditBase";
 import { User } from "./user";
 import { Submission } from "./submission";

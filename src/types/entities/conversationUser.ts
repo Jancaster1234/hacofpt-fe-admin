@@ -1,3 +1,4 @@
+// src/types/entities/conversationUser.ts
 import { AuditBase } from "./auditBase";
 import { User } from "./user";
 import { Conversation } from "./conversation";

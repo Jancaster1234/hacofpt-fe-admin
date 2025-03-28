@@ -1,3 +1,4 @@
+// src/types/entities/userDeviceTrack.ts
 import { AuditBase } from "./auditBase";
 import { UserDevice } from "./userDevice";
 import { FileUrl } from "./fileUrl";

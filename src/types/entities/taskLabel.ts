@@ -1,3 +1,4 @@
+// src/types/entities/taskLabel.ts
 import { AuditBase } from "./auditBase";
 import { Task } from "./task";
 import { BoardLabel } from "./boardLabel";

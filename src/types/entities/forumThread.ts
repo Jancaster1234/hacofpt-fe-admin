@@ -1,3 +1,4 @@
+// src/types/entities/forumThread.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { ForumCategory } from "./forumCategory";
 import { ThreadPost } from "./threadPost";

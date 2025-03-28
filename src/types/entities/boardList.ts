@@ -1,3 +1,4 @@
+// src/types/entities/boardList.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { Board } from "./board";
 import { Task } from "./task";

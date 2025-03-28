@@ -1,3 +1,4 @@
+// src/types/entities/task.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { BoardList } from "./boardList";
 import { FileUrl } from "./fileUrl";

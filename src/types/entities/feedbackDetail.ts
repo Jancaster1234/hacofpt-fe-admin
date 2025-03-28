@@ -1,3 +1,4 @@
+// src/types/entities/feedbackDetail.ts
 import { AuditBase } from "./auditBase";
 import { Feedback } from "./feedback";
 

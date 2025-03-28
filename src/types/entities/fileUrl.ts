@@ -1,3 +1,4 @@
+// src/types/entities/fileUrl.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { Submission } from "./submission";
 import { Message } from "./message";

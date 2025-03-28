@@ -1,12 +1,9 @@
+// src/types/entities/scheduleEventAttendee.ts
 import { AuditBase } from "./auditBase";
 import { ScheduleEvent } from "./scheduleEvent";
 import { User } from "./user";
 
-export enum ScheduleEventStatus {
-  INVITED = "INVITED",
-  CONFIRMED = "CONFIRMED",
-  DECLINED = "DECLINED",
-}
+export type ScheduleEventStatus = "INVITED" | "CONFIRMED" | "DECLINED";
 
 export type ScheduleEventAttendee = {
   id: string;
@@ -14,5 +11,5 @@ export type ScheduleEventAttendee = {
   scheduleEventId?: string;
   user?: User;
   userId?: string;
-  statusD: ScheduleEventStatus;
+  status: ScheduleEventStatus;
 } & AuditBase;

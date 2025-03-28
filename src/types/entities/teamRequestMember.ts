@@ -1,19 +1,19 @@
+// src/types/entities/teamRequestMember.ts
 import { AuditBase } from "./auditBase";
 import { TeamRequest } from "./teamRequest";
 import { User } from "./user";
 
-export enum TeamRequestMemberStatus {
-  PENDING = "pending",
-  APPROVED = "approved",
-  REJECTED = "rejected",
-  NO_RESPONSE = "no_response",
-}
+export type TeamRequestMemberStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "no_response";
 
 export type TeamRequestMember = {
   id: string;
   teamRequest?: TeamRequest;
   teamRequestId?: string;
-  user?: User;
+  user?: Partial<User>;
   userId?: string;
   status: TeamRequestMemberStatus;
   respondedAt: string;

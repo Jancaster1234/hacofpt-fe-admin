@@ -1,3 +1,4 @@
+// src/types/entities/threadPostLike.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { ThreadPost } from "./threadPost";
 

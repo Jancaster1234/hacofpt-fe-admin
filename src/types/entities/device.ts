@@ -1,3 +1,4 @@
+// src/types/entities/device.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { Hackathon } from "./hackathon";
 import { Round } from "./round";

@@ -1,3 +1,4 @@
+// src/types/entities/round.ts
 import { AuditBase } from "./auditBase";
 import { Hackathon } from "./hackathon";
 import { Submission } from "./submission";
@@ -15,16 +16,16 @@ export enum RoundStatus {
 
 export type Round = {
   id: string;
-  hackathon?: Hackathon;
+  hackathon?: Partial<Hackathon>;
   hackathonId?: string;
-  startTime: string;
-  endTime: string;
-  roundNumber: number;
-  roundTitle: string;
-  status: RoundStatus;
-  submissions: Submission[];
-  roundMarkCriteria: RoundMarkCriterion[];
-  judgeRounds: JudgeRound[];
-  teamRounds: TeamRound[];
-  roundLocations: RoundLocation[];
+  startTime?: string;
+  endTime?: string;
+  roundNumber?: number; // Represents the sequential order of a round in the hackathon, starting from 1
+  roundTitle?: string;
+  status?: RoundStatus;
+  submissions?: Submission[];
+  roundMarkCriteria?: RoundMarkCriterion[];
+  judgeRounds?: JudgeRound[];
+  teamRounds?: TeamRound[];
+  roundLocations?: RoundLocation[];
 } & AuditBase;

@@ -1,3 +1,4 @@
+// src/types/entities/location.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { RoundLocation } from "./roundLocation";
 

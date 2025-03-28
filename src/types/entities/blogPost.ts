@@ -1,3 +1,4 @@
+// src/types/entities/blogPost.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { User } from "./user";
 

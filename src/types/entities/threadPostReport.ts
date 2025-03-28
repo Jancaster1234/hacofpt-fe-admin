@@ -1,3 +1,4 @@
+// src/types/entities/threadPostReport.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { ThreadPost } from "./threadPost";
 import { User } from "./user";

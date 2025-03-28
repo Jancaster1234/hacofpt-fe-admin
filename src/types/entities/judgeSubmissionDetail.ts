@@ -1,3 +1,4 @@
+// src/types/entities/judgeSubmissionDetail.ts
 import { AuditBase } from "./auditBase";
 import { JudgeSubmission } from "./judgeSubmission";
 import { RoundMarkCriterion } from "./roundMarkCriterion";

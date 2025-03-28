@@ -1,3 +1,4 @@
+// src/types/entities/sponsorship.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { SponsorshipHackathon } from "./sponsorshipHackathon";
 

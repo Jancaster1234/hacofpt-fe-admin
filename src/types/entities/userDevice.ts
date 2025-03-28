@@ -1,3 +1,4 @@
+// src/types/entities/userDevice.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { User } from "./user";
 import { Device } from "./device";

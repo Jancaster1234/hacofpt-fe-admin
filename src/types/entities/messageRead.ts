@@ -1,3 +1,4 @@
+// src/types/entities/messageRead.ts
 import { AuditBase } from "./auditBase";
 import { Message } from "./message";
 import { User } from "./user";
