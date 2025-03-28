@@ -50,6 +50,18 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
+    name: "Mentorship Request",
+    allowedRoles: ["Mentor"],
+    path: "/mentorship-request",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Mentor Team",
+    allowedRoles: ["Mentor"],
+    path: "/mentor-team",
+  },
+  {
+    icon: <CalenderIcon />,
     name: "Organizer Hackathon",
     allowedRoles: ["Organizer"],
     path: "/organizer-hackathon-management",
