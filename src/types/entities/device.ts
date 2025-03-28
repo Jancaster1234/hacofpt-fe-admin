@@ -5,14 +5,13 @@ import { Round } from "./round";
 import { RoundLocation } from "./roundLocation";
 import { FileUrl } from "./fileUrl";
 
-export enum DeviceStatus {
-  AVAILABLE = "AVAILABLE",
-  IN_USE = "IN_USE",
-  DAMAGED = "DAMAGED",
-  LOST = "LOST",
-  RETIRED = "RETIRED",
-  PENDING = "PENDING",
-}
+export type DeviceStatus =
+  | "AVAILABLE"
+  | "IN_USE"
+  | "DAMAGED"
+  | "LOST"
+  | "RETIRED"
+  | "PENDING";
 
 export type Device = {
   id: string;

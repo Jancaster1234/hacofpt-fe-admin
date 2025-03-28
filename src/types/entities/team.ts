@@ -1,7 +1,6 @@
 // src/types/entities/team.ts
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { User } from "./user";
-import { Hackathon } from "./hackathon";
 import { UserTeam } from "./userTeam";
 import { MentorshipSessionRequest } from "./mentorshipSessionRequest";
 import { TeamHackathon } from "./teamHackathon";

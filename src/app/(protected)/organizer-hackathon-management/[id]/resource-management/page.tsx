@@ -1,22 +1,20 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/page.tsx
-export default async function ResourceManagementPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
+"use client";
 
-  const res = await fetch(`http://localhost:4000/api/hackathon/${id}`, {
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error("Failed to fetch hackathon data");
-  const hackathon = await res.json();
+import React from "react";
+import { useAuth } from "@/hooks/useAuth_v0";
+
+export default function DashboardHome() {
+  const { user } = useAuth();
 
   return (
-    <div>
-      <h1>Resource Management</h1>
-      <p>Hackathon Title: {hackathon.title}</p>
-      <p>Current Enrollment: {hackathon.enrollmentCount}</p>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
+      <h1 className="text-3xl font-bold text-gray-900">
+        This is the Dashboard Home Page
+      </h1>
+      <p className="mt-2 text-gray-600">
+        Welcome back, {user ? `${user.lastName} ${user.firstName}` : "Guest"}!.
+      </p>
     </div>
   );
 }

@@ -3,11 +3,7 @@ import { AuditCreatedBase } from "./auditCreatedBase";
 import { Round } from "./round";
 import { Location } from "./location";
 
-export enum RoundLocationType {
-  ONLINE = "ONLINE",
-  OFFLINE = "OFFLINE",
-  HYBRID = "HYBRID",
-}
+export type RoundLocationType = "ONLINE" | "OFFLINE" | "HYBRID";
 
 export type RoundLocation = {
   id: string;
