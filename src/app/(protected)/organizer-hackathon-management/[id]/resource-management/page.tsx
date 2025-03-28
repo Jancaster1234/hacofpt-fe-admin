@@ -1,20 +1,37 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/page.tsx
 "use client";
 
-import React from "react";
+import React, { useState, use } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
+import Tabs from "./_components/Tabs";
+import AssignJudgeToRound from "./_components/AssignJudgeToRound";
+import JudgeAssign from "./_components/JudgeAssign";
 
-export default function DashboardHome() {
+export default function ResourceManagementPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { user } = useAuth();
+  const { id: hackathonId } = use(params);
+  const [activeTab, setActiveTab] = useState<
+    "assignJudgeToRound" | "judge" | "device" | "sponsorship"
+  >("assignJudgeToRound");
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
-      <h1 className="text-3xl font-bold text-gray-900">
-        This is the Dashboard Home Page
+    <div className="min-h-screen bg-gray-100 p-6">
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        Hackathon Resource Management
       </h1>
-      <p className="mt-2 text-gray-600">
-        Welcome back, {user ? `${user.lastName} ${user.firstName}` : "Guest"}!.
-      </p>
+      <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+
+      {activeTab === "assignJudgeToRound" && (
+        <AssignJudgeToRound hackathonId={hackathonId} />
+      )}
+      {activeTab === "judge" && <JudgeAssign hackathonId={hackathonId} />}
+      {activeTab === "device" && (
+        <p>Device Management Feature Coming Soon...</p>
+      )}
+      {activeTab === "sponsorship" && <p>Sponsorship Feature Coming Soon...</p>}
     </div>
   );
 }
