@@ -1,4 +1,4 @@
-// Main component structure
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Submissions.tsx
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Submissions.tsx
 import { useEffect, useState } from "react";
 import { fetchMockRounds } from "../_mocks/fetchMockRounds";

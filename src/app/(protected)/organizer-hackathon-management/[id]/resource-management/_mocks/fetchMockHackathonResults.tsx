@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_mocks/fetchMockHackathonResults.ts
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_mocks/fetchMockHackathonResults.tsx
 import { HackathonResult } from "@/types/entities/hackathonResult";
 
 export const fetchMockHackathonResults = (

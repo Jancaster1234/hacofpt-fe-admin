@@ -1,4 +1,4 @@
-// Step 1: Create a HackathonResults component
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/HackathonResults.tsx
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/HackathonResults.tsx
 "use client";
 import React, { useState, useEffect } from "react";

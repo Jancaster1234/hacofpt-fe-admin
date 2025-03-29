@@ -14,6 +14,23 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
     });
   }, [hackathonId]);
 
+  // Helper function to format location type badge
+  const renderLocationType = (type: string) => {
+    return (
+      <span
+        className={`text-xs font-medium px-2 py-1 rounded-full ${
+          type === "ONLINE"
+            ? "bg-blue-100 text-blue-800"
+            : type === "HYBRID"
+            ? "bg-green-100 text-green-800"
+            : "bg-purple-100 text-purple-800"
+        }`}
+      >
+        {type}
+      </span>
+    );
+  };
+
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-800 mb-4">Rounds</h2>
@@ -28,20 +45,12 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
             <h3 className="text-lg font-medium text-gray-800">
               {round.roundTitle}
             </h3>
-            <p className="text-gray-600">
-              <strong>Round Number:</strong> {round.roundNumber}
-            </p>
-            <p className="text-gray-600">
-              <strong>Start:</strong>{" "}
-              {new Date(round.startTime).toLocaleString()}
-            </p>
-            <p className="text-gray-600">
-              <strong>End:</strong> {new Date(round.endTime).toLocaleString()}
-            </p>
-            <p className="text-gray-600">
-              <strong>Status:</strong>{" "}
+            <div className="flex items-center gap-2 mb-2">
+              <p className="text-gray-600">
+                <strong>Round Number:</strong> {round.roundNumber}
+              </p>
               <span
-                className={`px-2 py-1 rounded ${
+                className={`ml-2 text-sm px-2 py-1 rounded ${
                   round.status === "UPCOMING"
                     ? "bg-yellow-300 text-yellow-800"
                     : "bg-green-300 text-green-800"
@@ -49,7 +58,54 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
               >
                 {round.status}
               </span>
-            </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mb-3">
+              <p className="text-gray-600">
+                <strong>Start:</strong>{" "}
+                {new Date(round.startTime).toLocaleString()}
+              </p>
+              <p className="text-gray-600">
+                <strong>End:</strong> {new Date(round.endTime).toLocaleString()}
+              </p>
+            </div>
+
+            {/* Locations Section */}
+            <div className="mt-4">
+              <h4 className="text-md font-medium text-gray-700 mb-2">
+                Locations
+              </h4>
+              {round.roundLocations && round.roundLocations.length > 0 ? (
+                <div className="space-y-3">
+                  {round.roundLocations.map((location) => (
+                    <div
+                      key={location.id}
+                      className="bg-gray-50 p-3 rounded-md border border-gray-200"
+                    >
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-medium">
+                          {location.location.name}
+                        </span>
+                        {renderLocationType(location.type)}
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        {location.location.address}
+                      </p>
+                      {location.location.latitude !== 0 &&
+                        location.location.longitude !== 0 && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            Coordinates: {location.location.latitude},{" "}
+                            {location.location.longitude}
+                          </p>
+                        )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm italic">
+                  No locations assigned to this round.
+                </p>
+              )}
+            </div>
           </div>
         ))
       ) : (

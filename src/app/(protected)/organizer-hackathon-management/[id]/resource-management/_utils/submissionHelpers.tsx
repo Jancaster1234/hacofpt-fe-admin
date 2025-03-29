@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_utils/submissionHelpers.ts
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_utils/submissionHelpers.tsx
 import { Submission } from "@/types/entities/submission";
 
 /**

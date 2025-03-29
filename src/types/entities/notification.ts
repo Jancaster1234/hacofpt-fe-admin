@@ -3,14 +3,13 @@ import { AuditBase } from "./auditBase";
 import { User } from "./user";
 import { NotificationDelivery } from "./notificationDelivery";
 
-export enum NotificationType {
-  MESSAGE = "MESSAGE",
-  MENTOR_REQUEST = "MENTOR_REQUEST",
-  TEAM_INVITE = "TEAM_INVITE",
-  HACKATHON_UPDATE = "HACKATHON_UPDATE",
-  TASK_UPDATE = "TASK_UPDATE",
-  GENERAL = "GENERAL",
-}
+export type NotificationType =
+  | "MESSAGE"
+  | "MENTOR_REQUEST"
+  | "TEAM_INVITE"
+  | "HACKATHON_UPDATE"
+  | "TASK_UPDATE"
+  | "GENERAL";
 
 export type Notification = {
   id: string;
