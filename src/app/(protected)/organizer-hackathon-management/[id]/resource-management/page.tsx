@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth_v0";
 import Tabs from "./_components/Tabs";
 import AssignJudgeToRound from "./_components/AssignJudgeToRound";
 import JudgeAssign from "./_components/JudgeAssign";
+import RoundsList from "./_components/RoundsList";
 
 export default function ResourceManagementPage({
   params,
@@ -15,8 +16,8 @@ export default function ResourceManagementPage({
   const { user } = useAuth();
   const { id: hackathonId } = use(params);
   const [activeTab, setActiveTab] = useState<
-    "assignJudgeToRound" | "judge" | "device" | "sponsorship"
-  >("assignJudgeToRound");
+    "round" | "assignJudgeToRound" | "judge" | "device" | "sponsorship"
+  >("round");
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -25,6 +26,7 @@ export default function ResourceManagementPage({
       </h1>
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
+      {activeTab === "round" && <RoundsList hackathonId={hackathonId} />}
       {activeTab === "assignJudgeToRound" && (
         <AssignJudgeToRound hackathonId={hackathonId} />
       )}
