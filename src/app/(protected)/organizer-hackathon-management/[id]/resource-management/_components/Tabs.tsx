@@ -1,3 +1,8 @@
+interface TabsProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
+
 export default function Tabs({ activeTab, setActiveTab }: TabsProps) {
   return (
     <div className="flex space-x-4 border-b mb-4">

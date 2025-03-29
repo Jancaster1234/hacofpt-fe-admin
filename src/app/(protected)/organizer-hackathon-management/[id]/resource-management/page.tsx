@@ -1,12 +1,10 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/page.tsx
 "use client";
-
 import React, { useState, use } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import Tabs from "./_components/Tabs";
 import AssignJudgeToRound from "./_components/AssignJudgeToRound";
 import JudgeAssign from "./_components/JudgeAssign";
-import RoundsList from "./_components/RoundsList";
+import Rounds from "./_components/Rounds"; // Import the new component
 
 export default function ResourceManagementPage({
   params,
@@ -17,7 +15,7 @@ export default function ResourceManagementPage({
   const { id: hackathonId } = use(params);
   const [activeTab, setActiveTab] = useState<
     "round" | "assignJudgeToRound" | "judge" | "device" | "sponsorship"
-  >("round");
+  >("round"); // Default to "round"
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -26,7 +24,7 @@ export default function ResourceManagementPage({
       </h1>
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {activeTab === "round" && <RoundsList hackathonId={hackathonId} />}
+      {activeTab === "round" && <Rounds hackathonId={hackathonId} />}
       {activeTab === "assignJudgeToRound" && (
         <AssignJudgeToRound hackathonId={hackathonId} />
       )}
