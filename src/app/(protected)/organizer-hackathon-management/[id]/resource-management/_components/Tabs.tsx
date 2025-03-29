@@ -12,6 +12,7 @@ export default function Tabs({ activeTab, setActiveTab }: TabsProps) {
         "userManagement",
         "assignJudgeToRound",
         "judge",
+        "submission",
         "device",
         "sponsorship",
       ].map((tab) => (
@@ -32,6 +33,8 @@ export default function Tabs({ activeTab, setActiveTab }: TabsProps) {
             ? "Assign Judge to Round"
             : tab === "judge"
             ? "Judge Assign"
+            : tab === "submission"
+            ? "Submissions"
             : tab === "device"
             ? "Device Management"
             : "Sponsorship"}

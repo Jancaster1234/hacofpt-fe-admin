@@ -7,6 +7,7 @@ import AssignJudgeToRound from "./_components/AssignJudgeToRound";
 import JudgeAssign from "./_components/JudgeAssign";
 import Rounds from "./_components/Rounds";
 import UserManagement from "./_components/UserManagement"; // Import the new component
+import Submissions from "./_components/Submissions";
 
 export default function ResourceManagementPage({
   params,
@@ -20,6 +21,7 @@ export default function ResourceManagementPage({
     | "userManagement"
     | "assignJudgeToRound"
     | "judge"
+    | "submission"
     | "device"
     | "sponsorship"
   >("round"); // Default to "round"
@@ -39,6 +41,7 @@ export default function ResourceManagementPage({
         <AssignJudgeToRound hackathonId={hackathonId} />
       )}
       {activeTab === "judge" && <JudgeAssign hackathonId={hackathonId} />}
+      {activeTab === "submission" && <Submissions hackathonId={hackathonId} />}
       {activeTab === "device" && (
         <p>Device Management Feature Coming Soon...</p>
       )}
