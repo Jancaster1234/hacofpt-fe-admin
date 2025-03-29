@@ -4,10 +4,7 @@ import { fetchMockRounds } from "../_mocks/fetchMockRounds";
 import { fetchMockLocations } from "../_mocks/fetchMockLocations";
 import { Round } from "@/types/entities/round";
 import { Location } from "@/types/entities/location";
-import {
-  RoundLocation,
-  RoundLocationType,
-} from "@/types/entities/roundLocation";
+import RoundForm from "./RoundForm";
 
 export default function Rounds({ hackathonId }: { hackathonId: string }) {
   const [rounds, setRounds] = useState<Round[]>([]);
@@ -17,14 +14,9 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
   // Form state
   const [showForm, setShowForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<Partial<Round>>({
-    roundTitle: "",
-    roundNumber: 1,
-    startTime: "",
-    endTime: "",
-    status: "UPCOMING",
-    roundLocations: [],
-  });
+  const [currentRound, setCurrentRound] = useState<Partial<Round> | undefined>(
+    undefined
+  );
 
   // Status for operation feedback
   const [operationStatus, setOperationStatus] = useState<{
@@ -68,62 +60,33 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
     });
   };
 
-  // Create a new round
-  const createRound = async () => {
+  // Handle form submission
+  const handleFormSubmit = async (roundData: Round) => {
     try {
-      const newRound: Round = {
-        ...formData,
-        id: `round_${Date.now()}`,
-        hackathonId,
-        status: "UPCOMING",
-        roundLocations: formData.roundLocations || [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
       // Simulate API call
-      await simulateApiCall(newRound);
+      await simulateApiCall(roundData);
 
-      // Update state
-      setRounds([...rounds, newRound]);
-      setOperationStatus({
-        message: "Round created successfully!",
-        type: "success",
-      });
+      if (isEditing) {
+        // Update state
+        setRounds(
+          rounds.map((round) => (round.id === roundData.id ? roundData : round))
+        );
+        setOperationStatus({
+          message: "Round updated successfully!",
+          type: "success",
+        });
+      } else {
+        // Add new round
+        setRounds([...rounds, roundData]);
+        setOperationStatus({
+          message: "Round created successfully!",
+          type: "success",
+        });
+      }
       resetForm();
     } catch (error) {
       setOperationStatus({
-        message: "Failed to create round.",
-        type: "error",
-      });
-    }
-  };
-
-  // Update an existing round
-  const updateRound = async () => {
-    try {
-      const updatedRound: Round = {
-        ...formData,
-        updatedAt: new Date().toISOString(),
-      } as Round;
-
-      // Simulate API call
-      await simulateApiCall(updatedRound);
-
-      // Update state
-      setRounds(
-        rounds.map((round) =>
-          round.id === updatedRound.id ? updatedRound : round
-        )
-      );
-      setOperationStatus({
-        message: "Round updated successfully!",
-        type: "success",
-      });
-      resetForm();
-    } catch (error) {
-      setOperationStatus({
-        message: "Failed to update round.",
+        message: `Failed to ${isEditing ? "update" : "create"} round.`,
         type: "error",
       });
     }
@@ -153,32 +116,14 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
 
   // Reset form and hide it
   const resetForm = () => {
-    setFormData({
-      roundTitle: "",
-      roundNumber: 1,
-      startTime: "",
-      endTime: "",
-      status: "UPCOMING",
-      roundLocations: [],
-    });
+    setCurrentRound(undefined);
     setShowForm(false);
     setIsEditing(false);
   };
 
-  // Handle form input changes
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
   // Prepare form for editing a round
   const editRound = (round: Round) => {
-    setFormData({
+    setCurrentRound({
       ...round,
       startTime: new Date(round.startTime || "").toISOString().slice(0, 16),
       endTime: new Date(round.endTime || "").toISOString().slice(0, 16),
@@ -187,65 +132,11 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
     setShowForm(true);
   };
 
-  // Handle location selection for the round
-  const handleLocationChange = (
-    locationId: string,
-    locationType: RoundLocationType
-  ) => {
-    // Find if this location is already in the roundLocations
-    const existingIndex = formData.roundLocations?.findIndex(
-      (rl) => rl.locationId === locationId
-    );
-
-    if (existingIndex !== undefined && existingIndex >= 0) {
-      // If it exists, update the type
-      const updatedLocations = [...(formData.roundLocations || [])];
-      updatedLocations[existingIndex] = {
-        ...updatedLocations[existingIndex],
-        type: locationType,
-      };
-      setFormData({
-        ...formData,
-        roundLocations: updatedLocations,
-      });
-    } else {
-      // If it doesn't exist, add it
-      const location = locations.find((loc) => loc.id === locationId);
-      if (!location) return;
-
-      const newRoundLocation: RoundLocation = {
-        id: `rl_${Date.now()}_${locationId}`,
-        locationId,
-        location,
-        type: locationType,
-        createdAt: new Date().toISOString(),
-      };
-
-      setFormData({
-        ...formData,
-        roundLocations: [...(formData.roundLocations || []), newRoundLocation],
-      });
-    }
-  };
-
-  // Remove a location from the round
-  const removeLocation = (locationId: string) => {
-    setFormData({
-      ...formData,
-      roundLocations: formData.roundLocations?.filter(
-        (rl) => rl.locationId !== locationId
-      ),
-    });
-  };
-
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isEditing) {
-      updateRound();
-    } else {
-      createRound();
-    }
+  // Open form for creating a new round
+  const openCreateForm = () => {
+    setCurrentRound(undefined);
+    setIsEditing(false);
+    setShowForm(true);
   };
 
   return (
@@ -253,7 +144,7 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold text-gray-800">Rounds</h2>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => (showForm ? resetForm() : openCreateForm())}
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
         >
           {showForm ? "Cancel" : "Add Round"}
@@ -275,157 +166,15 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
 
       {/* Round Form */}
       {showForm && (
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h3 className="text-lg font-medium mb-4">
-            {isEditing ? "Edit Round" : "Create New Round"}
-          </h3>
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-gray-700 mb-1">Round Title</label>
-                <input
-                  type="text"
-                  name="roundTitle"
-                  value={formData.roundTitle}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 mb-1">Round Number</label>
-                <input
-                  type="number"
-                  name="roundNumber"
-                  value={formData.roundNumber}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  min="1"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 mb-1">Start Time</label>
-                <input
-                  type="datetime-local"
-                  name="startTime"
-                  value={formData.startTime}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 mb-1">End Time</label>
-                <input
-                  type="datetime-local"
-                  name="endTime"
-                  value={formData.endTime}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Locations Selection */}
-            <div className="mb-4">
-              <h4 className="text-md font-medium text-gray-700 mb-2">
-                Add Locations
-              </h4>
-              <div className="space-y-3">
-                {locations.map((location) => {
-                  const isSelected = formData.roundLocations?.some(
-                    (rl) => rl.locationId === location.id
-                  );
-                  const selectedType = formData.roundLocations?.find(
-                    (rl) => rl.locationId === location.id
-                  )?.type;
-
-                  return (
-                    <div
-                      key={location.id}
-                      className={`p-3 rounded-md border ${
-                        isSelected
-                          ? "border-blue-300 bg-blue-50"
-                          : "border-gray-200 bg-gray-50"
-                      }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <span className="font-medium">{location.name}</span>
-                          <p className="text-sm text-gray-600">
-                            {location.address}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <select
-                            value={selectedType || ""}
-                            onChange={(e) =>
-                              handleLocationChange(
-                                location.id,
-                                e.target.value as RoundLocationType
-                              )
-                            }
-                            className="p-1 border rounded text-sm"
-                          >
-                            <option value="">-- Select type --</option>
-                            <option value="ONLINE">Online</option>
-                            <option value="OFFLINE">Offline</option>
-                            <option value="HYBRID">Hybrid</option>
-                          </select>
-                          {isSelected && (
-                            <button
-                              type="button"
-                              onClick={() => removeLocation(location.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              Remove
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Selected Locations */}
-            {formData.roundLocations && formData.roundLocations.length > 0 && (
-              <div className="mb-4">
-                <h4 className="text-md font-medium text-gray-700 mb-2">
-                  Selected Locations
-                </h4>
-                <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
-                  <ul className="list-disc pl-5">
-                    {formData.roundLocations.map((rl) => (
-                      <li key={rl.id} className="mb-1">
-                        {rl.location?.name} - {renderLocationType(rl.type)}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={resetForm}
-                className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                {isEditing ? "Update Round" : "Create Round"}
-              </button>
-            </div>
-          </form>
-        </div>
+        <RoundForm
+          isEditing={isEditing}
+          locations={locations}
+          initialData={currentRound}
+          hackathonId={hackathonId}
+          onSubmit={handleFormSubmit}
+          onCancel={resetForm}
+          renderLocationType={renderLocationType}
+        />
       )}
 
       {/* Rounds List */}
