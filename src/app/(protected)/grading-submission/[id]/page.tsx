@@ -10,6 +10,7 @@ import { Round } from "@/types/entities/round";
 import { TeamRound } from "@/types/entities/teamRound";
 import { Submission } from "@/types/entities/submission";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export default function GradingSubmissionPage() {
   const { user } = useAuth();
@@ -18,6 +19,9 @@ export default function GradingSubmissionPage() {
   const [teamRounds, setTeamRounds] = useState<TeamRound[]>([]);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const params = useParams<{ id: string }>();
+  const hackathonId = params.id;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,7 +106,7 @@ export default function GradingSubmissionPage() {
                 <td className="p-3">
                   {submission && (
                     <Link
-                      href={`/grading-submission/${submission.round.id}/submission/${submission.id}/judge-submission`}
+                      href={`/grading-submission/${hackathonId}/round/${submission.round.id}/submission/${submission.id}/judge-submission`}
                       className="text-blue-600 hover:underline"
                     >
                       Mark
