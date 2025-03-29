@@ -10,6 +10,7 @@ import UserManagement from "./_components/UserManagement";
 import Submissions from "./_components/Submissions";
 import HackathonResults from "./_components/HackathonResults";
 import Locations from "./_components/Locations";
+import Notifications from "./_components/Notifications";
 
 export default function ResourceManagementPage({
   params,
@@ -25,6 +26,7 @@ export default function ResourceManagementPage({
     | "assignJudgeToRound"
     | "judge"
     | "submission"
+    | "notification"
     | "hackathonResult"
     | "device"
     | "sponsorship"
@@ -47,6 +49,9 @@ export default function ResourceManagementPage({
       )}
       {activeTab === "judge" && <JudgeAssign hackathonId={hackathonId} />}
       {activeTab === "submission" && <Submissions hackathonId={hackathonId} />}
+      {activeTab === "notification" && (
+        <Notifications hackathonId={hackathonId} />
+      )}
       {activeTab === "hackathonResult" && (
         <HackathonResults hackathonId={hackathonId} />
       )}

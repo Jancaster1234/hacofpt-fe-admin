@@ -30,6 +30,7 @@ export default function Tabs({ activeTab, setActiveTab }: TabsProps) {
     { id: "assignJudgeToRound", label: "Assign Judge to Round" },
     { id: "judge", label: "Judge Assign" },
     { id: "submission", label: "Submissions" },
+    { id: "notification", label: "Notifications" },
     { id: "hackathonResult", label: "Results" },
     { id: "device", label: "Device Management" },
     { id: "sponsorship", label: "Sponsorship" },
