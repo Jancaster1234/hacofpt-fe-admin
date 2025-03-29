@@ -1,0 +1,138 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/JudgeEvaluations.tsx
+import { useState } from "react";
+import { JudgeSubmission } from "@/types/entities/judgeSubmission";
+import { JudgeDetails } from "./JudgeDetails";
+
+interface JudgeEvaluationsProps {
+  judgeSubmissions: JudgeSubmission[];
+  showPopup: (type: string, id: string, note: string) => void;
+}
+
+export function JudgeEvaluations({
+  judgeSubmissions,
+  showPopup,
+}: JudgeEvaluationsProps) {
+  const [expandedJudgeDetails, setExpandedJudgeDetails] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  const toggleJudgeDetailsExpand = (judgeSubmissionId: string) => {
+    setExpandedJudgeDetails((prev) => ({
+      ...prev,
+      [judgeSubmissionId]: !prev[judgeSubmissionId],
+    }));
+  };
+
+  return (
+    <div className="mt-3 space-y-3">
+      <h5 className="font-medium text-sm border-b pb-1">Judge Evaluations</h5>
+
+      {judgeSubmissions.length === 0 ? (
+        <p className="text-sm text-gray-500 italic">
+          No judge evaluations yet.
+        </p>
+      ) : (
+        judgeSubmissions.map((judgeSubmission) => (
+          <div
+            key={judgeSubmission.id}
+            className="p-2 bg-white rounded border border-gray-200"
+          >
+            <div className="flex justify-between items-center">
+              <div className="flex items-center">
+                <div className="w-8 h-8 flex items-center justify-center bg-gray-300 text-xs rounded-full mr-2">
+                  {judgeSubmission.judge.firstName[0]}
+                  {judgeSubmission.judge.lastName[0]}
+                </div>
+                <div>
+                  <p className="text-sm font-medium">
+                    {judgeSubmission.judge.firstName}{" "}
+                    {judgeSubmission.judge.lastName}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {judgeSubmission.judge.email}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="font-bold text-lg">
+                  {judgeSubmission.score}
+                </span>
+                <button
+                  onClick={() =>
+                    showPopup(
+                      "judgeNote",
+                      judgeSubmission.id,
+                      judgeSubmission.note
+                    )
+                  }
+                  className="p-1 text-gray-500 hover:text-blue-500"
+                  title="View Judge Note"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                </button>
+                <button
+                  onClick={() => toggleJudgeDetailsExpand(judgeSubmission.id)}
+                  className="p-1 text-gray-500 hover:text-blue-500"
+                  title="View Scoring Details"
+                >
+                  {expandedJudgeDetails[judgeSubmission.id] ? (
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 15l7-7 7 7"
+                      ></path>
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      ></path>
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Judge Submission Details */}
+            {expandedJudgeDetails[judgeSubmission.id] && (
+              <JudgeDetails
+                judgeSubmissionDetails={judgeSubmission.judgeSubmissionDetails}
+                showPopup={showPopup}
+              />
+            )}
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
