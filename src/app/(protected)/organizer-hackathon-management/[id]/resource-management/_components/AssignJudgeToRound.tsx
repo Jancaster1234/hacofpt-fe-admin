@@ -1,5 +1,5 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/AssignJudgeToRound.tsx
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { fetchMockRounds } from "../_mocks/fetchMockRounds";
 import { fetchMockJudgeRounds } from "../_mocks/fetchMockJudgeRounds";
 import { Round } from "@/types/entities/round";
@@ -18,7 +18,6 @@ export default function AssignJudgeToRound({
   useEffect(() => {
     fetchMockRounds(hackathonId).then((roundsData) => {
       setRounds(roundsData);
-
       roundsData.forEach((round) => {
         fetchMockJudgeRounds(round.id).then((judgesData) => {
           setRoundJudges((prev) => ({ ...prev, [round.id]: judgesData }));
@@ -26,6 +25,10 @@ export default function AssignJudgeToRound({
       });
     });
   }, [hackathonId]);
+
+  const handleRemoveJudge = (judgeId: string, roundId: string) => {
+    console.log(`Removing judge ${judgeId} from round ${roundId}`);
+  };
 
   return (
     <div>
@@ -37,17 +40,46 @@ export default function AssignJudgeToRound({
           <h3 className="text-lg font-medium text-gray-800">
             {round.roundTitle}
           </h3>
-          <ul className="list-disc list-inside text-gray-700 mt-2">
+          <div className="flex flex-wrap gap-2 mt-2">
             {roundJudges[round.id]?.length ? (
               roundJudges[round.id].map((judgeRound) => (
-                <li key={judgeRound.id}>
-                  {judgeRound.judge?.firstName} {judgeRound.judge?.lastName}
-                </li>
+                <div
+                  key={judgeRound.id}
+                  className="flex items-center bg-gray-100 text-gray-800 px-3 py-1 rounded-full shadow-sm"
+                >
+                  {judgeRound.judge.avatarUrl ? (
+                    <Image
+                      src={judgeRound.judge.avatarUrl}
+                      alt={judgeRound.judge.firstName}
+                      width={24}
+                      height={24}
+                      className="w-6 h-6 rounded-full mr-2"
+                    />
+                  ) : (
+                    <span className="w-6 h-6 flex items-center justify-center bg-gray-300 text-xs rounded-full mr-2">
+                      {judgeRound.judge.firstName[0]}
+                    </span>
+                  )}
+                  <span className="text-sm font-medium">
+                    {judgeRound.judge.firstName} {judgeRound.judge.lastName}
+                  </span>
+                  <span className="text-xs text-gray-500 ml-2">
+                    {judgeRound.judge.email}
+                  </span>
+                  <button
+                    onClick={() =>
+                      handleRemoveJudge(judgeRound.judge.id, round.id)
+                    }
+                    className="ml-2 text-xs text-black-500 hover:text-blue-500 font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
               ))
             ) : (
               <p className="text-gray-500">No judges assigned yet.</p>
             )}
-          </ul>
+          </div>
         </div>
       ))}
     </div>
