@@ -65,7 +65,15 @@ export const fetchMockTeamRounds = (
                 lastName: "Doe",
                 email: "john.doe@example.com",
                 avatarUrl: "/avatars/john-doe.jpg",
-                userRoles: ["Judge"],
+                userRoles: [
+                  {
+                    id: "ur2",
+                    user: {
+                      id: "judge2",
+                    },
+                    role: { id: "2", name: "JUDGE" },
+                  },
+                ],
                 university: "Tech University",
                 skills: ["Software Development", "Machine Learning"],
               },
@@ -80,7 +88,15 @@ export const fetchMockTeamRounds = (
                 lastName: "Smith",
                 email: "jane.smith@example.com",
                 avatarUrl: "/avatars/jane-smith.jpg",
-                userRoles: ["Judge", "Mentor"],
+                userRoles: [
+                  {
+                    id: "ur2",
+                    user: {
+                      id: "judge2",
+                    },
+                    role: { id: "2", name: "JUDGE" },
+                  },
+                ],
                 university: "Innovation College",
                 skills: ["Product Management", "Entrepreneurship"],
               },
@@ -136,7 +152,15 @@ export const fetchMockTeamRounds = (
                 lastName: "Johnson",
                 email: "alex.johnson@example.com",
                 avatarUrl: "/avatars/alex-johnson.jpg",
-                userRoles: ["Judge"],
+                userRoles: [
+                  {
+                    id: "ur2",
+                    user: {
+                      id: "judge2",
+                    },
+                    role: { id: "2", name: "JUDGE" },
+                  },
+                ],
                 university: "Design Institute",
                 skills: ["UX Design", "User Research"],
               },
@@ -222,7 +246,15 @@ export const fetchMockTeamRounds = (
                 lastName: "Williams",
                 email: "emily.williams@example.com",
                 avatarUrl: "/avatars/emily-williams.jpg",
-                userRoles: ["Judge", "Organizer"],
+                userRoles: [
+                  {
+                    id: "ur2",
+                    user: {
+                      id: "judge2",
+                    },
+                    role: { id: "2", name: "JUDGE" },
+                  },
+                ],
                 university: "Business School",
                 skills: ["Entrepreneurship", "Strategic Planning"],
               },

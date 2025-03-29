@@ -31,7 +31,17 @@ export const fetchMockSubmissions = (
                 firstName: "Alice",
                 lastName: "Anderson",
                 email: "alice.anderson@example.com",
-                userRoles: ["Judge"],
+                userRoles: [
+                  {
+                    id: "ur2",
+                    user: {
+                      id: "judge1",
+                      firstName: "Alice",
+                      lastName: "Anderson",
+                    },
+                    role: { id: "2", name: "JUDGE" },
+                  },
+                ],
                 skills: ["Software Engineering", "AI"],
               },
               score: 85,
@@ -71,7 +81,15 @@ export const fetchMockSubmissions = (
                 firstName: "Bob",
                 lastName: "Brown",
                 email: "bob.brown@example.com",
-                userRoles: ["Judge"],
+                userRoles: [
+                  {
+                    id: "ur2",
+                    user: {
+                      id: "judge2",
+                    },
+                    role: { id: "2", name: "JUDGE" },
+                  },
+                ],
                 skills: ["Product Management", "UI/UX"],
               },
               score: 78,
@@ -114,7 +132,15 @@ export const fetchMockSubmissions = (
             firstName: "John",
             lastName: "Doe",
             email: "john.doe@example.com",
-            userRoles: ["TeamMember"],
+            userRoles: [
+              {
+                id: "ur5",
+                user: {
+                  id: createdById,
+                },
+                role: { id: "6", name: "TEAM_MEMBER" },
+              },
+            ],
           },
         },
         {
@@ -137,7 +163,15 @@ export const fetchMockSubmissions = (
             firstName: "John",
             lastName: "Doe",
             email: "john.doe@example.com",
-            userRoles: ["TeamMember"],
+            userRoles: [
+              {
+                id: "ur5",
+                user: {
+                  id: createdById,
+                },
+                role: { id: "6", name: "TEAM_MEMBER" },
+              },
+            ],
           },
         },
       ];

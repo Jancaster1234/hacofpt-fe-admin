@@ -29,15 +29,7 @@ import { Notification } from "./notification";
 import { Team } from "./team";
 import { MentorTeam } from "./mentorTeam";
 import { MentorTeamLimit } from "./mentorTeamLimit";
-
-export type UserRole =
-  | "Admin"
-  | "Organizer"
-  | "Judge"
-  | "Mentor"
-  | "TeamLeader"
-  | "TeamMember";
-
+import { UserRole } from "./userRole";
 export type UserStatus =
   | "Active"
   | "Inactive"
@@ -65,7 +57,7 @@ export type User = {
   experienceLevel?: "Beginner" | "Intermediate" | "Advanced"; // Helps categorize users
   status?: UserStatus;
   createdUsers?: User[];
-  userRoles?: UserRole[];
+  userRoles?: Partial<UserRole>[];
   userHackathons?: UserHackathon[];
   userTeams?: UserTeam[];
   organizedHackathons?: Hackathon[];

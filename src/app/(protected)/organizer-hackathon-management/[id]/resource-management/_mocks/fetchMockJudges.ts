@@ -10,7 +10,13 @@ export const fetchMockJudges = (hackathonId: string): Promise<User[]> => {
           firstName: "Alice",
           lastName: "Smith",
           email: "alice@example.com",
-          userRoles: ["Judge"],
+          userRoles: [
+            {
+              id: "ur1",
+              user: { id: "judge1", firstName: "Alice", lastName: "Smith" },
+              role: { id: "2", name: "JUDGE" },
+            },
+          ],
           userHackathons: [
             {
               id: "uh1",
@@ -32,7 +38,13 @@ export const fetchMockJudges = (hackathonId: string): Promise<User[]> => {
           firstName: "Bob",
           lastName: "Johnson",
           email: "bob@example.com",
-          userRoles: ["Judge"],
+          userRoles: [
+            {
+              id: "ur2",
+              user: { id: "judge2", firstName: "Bob", lastName: "Johnson" },
+              role: { id: "2", name: "JUDGE" },
+            },
+          ],
           userHackathons: [
             {
               id: "uh2",
