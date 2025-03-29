@@ -25,6 +25,15 @@ export default function Locations() {
             >
               <h3 className="font-medium text-lg">{location.name}</h3>
               <p className="text-gray-600">{location.address}</p>
+              <p className="text-sm text-gray-500">
+                Latitude: {location.latitude}, Longitude: {location.longitude}
+              </p>
+              <p className="text-xs text-gray-400">
+                Created: {new Date(location.createdAt).toLocaleString()}
+              </p>
+              <p className="text-xs text-gray-400">
+                Updated: {new Date(location.updatedAt).toLocaleString()}
+              </p>
             </li>
           ))}
         </ul>
