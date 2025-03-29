@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Rounds.tsx
 import { useEffect, useState } from "react";
 import { fetchMockRounds } from "../_mocks/fetchMockRounds";
 import { fetchMockLocations } from "../_mocks/fetchMockLocations";
@@ -63,6 +62,13 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
   // Handle form submission
   const handleFormSubmit = async (roundData: Round) => {
     try {
+      // Log the request body before sending
+      console.log(`${isEditing ? "UPDATE" : "CREATE"} ROUND REQUEST:`, {
+        endpoint: isEditing ? `/api/rounds/${roundData.id}` : "/api/rounds",
+        method: isEditing ? "PUT" : "POST",
+        payload: roundData,
+      });
+
       // Simulate API call
       await simulateApiCall(roundData);
 
@@ -85,6 +91,10 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
       }
       resetForm();
     } catch (error) {
+      console.error(
+        `Failed to ${isEditing ? "update" : "create"} round:`,
+        error
+      );
       setOperationStatus({
         message: `Failed to ${isEditing ? "update" : "create"} round.`,
         type: "error",
@@ -97,6 +107,13 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
     if (!confirm("Are you sure you want to delete this round?")) return;
 
     try {
+      // Log the delete request before sending
+      console.log("DELETE ROUND REQUEST:", {
+        endpoint: `/api/rounds/${roundId}`,
+        method: "DELETE",
+        roundId,
+      });
+
       // Simulate API call
       await simulateApiCall({ success: true });
 
@@ -107,6 +124,7 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
         type: "success",
       });
     } catch (error) {
+      console.error("Failed to delete round:", error);
       setOperationStatus({
         message: "Failed to delete round.",
         type: "error",

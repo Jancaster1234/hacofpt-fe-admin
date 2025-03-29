@@ -49,6 +49,26 @@ export const fetchMockJudgeRounds = (
           createdAt: now.toISOString(),
           updatedAt: now.toISOString(),
         },
+        {
+          id: `judgeRound3-${roundId}`,
+          judge: {
+            id: "judge3",
+            email: "carol.zhang@example.com",
+            username: "carol_z",
+            firstName: "Carol",
+            lastName: "Zhang",
+            avatarUrl: "",
+            bio: "UX designer and product strategist.",
+            country: "Singapore",
+            city: "Singapore",
+            birthdate: "1988-03-12",
+          },
+          judgeId: "judge3",
+          roundId,
+          isDeleted: false,
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+        },
       ];
       resolve(mockJudgeRounds);
     }, 500);

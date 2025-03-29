@@ -26,6 +26,7 @@ export default function Tabs({ activeTab, setActiveTab }: TabsProps) {
   const tabs = [
     { id: "round", label: "Rounds" },
     { id: "location", label: "Locations" },
+    { id: "roundMarkCriteria", label: "Round Mark Criteria" },
     { id: "userManagement", label: "User Management" },
     { id: "assignJudgeToRound", label: "Assign Judge to Round" },
     { id: "judge", label: "Judge Assign" },

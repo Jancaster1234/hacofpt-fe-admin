@@ -1,5 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/RoundForm.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Round } from "@/types/entities/round";
 import { Location } from "@/types/entities/location";
 import {
@@ -38,6 +37,12 @@ export default function RoundForm({
     }
   );
 
+  // Validation state
+  const [formErrors, setFormErrors] = useState<{
+    startTime?: string;
+    endTime?: string;
+  }>({});
+
   // Handle form input changes
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -47,7 +52,34 @@ export default function RoundForm({
       ...formData,
       [name]: value,
     });
+
+    // Clear validation errors when field is updated
+    if (formErrors[name as keyof typeof formErrors]) {
+      setFormErrors({
+        ...formErrors,
+        [name]: undefined,
+      });
+    }
   };
+
+  // Validate dates when they change
+  useEffect(() => {
+    const startDate = formData.startTime ? new Date(formData.startTime) : null;
+    const endDate = formData.endTime ? new Date(formData.endTime) : null;
+
+    if (startDate && endDate && startDate >= endDate) {
+      setFormErrors({
+        ...formErrors,
+        endTime: "End time must be after start time",
+      });
+    } else if (startDate && endDate) {
+      setFormErrors({
+        ...formErrors,
+        startTime: undefined,
+        endTime: undefined,
+      });
+    }
+  }, [formData.startTime, formData.endTime]);
 
   // Handle location selection for the round
   const handleLocationChange = (
@@ -104,6 +136,19 @@ export default function RoundForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate start and end times
+    const startDate = new Date(formData.startTime || "");
+    const endDate = new Date(formData.endTime || "");
+
+    if (startDate >= endDate) {
+      setFormErrors({
+        ...formErrors,
+        endTime: "End time must be after start time",
+      });
+      return;
+    }
+
+    // Create round data object
     const roundData: Round = {
       ...formData,
       id: formData.id || `round_${Date.now()}`,
@@ -113,6 +158,23 @@ export default function RoundForm({
       createdAt: formData.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     } as Round;
+
+    // Log detailed form submission data
+    console.log("ROUND FORM SUBMISSION:", {
+      action: isEditing ? "UPDATE" : "CREATE",
+      requestBody: roundData,
+      validationPassed: true,
+      formattedTimestamps: {
+        startTime: new Date(roundData.startTime || "").toLocaleString(),
+        endTime: new Date(roundData.endTime || "").toLocaleString(),
+        createdAt: new Date(roundData.createdAt).toLocaleString(),
+        updatedAt: new Date(roundData.updatedAt).toLocaleString(),
+      },
+      metadata: {
+        totalLocations: roundData.roundLocations.length,
+        locationTypes: roundData.roundLocations.map((rl) => rl.type),
+      },
+    });
 
     await onSubmit(roundData);
   };
@@ -154,9 +216,16 @@ export default function RoundForm({
               name="startTime"
               value={formData.startTime}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className={`w-full p-2 border rounded ${
+                formErrors.startTime ? "border-red-500" : ""
+              }`}
               required
             />
+            {formErrors.startTime && (
+              <p className="text-red-500 text-sm mt-1">
+                {formErrors.startTime}
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-gray-700 mb-1">End Time</label>
@@ -165,9 +234,29 @@ export default function RoundForm({
               name="endTime"
               value={formData.endTime}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className={`w-full p-2 border rounded ${
+                formErrors.endTime ? "border-red-500" : ""
+              }`}
               required
             />
+            {formErrors.endTime && (
+              <p className="text-red-500 text-sm mt-1">{formErrors.endTime}</p>
+            )}
+          </div>
+          <div>
+            <label className="block text-gray-700 mb-1">Status</label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+              required
+            >
+              <option value="UPCOMING">Upcoming</option>
+              <option value="ONGOING">Ongoing</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
           </div>
         </div>
 
@@ -263,6 +352,7 @@ export default function RoundForm({
           <button
             type="submit"
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            disabled={!!formErrors.startTime || !!formErrors.endTime}
           >
             {isEditing ? "Update Round" : "Create Round"}
           </button>

@@ -11,6 +11,7 @@ import Submissions from "./_components/Submissions";
 import HackathonResults from "./_components/HackathonResults";
 import Locations from "./_components/Locations";
 import Notifications from "./_components/Notifications";
+import RoundMarkCriteria from "./_components/RoundMarkCriteria";
 
 export default function ResourceManagementPage({
   params,
@@ -22,6 +23,7 @@ export default function ResourceManagementPage({
   const [activeTab, setActiveTab] = useState<
     | "round"
     | "location"
+    | "roundMarkCriteria"
     | "userManagement"
     | "assignJudgeToRound"
     | "judge"
@@ -41,6 +43,9 @@ export default function ResourceManagementPage({
 
       {activeTab === "round" && <Rounds hackathonId={hackathonId} />}
       {activeTab === "location" && <Locations />}
+      {activeTab === "roundMarkCriteria" && (
+        <RoundMarkCriteria hackathonId={hackathonId} />
+      )}
       {activeTab === "userManagement" && (
         <UserManagement hackathonId={hackathonId} />
       )}
