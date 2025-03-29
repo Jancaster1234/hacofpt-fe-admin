@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/AssignJudgeToRound.tsx
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { fetchMockRounds } from "../_mocks/fetchMockRounds";

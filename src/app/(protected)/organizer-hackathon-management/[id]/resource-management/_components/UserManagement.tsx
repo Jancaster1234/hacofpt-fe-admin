@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/UserManagement.tsx
 import { useEffect, useState } from "react";
 import { fetchMockUserHackathons } from "../_mocks/fetchMockUserHackathons";
 import { UserHackathon } from "@/types/entities/userHackathon";
