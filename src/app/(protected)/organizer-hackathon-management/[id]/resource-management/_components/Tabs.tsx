@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Tabs.tsx
 interface TabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -13,6 +12,7 @@ export default function Tabs({ activeTab, setActiveTab }: TabsProps) {
         "assignJudgeToRound",
         "judge",
         "submission",
+        "hackathonResult",
         "device",
         "sponsorship",
       ].map((tab) => (
@@ -35,6 +35,8 @@ export default function Tabs({ activeTab, setActiveTab }: TabsProps) {
             ? "Judge Assign"
             : tab === "submission"
             ? "Submissions"
+            : tab === "hackathonResult"
+            ? "Results"
             : tab === "device"
             ? "Device Management"
             : "Sponsorship"}
