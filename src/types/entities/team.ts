@@ -10,6 +10,7 @@ import { MentorshipRequest } from "./mentorshipRequest";
 import { Feedback } from "./feedback";
 import { MentorTeam } from "./mentorTeam";
 import { MentorTeamLimit } from "./mentorTeamLimit";
+import { Submission } from "./submission";
 
 export type Team = {
   id: string;
@@ -29,4 +30,5 @@ export type Team = {
   deletedById?: string;
   mentorTeams?: MentorTeam[];
   mentorTeamLimits?: MentorTeamLimit[];
+  submissions?: Submission[];
 } & AuditCreatedBase;
