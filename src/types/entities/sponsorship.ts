@@ -2,12 +2,11 @@
 import { AuditCreatedBase } from "./auditCreatedBase";
 import { SponsorshipHackathon } from "./sponsorshipHackathon";
 
-export enum SponsorshipStatus {
-  PENDING = "PENDING",
-  ACTIVE = "ACTIVE",
-  COMPLETED = "COMPLETED",
-  CANCELLED = "CANCELLED",
-}
+export type SponsorshipStatus =
+  | "PENDING"
+  | "ACTIVE"
+  | "COMPLETED"
+  | "CANCELLED"; // adjust to your actual enum values
 
 export type Sponsorship = {
   id: string;
