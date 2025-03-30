@@ -3,11 +3,7 @@ import { AuditBase } from "./auditBase";
 import { SponsorshipHackathon } from "./sponsorshipHackathon";
 import { FileUrl } from "./fileUrl";
 
-export enum SponsorshipDetailStatus {
-  PLANNED = "PLANNED",
-  COMPLETED = "COMPLETED",
-  CANCELLED = "CANCELLED",
-}
+export type SponsorshipDetailStatus = "PLANNED" | "COMPLETED" | "CANCELLED";
 
 export type SponsorshipHackathonDetail = {
   id: string;
