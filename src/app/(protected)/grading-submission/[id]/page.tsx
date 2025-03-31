@@ -45,7 +45,7 @@ export default function GradingSubmissionPage() {
           .flat()
           .map((teamRound) =>
             teamRound.team.teamMembers.map((member) =>
-              fetchMockSubmissions(member.user.id, teamRound.round.id)
+              fetchMockSubmissions(member.user.username, teamRound.round.id)
             )
           )
           .flat();

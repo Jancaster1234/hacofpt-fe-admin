@@ -2,7 +2,7 @@
 import { Submission } from "@/types/entities/submission";
 
 export const fetchMockSubmissions = (
-  createdById: string,
+  createdByUserName: string,
   roundId: string
 ): Promise<Submission[]> => {
   return new Promise((resolve) => {
@@ -127,21 +127,7 @@ export const fetchMockSubmissions = (
           submittedAt: new Date().toISOString(),
           finalScore: 81.5,
           createdAt: new Date().toISOString(),
-          createdBy: {
-            id: createdById,
-            firstName: "John",
-            lastName: "Doe",
-            email: "john.doe@example.com",
-            userRoles: [
-              {
-                id: "ur5",
-                user: {
-                  id: createdById,
-                },
-                role: { id: "6", name: "TEAM_MEMBER" },
-              },
-            ],
-          },
+          createdByUserName,
         },
         {
           id: "sub2",
@@ -158,21 +144,7 @@ export const fetchMockSubmissions = (
           submittedAt: "",
           finalScore: undefined,
           createdAt: new Date().toISOString(),
-          createdBy: {
-            id: createdById,
-            firstName: "John",
-            lastName: "Doe",
-            email: "john.doe@example.com",
-            userRoles: [
-              {
-                id: "ur5",
-                user: {
-                  id: createdById,
-                },
-                role: { id: "6", name: "TEAM_MEMBER" },
-              },
-            ],
-          },
+          createdByUserName,
         },
       ];
 

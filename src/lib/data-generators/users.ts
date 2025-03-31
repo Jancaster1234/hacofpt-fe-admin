@@ -54,7 +54,7 @@ export function generateFakeUser(): User {
     ]),
     createdAt: faker.date.past().toISOString(),
     updatedAt: faker.date.recent().toISOString(),
-    createdById: faker.string.uuid(),
+    createdByUserName: faker.internet.userName(),
   };
 }
 

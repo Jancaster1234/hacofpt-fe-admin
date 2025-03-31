@@ -46,8 +46,7 @@ export function AllSubmissions({ submissions }: AllSubmissionsProps) {
                 </p>
                 <p className="text-sm">
                   <span className="font-medium">Created by:</span>{" "}
-                  {submission.createdBy.firstName}{" "}
-                  {submission.createdBy.lastName}
+                  {submission.createdByUserName}
                 </p>
                 {submission.submittedAt && (
                   <p className="text-sm">
