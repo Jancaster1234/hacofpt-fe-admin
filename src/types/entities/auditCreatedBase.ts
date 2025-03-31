@@ -5,4 +5,5 @@ import { AuditBase } from "./auditBase";
 export interface AuditCreatedBase extends AuditBase {
   createdBy?: User;
   createdById?: string;
+  createdByUserName?: string;
 }

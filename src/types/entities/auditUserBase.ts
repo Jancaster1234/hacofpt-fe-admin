@@ -6,4 +6,5 @@ import { AuditCreatedBase } from "./auditCreatedBase";
 export interface AuditUserBase extends AuditCreatedBase {
   lastModifiedBy?: User;
   lastModifiedById?: string;
+  lastModifiedByUserName?: string;
 }
