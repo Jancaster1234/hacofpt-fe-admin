@@ -16,10 +16,6 @@ export const fetchMockRounds = (hackathonId: string): Promise<Round[]> => {
           roundNumber: 1,
           roundTitle: "Preliminary Round",
           status: "UPCOMING",
-          submissions: [],
-          roundMarkCriteria: [],
-          judgeRounds: [],
-          teamRounds: [],
           roundLocations: [
             {
               id: "rl1",
@@ -52,10 +48,6 @@ export const fetchMockRounds = (hackathonId: string): Promise<Round[]> => {
           roundNumber: 2,
           roundTitle: "Final Round",
           status: "UPCOMING",
-          submissions: [],
-          roundMarkCriteria: [],
-          judgeRounds: [],
-          teamRounds: [],
           roundLocations: [
             {
               id: "rl2",
