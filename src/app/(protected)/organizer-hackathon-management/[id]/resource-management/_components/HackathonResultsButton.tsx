@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/HackathonResultsButton.tsx
 import { useState } from "react";
 import { Round } from "@/types/entities/round";
 import { TeamRound } from "@/types/entities/teamRound";
