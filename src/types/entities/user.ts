@@ -56,8 +56,8 @@ export type User = {
   skills?: string[]; // Helps with team formation & mentorship matching
   experienceLevel?: "Beginner" | "Intermediate" | "Advanced"; // Helps categorize users
   status?: UserStatus;
-  createdUsers?: User[];
   userRoles?: Partial<UserRole>[];
+  createdUsers?: User[];
   userHackathons?: UserHackathon[];
   userTeams?: UserTeam[];
   organizedHackathons?: Hackathon[];
