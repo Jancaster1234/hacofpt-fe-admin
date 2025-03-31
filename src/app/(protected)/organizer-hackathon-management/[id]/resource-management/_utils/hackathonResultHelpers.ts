@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_utils/hackathonResultHelpers.ts
 import { Round } from "@/types/entities/round";
 import { TeamRound } from "@/types/entities/teamRound";
 import { Submission } from "@/types/entities/submission";
@@ -35,16 +34,22 @@ export const calculateTeamTotalScores = (
       const isTeamInRound = roundTeams.some((tr) => tr.team.id === teamId);
 
       if (isTeamInRound) {
+        // Filter submissions for this team and round
         const teamSubmissionsForRound = (teamSubmissions[teamId] || []).filter(
-          (submission) => submission.roundId === round.id
+          (submission) => submission.round && submission.round.id === round.id
         );
 
-        // Find the latest submission for this round
-        const latestSubmission = teamSubmissionsForRound.sort(
-          (a, b) =>
-            new Date(b.submittedAt).getTime() -
-            new Date(a.submittedAt).getTime()
-        )[0];
+        // Find the latest submitted submission for this round
+        const latestSubmission = teamSubmissionsForRound
+          .filter(
+            (submission) =>
+              submission.status === "SUBMITTED" && submission.submittedAt
+          )
+          .sort(
+            (a, b) =>
+              new Date(b.submittedAt).getTime() -
+              new Date(a.submittedAt).getTime()
+          )[0];
 
         if (
           !latestSubmission ||

@@ -1,5 +1,4 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/HackathonResults.tsx
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/HackathonResults.tsx
 "use client";
 import React, { useState, useEffect } from "react";
 import { fetchMockHackathonResults } from "../_mocks/fetchMockHackathonResults";
