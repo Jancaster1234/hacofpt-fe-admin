@@ -68,6 +68,12 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
+    name: "User Creation",
+    allowedRoles: ["Organizer"],
+    path: "/user-creation",
+  },
+  {
+    icon: <CalenderIcon />,
     name: "Calendar",
     allowedRoles: ["Admin", "Organizer", "Mentor", "Judge"],
     path: "/calendar",
