@@ -17,7 +17,7 @@ export type TeamRequest = {
   hackathonId?: string;
   status: TeamRequestStatus;
   confirmationDeadline: string;
-  note: string;
+  note?: string;
   reviewedBy?: User;
   reviewedById?: string;
   teamRequestMembers: TeamRequestMember[];
