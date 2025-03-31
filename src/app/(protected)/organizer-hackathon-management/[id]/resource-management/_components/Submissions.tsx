@@ -1,5 +1,4 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Submissions.tsx
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Submissions.tsx
 import { useEffect, useState } from "react";
 import { fetchMockRounds } from "../_mocks/fetchMockRounds";
 import { fetchMockTeamRounds } from "../_mocks/fetchMockTeamRounds";
@@ -7,6 +6,7 @@ import { fetchMockSubmissions } from "../_mocks/fetchMockSubmissions";
 import { RoundTabs } from "./RoundTabs";
 import { TeamList } from "./TeamList";
 import { NotePopup } from "./NotePopup";
+import { HackathonResultsButton } from "./HackathonResultsButton";
 import { Round } from "@/types/entities/round";
 import { TeamRound } from "@/types/entities/teamRound";
 import { Submission } from "@/types/entities/submission";
@@ -104,6 +104,19 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
         teamSubmissions={teamSubmissions}
         showPopup={showPopup}
       />
+
+      {/* Hackathon Results Button */}
+      <div className="border-t border-gray-200 pt-4 mt-8">
+        <h3 className="text-lg font-medium text-gray-800 mb-2">
+          Hackathon Results
+        </h3>
+        <HackathonResultsButton
+          hackathonId={hackathonId}
+          rounds={rounds}
+          teamRounds={teamRounds}
+          teamSubmissions={teamSubmissions}
+        />
+      </div>
 
       {/* Popup for Notes */}
       {activePopup && (
