@@ -10,7 +10,6 @@ export const fetchMockSubmissions = (
       const mockSubmissions: Submission[] = [
         {
           id: "sub1",
-          round: { id: roundId, roundTitle: `Round ${roundId}` },
           fileUrls: [
             {
               id: "file1",
@@ -31,6 +30,18 @@ export const fetchMockSubmissions = (
                 firstName: "Alice",
                 lastName: "Anderson",
                 email: "alice.anderson@example.com",
+                avatarUrl: "https://example.com/avatars/userx.png",
+                bio: "Experienced judge with a passion for innovation.",
+                country: "USA",
+                city: "New York",
+                birthdate: "1985-06-12",
+                phone: "+123456789",
+                studentId: "JUDGE123",
+                university: "Tech University",
+                linkedinUrl: "https://linkedin.com/in/userx",
+                githubUrl: "https://github.com/userx",
+                experienceLevel: "Beginner",
+                status: "Active",
                 userRoles: [
                   {
                     id: "ur2",
@@ -81,6 +92,19 @@ export const fetchMockSubmissions = (
                 firstName: "Bob",
                 lastName: "Brown",
                 email: "bob.brown@example.com",
+                avatarUrl: "https://example.com/avatars/userx.png",
+                bio: "Experienced judge with a passion for innovation.",
+                country: "USA",
+                city: "New York",
+                birthdate: "1985-06-12",
+                phone: "+123456789",
+                studentId: "JUDGE123",
+                university: "Tech University",
+                linkedinUrl: "https://linkedin.com/in/userx",
+                githubUrl: "https://github.com/userx",
+                skills: ["Product Management", "Design Thinking"],
+                experienceLevel: "Beginner",
+                status: "Active",
                 userRoles: [
                   {
                     id: "ur2",
@@ -90,7 +114,6 @@ export const fetchMockSubmissions = (
                     role: { id: "2", name: "JUDGE" },
                   },
                 ],
-                skills: ["Product Management", "UI/UX"],
               },
               score: 78,
               note: "Good structure, but needs better user experience.",
