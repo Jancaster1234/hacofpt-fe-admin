@@ -68,7 +68,7 @@ export default function GradingSubmissionPage() {
     submissions
       .filter((submission) => submission.round.id === roundId)
       .forEach((submission) => {
-        teamSubmissionMap.set(submission.createdBy.id, submission);
+        teamSubmissionMap.set(submission.createdByUserName, submission);
       });
 
     const roundTeams = teamRounds
