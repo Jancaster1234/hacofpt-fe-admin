@@ -292,12 +292,12 @@ export default function Locations() {
                     >
                       Edit
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => handleDelete(location.id)}
                       className="px-3 py-1 text-xs text-white bg-red-600 rounded-md hover:bg-red-700"
                     >
                       Delete
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </li>
