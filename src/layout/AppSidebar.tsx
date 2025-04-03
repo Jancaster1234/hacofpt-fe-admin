@@ -27,67 +27,67 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    allowedRoles: ["Admin"],
+    allowedRoles: ["ADMIN"],
     subItems: [{ name: "Ecommerce", path: "/dashboard", pro: false }],
   },
   {
     icon: <CalenderIcon />,
     name: "Hackathon",
-    allowedRoles: ["Admin"],
+    allowedRoles: ["ADMIN"],
     path: "/admin-hackathon-management",
   },
   {
     icon: <CalenderIcon />,
     name: "User",
-    allowedRoles: ["Admin"],
+    allowedRoles: ["ADMIN"],
     path: "/user-management",
   },
   {
     icon: <CalenderIcon />,
     name: "Organization",
-    allowedRoles: ["Admin"],
+    allowedRoles: ["ADMIN"],
     path: "/organization-management",
   },
   {
     icon: <CalenderIcon />,
     name: "Mentorship Request",
-    allowedRoles: ["Mentor"],
+    allowedRoles: ["MENTOR"],
     path: "/mentorship-request",
   },
   {
     icon: <CalenderIcon />,
     name: "Mentor Team",
-    allowedRoles: ["Mentor"],
+    allowedRoles: ["MENTOR"],
     path: "/mentor-team",
   },
   {
     icon: <CalenderIcon />,
     name: "Organizer Hackathon",
-    allowedRoles: ["Organizer"],
+    allowedRoles: ["ORGANIZER"],
     path: "/organizer-hackathon-management",
   },
   {
     icon: <CalenderIcon />,
     name: "User Creation",
-    allowedRoles: ["Organizer"],
+    allowedRoles: ["ORGANIZER"],
     path: "/user-creation",
   },
   {
     icon: <CalenderIcon />,
     name: "Calendar",
-    allowedRoles: ["Admin", "Organizer", "Mentor", "Judge"],
+    allowedRoles: ["ADMIN", "ORGANIZER", "MENTOR", "JUDGE"],
     path: "/calendar",
   },
   {
     icon: <CalenderIcon />,
     name: "Kanban board",
-    allowedRoles: ["Admin", "Organizer", "Mentor", "Judge"],
+    allowedRoles: ["ADMIN", "ORGANIZER", "MENTOR", "JUDGE"],
     path: "/kanban-board",
   },
   {
     icon: <CalenderIcon />,
     name: "Chat",
-    allowedRoles: ["Admin", "Organizer", "Judge", "Mentor"],
+    allowedRoles: ["ADMIN", "ORGANIZER", "MENTOR", "JUDGE"],
     path: "/chat",
   },
   // {
@@ -99,19 +99,19 @@ const navItems: NavItem[] = [
   {
     icon: <CalenderIcon />,
     name: "Grading Submission",
-    allowedRoles: ["Judge"],
+    allowedRoles: ["JUDGE"],
     path: "/grading-submission",
   },
   {
     icon: <CalenderIcon />,
     name: "Send Notification",
-    allowedRoles: ["Admin", "Organizer"],
+    allowedRoles: ["ADMIN", "ORGANIZER"],
     path: "/send-notification",
   },
   {
     icon: <CalenderIcon />,
     name: "Blog",
-    allowedRoles: ["Admin"],
+    allowedRoles: ["ADMIN"],
     path: "/blog-management",
   },
 ];
@@ -122,7 +122,7 @@ const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
   const { user } = useAuth();
-  const userRole = user?.role;
+  const userRole = user?.userRoles?.[0]?.role?.name || null;
 
   const filteredNavItems = navItems.filter(
     (item) =>
