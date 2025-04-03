@@ -1,15 +1,18 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Rounds.tsx
-import { useEffect, useState } from "react";
-import { fetchMockRounds } from "../_mocks/fetchMockRounds";
-import { fetchMockLocations } from "../_mocks/fetchMockLocations";
+import { useEffect, useState, useCallback } from "react";
 import { Round } from "@/types/entities/round";
 import { Location } from "@/types/entities/location";
 import RoundForm from "./RoundForm";
+import ApiResponseModal from "@/components/common/ApiResponseModal";
+import { useApiModal } from "@/hooks/useApiModal";
+import { roundService } from "@/services/round.service";
+import { locationService } from "@/services/location.service";
 
 export default function Rounds({ hackathonId }: { hackathonId: string }) {
   const [rounds, setRounds] = useState<Round[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchFailed, setFetchFailed] = useState(false);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -18,21 +21,91 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
     undefined
   );
 
-  // Status for operation feedback
-  const [operationStatus, setOperationStatus] = useState<{
-    message: string;
-    type: "success" | "error" | null;
-  }>({ message: "", type: null });
+  // API Modal for handling responses
+  const { modalState, showSuccess, showError, hideModal } = useApiModal();
+
+  // Memoize the error handler to prevent recreating it on each render
+  const handleError = useCallback(
+    (title: string, message: string, error: any) => {
+      // Only show the error if we haven't already marked fetch as failed
+      if (!fetchFailed) {
+        setFetchFailed(true);
+        showError(title, message);
+        console.error(message, error);
+      }
+    },
+    [showError, fetchFailed]
+  );
 
   useEffect(() => {
-    Promise.all([fetchMockRounds(hackathonId), fetchMockLocations()]).then(
-      ([roundsData, locationsData]) => {
-        setRounds(roundsData);
-        setLocations(locationsData);
-        setLoading(false);
+    let isMounted = true;
+
+    const fetchData = async () => {
+      // Skip fetching if we've already failed to prevent infinite loops
+      if (fetchFailed) return;
+
+      try {
+        const roundsPromise = roundService.getRoundsByHackathonId(hackathonId);
+        const locationsPromise = locationService.getAllLocations();
+
+        // Use Promise.allSettled to handle partial failures
+        const [roundsResult, locationsResult] = await Promise.allSettled([
+          roundsPromise,
+          locationsPromise,
+        ]);
+
+        // Make sure the component is still mounted before updating state
+        if (!isMounted) return;
+
+        // Handle rounds result
+        if (roundsResult.status === "fulfilled") {
+          setRounds(roundsResult.value.data);
+        } else {
+          console.error("Error fetching rounds:", roundsResult.reason);
+          // Don't show error modal here, just log it
+        }
+
+        // Handle locations result
+        if (locationsResult.status === "fulfilled") {
+          setLocations(locationsResult.value.data);
+        } else {
+          console.error("Error fetching locations:", locationsResult.reason);
+          // Don't show error modal here, just log it
+        }
+
+        // If both failed, show a single error message
+        if (
+          roundsResult.status === "rejected" &&
+          locationsResult.status === "rejected"
+        ) {
+          handleError(
+            "Data Loading Error",
+            "Failed to load rounds and locations.",
+            { rounds: roundsResult.reason, locations: locationsResult.reason }
+          );
+        }
+      } catch (error) {
+        if (isMounted) {
+          handleError(
+            "Data Loading Error",
+            "Failed to load rounds and locations.",
+            error
+          );
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    );
-  }, [hackathonId]);
+    };
+
+    fetchData();
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, [hackathonId, handleError, fetchFailed]);
 
   // Helper function to format location type badge
   const renderLocationType = (type: string) => {
@@ -51,55 +124,72 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
     );
   };
 
-  // Helper to simulate API call
-  const simulateApiCall = <T,>(data: T, delay = 800): Promise<T> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(data);
-      }, delay);
-    });
-  };
-
   // Handle form submission
   const handleFormSubmit = async (roundData: Round) => {
     try {
-      // Log the request body before sending
-      console.log(`${isEditing ? "UPDATE" : "CREATE"} ROUND REQUEST:`, {
-        endpoint: isEditing ? `/api/rounds/${roundData.id}` : "/api/rounds",
-        method: isEditing ? "PUT" : "POST",
-        payload: roundData,
-      });
-
-      // Simulate API call
-      await simulateApiCall(roundData);
+      let response;
 
       if (isEditing) {
-        // Update state
-        setRounds(
-          rounds.map((round) => (round.id === roundData.id ? roundData : round))
+        response = await roundService.updateRound({
+          id: roundData.id,
+          hackathonId: roundData.hackathonId,
+          startTime: roundData.startTime,
+          endTime: roundData.endTime,
+          roundNumber: roundData.roundNumber,
+          roundTitle: roundData.roundTitle,
+          status: roundData.status as
+            | "UPCOMING"
+            | "ONGOING"
+            | "COMPLETED"
+            | "CANCELLED",
+          roundLocations: roundData.roundLocations,
+        });
+
+        // Update state with the updated round
+        setRounds((prev) =>
+          prev.map((round) =>
+            round.id === response.data.id ? response.data : round
+          )
         );
-        setOperationStatus({
-          message: "Round updated successfully!",
-          type: "success",
-        });
+
+        showSuccess(
+          "Round Updated",
+          response.message || "Round updated successfully!"
+        );
       } else {
-        // Add new round
-        setRounds([...rounds, roundData]);
-        setOperationStatus({
-          message: "Round created successfully!",
-          type: "success",
+        response = await roundService.createRound({
+          hackathonId: roundData.hackathonId,
+          startTime: roundData.startTime,
+          endTime: roundData.endTime,
+          roundNumber: roundData.roundNumber,
+          roundTitle: roundData.roundTitle,
+          status: roundData.status as
+            | "UPCOMING"
+            | "ONGOING"
+            | "COMPLETED"
+            | "CANCELLED",
+          roundLocations: roundData.roundLocations,
         });
+
+        // Add new round to state
+        setRounds((prev) => [...prev, response.data]);
+
+        showSuccess(
+          "Round Created",
+          response.message || "Round created successfully!"
+        );
       }
+
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
+      showError(
+        `${isEditing ? "Update" : "Create"} Failed`,
+        error.message || `Failed to ${isEditing ? "update" : "create"} round.`
+      );
       console.error(
         `Failed to ${isEditing ? "update" : "create"} round:`,
         error
       );
-      setOperationStatus({
-        message: `Failed to ${isEditing ? "update" : "create"} round.`,
-        type: "error",
-      });
     }
   };
 
@@ -108,28 +198,18 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
     if (!confirm("Are you sure you want to delete this round?")) return;
 
     try {
-      // Log the delete request before sending
-      console.log("DELETE ROUND REQUEST:", {
-        endpoint: `/api/rounds/${roundId}`,
-        method: "DELETE",
-        roundId,
-      });
+      const response = await roundService.deleteRound(roundId);
 
-      // Simulate API call
-      await simulateApiCall({ success: true });
+      // Update state after successful deletion
+      setRounds((prev) => prev.filter((round) => round.id !== roundId));
 
-      // Update state
-      setRounds(rounds.filter((round) => round.id !== roundId));
-      setOperationStatus({
-        message: "Round deleted successfully!",
-        type: "success",
-      });
-    } catch (error) {
+      showSuccess(
+        "Round Deleted",
+        response.message || "Round deleted successfully!"
+      );
+    } catch (error: any) {
+      showError("Delete Failed", error.message || "Failed to delete round.");
       console.error("Failed to delete round:", error);
-      setOperationStatus({
-        message: "Failed to delete round.",
-        type: "error",
-      });
     }
   };
 
@@ -158,30 +238,35 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
     setShowForm(true);
   };
 
+  // Function to retry fetching data
+  const retryFetch = () => {
+    setFetchFailed(false);
+    setLoading(true);
+    hideModal();
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold text-gray-800">Rounds</h2>
-        <button
-          onClick={() => (showForm ? resetForm() : openCreateForm())}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          {showForm ? "Cancel" : "Add Round"}
-        </button>
-      </div>
-
-      {/* Operation status message */}
-      {operationStatus.type && (
-        <div
-          className={`mb-4 p-3 rounded ${
-            operationStatus.type === "success"
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
-          }`}
-        >
-          {operationStatus.message}
+        <div className="flex gap-2">
+          {fetchFailed && (
+            <button
+              onClick={retryFetch}
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+            >
+              Retry Loading
+            </button>
+          )}
+          <button
+            onClick={() => (showForm ? resetForm() : openCreateForm())}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+            disabled={loading || fetchFailed}
+          >
+            {showForm ? "Cancel" : "Add Round"}
+          </button>
         </div>
-      )}
+      </div>
 
       {/* Round Form */}
       {showForm && (
@@ -196,9 +281,22 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
         />
       )}
 
+      {/* API Response Modal */}
+      <ApiResponseModal
+        isOpen={modalState.isOpen}
+        onClose={hideModal}
+        title={modalState.title}
+        message={modalState.message}
+        type={modalState.type}
+      />
+
       {/* Rounds List */}
       {loading ? (
         <p className="text-gray-500">Loading rounds...</p>
+      ) : fetchFailed ? (
+        <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-700">
+          <p>Failed to load rounds and locations. Please try again later.</p>
+        </div>
       ) : rounds.length > 0 ? (
         rounds.map((round) => (
           <div

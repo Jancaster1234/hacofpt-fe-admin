@@ -1,5 +1,5 @@
 // src/hooks/useApiModal.ts
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 interface ApiModalState {
   isOpen: boolean;
@@ -18,38 +18,67 @@ const initialState: ApiModalState = {
 export const useApiModal = () => {
   const [modalState, setModalState] = useState<ApiModalState>(initialState);
 
-  const showModal = (
-    title: string,
-    message: string,
-    type: "success" | "error" | "info" | "warning" = "info"
-  ) => {
-    setModalState({
-      isOpen: true,
-      title,
-      message,
-      type,
-    });
-  };
+  // Use useCallback to prevent recreating these functions on each render
+  const showModal = useCallback(
+    (
+      title: string,
+      message: string,
+      type: "success" | "error" | "info" | "warning" = "info"
+    ) => {
+      // Prevent multiple modals with the same error
+      setModalState((prevState) => {
+        // If the modal is already showing this exact error, don't update state
+        if (
+          prevState.isOpen &&
+          prevState.title === title &&
+          prevState.message === message &&
+          prevState.type === type
+        ) {
+          return prevState;
+        }
 
-  const hideModal = () => {
+        return {
+          isOpen: true,
+          title,
+          message,
+          type,
+        };
+      });
+    },
+    []
+  );
+
+  const hideModal = useCallback(() => {
     setModalState((prev) => ({ ...prev, isOpen: false }));
-  };
+  }, []);
 
-  const showSuccess = (title: string, message: string) => {
-    showModal(title, message, "success");
-  };
+  const showSuccess = useCallback(
+    (title: string, message: string) => {
+      showModal(title, message, "success");
+    },
+    [showModal]
+  );
 
-  const showError = (title: string, message: string) => {
-    showModal(title, message, "error");
-  };
+  const showError = useCallback(
+    (title: string, message: string) => {
+      showModal(title, message, "error");
+    },
+    [showModal]
+  );
 
-  const showWarning = (title: string, message: string) => {
-    showModal(title, message, "warning");
-  };
+  const showWarning = useCallback(
+    (title: string, message: string) => {
+      showModal(title, message, "warning");
+    },
+    [showModal]
+  );
 
-  const showInfo = (title: string, message: string) => {
-    showModal(title, message, "info");
-  };
+  const showInfo = useCallback(
+    (title: string, message: string) => {
+      showModal(title, message, "info");
+    },
+    [showModal]
+  );
 
   return {
     modalState,
