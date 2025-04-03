@@ -1,10 +1,11 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/TeamRequests.tsx
 "use client";
 import React, { useState, useEffect } from "react";
-import { fetchMockTeamRequests } from "../_mocks/fetchMockTeamRequests";
 import { TeamRequest, TeamRequestStatus } from "@/types/entities/teamRequest";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { Badge } from "@/components/ui/badge";
+import { useApiModal } from "@/hooks/useApiModal";
+import { teamRequestService } from "@/services/teamRequest.service";
 import {
   Select,
   SelectContent,
@@ -27,7 +28,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,6 +39,7 @@ interface TeamRequestsProps {
 
 export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
   const { user } = useAuth();
+  const { showError, showSuccess } = useApiModal();
   const [teamRequests, setTeamRequests] = useState<TeamRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -55,17 +56,30 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
     const loadTeamRequests = async () => {
       setLoading(true);
       try {
-        const data = await fetchMockTeamRequests(hackathonId);
-        setTeamRequests(data);
+        const { data, message } =
+          await teamRequestService.getTeamRequestsByHackathon(hackathonId);
+
+        if (data && Array.isArray(data)) {
+          setTeamRequests(data);
+        } else {
+          showError(
+            "Error",
+            "Failed to load team requests: Invalid response data"
+          );
+        }
       } catch (error) {
         console.error("Error loading team requests:", error);
+        showError(
+          "Error",
+          "Failed to load team requests. Please try again later."
+        );
       } finally {
         setLoading(false);
       }
     };
 
     loadTeamRequests();
-  }, [hackathonId]);
+  }, [hackathonId, showError]);
 
   const getStatusBadgeColor = (status: TeamRequestStatus) => {
     switch (status) {
@@ -84,37 +98,43 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
     }
   };
 
-  const updateTeamRequest = async (status: "approved" | "rejected") => {
+  const updateTeamRequest = async (status: "APPROVED" | "REJECTED") => {
     if (!selectedRequest) return;
 
     setUpdatingRequest(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Create the request body
-      const updatedRequest = {
-        ...selectedRequest,
+      const { data, message } = await teamRequestService.reviewTeamRequest({
+        requestId: selectedRequest.id,
         status,
-        note: updateNote || selectedRequest.note,
-        reviewedById: user?.id,
-      };
+        note: updateNote || selectedRequest.note || "",
+      });
 
-      // In a real application, you would make an API call here
-      console.log("Updating team request with data:", updatedRequest);
+      if (data) {
+        // Update the local state with the updated request
+        setTeamRequests((prev) =>
+          prev.map((req) => (req.id === selectedRequest.id ? data : req))
+        );
 
-      // Update the local state
-      setTeamRequests((prev) =>
-        prev.map((req) =>
-          req.id === selectedRequest.id ? { ...updatedRequest } : req
-        )
-      );
+        showSuccess(
+          "Success",
+          `Team request ${status.toLowerCase()} successfully`
+        );
+      } else {
+        showError(
+          "Error",
+          message || `Failed to ${status.toLowerCase()} team request`
+        );
+      }
 
       setOpenDialog(false);
       setSelectedRequest(null);
       setUpdateNote("");
     } catch (error) {
       console.error("Error updating team request:", error);
+      showError(
+        "Error",
+        `Failed to ${status.toLowerCase()} team request. Please try again later.`
+      );
     } finally {
       setUpdatingRequest(false);
     }
@@ -396,7 +416,7 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
             <Button
               variant="destructive"
               disabled={updatingRequest}
-              onClick={() => updateTeamRequest("rejected")}
+              onClick={() => updateTeamRequest("REJECTED")}
             >
               {updatingRequest ? (
                 <>
@@ -413,7 +433,7 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
             <Button
               variant="default"
               disabled={updatingRequest}
-              onClick={() => updateTeamRequest("approved")}
+              onClick={() => updateTeamRequest("APPROVED")}
             >
               {updatingRequest ? (
                 <>
