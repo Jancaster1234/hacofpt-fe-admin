@@ -113,6 +113,58 @@ class UserHackathonService {
       );
     }
   }
+
+  // Add the delete method
+  async deleteUserHackathon(
+    id: string
+  ): Promise<{ success: boolean; message?: string }> {
+    try {
+      const response = await apiService.auth.delete(
+        `/identity-service/api/v1/user-hackathons/${id}`
+      );
+
+      if (!response) {
+        throw new Error("Failed to delete user hackathon");
+      }
+
+      return {
+        success: true,
+        message: response.message || "User hackathon deleted successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<{ success: boolean }>(
+        error,
+        { success: false },
+        "Error deleting UserHackathon:"
+      );
+    }
+  }
+  // Alternative method that takes userId and hackathonId if the API is structured that way
+  async removeUserFromHackathon(
+    userId: string,
+    hackathonId: string
+  ): Promise<{ success: boolean; message?: string }> {
+    try {
+      const response = await apiService.auth.delete(
+        `/identity-service/api/v1/user-hackathons/user/${userId}/hackathon/${hackathonId}`
+      );
+
+      if (!response) {
+        throw new Error("Failed to remove user from hackathon");
+      }
+
+      return {
+        success: true,
+        message: response.message || "User removed from hackathon successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<{ success: boolean }>(
+        error,
+        { success: false },
+        "Error removing user from hackathon:"
+      );
+    }
+  }
 }
 
 export const userHackathonService = new UserHackathonService();

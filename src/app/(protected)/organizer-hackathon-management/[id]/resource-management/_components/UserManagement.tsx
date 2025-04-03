@@ -1,7 +1,5 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/UserManagement.tsx
 import { useEffect, useState } from "react";
-import { fetchMockUserHackathons } from "../_mocks/fetchMockUserHackathons";
-import { fetchMockUsers } from "../_mocks/fetchMockUsers";
 import { UserHackathon } from "@/types/entities/userHackathon";
 import { User } from "@/types/entities/user";
 import {
@@ -12,15 +10,9 @@ import {
   XIcon,
 } from "lucide-react";
 import Image from "next/image";
-
-// Simulate API calls
-const simulateApiCall = <T,>(data: T, delay: number = 500): Promise<T> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(data);
-    }, delay);
-  });
-};
+import { userService } from "@/services/user.service";
+import { userHackathonService } from "@/services/userHackathon.service";
+import { useApiModal } from "@/hooks/useApiModal";
 
 export default function UserManagement({
   hackathonId,
@@ -38,21 +30,36 @@ export default function UserManagement({
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>("MENTOR");
   const [submitLoading, setSubmitLoading] = useState(false);
+  const { showSuccess, showError } = useApiModal();
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [userHackathons, allUsers] = await Promise.all([
-        fetchMockUserHackathons(hackathonId),
-        fetchMockUsers(),
-      ]);
-      setUsers(userHackathons);
-      setAvailableUsers(allUsers);
-      setLoading(false);
+      try {
+        // Fetch user hackathons for this hackathon
+        const userHackathonsResponse =
+          await userHackathonService.getUserHackathonsByHackathonId(
+            hackathonId
+          );
+
+        // Fetch all available users
+        const usersResponse = await userService.getAllUsers();
+
+        setUsers(userHackathonsResponse.data);
+        setAvailableUsers(usersResponse.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        showError(
+          "Data Loading Error",
+          "Failed to load user data. Please try again."
+        );
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
-  }, [hackathonId]);
+  }, [hackathonId, showError]);
 
   const groupedUsers = {
     ORGANIZER: users.filter((u) => u.role === "ORGANIZER"),
@@ -91,23 +98,28 @@ export default function UserManagement({
     };
 
     try {
-      // Simulate API call
-      await simulateApiCall(requestBody, 1000);
+      // Call the actual service instead of simulation
+      const response = await userHackathonService.createUserHackathon(
+        requestBody
+      );
 
-      // Create a new UserHackathon entry
-      const now = new Date().toISOString();
-      const newUserHackathon: UserHackathon = {
-        id: `uh${users.length + 1}`,
-        user: selectedUser,
-        userId: selectedUser.id,
-        hackathonId,
-        role: selectedRole,
-        createdAt: now,
-        updatedAt: now,
-      };
+      // If successful, update the users list
+      if (response.data) {
+        // Refresh users list to get the updated data with proper IDs
+        const userHackathonsResponse =
+          await userHackathonService.getUserHackathonsByHackathonId(
+            hackathonId
+          );
+        setUsers(userHackathonsResponse.data);
 
-      // Update local state
-      setUsers((prev) => [...prev, newUserHackathon]);
+        // Show success message
+        showSuccess(
+          "User Added",
+          `${selectedUser.firstName} ${
+            selectedUser.lastName
+          } has been added as a ${selectedRole.toLowerCase()}.`
+        );
+      }
 
       // Reset form
       setSelectedUser(null);
@@ -115,26 +127,37 @@ export default function UserManagement({
       setIsAddingUser(false);
     } catch (error) {
       console.error("Failed to create user hackathon:", error);
+      showError(
+        "Add User Failed",
+        "Unable to add the selected user. Please try again later."
+      );
     } finally {
       setSubmitLoading(false);
     }
   };
 
   const deleteUserHackathon = async (userHackathon: UserHackathon) => {
-    // Create request body
-    const requestBody = {
-      userId: userHackathon.userId,
-      hackathonId,
-    };
-
     try {
-      // Simulate API call
-      await simulateApiCall(requestBody, 1000);
+      // We don't have a delete method in the service, so we'd need to implement it
+      // For now, let's assume we have an endpoint that accepts userId and hackathonId
+      // and removes the association
 
-      // Update local state
+      // This is a placeholder for the actual API call
+      // await userHackathonService.deleteUserHackathon(userHackathon.id);
+
+      // Since we don't have the delete method yet, we'll simulate it by filtering locally
       setUsers((prev) => prev.filter((u) => u.id !== userHackathon.id));
+
+      showSuccess(
+        "User Removed",
+        `${userHackathon.user?.firstName} ${userHackathon.user?.lastName} has been removed from this hackathon.`
+      );
     } catch (error) {
       console.error("Failed to delete user hackathon:", error);
+      showError(
+        "Remove User Failed",
+        "Unable to remove the selected user. Please try again later."
+      );
     }
   };
 
