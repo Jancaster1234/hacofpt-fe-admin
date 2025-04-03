@@ -1,15 +1,9 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Locations.tsx
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchMockLocations } from "../_mocks/fetchMockLocations";
 import { Location } from "@/types/entities/location";
-import {
-  createLocation,
-  updateLocation,
-  deleteLocation,
-  LocationCreateRequest,
-  LocationUpdateRequest,
-} from "../_api/locationApi";
+import { locationService } from "@/services/location.service";
+import { useApiModal } from "@/hooks/useApiModal";
+import ApiResponseModal from "@/components/common/ApiResponseModal";
 
 export default function Locations() {
   const [locations, setLocations] = useState<Location[]>([]);
@@ -23,6 +17,9 @@ export default function Locations() {
     longitude: 0,
   });
 
+  // Use the API modal hook
+  const { modalState, hideModal, showSuccess, showError } = useApiModal();
+
   useEffect(() => {
     loadLocations();
   }, []);
@@ -30,10 +27,15 @@ export default function Locations() {
   const loadLocations = async () => {
     setIsLoading(true);
     try {
-      const data = await fetchMockLocations();
-      setLocations(data);
+      const response = await locationService.getAllLocations();
+      if (response.data) {
+        setLocations(response.data);
+      } else {
+        showError("Error", "Failed to load locations. Please try again.");
+      }
     } catch (error) {
       console.error("Failed to load locations:", error);
+      showError("Error", "Failed to load locations. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -70,18 +72,28 @@ export default function Locations() {
     setIsLoading(true);
 
     try {
-      const request: LocationCreateRequest = {
+      const request = {
         name: formData.name,
         address: formData.address,
         latitude: formData.latitude,
         longitude: formData.longitude,
       };
 
-      const newLocation = await createLocation(request);
-      setLocations([...locations, newLocation]);
-      resetForm();
-    } catch (error) {
+      const response = await locationService.createLocation(request);
+
+      if (response.data) {
+        setLocations([...locations, response.data]);
+        showSuccess(
+          "Success",
+          response.message || "Location created successfully"
+        );
+        resetForm();
+      } else {
+        showError("Error", "Failed to create location");
+      }
+    } catch (error: any) {
       console.error("Error creating location:", error);
+      showError("Error", error.message || "Failed to create location");
     } finally {
       setIsLoading(false);
     }
@@ -94,24 +106,34 @@ export default function Locations() {
     setIsLoading(true);
 
     try {
-      const request: LocationUpdateRequest = {
+      const request = {
+        id: editingLocation.id,
         name: formData.name,
         address: formData.address,
         latitude: formData.latitude,
         longitude: formData.longitude,
       };
 
-      const updatedLocation = await updateLocation(editingLocation.id, request);
+      const response = await locationService.updateLocation(request);
 
-      // Update the locations array with the updated location
-      const updatedLocations = locations.map((loc) =>
-        loc.id === updatedLocation.id ? updatedLocation : loc
-      );
+      if (response.data) {
+        // Update the locations array with the updated location
+        const updatedLocations = locations.map((loc) =>
+          loc.id === response.data.id ? response.data : loc
+        );
 
-      setLocations(updatedLocations);
-      resetForm();
-    } catch (error) {
+        setLocations(updatedLocations);
+        showSuccess(
+          "Success",
+          response.message || "Location updated successfully"
+        );
+        resetForm();
+      } else {
+        showError("Error", "Failed to update location");
+      }
+    } catch (error: any) {
       console.error("Error updating location:", error);
+      showError("Error", error.message || "Failed to update location");
     } finally {
       setIsLoading(false);
     }
@@ -123,11 +145,16 @@ export default function Locations() {
     setIsLoading(true);
 
     try {
-      await deleteLocation(id);
+      const response = await locationService.deleteLocation(id);
       // Remove the deleted location from the state
       setLocations(locations.filter((loc) => loc.id !== id));
-    } catch (error) {
+      showSuccess(
+        "Success",
+        response.message || "Location deleted successfully"
+      );
+    } catch (error: any) {
       console.error("Error deleting location:", error);
+      showError("Error", error.message || "Failed to delete location");
     } finally {
       setIsLoading(false);
     }
@@ -240,6 +267,15 @@ export default function Locations() {
 
   return (
     <div className="bg-white shadow-md p-4 rounded-lg">
+      {/* Modal for API responses */}
+      <ApiResponseModal
+        isOpen={modalState.isOpen}
+        onClose={hideModal}
+        title={modalState.title}
+        message={modalState.message}
+        type={modalState.type}
+      />
+
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Available Locations</h2>
 
@@ -292,12 +328,12 @@ export default function Locations() {
                     >
                       Edit
                     </button>
-                    {/* <button
+                    <button
                       onClick={() => handleDelete(location.id)}
                       className="px-3 py-1 text-xs text-white bg-red-600 rounded-md hover:bg-red-700"
                     >
                       Delete
-                    </button> */}
+                    </button>
                   </div>
                 </div>
               </li>
