@@ -1,44 +1,13 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/AssignJudgeToRound.tsx
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { fetchMockRounds } from "../_mocks/fetchMockRounds";
-import { fetchMockJudgeRounds } from "../_mocks/fetchMockJudgeRounds";
-import { fetchMockUserHackathons } from "../_mocks/fetchMockUserHackathons";
 import { Round } from "@/types/entities/round";
 import { JudgeRound } from "@/types/entities/judgeRound";
 import { UserHackathon } from "@/types/entities/userHackathon";
-
-// Simulated API functions for judge assignment
-const assignJudgeToRound = async (
-  judgeId: string,
-  roundId: string
-): Promise<boolean> => {
-  // This would be an API call in a real application
-  return new Promise((resolve) => {
-    console.log(`Assigning judge ${judgeId} to round ${roundId}`);
-    // Simulate API delay
-    setTimeout(() => {
-      // Simulate successful response
-      //api create request body format: judgeId: string, roundId: string, isDeleted: false
-      resolve(true);
-    }, 500);
-  });
-};
-
-const removeJudgeFromRound = async (
-  judgeId: string,
-  roundId: string
-): Promise<boolean> => {
-  // This would be an API call in a real application
-  return new Promise((resolve) => {
-    console.log(`Removing judge ${judgeId} from round ${roundId}`);
-    // Simulate API delay
-    setTimeout(() => {
-      // Simulate successful response
-      resolve(true);
-    }, 500);
-  });
-};
+import { roundService } from "@/services/round.service";
+import { judgeRoundService } from "@/services/judgeRound.service";
+import { userHackathonService } from "@/services/userHackathon.service";
+import { useApiModal } from "@/hooks/useApiModal";
 
 export default function AssignJudgeToRound({
   hackathonId,
@@ -51,8 +20,10 @@ export default function AssignJudgeToRound({
   }>({});
   const [availableJudges, setAvailableJudges] = useState<UserHackathon[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [selectedRound, setSelectedRound] = useState<string | null>(null);
   const [isAssigning, setIsAssigning] = useState<boolean>(false);
+  const { showSuccess, showError } = useApiModal();
 
   // Fetch rounds, judges, and available users
   useEffect(() => {
@@ -60,78 +31,104 @@ export default function AssignJudgeToRound({
       setLoading(true);
       try {
         // Fetch rounds
-        const roundsData = await fetchMockRounds(hackathonId);
-        setRounds(roundsData);
+        const roundsResponse = await roundService.getRoundsByHackathonId(
+          hackathonId
+        );
+        if (!roundsResponse.data || roundsResponse.data.length === 0) {
+          showInfo(
+            "No Rounds Found",
+            "No rounds exist for this hackathon yet."
+          );
+          setLoading(false);
+          return;
+        }
+        setRounds(roundsResponse.data);
 
         // Fetch judges for each round
-        const judgesPromises = roundsData.map((round) =>
-          fetchMockJudgeRounds(round.id)
+        const judgesPromises = roundsResponse.data.map((round) =>
+          judgeRoundService.getJudgeRoundsByRoundId(round.id)
         );
         const judgesResults = await Promise.all(judgesPromises);
 
         const newRoundJudges: { [roundId: string]: JudgeRound[] } = {};
-        roundsData.forEach((round, index) => {
-          newRoundJudges[round.id] = judgesResults[index];
+        roundsResponse.data.forEach((round, index) => {
+          newRoundJudges[round.id] = judgesResults[index].data || [];
         });
         setRoundJudges(newRoundJudges);
 
         // Fetch available judges (users with JUDGE role)
-        const userHackathons = await fetchMockUserHackathons(hackathonId);
-        const judgeUsers = userHackathons.filter((uh) => uh.role === "JUDGE");
-        setAvailableJudges(judgeUsers);
+        const userHackathonsResponse =
+          await userHackathonService.getUserHackathonsByRole(
+            hackathonId,
+            "JUDGE"
+          );
+        setAvailableJudges(userHackathonsResponse.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
+        showError(
+          "Data Fetch Error",
+          "Failed to load rounds and judges data. Please try again later."
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [hackathonId]);
+  }, [hackathonId, showError]);
 
   const handleRemoveJudge = async (judgeId: string, roundId: string) => {
+    setIsProcessing(true);
     try {
-      const success = await removeJudgeFromRound(judgeId, roundId);
+      await judgeRoundService.deleteJudgeRoundByJudgeAndRound(judgeId, roundId);
 
-      if (success) {
-        // Update the local state to reflect the removal
-        setRoundJudges((prev) => ({
-          ...prev,
-          [roundId]: prev[roundId].filter((jr) => jr.judge.id !== judgeId),
-        }));
-      }
-    } catch (error) {
+      // Update the local state to reflect the removal
+      setRoundJudges((prev) => ({
+        ...prev,
+        [roundId]: prev[roundId].filter((jr) => jr.judge.id !== judgeId),
+      }));
+
+      showSuccess(
+        "Judge Removed",
+        "Judge has been successfully removed from the round."
+      );
+    } catch (error: any) {
       console.error("Error removing judge:", error);
+      showError("Error", error.message || "Failed to remove judge from round.");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleAssignJudge = async (judgeId: string, roundId: string) => {
+    setIsProcessing(true);
     try {
-      const success = await assignJudgeToRound(judgeId, roundId);
+      const response = await judgeRoundService.createJudgeRound({
+        judgeId,
+        roundId,
+      });
 
-      if (success) {
-        // Get the judge details from the available judges
-        const judgeUser = availableJudges.find((j) => j.user.id === judgeId);
+      if (response.data) {
+        // Get the judge rounds for this round again to refresh state
+        const updatedJudgeRoundsResponse =
+          await judgeRoundService.getJudgeRoundsByRoundId(roundId);
 
-        if (judgeUser) {
-          // Create a new JudgeRound object
-          const newJudgeRound: JudgeRound = {
-            id: `jr-${Date.now()}`, // Generate a temporary ID
-            roundId: roundId,
-            judge: judgeUser.user,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
+        // Update the local state
+        setRoundJudges((prev) => ({
+          ...prev,
+          [roundId]: updatedJudgeRoundsResponse.data || [],
+        }));
 
-          // Update the local state
-          setRoundJudges((prev) => ({
-            ...prev,
-            [roundId]: [...prev[roundId], newJudgeRound],
-          }));
-        }
+        showSuccess(
+          "Judge Assigned",
+          "Judge has been successfully assigned to the round."
+        );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error assigning judge:", error);
+      showError("Error", error.message || "Failed to assign judge to round.");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -142,8 +139,24 @@ export default function AssignJudgeToRound({
     return roundJudges[roundId]?.some((jr) => jr.judge.id === judgeId) || false;
   };
 
+  // Helper function for displaying info messages
+  const showInfo = (title: string, message: string) => {
+    const { showModal } = useApiModal();
+    showModal(title, message, "info");
+  };
+
   if (loading) {
-    return <div className="p-4">Loading...</div>;
+    return (
+      <div className="p-4 text-center">Loading judges and rounds data...</div>
+    );
+  }
+
+  if (rounds.length === 0) {
+    return (
+      <div className="p-4 text-center">
+        No rounds have been created for this hackathon.
+      </div>
+    );
   }
 
   return (
@@ -156,14 +169,15 @@ export default function AssignJudgeToRound({
         <div key={round.id} className="bg-white p-4 rounded-lg shadow-md mb-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium text-gray-800">
-              {round.roundTitle}
+              {round.roundTitle} (Round {round.roundNumber})
             </h3>
             <button
               onClick={() => {
                 setSelectedRound(selectedRound === round.id ? null : round.id);
                 setIsAssigning(selectedRound !== round.id);
               }}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm disabled:opacity-50"
+              disabled={isProcessing}
             >
               {selectedRound === round.id ? "Cancel" : "Assign Judges"}
             </button>
@@ -200,7 +214,8 @@ export default function AssignJudgeToRound({
                     onClick={() =>
                       handleRemoveJudge(judgeRound.judge.id, round.id)
                     }
-                    className="ml-2 text-xs text-red-500 hover:text-red-700 font-bold"
+                    className="ml-2 text-xs text-red-500 hover:text-red-700 font-bold disabled:opacity-50"
+                    disabled={isProcessing}
                   >
                     ✕
                   </button>
@@ -259,15 +274,23 @@ export default function AssignJudgeToRound({
                             isAssigned
                               ? "text-red-500 hover:text-red-700"
                               : "text-blue-500 hover:text-blue-700"
-                          } font-medium`}
+                          } font-medium disabled:opacity-50`}
+                          disabled={isProcessing}
                         >
-                          {isAssigned ? "Remove" : "Assign"}
+                          {isProcessing
+                            ? "..."
+                            : isAssigned
+                            ? "Remove"
+                            : "Assign"}
                         </button>
                       </div>
                     );
                   })
                 ) : (
-                  <p className="text-gray-500">No judges available.</p>
+                  <p className="text-gray-500">
+                    No judges available. Please add judges to the hackathon
+                    first.
+                  </p>
                 )}
               </div>
             </div>

@@ -96,7 +96,7 @@ class RoundMarkCriterionService {
   ): Promise<{ data: RoundMarkCriterion[]; message?: string }> {
     try {
       const response = await apiService.auth.get(
-        `/submission-service/api/v1/roundmarkcriteria?roundId=${roundId}`
+        `/submission-service/api/v1/roundmarkcriteria/by-round/${roundId}`
       );
 
       if (!response || !response.data) {
