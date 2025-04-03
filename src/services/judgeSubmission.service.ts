@@ -1,48 +1,77 @@
 // src/services/judgeSubmission.service.ts
 import { apiService } from "@/services/apiService_v0";
 import { JudgeSubmission } from "@/types/entities/judgeSubmission";
-
-type JudgeSubmissionPayload = {
-  judgeId: string;
-  submissionId: string;
-  score: number;
-  note: string;
-  judgeSubmissionDetails: {
-    roundMarkCriterionId: string;
-    score: number;
-    note?: string;
-  }[];
-};
+import { handleApiError } from "@/utils/errorHandler";
 
 class JudgeSubmissionService {
-  async createJudgeSubmission(
-    data: JudgeSubmissionPayload
-  ): Promise<JudgeSubmission> {
+  async createJudgeSubmission(data: {
+    judgeId: string;
+    submissionId: string;
+    score: number;
+    note: string;
+    judgeSubmissionDetails: {
+      roundMarkCriterionId: string;
+      score: number;
+      note?: string;
+    }[];
+  }): Promise<{ data: JudgeSubmission; message?: string }> {
     try {
       const response = await apiService.auth.post<JudgeSubmission>(
         "/submission-service/api/v1/judge-submissions",
         data
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error creating JudgeSubmission:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to create judge submission");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Judge submission created successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<JudgeSubmission>(
+        error,
+        {} as JudgeSubmission,
+        "Error creating JudgeSubmission:"
+      );
     }
   }
 
   async updateJudgeSubmission(
     id: string,
-    data: JudgeSubmissionPayload
-  ): Promise<JudgeSubmission> {
+    data: {
+      judgeId: string;
+      submissionId: string;
+      score: number;
+      note: string;
+      judgeSubmissionDetails: {
+        roundMarkCriterionId: string;
+        score: number;
+        note?: string;
+      }[];
+    }
+  ): Promise<{ data: JudgeSubmission; message?: string }> {
     try {
       const response = await apiService.auth.put<JudgeSubmission>(
         `/submission-service/api/v1/judge-submissions/${id}`,
         data
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error updating JudgeSubmission:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to update judge submission");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Judge submission updated successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<JudgeSubmission>(
+        error,
+        {} as JudgeSubmission,
+        "Error updating JudgeSubmission:"
+      );
     }
   }
 }

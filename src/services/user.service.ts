@@ -1,127 +1,222 @@
 // src/services/user.service.ts
 import { apiService } from "@/services/apiService_v0";
 import { User } from "@/types/entities/user";
-
-type UserPayload = {
-  username: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  userRoles: {
-    roleId: string;
-  }[];
-};
+import { handleApiError } from "@/utils/errorHandler";
 
 class UserService {
-  async getUserById(userId: string): Promise<Partial<User>> {
+  async getUserById(userId: string): Promise<{ data: User; message?: string }> {
     try {
-      const response = await apiService.auth.get<Partial<User>>(
+      const response = await apiService.auth.get<User>(
         `/identity-service/api/v1/users/${userId}`
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching user by ID:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve user");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<User>(
+        error,
+        {} as User,
+        "Error fetching user by ID:"
+      );
     }
   }
 
-  async getAllUsers(): Promise<Partial<User>[]> {
+  async getAllUsers(): Promise<{ data: User[]; message?: string }> {
     try {
-      const response = await apiService.auth.get<Partial<User>[]>(
+      const response = await apiService.auth.get<User[]>(
         "/identity-service/api/v1/users"
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching all users:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve users");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<User[]>(error, [], "Error fetching all users:");
     }
   }
 
-  async getUsersByRoles(): Promise<Partial<User>[]> {
+  async getUsersByRoles(): Promise<{ data: User[]; message?: string }> {
     try {
-      const response = await apiService.auth.get<Partial<User>[]>(
+      const response = await apiService.auth.get<User[]>(
         "/identity-service/api/v1/users/users-by-roles"
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching users by roles:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve users by roles");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<User[]>(
+        error,
+        [],
+        "Error fetching users by roles:"
+      );
     }
   }
 
-  async getTeamMembers(): Promise<Partial<User>[]> {
+  async getTeamMembers(): Promise<{ data: User[]; message?: string }> {
     try {
-      const response = await apiService.auth.get<Partial<User>[]>(
+      const response = await apiService.auth.get<User[]>(
         "/identity-service/api/v1/users/team-members"
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching team members:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve team members");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<User[]>(error, [], "Error fetching team members:");
     }
   }
 
-  async getUserByUsername(username: string): Promise<Partial<User>> {
+  async getUserByUsername(
+    username: string
+  ): Promise<{ data: User; message?: string }> {
     try {
-      const response = await apiService.auth.get<Partial<User>>(
+      const response = await apiService.auth.get<User>(
         `/identity-service/api/v1/users/username/${username}`
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching user by username:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve user by username");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<User>(
+        error,
+        {} as User,
+        "Error fetching user by username:"
+      );
     }
   }
 
   async getUsersByCreatedUserName(
     createdUserName: string
-  ): Promise<Partial<User>[]> {
+  ): Promise<{ data: User[]; message?: string }> {
     try {
-      const response = await apiService.auth.get<Partial<User>[]>(
+      const response = await apiService.auth.get<User[]>(
         `/identity-service/api/v1/users/users-by-created-by/${createdUserName}`
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching users by createdUserName:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve users by created username");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<User[]>(
+        error,
+        [],
+        "Error fetching users by createdUserName:"
+      );
     }
   }
 
-  async getCurrentUser(): Promise<User> {
+  async getCurrentUser(): Promise<{ data: User; message?: string }> {
     try {
       const response = await apiService.auth.get<User>(
         `/identity-service/api/v1/users/my-info`
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching current user info:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve current user info");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<User>(
+        error,
+        {} as User,
+        "Error fetching current user info:"
+      );
     }
   }
 
-  async createUser(data: UserPayload): Promise<User> {
+  async createUser(data: {
+    username: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    userRoles: {
+      roleId: string;
+    }[];
+  }): Promise<{ data: User; message?: string }> {
     try {
       const response = await apiService.auth.post<User>(
         "/identity-service/api/v1/users",
         data
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error creating user:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to create user");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "User created successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<User>(error, {} as User, "Error creating user:");
     }
   }
 
-  async updateUser(userId: string, data: UserPayload): Promise<User> {
+  async updateUser(
+    userId: string,
+    data: {
+      username: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+      userRoles: {
+        roleId: string;
+      }[];
+    }
+  ): Promise<{ data: User; message?: string }> {
     try {
       const response = await apiService.auth.put<User>(
         `/identity-service/api/v1/users/${userId}`,
         data
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error updating user:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to update user");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "User updated successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<User>(error, {} as User, "Error updating user:");
     }
   }
 }

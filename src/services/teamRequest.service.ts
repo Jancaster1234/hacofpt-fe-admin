@@ -1,72 +1,158 @@
 // src/services/teamRequest.service.ts
 import { apiService } from "@/services/apiService_v0";
 import { TeamRequest } from "@/types/entities/teamRequest";
-
-type TeamRequestPayload = {
-  hackathonId: string;
-  name: string;
-  note: string;
-  teamRequestMembers: {
-    userId: string;
-  }[];
-};
+import { handleApiError } from "@/utils/errorHandler";
 
 class TeamRequestService {
   async getTeamRequestsByHackathonAndUser(
     hackathonId: string,
     memberId: string
-  ): Promise<Partial<TeamRequest>[]> {
+  ): Promise<{ data: TeamRequest[]; message?: string }> {
     try {
-      const response = await apiService.auth.get<Partial<TeamRequest>[]>(
+      const response = await apiService.auth.get<TeamRequest[]>(
         `/hackathon-service/api/v1/teams/requests?memberId=${memberId}&hackathonId=${hackathonId}`
       );
-      return response.data;
-    } catch (error) {
-      console.error(
-        "Error fetching team requests by hackathonId and memberId:",
-        error
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve team requests");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<TeamRequest[]>(
+        error,
+        [],
+        "[Team Request Service] Error fetching team requests:"
       );
-      throw error;
     }
   }
 
   async getTeamRequestsByUser(
     memberId: string
-  ): Promise<Partial<TeamRequest>[]> {
+  ): Promise<{ data: TeamRequest[]; message?: string }> {
     try {
-      const response = await apiService.auth.get<Partial<TeamRequest>[]>(
+      const response = await apiService.auth.get<TeamRequest[]>(
         `/hackathon-service/api/v1/teams/requests?memberId=${memberId}`
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching team requests by memberId:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve team requests");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<TeamRequest[]>(
+        error,
+        [],
+        "[Team Request Service] Error fetching team requests:"
+      );
     }
   }
 
   async getTeamRequestsByHackathon(
     hackathonId: string
-  ): Promise<Partial<TeamRequest>[]> {
+  ): Promise<{ data: TeamRequest[]; message?: string }> {
     try {
-      const response = await apiService.auth.get<Partial<TeamRequest>[]>(
+      const response = await apiService.auth.get<TeamRequest[]>(
         `/hackathon-service/api/v1/teams/requests?hackathonId=${hackathonId}`
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching team requests by hackathonId:", error);
-      throw error;
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve team requests");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<TeamRequest[]>(
+        error,
+        [],
+        "[Team Request Service] Error fetching team requests:"
+      );
     }
   }
 
-  async createTeamRequest(data: TeamRequestPayload): Promise<TeamRequest> {
+  async createTeamRequest(data: {
+    hackathonId: string;
+    name: string;
+    note: string;
+    teamRequestMembers: {
+      userId: string;
+    }[];
+  }): Promise<{ data: TeamRequest; message?: string }> {
     try {
       const response = await apiService.auth.post<TeamRequest>(
         "/hackathon-service/api/v1/teams/requests",
         data
       );
-      return response.data;
-    } catch (error) {
-      console.error("Error creating TeamRequest:", error);
+
+      if (!response || !response.data) {
+        throw new Error(response?.message || "Failed to create team request");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Team request created successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<TeamRequest>(
+        error,
+        {} as TeamRequest,
+        "[Team Request Service] Error creating team request:"
+      );
+    }
+  }
+
+  async reviewTeamRequest(data: {
+    requestId: string;
+    status: "APPROVED" | "REJECTED";
+    note: string;
+  }): Promise<{ data: TeamRequest; message?: string }> {
+    try {
+      const response = await apiService.auth.post<TeamRequest>(
+        "/hackathon-service/api/v1/teams/requests/review",
+        { data }
+      );
+
+      if (!response || !response.data) {
+        throw new Error(response?.message || "Failed to review team request");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Team request reviewed successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<TeamRequest>(
+        error,
+        {} as TeamRequest,
+        "[Team Request Service] Error reviewing team request:"
+      );
+    }
+  }
+
+  async deleteTeamRequest(id: string): Promise<{ message?: string }> {
+    try {
+      const response = await apiService.auth.delete<void>(
+        `/hackathon-service/api/v1/teams/requests/${id}`
+      );
+
+      return {
+        message: response.message || "Successfully deleted team request",
+      };
+    } catch (error: any) {
+      console.error(
+        "[Team Request Service] Error deleting team request:",
+        error.message
+      );
       throw error;
     }
   }
