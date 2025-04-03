@@ -1,5 +1,5 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/page.tsx
-
+"use client";
 // TODO: [Lv1] check if should cache the page server side and revalidate
 // TODO: [Lv1] check if nextjs able to cache this page client-side
 import { Metadata } from "next";
@@ -9,39 +9,52 @@ import HackathonOverview from "./_components/HackathonOverview";
 import { Hackathon } from "@/types/entities/hackathon"; // Import type
 import EditSaveButtons from "./_components/EditSaveButtons";
 import ResourceManagementButton from "./_components/ResourceManagementButton";
-
-type HackathonProps = {
-  params: { id: string }; //Keep this to access the dynamic route param
-};
+import { hackathonService } from "@/services/hackathon.service";
+import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 
 // TODO: [Lv1] check if memoization is enabled by default, without the need of enable force-cache
 
 // This function should be memoized to avoid fetching the same data multiple times
-async function getHackathon(id: string): Promise<Hackathon> {
-  const res = await fetch(`http://localhost:4000/api/hackathon/${id}`, {
-    cache: "no-store",
+async function getHackathon(id: string): Promise<Hackathon[]> {
+  const response = await hackathonService.getHackathonById(id);
+  return response.data.length > 0 ? response.data[0] : null;
+}
+
+export default function HackathonDetail() {
+  const params = useParams();
+  const id = params.id as string;
+
+  const {
+    data: hackathon,
+    error,
+    isLoading,
+  } = useQuery<Hackathon>({
+    queryKey: ["hackathon", id],
+    queryFn: () => getHackathon(id),
+    staleTime: 60 * 1000, // 1 minute before refetch
+    refetchOnWindowFocus: false,
   });
-  if (!res.ok) throw new Error("Failed to fetch hackathon data");
-  return res.json();
-}
 
-//`params` is necessary here for fetching metadata dynamically, SEO purposes
-export async function generateMetadata({
-  params,
-}: HackathonProps): Promise<Metadata> {
-  // Await the params object
-  const id = (await params).id;
-  const hackathon = await getHackathon(id);
-  return {
-    title: hackathon.title,
-    description: hackathon.description,
-  };
-}
+  // For metadata-related side effects
+  useEffect(() => {
+    if (hackathon) {
+      document.title = hackathon.title || "Hackathon Detail";
+      // Update meta description if needed
+      const metaDescription = document.querySelector(
+        'meta[name="description"]'
+      );
+      if (metaDescription) {
+        metaDescription.setAttribute("content", hackathon.description || "");
+      }
+    }
+  }, [hackathon]);
 
-export default async function HackathonDetail({ params }: HackathonProps) {
-  // Await the params object
-  const id = (await params).id;
-  const hackathon = await getHackathon(id);
+  if (isLoading) return <p>Loading hackathon details...</p>;
+  if (error) return <p>Failed to load hackathon details.</p>;
+  if (!hackathon) return <p>No hackathon found.</p>;
+
   return (
     <div className="container mx-auto p-4 sm:p-6">
       {/* Edit & Save Buttons */}
