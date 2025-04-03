@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Locations.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import { Location } from "@/types/entities/location";

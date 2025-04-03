@@ -7,12 +7,14 @@ interface RoundMarkCriterionFormProps {
   criterion: RoundMarkCriterion | null;
   onSubmit: (data: { name: string; maxScore: number; note?: string }) => void;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
 export default function RoundMarkCriterionForm({
   criterion,
   onSubmit,
   onCancel,
+  isLoading = false,
 }: RoundMarkCriterionFormProps) {
   const [name, setName] = useState("");
   const [maxScore, setMaxScore] = useState(10);
@@ -65,6 +67,7 @@ export default function RoundMarkCriterionForm({
         <button
           onClick={onCancel}
           className="p-1 text-gray-500 hover:text-gray-700"
+          disabled={isLoading}
         >
           <X size={20} />
         </button>
@@ -83,6 +86,7 @@ export default function RoundMarkCriterionForm({
               errors.name ? "border-red-500" : "border-gray-300"
             }`}
             placeholder="e.g. Innovation"
+            disabled={isLoading}
           />
           {errors.name && (
             <p className="text-red-500 text-xs mt-1">{errors.name}</p>
@@ -101,6 +105,7 @@ export default function RoundMarkCriterionForm({
             className={`w-full p-2 border rounded-md ${
               errors.maxScore ? "border-red-500" : "border-gray-300"
             }`}
+            disabled={isLoading}
           />
           {errors.maxScore && (
             <p className="text-red-500 text-xs mt-1">{errors.maxScore}</p>
@@ -117,6 +122,7 @@ export default function RoundMarkCriterionForm({
             className="w-full p-2 border border-gray-300 rounded-md"
             rows={3}
             placeholder="Describe what this criterion evaluates..."
+            disabled={isLoading}
           />
         </div>
 
@@ -124,15 +130,17 @@ export default function RoundMarkCriterionForm({
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+            disabled={isLoading}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
+            disabled={isLoading}
           >
-            {criterion ? "Update" : "Create"}
+            {isLoading ? "Processing..." : criterion ? "Update" : "Create"}
           </button>
         </div>
       </form>

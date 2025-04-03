@@ -89,6 +89,33 @@ class RoundMarkCriterionService {
       );
     }
   }
+
+  // New method to get mark criteria by round ID
+  async getRoundMarkCriteriaByRoundId(
+    roundId: string
+  ): Promise<{ data: RoundMarkCriterion[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get(
+        `/submission-service/api/v1/roundmarkcriteria?roundId=${roundId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve round mark criteria");
+      }
+
+      return {
+        data: response.data,
+        message:
+          response.message || "Round mark criteria retrieved successfully",
+      };
+    } catch (error: any) {
+      return handleApiError(
+        error,
+        [],
+        "[RoundMarkCriterion Service] Error fetching round mark criteria:"
+      );
+    }
+  }
 }
 
 export const roundMarkCriterionService = new RoundMarkCriterionService();

@@ -44,6 +44,9 @@ export default function RoundForm({
     endTime?: string;
   }>({});
 
+  // Loading state for form submission
+  const [submitting, setSubmitting] = useState(false);
+
   // Handle form input changes
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -109,7 +112,7 @@ export default function RoundForm({
       if (!location) return;
 
       const newRoundLocation: RoundLocation = {
-        id: `rl_${Date.now()}_${locationId}`,
+        id: `temp_${Date.now()}_${locationId}`, // The API will assign a proper ID
         locationId,
         location,
         type: locationType,
@@ -136,48 +139,39 @@ export default function RoundForm({
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
 
-    // Validate start and end times
-    const startDate = new Date(formData.startTime || "");
-    const endDate = new Date(formData.endTime || "");
+    try {
+      // Validate start and end times
+      const startDate = new Date(formData.startTime || "");
+      const endDate = new Date(formData.endTime || "");
 
-    if (startDate >= endDate) {
-      setFormErrors({
-        ...formErrors,
-        endTime: "End time must be after start time",
-      });
-      return;
+      if (startDate >= endDate) {
+        setFormErrors({
+          ...formErrors,
+          endTime: "End time must be after start time",
+        });
+        setSubmitting(false);
+        return;
+      }
+
+      // Create round data object
+      const roundData: Round = {
+        ...formData,
+        id: formData.id || `temp_round_${Date.now()}`, // The API will assign a proper ID for new rounds
+        hackathonId,
+        status: formData.status || "UPCOMING",
+        roundLocations: formData.roundLocations || [],
+        createdAt: formData.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      } as Round;
+
+      await onSubmit(roundData);
+    } catch (error) {
+      console.error("Form submission error:", error);
+    } finally {
+      setSubmitting(false);
     }
-
-    // Create round data object
-    const roundData: Round = {
-      ...formData,
-      id: formData.id || `round_${Date.now()}`,
-      hackathonId,
-      status: formData.status || "UPCOMING",
-      roundLocations: formData.roundLocations || [],
-      createdAt: formData.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    } as Round;
-
-    // Log detailed form submission data
-    console.log("ROUND FORM SUBMISSION:", {
-      action: isEditing ? "UPDATE" : "CREATE",
-      requestBody: roundData,
-      validationPassed: true,
-      formattedTimestamps: {
-        startTime: new Date(roundData.startTime || "").toLocaleString(),
-        endTime: new Date(roundData.endTime || "").toLocaleString(),
-        createdAt: new Date(roundData.createdAt).toLocaleString(),
-        updatedAt: new Date(roundData.updatedAt).toLocaleString(),
-      },
-      metadata: {
-        totalLocations: roundData.roundLocations.length,
-        locationTypes: roundData.roundLocations.map((rl) => rl.type),
-      },
-    });
-
-    await onSubmit(roundData);
   };
 
   return (
@@ -196,6 +190,7 @@ export default function RoundForm({
               onChange={handleInputChange}
               className="w-full p-2 border rounded"
               required
+              disabled={submitting}
             />
           </div>
           <div>
@@ -208,6 +203,7 @@ export default function RoundForm({
               className="w-full p-2 border rounded"
               min="1"
               required
+              disabled={submitting}
             />
           </div>
           <div>
@@ -221,6 +217,7 @@ export default function RoundForm({
                 formErrors.startTime ? "border-red-500" : ""
               }`}
               required
+              disabled={submitting}
             />
             {formErrors.startTime && (
               <p className="text-red-500 text-sm mt-1">
@@ -239,6 +236,7 @@ export default function RoundForm({
                 formErrors.endTime ? "border-red-500" : ""
               }`}
               required
+              disabled={submitting}
             />
             {formErrors.endTime && (
               <p className="text-red-500 text-sm mt-1">{formErrors.endTime}</p>
@@ -252,6 +250,7 @@ export default function RoundForm({
               onChange={handleInputChange}
               className="w-full p-2 border rounded"
               required
+              disabled={submitting}
             >
               <option value="UPCOMING">Upcoming</option>
               <option value="ONGOING">Ongoing</option>
@@ -301,13 +300,14 @@ export default function RoundForm({
                           )
                         }
                         className="p-1 border rounded text-sm"
+                        disabled={submitting}
                       >
                         <option value="">-- Select type --</option>
                         <option value="ONLINE">Online</option>
                         <option value="OFFLINE">Offline</option>
                         <option value="HYBRID">Hybrid</option>
                       </select>
-                      {isSelected && (
+                      {isSelected && !submitting && (
                         <button
                           type="button"
                           onClick={() => removeLocation(location.id)}
@@ -347,15 +347,24 @@ export default function RoundForm({
             type="button"
             onClick={onCancel}
             className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100"
+            disabled={submitting}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            disabled={!!formErrors.startTime || !!formErrors.endTime}
+            className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
+              submitting ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+            disabled={
+              !!formErrors.startTime || !!formErrors.endTime || submitting
+            }
           >
-            {isEditing ? "Update Round" : "Create Round"}
+            {submitting
+              ? "Processing..."
+              : isEditing
+              ? "Update Round"
+              : "Create Round"}
           </button>
         </div>
       </form>
