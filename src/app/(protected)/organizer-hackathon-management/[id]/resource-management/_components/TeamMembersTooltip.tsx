@@ -1,6 +1,7 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/TeamMembersTooltip.tsx
 import { useState, useEffect } from "react";
 import { UsersIcon } from "lucide-react";
+import { useApiModal } from "@/hooks/useApiModal";
 
 interface TeamMember {
   id: string;
@@ -14,57 +15,72 @@ interface TeamMembersTooltipProps {
   teamId: string;
 }
 
-// Mock function to fetch team members
-const fetchTeamMembers = async (teamId: string): Promise<TeamMember[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        {
-          id: "1",
-          firstName: "John",
-          lastName: "Doe",
-          email: "john.doe@example.com",
-          role: "Developer",
-        },
-        {
-          id: "2",
-          firstName: "Jane",
-          lastName: "Smith",
-          email: "jane.smith@example.com",
-          role: "Designer",
-        },
-        {
-          id: "3",
-          firstName: "Alex",
-          lastName: "Johnson",
-          email: "alex.johnson@example.com",
-          role: "Developer",
-        },
-      ]);
-    }, 300);
-  });
-};
+// Create a team member service
+// src/services/teamMember.service.ts
+import { apiService } from "@/services/apiService_v0";
+import { handleApiError } from "@/utils/errorHandler";
 
+export interface TeamMember {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+}
+
+class TeamMemberService {
+  async getTeamMembers(
+    teamId: string
+  ): Promise<{ data: TeamMember[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<TeamMember[]>(
+        `/hackathon-service/api/v1/team-members?teamId=${teamId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve team members");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Team members retrieved successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<TeamMember[]>(
+        error,
+        [],
+        "[TeamMember Service] Error fetching team members:"
+      );
+    }
+  }
+}
+
+export const teamMemberService = new TeamMemberService();
+
+// Now update the TeamMembersTooltip component
 export function TeamMembersTooltip({ teamId }: TeamMembersTooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(false);
+  const { showError } = useApiModal();
 
   useEffect(() => {
     if (isVisible && members.length === 0) {
       setLoading(true);
-      fetchTeamMembers(teamId)
-        .then((data) => {
-          setMembers(data);
+      teamMemberService
+        .getTeamMembers(teamId)
+        .then((response) => {
+          setMembers(response.data);
         })
         .catch((error) => {
           console.error("Error fetching team members:", error);
+          showError("Error", "Failed to load team members.");
         })
         .finally(() => {
           setLoading(false);
         });
     }
-  }, [isVisible, teamId, members.length]);
+  }, [isVisible, teamId, members.length, showError]);
 
   return (
     <div className="relative inline-block ml-2">

@@ -1,50 +1,17 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/JudgeAssign.tsx
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { fetchMockRounds } from "../_mocks/fetchMockRounds";
-import { fetchMockTeamRounds } from "../_mocks/fetchMockTeamRounds";
-import { fetchMockTeamRoundJudges } from "../_mocks/fetchMockTeamRoundJudges";
-import { fetchMockJudgeRounds } from "../_mocks/fetchMockJudgeRounds";
 import { Round } from "@/types/entities/round";
-import { TeamRound, TeamRoundStatus } from "@/types/entities/teamRound";
+import { TeamRound } from "@/types/entities/teamRound";
 import { TeamRoundJudge } from "@/types/entities/teamRoundJudge";
 import { JudgeRound } from "@/types/entities/judgeRound";
 import { TeamMembersTooltip } from "./TeamMembersTooltip";
 import { InfoTooltip } from "./InfoTooltip";
-
-// Simulated API functions for judge assignment
-const assignJudgeToTeamRound = async (
-  teamRoundId: string,
-  judgeId: string
-): Promise<boolean> => {
-  // This would be an API call in a real application
-  return new Promise((resolve) => {
-    console.log(`Assigning judge ${judgeId} to teamRound ${teamRoundId}`);
-
-    // Simulate API delay
-    setTimeout(() => {
-      // Simulate successful response
-      // API create request body format: teamRoundId: string, judgeId: string
-      resolve(true);
-    }, 500);
-  });
-};
-
-const removeJudgeFromTeamRound = async (
-  teamRoundJudgeId: string
-): Promise<boolean> => {
-  // This would be an API call in a real application
-  return new Promise((resolve) => {
-    console.log(`Removing judge with teamRoundJudge ID: ${teamRoundJudgeId}`);
-
-    // Simulate API delay
-    setTimeout(() => {
-      // Simulate successful response
-      // API delete request: Delete /api/teamRoundJudges/{teamRoundJudgeId}
-      resolve(true);
-    }, 500);
-  });
-};
+import { roundService } from "@/services/round.service";
+import { teamRoundService } from "@/services/teamRound.service";
+import { teamRoundJudgeService } from "@/services/teamRoundJudge.service";
+import { judgeRoundService } from "@/services/judgeRound.service";
+import { useApiModal } from "@/hooks/useApiModal";
 
 export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
   const [rounds, setRounds] = useState<Round[]>([]);
@@ -62,12 +29,17 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
     null
   );
   const [loading, setLoading] = useState<boolean>(true);
+  const { showError, showSuccess } = useApiModal();
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const roundsData = await fetchMockRounds(hackathonId);
+        // Fetch real rounds data
+        const roundsResponse = await roundService.getRoundsByHackathonId(
+          hackathonId
+        );
+        const roundsData = roundsResponse.data;
         setRounds(roundsData);
 
         if (roundsData.length > 0) {
@@ -82,20 +54,22 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
 
         for (const round of roundsData) {
           // Fetch team rounds for this round
-          const teamRoundsData = await fetchMockTeamRounds(
-            hackathonId,
-            round.id
-          );
-          teamRoundsObj[round.id] = teamRoundsData;
+          const teamRoundsResponse =
+            await teamRoundService.getTeamRoundsByRoundId(round.id);
+          teamRoundsObj[round.id] = teamRoundsResponse.data;
 
           // Fetch judges available for this round
-          const judgeRoundsData = await fetchMockJudgeRounds(round.id);
-          availableJudgesObj[round.id] = judgeRoundsData;
+          const judgeRoundsResponse =
+            await judgeRoundService.getJudgeRoundsByRoundId(round.id);
+          availableJudgesObj[round.id] = judgeRoundsResponse.data;
 
           // Fetch judges for each team round
-          for (const teamRound of teamRoundsData) {
-            const judgesData = await fetchMockTeamRoundJudges(teamRound.id);
-            teamRoundJudgesObj[teamRound.id] = judgesData;
+          for (const teamRound of teamRoundsResponse.data) {
+            const judgesResponse =
+              await teamRoundJudgeService.getTeamRoundJudgesByTeamRoundId(
+                teamRound.id
+              );
+            teamRoundJudgesObj[teamRound.id] = judgesResponse.data;
           }
         }
 
@@ -104,22 +78,30 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
         setAvailableJudges(availableJudgesObj);
       } catch (error) {
         console.error("Error fetching data:", error);
+        showError(
+          "Data Loading Error",
+          "Failed to load hackathon data. Please try again later."
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [hackathonId]);
+  }, [hackathonId, showError]);
 
   const handleRemoveJudge = async (
     teamRoundJudgeId: string,
-    teamRoundId: string
+    teamRoundId: string,
+    judgeId: string
   ) => {
     try {
-      const success = await removeJudgeFromTeamRound(teamRoundJudgeId);
+      const response = await teamRoundJudgeService.deleteTeamRoundJudge(
+        teamRoundId,
+        judgeId
+      );
 
-      if (success) {
+      if (response.message) {
         // Update local state to reflect removal
         setTeamRoundJudges((prev) => ({
           ...prev,
@@ -127,9 +109,18 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
             (judge) => judge.id !== teamRoundJudgeId
           ),
         }));
+
+        showSuccess(
+          "Judge Removed",
+          "Judge has been successfully removed from the team."
+        );
       }
     } catch (error) {
       console.error("Error removing judge:", error);
+      showError(
+        "Failed to Remove Judge",
+        "Could not remove the judge. Please try again later."
+      );
     }
   };
 
@@ -139,34 +130,29 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
     roundId: string
   ) => {
     try {
-      const success = await assignJudgeToTeamRound(teamRoundId, judgeId);
+      const response = await teamRoundJudgeService.createTeamRoundJudge({
+        teamRoundId,
+        judgeId,
+      });
 
-      if (success) {
-        // Find the judge details from available judges
-        const judgeRound = availableJudges[roundId]?.find(
-          (jr) => jr.judge.id === judgeId
+      if (response.data) {
+        // Update local state with the returned data from API
+        setTeamRoundJudges((prev) => ({
+          ...prev,
+          [teamRoundId]: [...(prev[teamRoundId] || []), response.data],
+        }));
+
+        showSuccess(
+          "Judge Assigned",
+          "Judge has been successfully assigned to the team."
         );
-
-        if (judgeRound) {
-          // Create a new TeamRoundJudge object
-          const newTeamRoundJudge: TeamRoundJudge = {
-            id: `trj-${Date.now()}`, // Generate a temporary ID
-            teamRoundId: teamRoundId,
-            judgeId: judgeId,
-            judge: judgeRound.judge,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-
-          // Update local state
-          setTeamRoundJudges((prev) => ({
-            ...prev,
-            [teamRoundId]: [...(prev[teamRoundId] || []), newTeamRoundJudge],
-          }));
-        }
       }
     } catch (error) {
       console.error("Error assigning judge:", error);
+      showError(
+        "Failed to Assign Judge",
+        "Could not assign judge to the team. Please try again later."
+      );
     }
   };
 
@@ -296,7 +282,11 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
                           {!isDisqualified && (
                             <button
                               onClick={() =>
-                                handleRemoveJudge(judge.id, teamRound.id)
+                                handleRemoveJudge(
+                                  judge.id,
+                                  teamRound.id,
+                                  judge.judgeId
+                                )
                               }
                               className="ml-2 text-xs text-red-500 hover:text-red-700 font-bold"
                             >
@@ -360,7 +350,8 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
                                     if (teamRoundJudge) {
                                       handleRemoveJudge(
                                         teamRoundJudge.id,
-                                        teamRound.id
+                                        teamRound.id,
+                                        judgeRound.judge.id
                                       );
                                     }
                                   } else {
