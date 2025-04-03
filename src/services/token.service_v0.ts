@@ -19,19 +19,22 @@ class TokenService_v0 {
     if (!accessToken) return null;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/refresh_v0`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ accessToken }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/identity-service/api/v1/auth/refresh`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: accessToken }),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
-        this.setAccessToken(data.accessToken);
+        this.setAccessToken(data.token);
         console.warn("Access token successfully refreshed (v0).");
-        return data.accessToken;
+        return data.token;
       } else {
         console.warn("Token refresh failed (v0). User must re-login.");
         this.setAccessToken(null);
