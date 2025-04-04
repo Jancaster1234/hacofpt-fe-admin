@@ -35,7 +35,7 @@ class TeamRoundService {
   ): Promise<{ data: TeamRound[]; message?: string }> {
     try {
       const response = await apiService.auth.post<TeamRound[]>(
-        "/api/v1/team-rounds/filter-by-judge-and-round",
+        "/hackathon-service/api/v1/team-rounds/filter-by-judge-and-round",
         {
           data: {
             judgeId: judgeId,
