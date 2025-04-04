@@ -4,8 +4,12 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { fetchMockMentorshipRequests } from "./_mocks/fetchMockMentorshipRequests";
-import { MentorshipRequest } from "@/types/entities/mentorshipRequest";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { updateMentorshipRequest } from "./_api/updateMentorshipRequest";
+import {
+  MentorshipRequest,
+  MentorshipStatus,
+} from "@/types/entities/mentorshipRequest";
+import { ChevronDown, ChevronUp, Check, X, Loader2 } from "lucide-react";
 
 export default function MentorshipRequestsPage() {
   const { user } = useAuth();
@@ -15,6 +19,7 @@ export default function MentorshipRequestsPage() {
   const [expandedHackathons, setExpandedHackathons] = useState<
     Record<string, boolean>
   >({});
+  const [loading, setLoading] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (user) {
@@ -37,6 +42,50 @@ export default function MentorshipRequestsPage() {
       ...prev,
       [title]: !prev[title],
     }));
+  };
+
+  const handleUpdateStatus = async (
+    requestId: string,
+    status: Extract<MentorshipStatus, "APPROVED" | "REJECTED">
+  ) => {
+    if (!user) return;
+
+    // Set loading state for this specific request
+    setLoading((prev) => ({ ...prev, [requestId]: true }));
+
+    try {
+      const updatedRequest = await updateMentorshipRequest({
+        requestId,
+        status,
+        evaluatedById: user.id,
+      });
+
+      // Update the state with the updated request
+      setMentorshipRequests((prev) =>
+        prev.map((request) =>
+          request.id === requestId
+            ? {
+                ...request,
+                status: updatedRequest.status,
+                evaluatedAt: updatedRequest.evaluatedAt,
+                evaluatedBy: user
+                  ? {
+                      id: user.id,
+                      firstName: user.firstName,
+                      lastName: user.lastName,
+                    }
+                  : undefined,
+                evaluatedById: user.id,
+              }
+            : request
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update request:", error);
+      // You could add toast notification here
+    } finally {
+      setLoading((prev) => ({ ...prev, [requestId]: false }));
+    }
   };
 
   return (
@@ -108,6 +157,48 @@ export default function MentorshipRequestsPage() {
                             <strong>Evaluated At:</strong>{" "}
                             {new Date(request.evaluatedAt).toLocaleString()}
                           </p>
+                        )}
+
+                        {/* Action Buttons - Only show for PENDING requests */}
+                        {request.status === "PENDING" && (
+                          <div className="mt-3 flex space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUpdateStatus(request.id, "APPROVED");
+                              }}
+                              disabled={loading[request.id]}
+                              className="flex items-center px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 disabled:opacity-50"
+                            >
+                              {loading[request.id] ? (
+                                <Loader2
+                                  size={16}
+                                  className="animate-spin mr-1"
+                                />
+                              ) : (
+                                <Check size={16} className="mr-1" />
+                              )}
+                              Approve
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUpdateStatus(request.id, "REJECTED");
+                              }}
+                              disabled={loading[request.id]}
+                              className="flex items-center px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
+                            >
+                              {loading[request.id] ? (
+                                <Loader2
+                                  size={16}
+                                  className="animate-spin mr-1"
+                                />
+                              ) : (
+                                <X size={16} className="mr-1" />
+                              )}
+                              Reject
+                            </button>
+                          </div>
                         )}
                       </div>
                     ))}
