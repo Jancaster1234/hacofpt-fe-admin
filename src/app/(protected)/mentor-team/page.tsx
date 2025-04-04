@@ -58,6 +58,79 @@ export default function MentorTeamsPage() {
     }));
   };
 
+  // Add this function inside the MentorTeamsPage component
+  const updateMentorshipSessionStatus = async (
+    sessionId: string,
+    newStatus: "approved" | "rejected"
+  ) => {
+    if (!user) return;
+
+    // Find the session to update
+    let updatedSession: MentorshipSessionRequest | null = null;
+    let updatedTeams = [...mentorTeams];
+
+    // Find and update the session in our state
+    updatedTeams = updatedTeams.map((team) => {
+      if (team.mentorshipSessionRequests) {
+        const updatedRequests = team.mentorshipSessionRequests.map(
+          (request) => {
+            if (request.id === sessionId && request.status === "pending") {
+              updatedSession = {
+                ...request,
+                status: newStatus,
+                evaluatedById: user.id,
+                evaluatedBy: {
+                  id: user.id,
+                  firstName: user.firstName || "Unknown",
+                  lastName: user.lastName || "Unknown",
+                },
+                evaluatedAt: new Date().toISOString(),
+              };
+              return updatedSession;
+            }
+            return request;
+          }
+        );
+
+        return {
+          ...team,
+          mentorshipSessionRequests: updatedRequests,
+        };
+      }
+      return team;
+    });
+
+    if (updatedSession) {
+      // Update the local state first for immediate UI feedback
+      setMentorTeams(updatedTeams);
+
+      try {
+        // This would be replaced with your actual API call
+        // Simulating API call with timeout
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        // In a real implementation, you would have something like:
+        // const response = await fetch(`/api/mentorship-sessions/${sessionId}`, {
+        //   method: 'PATCH',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify({
+        //     status: newStatus,
+        //     evaluatedById: user.id,
+        //     evaluatedAt: new Date().toISOString()
+        //   }),
+        // });
+
+        console.log(`Session ${sessionId} status updated to ${newStatus}`);
+      } catch (error) {
+        console.error("Failed to update session status:", error);
+        // Revert state on error
+        fetchMockMentorTeams(user.id).then(setMentorTeams);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen p-6 bg-gray-100">
       <h1 className="text-3xl font-bold text-gray-900 text-center mb-6">
@@ -181,6 +254,35 @@ export default function MentorTeamsPage() {
                                     {session.evaluatedBy.firstName}{" "}
                                     {session.evaluatedBy.lastName}
                                   </p>
+                                )}
+                                {/* Add action buttons for pending sessions */}
+                                {session.status === "pending" && (
+                                  <div className="mt-2 flex space-x-2">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        updateMentorshipSessionStatus(
+                                          session.id,
+                                          "approved"
+                                        );
+                                      }}
+                                      className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 text-sm"
+                                    >
+                                      Approve
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        updateMentorshipSessionStatus(
+                                          session.id,
+                                          "rejected"
+                                        );
+                                      }}
+                                      className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm"
+                                    >
+                                      Reject
+                                    </button>
+                                  </div>
                                 )}
                               </div>
                             ))
