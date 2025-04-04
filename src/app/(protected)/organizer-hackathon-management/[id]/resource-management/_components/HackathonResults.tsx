@@ -1,8 +1,9 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/HackathonResults.tsx
 "use client";
 import React, { useState, useEffect } from "react";
-import { fetchMockHackathonResults } from "../_mocks/fetchMockHackathonResults";
 import { HackathonResult } from "@/types/entities/hackathonResult";
+import { hackathonResultService } from "@/services/hackathonResult.service";
+import { useApiModal } from "@/hooks/useApiModal";
 
 interface HackathonResultsProps {
   hackathonId: string;
@@ -13,36 +14,42 @@ export default function HackathonResults({
 }: HackathonResultsProps) {
   const [results, setResults] = useState<HackathonResult[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useApiModal();
 
   useEffect(() => {
     const fetchResults = async () => {
       try {
         setLoading(true);
-        const data = await fetchMockHackathonResults(hackathonId);
-        // Sort results by totalScore (highest to lowest)
-        const sortedResults = [...data].sort(
-          (a, b) => b.totalScore - a.totalScore
-        );
-        setResults(sortedResults);
-        setError(null);
+        const { data, message } =
+          await hackathonResultService.getHackathonResultsByHackathonId(
+            hackathonId
+          );
+
+        if (data && data.length > 0) {
+          // Sort results by totalScore (highest to lowest)
+          const sortedResults = [...data].sort(
+            (a, b) => b.totalScore - a.totalScore
+          );
+          setResults(sortedResults);
+        } else {
+          setResults([]);
+        }
       } catch (err) {
-        setError("Failed to load hackathon results");
-        console.error(err);
+        console.error("Error fetching hackathon results:", err);
+        showError(
+          "Results Error",
+          "Failed to load hackathon results. Please try again later."
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchResults();
-  }, [hackathonId]);
+  }, [hackathonId, showError]);
 
   if (loading) {
     return <div className="flex justify-center py-8">Loading results...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500 py-4">{error}</div>;
   }
 
   return (
