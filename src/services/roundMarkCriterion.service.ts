@@ -95,7 +95,7 @@ class RoundMarkCriterionService {
     roundId: string
   ): Promise<{ data: RoundMarkCriterion[]; message?: string }> {
     try {
-      const response = await apiService.auth.get(
+      const response = await apiService.auth.get<RoundMarkCriterion[]>(
         `/submission-service/api/v1/roundmarkcriteria/by-round/${roundId}`
       );
 
@@ -109,7 +109,7 @@ class RoundMarkCriterionService {
           response.message || "Round mark criteria retrieved successfully",
       };
     } catch (error: any) {
-      return handleApiError(
+      return handleApiError<RoundMarkCriterion[]>(
         error,
         [],
         "[RoundMarkCriterion Service] Error fetching round mark criteria:"
