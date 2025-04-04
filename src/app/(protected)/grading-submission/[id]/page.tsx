@@ -11,6 +11,7 @@ import { TeamRound } from "@/types/entities/teamRound";
 import { Submission } from "@/types/entities/submission";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { FileDownloader } from "@/components/FileDownloader";
 
 export default function GradingSubmissionPage() {
   const { user } = useAuth();
@@ -64,12 +65,11 @@ export default function GradingSubmissionPage() {
   }, [user]);
 
   const renderTeamSubmissions = (roundId: string) => {
+    // Associate submissions with the correct round
     const teamSubmissionMap = new Map<string, Submission>();
-    submissions
-      .filter((submission) => submission.round.id === roundId)
-      .forEach((submission) => {
-        teamSubmissionMap.set(submission.createdByUserName, submission);
-      });
+    submissions.forEach((submission) => {
+      teamSubmissionMap.set(submission.createdByUserName, submission);
+    });
 
     const roundTeams = teamRounds
       .filter((tr) => tr.round.id === roundId)
@@ -80,36 +80,63 @@ export default function GradingSubmissionPage() {
         <thead className="bg-gray-100 border-b">
           <tr>
             <th className="p-3">Team</th>
-            <th className="p-3">Total Score</th>
+            <th className="p-3">Final Score</th>
+            <th className="p-3">Your Score</th>
             <th className="p-3">Submission</th>
-            <th className="p-3">Mark</th>
+            <th className="p-3">Action</th>
           </tr>
         </thead>
         <tbody>
           {roundTeams.map((team) => {
+            // Find the submission for this team
             const submission = teamSubmissionMap.get(
-              team.teamMembers[0]?.user.id
+              team.teamMembers[0]?.user.username
             );
+
+            // Get current judge's score for this submission
+            const currentJudgeScore = submission?.judgeSubmissions?.find(
+              (js) => js.judge.id === user?.id
+            )?.score;
+
+            // Debug information
+            console.log(`Team: ${team.name}`);
+            console.log(
+              `Team Member Username: ${team.teamMembers[0]?.user.username}`
+            );
+            console.log(`User ID: ${user?.id}`);
+            console.log(`Found Submission:`, submission);
+            console.log(`Judge Score:`, currentJudgeScore);
+
             return (
               <tr key={team.id} className="border-b hover:bg-gray-50">
                 <td className="p-3">{team.name}</td>
                 <td className="p-3">
                   {submission?.finalScore
                     ? `${submission.finalScore.toFixed(1)}/100`
-                    : "Not marked"}
+                    : "Pending Final Score"}
                 </td>
                 <td className="p-3">
-                  <a href="#" className="text-blue-600 hover:underline">
-                    Download
-                  </a>
+                  {currentJudgeScore !== undefined
+                    ? `${currentJudgeScore.toFixed(1)}/100`
+                    : "Not Marked"}
+                </td>
+                <td className="p-3">
+                  {submission?.fileUrls && submission.fileUrls.length > 0 ? (
+                    <FileDownloader
+                      files={submission.fileUrls}
+                      zipName={`${team.name}-submission-files.zip`}
+                    />
+                  ) : (
+                    "No files"
+                  )}
                 </td>
                 <td className="p-3">
                   {submission && (
                     <Link
-                      href={`/grading-submission/${hackathonId}/round/${submission.round.id}/submission/${submission.id}/judge-submission`}
+                      href={`/grading-submission/${hackathonId}/round/${roundId}/submission/${submission.id}/judge-submission`}
                       className="text-blue-600 hover:underline"
                     >
-                      Mark
+                      {currentJudgeScore !== undefined ? "Edit Mark" : "Mark"}
                     </Link>
                   )}
                 </td>
