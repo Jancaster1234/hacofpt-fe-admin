@@ -2,57 +2,85 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { fetchMockSubmissions } from "../../../../../../[id]/_mocks/fetchMockSubmissions";
+import { useParams, useRouter } from "next/navigation";
 import { Submission } from "@/types/entities/submission";
 import { useAuth } from "@/hooks/useAuth_v0";
+import { submissionService } from "@/services/submission.service";
+import ApiResponseModal from "@/components/common/ApiResponseModal";
+import { useApiModal } from "@/hooks/useApiModal";
 
 export default function JudgeSubmissionPage() {
-  const { id } = useParams();
+  const { id, roundId, submissionId } = useParams<{
+    id: string;
+    roundId: string;
+    submissionId: string;
+  }>();
+  const router = useRouter();
   const { user } = useAuth();
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [activeJudgeIndex, setActiveJudgeIndex] = useState(0);
   const [criteriaScores, setCriteriaScores] = useState<{
     [key: string]: number;
   }>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  const { modalState, hideModal, showError, showSuccess } = useApiModal();
 
   useEffect(() => {
     const fetchSubmission = async () => {
-      if (!user) return;
+      if (!user || !submissionId) return;
 
       try {
-        // Fetch all submissions
-        const submissions = await fetchMockSubmissions(user.id, id as string);
+        setIsLoading(true);
+        const response = await submissionService.getSubmissionById(
+          submissionId
+        );
 
-        // Select the submission with the latest submittedAt
-        const latestSubmission = submissions
-          .filter((s) => s.submittedAt) // Ensure it has a submitted date
-          .sort(
-            (a, b) =>
-              new Date(b.submittedAt).getTime() -
-              new Date(a.submittedAt).getTime()
-          )[0];
+        if (response.data) {
+          setSubmission(response.data);
 
-        if (latestSubmission) {
-          setSubmission(latestSubmission);
+          // Set initial scores from the current judge's submission if it exists
+          const currentJudgeSubmission = response.data.judgeSubmissions?.find(
+            (js) => js.judge.id === user.id
+          );
 
-          // Set initial scores from the first judge submission
-          if (latestSubmission.judgeSubmissions.length > 0) {
-            const firstJudgeSubmission = latestSubmission.judgeSubmissions[0];
+          if (currentJudgeSubmission) {
             const initialScores: { [key: string]: number } = {};
-            firstJudgeSubmission.judgeSubmissionDetails.forEach((jsd) => {
+            currentJudgeSubmission.judgeSubmissionDetails.forEach((jsd) => {
               initialScores[jsd.roundMarkCriterion.id] = jsd.score;
             });
             setCriteriaScores(initialScores);
+
+            // Find the index of the current judge
+            const judgeIndex = response.data.judgeSubmissions.findIndex(
+              (js) => js.judge.id === user.id
+            );
+            if (judgeIndex !== -1) {
+              setActiveJudgeIndex(judgeIndex);
+            }
+          } else if (response.data.judgeSubmissions?.length > 0) {
+            // If current judge hasn't submitted yet, initialize with zeros
+            const firstJudgeSubmission = response.data.judgeSubmissions[0];
+            const initialScores: { [key: string]: number } = {};
+            firstJudgeSubmission.judgeSubmissionDetails.forEach((jsd) => {
+              initialScores[jsd.roundMarkCriterion.id] = 0;
+            });
+            setCriteriaScores(initialScores);
           }
+        } else {
+          showError("Error", "Failed to load submission");
+          router.push(`/grading-submission/${id}`);
         }
       } catch (error) {
         console.error("Error fetching submission:", error);
+        showError("Error", "Failed to load submission data");
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchSubmission();
-  }, [user, id]);
+  }, [user, submissionId, id, router, showError]);
 
   const handleScoreChange = (criterionId: string, score: number) => {
     setCriteriaScores((prev) => ({
@@ -65,14 +93,47 @@ export default function JudgeSubmissionPage() {
     return Object.values(criteriaScores).reduce((sum, score) => sum + score, 0);
   };
 
-  const handleSubmit = () => {
-    console.log("Submitted Scores:", criteriaScores);
-    console.log("Total Score:", calculateTotalScore());
+  const handleSubmit = async () => {
+    if (!user || !submission) return;
+
+    try {
+      // Prepare judgeSubmission data
+      const judgeSubmissionData = {
+        submissionId: submission.id,
+        judgeId: user.id,
+        criteriaScores: criteriaScores,
+      };
+
+      // Call the service to save the judge submission
+      const response = await submissionService.saveJudgeSubmission(
+        judgeSubmissionData
+      );
+
+      if (response.data) {
+        showSuccess(
+          "Success",
+          "Your evaluation has been submitted successfully"
+        );
+        // Refresh the submission data
+        const updatedSubmission = await submissionService.getSubmissionById(
+          submissionId
+        );
+        if (updatedSubmission.data) {
+          setSubmission(updatedSubmission.data);
+        }
+      } else {
+        showError("Error", response.message || "Failed to submit evaluation");
+      }
+    } catch (error) {
+      console.error("Error submitting evaluation:", error);
+      showError("Error", "Failed to submit your evaluation");
+    }
   };
 
-  if (!submission) return <div>Loading...</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (!submission) return <div>Submission not found</div>;
 
-  const judgeSubmissions = submission.judgeSubmissions;
+  const judgeSubmissions = submission.judgeSubmissions || [];
   const activeJudgeSubmission = judgeSubmissions[activeJudgeIndex];
 
   return (
@@ -123,6 +184,7 @@ export default function JudgeSubmissionPage() {
                     )
                   }
                   className="w-20 p-2 border rounded"
+                  disabled={activeJudgeSubmission.judge.id !== user?.id}
                 />
               </div>
               <p className="text-sm text-gray-500">
@@ -145,13 +207,15 @@ export default function JudgeSubmissionPage() {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <button
-            onClick={handleSubmit}
-            className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-          >
-            Submit Evaluation
-          </button>
+          {/* Submit Button - Only show for current user's submission */}
+          {activeJudgeSubmission.judge.id === user?.id && (
+            <button
+              onClick={handleSubmit}
+              className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            >
+              Submit Evaluation
+            </button>
+          )}
         </div>
       )}
 
@@ -159,7 +223,7 @@ export default function JudgeSubmissionPage() {
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-3">Submitted Files</h3>
         <div className="grid grid-cols-2 gap-4">
-          {submission.fileUrls.map((file) => (
+          {submission.fileUrls?.map((file) => (
             <div
               key={file.id}
               className="border p-3 rounded flex items-center justify-between"
@@ -177,6 +241,15 @@ export default function JudgeSubmissionPage() {
           ))}
         </div>
       </div>
+
+      {/* API Response Modal */}
+      <ApiResponseModal
+        isOpen={modalState.isOpen}
+        onClose={hideModal}
+        title={modalState.title}
+        message={modalState.message}
+        type={modalState.type}
+      />
     </div>
   );
 }

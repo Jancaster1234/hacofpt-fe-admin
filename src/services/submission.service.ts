@@ -4,6 +4,31 @@ import { Submission } from "@/types/entities/submission";
 import { handleApiError } from "@/utils/errorHandler";
 
 class SubmissionService {
+  async getSubmissionById(
+    submissionId: string
+  ): Promise<{ data: Submission | null; message?: string }> {
+    try {
+      const response = await apiService.auth.get<Submission>(
+        `/submission-service/api/v1/submissions/${submissionId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve submission");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Submission retrieved successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<Submission | null>(
+        error,
+        null,
+        "[Submission Service] Error fetching submission by id:"
+      );
+    }
+  }
+
   async getSubmissionsByRoundAndCreator(
     roundId: string,
     createdByUsername: string
