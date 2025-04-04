@@ -3,11 +3,12 @@ import { useState } from "react";
 import { Round } from "@/types/entities/round";
 import { TeamRound } from "@/types/entities/teamRound";
 import { Submission } from "@/types/entities/submission";
-import { createBulkHackathonResults } from "../_services/hackathonResultService";
+import { hackathonResultService } from "@/services/hackathonResult.service";
 import {
   calculateTeamTotalScores,
   prepareHackathonResults,
 } from "../_utils/hackathonResultHelpers";
+import { useApiModal } from "@/hooks/useApiModal";
 
 interface HackathonResultsButtonProps {
   hackathonId: string;
@@ -23,8 +24,7 @@ export function HackathonResultsButton({
   teamSubmissions,
 }: HackathonResultsButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { showSuccess, showError } = useApiModal();
 
   // Calculate team scores and check for missing data
   const { teamScores, teamsWithMissingScores } = calculateTeamTotalScores(
@@ -40,21 +40,33 @@ export function HackathonResultsButton({
     if (!hasAllScores) return;
 
     setIsLoading(true);
-    setError(null);
-    setIsSuccess(false);
 
     try {
       // Prepare the data for the API call
       const resultData = prepareHackathonResults(hackathonId, teamScores);
 
       // Make the API call
-      const results = await createBulkHackathonResults(hackathonId, resultData);
-      console.log("Results created:", results);
+      const results = await hackathonResultService.createBulkHackathonResults(
+        resultData
+      );
 
-      setIsSuccess(true);
+      if (results.data && results.data.length > 0) {
+        showSuccess(
+          "Results Created",
+          results.message || "Hackathon results have been successfully created!"
+        );
+      } else {
+        showError(
+          "Results Creation Issue",
+          "The results were processed but no data was returned. Please verify results in the system."
+        );
+      }
     } catch (err) {
-      setError("Failed to create hackathon results. Please try again.");
       console.error("Error creating hackathon results:", err);
+      showError(
+        "Results Creation Failed",
+        "Failed to create hackathon results. Please try again later."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -82,14 +94,6 @@ export function HackathonResultsButton({
               teams are missing final scores:
               {" " + teamsWithMissingScores.join(", ")}
             </p>
-          </div>
-        )}
-
-        {error && <div className="text-sm text-red-600">{error}</div>}
-
-        {isSuccess && (
-          <div className="text-sm text-green-600">
-            Hackathon results created successfully!
           </div>
         )}
       </div>
