@@ -32,9 +32,9 @@ class TokenService_v0 {
 
       if (response.ok) {
         const data = await response.json();
-        this.setAccessToken(data.token);
+        this.setAccessToken(data.data?.token);
         console.warn("Access token successfully refreshed (v0).");
-        return data.token;
+        return data.data?.token;
       } else {
         console.warn("Token refresh failed (v0). User must re-login.");
         this.setAccessToken(null);
