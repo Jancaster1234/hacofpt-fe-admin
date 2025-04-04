@@ -1,12 +1,13 @@
-// src/app/(protected)/mentor-team/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
-import { fetchMockMentorTeams } from "./_mocks/fetchMockMentorTeams";
 import { MentorTeam } from "@/types/entities/mentorTeam";
 import { MentorshipSessionRequest } from "@/types/entities/mentorshipSessionRequest";
 import { ChevronDown, ChevronUp, Users, Info } from "lucide-react";
+import ApiResponseModal from "@/components/common/ApiResponseModal";
+import { useApiModal } from "@/hooks/useApiModal";
+import { mentorshipRequestService } from "@/services/mentorshipRequest.service";
 
 export default function MentorTeamsPage() {
   const { user } = useAuth();
@@ -20,12 +21,64 @@ export default function MentorTeamsPage() {
   const [expandedTeamInfo, setExpandedTeamInfo] = useState<
     Record<string, boolean>
   >({});
+  const [loading, setLoading] = useState<boolean>(true);
+  const { modalState, hideModal, showSuccess, showError } = useApiModal();
 
   useEffect(() => {
     if (user) {
-      fetchMockMentorTeams(user.id).then(setMentorTeams);
+      fetchMentorTeams();
     }
   }, [user]);
+
+  const fetchMentorTeams = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      // Use the real service to fetch mentor teams by mentor ID
+      const response =
+        await mentorshipRequestService.getMentorshipRequestsByMentorId(user.id);
+
+      if (response.data) {
+        // Process the data to match the expected MentorTeam structure
+        // This part depends on your API response structure and might need adjustment
+        const formattedTeams = response.data.map((request) => ({
+          id: request.id || "",
+          createdAt: request.createdAt || new Date().toISOString(),
+          hackathon: request.hackathon || { title: "Unknown Hackathon" },
+          team: request.team || { name: "Unknown Team" },
+          mentorshipSessionRequests: [
+            {
+              id: request.id || "",
+              status: request.status.toLowerCase() as
+                | "pending"
+                | "approved"
+                | "rejected",
+              description: request.description || "",
+              location: request.location || "",
+              startTime: request.startTime || "",
+              endTime: request.endTime || "",
+              evaluatedById: request.evaluatedById || "",
+              evaluatedBy: request.evaluatedBy || null,
+              evaluatedAt: request.evaluatedAt || null,
+            },
+          ],
+        }));
+
+        setMentorTeams(formattedTeams);
+      } else {
+        showError("Error", response.message || "Failed to fetch mentor teams");
+      }
+    } catch (error) {
+      console.error("Error fetching mentor teams:", error);
+      showError(
+        "Error",
+        "Failed to fetch mentor teams. Please try again later."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Group mentor teams by hackathon title
   const groupedByHackathon = mentorTeams.reduce((acc, mentorTeam) => {
@@ -58,7 +111,7 @@ export default function MentorTeamsPage() {
     }));
   };
 
-  // Add this function inside the MentorTeamsPage component
+  // Update to use real service calls
   const updateMentorshipSessionStatus = async (
     sessionId: string,
     newStatus: "approved" | "rejected"
@@ -66,16 +119,32 @@ export default function MentorTeamsPage() {
     if (!user) return;
 
     // Find the session to update
-    let updatedSession: MentorshipSessionRequest | null = null;
-    let updatedTeams = [...mentorTeams];
+    let sessionToUpdate: MentorshipSessionRequest | null = null;
+    let teamId = "";
+    let hackathonId = "";
 
-    // Find and update the session in our state
-    updatedTeams = updatedTeams.map((team) => {
+    // Find the session and its associated team and hackathon IDs
+    mentorTeams.forEach((team) => {
+      if (team.mentorshipSessionRequests) {
+        team.mentorshipSessionRequests.forEach((request) => {
+          if (request.id === sessionId) {
+            sessionToUpdate = request;
+            teamId = team.team?.id || "";
+            hackathonId = team.hackathon?.id || "";
+          }
+        });
+      }
+    });
+
+    if (!sessionToUpdate) return;
+
+    // Update local state first for immediate UI feedback
+    const updatedTeams = mentorTeams.map((team) => {
       if (team.mentorshipSessionRequests) {
         const updatedRequests = team.mentorshipSessionRequests.map(
           (request) => {
             if (request.id === sessionId && request.status === "pending") {
-              updatedSession = {
+              return {
                 ...request,
                 status: newStatus,
                 evaluatedById: user.id,
@@ -86,7 +155,6 @@ export default function MentorTeamsPage() {
                 },
                 evaluatedAt: new Date().toISOString(),
               };
-              return updatedSession;
             }
             return request;
           }
@@ -100,34 +168,46 @@ export default function MentorTeamsPage() {
       return team;
     });
 
-    if (updatedSession) {
-      // Update the local state first for immediate UI feedback
-      setMentorTeams(updatedTeams);
+    setMentorTeams(updatedTeams);
 
-      try {
-        // This would be replaced with your actual API call
-        // Simulating API call with timeout
-        await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      // Call the real service to update the mentorship request
+      const response = await mentorshipRequestService.updateMentorshipRequest({
+        id: sessionId,
+        hackathonId: hackathonId,
+        mentorId: user.id,
+        teamId: teamId,
+        status: newStatus.toUpperCase() as
+          | "PENDING"
+          | "APPROVED"
+          | "REJECTED"
+          | "DELETED"
+          | "COMPLETED",
+        evaluatedById: user.id,
+      });
 
-        // In a real implementation, you would have something like:
-        // const response = await fetch(`/api/mentorship-sessions/${sessionId}`, {
-        //   method: 'PATCH',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({
-        //     status: newStatus,
-        //     evaluatedById: user.id,
-        //     evaluatedAt: new Date().toISOString()
-        //   }),
-        // });
-
-        console.log(`Session ${sessionId} status updated to ${newStatus}`);
-      } catch (error) {
-        console.error("Failed to update session status:", error);
-        // Revert state on error
-        fetchMockMentorTeams(user.id).then(setMentorTeams);
+      if (response.data) {
+        showSuccess(
+          "Status Updated",
+          `Session has been successfully ${
+            newStatus === "approved" ? "approved" : "rejected"
+          }.`
+        );
+      } else {
+        // If the API call fails, revert the local state change
+        showError(
+          "Update Failed",
+          response.message || "Failed to update session status."
+        );
+        fetchMentorTeams(); // Refresh data from server
       }
+    } catch (error: any) {
+      console.error("Failed to update session status:", error);
+      showError(
+        "Update Failed",
+        error.message || "Failed to update session status. Please try again."
+      );
+      fetchMentorTeams(); // Refresh data from server
     }
   };
 
@@ -137,7 +217,11 @@ export default function MentorTeamsPage() {
         Mentor Teams
       </h1>
 
-      {Object.keys(groupedByHackathon).length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : Object.keys(groupedByHackathon).length === 0 ? (
         <p className="text-center text-gray-600">No mentor teams found.</p>
       ) : (
         <div className="space-y-6">
@@ -226,13 +310,15 @@ export default function MentorTeamsPage() {
                                 </p>
                                 <p>
                                   <strong>Time:</strong>{" "}
-                                  {new Date(
-                                    session.startTime || ""
-                                  ).toLocaleString()}{" "}
-                                  -{" "}
-                                  {new Date(
-                                    session.endTime || ""
-                                  ).toLocaleString()}
+                                  {session.startTime &&
+                                    new Date(
+                                      session.startTime
+                                    ).toLocaleString()}{" "}
+                                  {session.endTime &&
+                                    "- " +
+                                      new Date(
+                                        session.endTime
+                                      ).toLocaleString()}
                                 </p>
                                 <p>
                                   <strong>Status:</strong>{" "}
@@ -301,6 +387,15 @@ export default function MentorTeamsPage() {
           ))}
         </div>
       )}
+
+      {/* Include the ApiResponseModal component at the bottom of the component */}
+      <ApiResponseModal
+        isOpen={modalState.isOpen}
+        onClose={hideModal}
+        title={modalState.title}
+        message={modalState.message}
+        type={modalState.type}
+      />
     </div>
   );
 }
