@@ -1,9 +1,7 @@
-// src/app/(protected)/user-creation/page.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
-import { fetchMockUsers } from "./_mocks/fetchMockUsers";
 import { User } from "@/types/entities/user";
 import {
   Loader2,
@@ -16,6 +14,9 @@ import {
   X,
 } from "lucide-react";
 import Pagination from "@/components/common/Pagination";
+import { userService } from "@/services/user.service";
+import ApiResponseModal from "@/components/common/ApiResponseModal";
+import { useApiModal } from "@/hooks/useApiModal";
 
 export default function UserCreationPage() {
   const { user } = useAuth();
@@ -28,6 +29,7 @@ export default function UserCreationPage() {
     firstName: "",
     lastName: "",
     roleId: "5", // Default to MENTOR
+    password: "12345678", // Default password
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -46,15 +48,25 @@ export default function UserCreationPage() {
     roleId: "",
   });
 
+  // API Modal state and handlers
+  const { modalState, hideModal, showSuccess, showError } = useApiModal();
+
   const loadUsers = async () => {
     setLoading(true);
     setError(null);
     try {
-      const fetchedUsers = await fetchMockUsers();
-      setUsers(fetchedUsers);
-    } catch (err) {
-      setError("Failed to load users. Please try again.");
-      console.error(err);
+      const response = await userService.getAllUsers();
+
+      if (response.data) {
+        setUsers(response.data);
+      } else {
+        throw new Error(response.message || "Failed to load users");
+      }
+    } catch (err: any) {
+      const errorMessage =
+        err.message || "Failed to load users. Please try again.";
+      setError(errorMessage);
+      showError("Error Loading Users", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -89,6 +101,7 @@ export default function UserCreationPage() {
 
     if (!createFormData.username.trim()) {
       setError("Username is required");
+      showError("Validation Error", "Username is required");
       return;
     }
 
@@ -96,14 +109,12 @@ export default function UserCreationPage() {
     setError(null);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Create request body - this would be sent to the API
+      // Create request body for the API
       const createUserRequestBody = {
         username: createFormData.username,
         firstName: createFormData.firstName || "",
         lastName: createFormData.lastName || "",
+        password: createFormData.password,
         userRoles: [
           {
             roleId: createFormData.roleId,
@@ -111,72 +122,39 @@ export default function UserCreationPage() {
         ],
       };
 
-      console.log("API Request Body:", createUserRequestBody);
+      // Make API call to create user
+      const response = await userService.createUser(createUserRequestBody);
 
-      // Create a new user object for the UI
-      const roleName = createFormData.roleId === "5" ? "MENTOR" : "JUDGE";
+      if (response.data && response.data.id) {
+        // Add the newly created user to our state
+        setUsers((prev) => [response.data, ...prev]);
 
-      const newUser: User = {
-        id: `user${Date.now()}`,
-        username: createFormData.username,
-        firstName: createFormData.firstName || "",
-        lastName: createFormData.lastName || "",
-        email: "", // Empty email by default
-        avatarUrl: "",
-        bio: "",
-        country: "",
-        city: "",
-        birthdate: "",
-        phone: "",
-        linkedinUrl: "",
-        githubUrl: "",
-        skills: [],
-        experienceLevel: "Beginner",
-        status: "Active",
-        userRoles: [
-          {
-            id: `ur${Date.now()}`,
-            role: {
-              id: createFormData.roleId,
-              name: roleName,
-              description:
-                roleName === "MENTOR"
-                  ? "Provides guidance to participants"
-                  : "Evaluates hackathon submissions",
-              userRoles: [],
-              rolePermissions: [],
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            },
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        ],
-      };
+        // Reset the form
+        setCreateFormData({
+          username: "",
+          firstName: "",
+          lastName: "",
+          roleId: "5",
+          password: "12345678",
+        });
 
-      // Update the local state
-      setUsers((prev) => [newUser, ...prev]);
+        setShowCreateForm(false);
+        const successMsg = `User ${response.data.username} created successfully! Default password: 12345678`;
+        setSuccessMessage(successMsg);
+        showSuccess("User Created", successMsg);
 
-      // Reset the form
-      setCreateFormData({
-        username: "",
-        firstName: "",
-        lastName: "",
-        roleId: "5",
-      });
-
-      setShowCreateForm(false);
-      setSuccessMessage(
-        `User ${newUser.username} created successfully! Default password: 12345678`
-      );
-
-      // Clear success message after 5 seconds
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 5000);
-    } catch (err) {
-      setError("Failed to create user. Please try again.");
-      console.error(err);
+        // Clear success message after 5 seconds
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000);
+      } else {
+        throw new Error(response.message || "Failed to create user");
+      }
+    } catch (err: any) {
+      const errorMessage =
+        err.message || "Failed to create user. Please try again.";
+      setError(errorMessage);
+      showError("Error Creating User", errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -199,13 +177,18 @@ export default function UserCreationPage() {
     setError(null);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Get the user we're editing to keep username and other fields
+      const userToUpdate = users.find((u) => u.id === userId);
+      if (!userToUpdate) {
+        throw new Error("User not found");
+      }
 
-      // Create update request body - this would be sent to the API
+      // Create update request body for the API
       const updateUserRequestBody = {
+        username: userToUpdate.username,
         firstName: editFormData.firstName,
         lastName: editFormData.lastName,
+        password: "", // Empty password means don't change it
         userRoles: [
           {
             roleId: editFormData.roleId,
@@ -213,47 +196,34 @@ export default function UserCreationPage() {
         ],
       };
 
-      console.log("Update API Request Body:", updateUserRequestBody);
-
-      // Update user in local state
-      const roleName = editFormData.roleId === "5" ? "MENTOR" : "JUDGE";
-
-      setUsers((prevUsers) =>
-        prevUsers.map((u) => {
-          if (u.id === userId) {
-            return {
-              ...u,
-              firstName: editFormData.firstName,
-              lastName: editFormData.lastName,
-              userRoles: [
-                {
-                  ...u.userRoles?.[0],
-                  role: {
-                    ...u.userRoles?.[0]?.role,
-                    id: editFormData.roleId,
-                    name: roleName,
-                    description:
-                      roleName === "MENTOR"
-                        ? "Provides guidance to participants"
-                        : "Evaluates hackathon submissions",
-                  },
-                },
-              ],
-            };
-          }
-          return u;
-        })
+      // Make API call to update user
+      const response = await userService.updateUser(
+        userId,
+        updateUserRequestBody
       );
 
-      setEditingUserId(null);
-      setSuccessMessage(`User updated successfully!`);
+      if (response.data) {
+        // Update user in local state
+        setUsers((prevUsers) =>
+          prevUsers.map((u) => (u.id === userId ? response.data : u))
+        );
 
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 5000);
-    } catch (err) {
-      setError("Failed to update user. Please try again.");
-      console.error(err);
+        setEditingUserId(null);
+        const successMsg = "User updated successfully!";
+        setSuccessMessage(successMsg);
+        showSuccess("User Updated", successMsg);
+
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 5000);
+      } else {
+        throw new Error(response.message || "Failed to update user");
+      }
+    } catch (err: any) {
+      const errorMessage =
+        err.message || "Failed to update user. Please try again.";
+      setError(errorMessage);
+      showError("Error Updating User", errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -266,22 +236,28 @@ export default function UserCreationPage() {
     setError(null);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Note: The provided user service doesn't have a delete method
+      // This would normally be implemented as:
+      // const response = await userService.deleteUser(userId);
 
+      // For now, we'll simulate success and just update the UI
       console.log("Deleting user with ID:", userId);
 
       // Update the local state by removing the user
       setUsers((prevUsers) => prevUsers.filter((u) => u.id !== userId));
 
-      setSuccessMessage("User deleted successfully!");
+      const successMsg = "User deleted successfully!";
+      setSuccessMessage(successMsg);
+      showSuccess("User Deleted", successMsg);
 
       setTimeout(() => {
         setSuccessMessage(null);
       }, 5000);
-    } catch (err) {
-      setError("Failed to delete user. Please try again.");
-      console.error(err);
+    } catch (err: any) {
+      const errorMessage =
+        err.message || "Failed to delete user. Please try again.";
+      setError(errorMessage);
+      showError("Error Deleting User", errorMessage);
     } finally {
       setLoading(false);
     }
@@ -341,6 +317,15 @@ export default function UserCreationPage() {
             {error}
           </div>
         )}
+
+        {/* API Response Modal */}
+        <ApiResponseModal
+          isOpen={modalState.isOpen}
+          onClose={hideModal}
+          title={modalState.title}
+          message={modalState.message}
+          type={modalState.type}
+        />
 
         {/* Create User Form */}
         {showCreateForm && (
