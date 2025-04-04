@@ -1,4 +1,5 @@
 // src/app/(protected)/mentorship-request/_api/updateMentorshipRequest.tsx
+import { mentorshipRequestService } from "@/services/mentorshipRequest.service";
 import {
   MentorshipRequest,
   MentorshipStatus,
@@ -15,27 +16,25 @@ export const updateMentorshipRequest = async (
 ): Promise<MentorshipRequest> => {
   const { requestId, status, evaluatedById } = params;
 
-  // This would be a real API call in production
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      try {
-        // Simulate successful API response
-        const updatedRequest: MentorshipRequest = {
-          id: requestId,
-          status,
-          evaluatedAt: new Date().toISOString(),
-          evaluatedById,
-          // Note: In a real implementation, the API would return the full updated object
-          // with all properties. This is a simplified version.
-          createdByUserName: "User",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
+  try {
+    // Call the actual service method
+    const response = await mentorshipRequestService.updateMentorshipRequest({
+      id: requestId,
+      status,
+      evaluatedById,
+      // Note: You'll need to get these from the original request or from context
+      hackathonId: "", // This needs to be filled with the actual hackathon ID
+      mentorId: "", // This needs to be filled with the actual mentor ID
+    });
 
-        resolve(updatedRequest);
-      } catch (error) {
-        reject(new Error("Failed to update mentorship request"));
-      }
-    }, 500); // Simulate network delay
-  });
+    if (!response.data) {
+      throw new Error(
+        response.message || "Failed to update mentorship request"
+      );
+    }
+
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 };

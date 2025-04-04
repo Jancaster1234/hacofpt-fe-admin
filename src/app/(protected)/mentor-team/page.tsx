@@ -116,10 +116,7 @@ export default function MentorTeamsPage() {
                             <strong>Team Name:</strong>{" "}
                             {team.team?.name || "N/A"}
                           </p>
-                          <p>
-                            <strong>Created By:</strong>{" "}
-                            {team.createdBy.firstName} {team.createdBy.lastName}
-                          </p>
+
                           <p>
                             <strong>Created At:</strong>{" "}
                             {new Date(team.createdAt).toLocaleString()}
