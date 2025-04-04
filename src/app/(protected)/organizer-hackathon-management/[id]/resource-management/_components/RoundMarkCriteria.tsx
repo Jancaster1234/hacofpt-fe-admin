@@ -54,18 +54,19 @@ export default function RoundMarkCriteria({
       // You may need to add this method to your roundMarkCriterionService
       // For now, assuming it returns an array of RoundMarkCriterion objects
 
-      // const response = await roundMarkCriterionService.getRoundMarkCriteriaByRoundId(roundId);
-      // setRoundMarkCriteria(prev => ({
-      //   ...prev,
-      //   [roundId]: response.data
-      // }));
+      const response =
+        await roundMarkCriterionService.getRoundMarkCriteriaByRoundId(roundId);
+      setRoundMarkCriteria((prev) => ({
+        ...prev,
+        [roundId]: response.data,
+      }));
 
       // Since the endpoint is not available in the provided code, we'll
       // use an empty array for now as placeholder
-      setRoundMarkCriteria((prev) => ({
-        ...prev,
-        [roundId]: [],
-      }));
+      // setRoundMarkCriteria((prev) => ({
+      //   ...prev,
+      //   [roundId]: [],
+      // }));
     } catch (error) {
       showError("Error", "Failed to load mark criteria");
       console.error("Error fetching mark criteria:", error);
