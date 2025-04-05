@@ -143,10 +143,10 @@ export default function UserManagement({
       // and removes the association
 
       // This is a placeholder for the actual API call
-      // await userHackathonService.deleteUserHackathon(userHackathon.id);
+      await userHackathonService.deleteUserHackathon(userHackathon.id);
 
       // Since we don't have the delete method yet, we'll simulate it by filtering locally
-      setUsers((prev) => prev.filter((u) => u.id !== userHackathon.id));
+      // setUsers((prev) => prev.filter((u) => u.id !== userHackathon.id));
 
       showSuccess(
         "User Removed",
