@@ -5,11 +5,11 @@ import { User } from "./user";
 import { TeamRequestMember } from "./teamRequestMember";
 
 export type TeamRequestStatus =
-  | "pending"
-  | "under_review"
-  | "approved"
-  | "rejected"
-  | "canceled";
+  | "PENDING"
+  | "UNDER_REVIEW"
+  | "APPROVED"
+  | "REJECTED"
+  | "CANCELED";
 
 export type TeamRequest = {
   id: string;

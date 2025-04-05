@@ -83,15 +83,15 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
 
   const getStatusBadgeColor = (status: TeamRequestStatus) => {
     switch (status) {
-      case "pending":
+      case "PENDING":
         return "bg-yellow-100 text-yellow-800";
-      case "under_review":
+      case "UNDER_REVIEW":
         return "bg-blue-100 text-blue-800";
-      case "approved":
+      case "APPROVED":
         return "bg-green-100 text-green-800";
-      case "rejected":
+      case "REJECTED":
         return "bg-red-100 text-red-800";
-      case "canceled":
+      case "CANCELED":
         return "bg-gray-100 text-gray-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -190,11 +190,11 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="under_review">Under Review</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-                <SelectItem value="canceled">Canceled</SelectItem>
+                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="UNDER_REVIEW">Under Review</SelectItem>
+                <SelectItem value="APPROVED">Approved</SelectItem>
+                <SelectItem value="REJECTED">Rejected</SelectItem>
+                <SelectItem value="CANCELED">Canceled</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -307,9 +307,9 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
                           </div>
                           <Badge
                             className={
-                              member.status === "approved"
+                              member.status === "APPROVED"
                                 ? "bg-green-100 text-green-800"
-                                : member.status === "rejected"
+                                : member.status === "REJECTED"
                                 ? "bg-red-100 text-red-800"
                                 : member.status === "no_response"
                                 ? "bg-gray-100 text-gray-800"
@@ -332,7 +332,7 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
                       request.confirmationDeadline
                     ).toLocaleDateString()}
                   </div>
-                  {request.status === "under_review" && (
+                  {request.status === "UNDER_REVIEW" && (
                     <Button onClick={() => handleOpenDialog(request)}>
                       Review
                     </Button>
@@ -395,9 +395,9 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
                     </div>
                     <Badge
                       className={
-                        member.status === "approved"
+                        member.status === "APPROVED"
                           ? "bg-green-100 text-green-800"
-                          : member.status === "rejected"
+                          : member.status === "REJECTED"
                           ? "bg-red-100 text-red-800"
                           : member.status === "no_response"
                           ? "bg-gray-100 text-gray-800"
