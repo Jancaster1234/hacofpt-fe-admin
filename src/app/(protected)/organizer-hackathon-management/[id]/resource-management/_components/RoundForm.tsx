@@ -112,9 +112,7 @@ export default function RoundForm({
       if (!location) return;
 
       const newRoundLocation: RoundLocation = {
-        id: `temp_${Date.now()}_${locationId}`, // The API will assign a proper ID
         locationId,
-        location,
         type: locationType,
         createdAt: new Date().toISOString(),
       };
@@ -158,7 +156,6 @@ export default function RoundForm({
       // Create round data object
       const roundData: Round = {
         ...formData,
-        id: formData.id || `temp_round_${Date.now()}`, // The API will assign a proper ID for new rounds
         hackathonId,
         status: formData.status || "UPCOMING",
         roundLocations: formData.roundLocations || [],

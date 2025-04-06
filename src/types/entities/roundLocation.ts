@@ -6,7 +6,7 @@ import { Location } from "./location";
 export type RoundLocationType = "ONLINE" | "OFFLINE" | "HYBRID";
 
 export type RoundLocation = {
-  id: string;
+  id?: string;
   round?: Round;
   roundId?: string;
   location?: Location;
