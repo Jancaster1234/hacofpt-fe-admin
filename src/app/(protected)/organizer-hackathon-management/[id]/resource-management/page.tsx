@@ -13,6 +13,7 @@ import Locations from "./_components/Locations";
 import Notifications from "./_components/Notifications";
 import RoundMarkCriteria from "./_components/RoundMarkCriteria";
 import TeamRequests from "./_components/TeamRequests";
+import IndividualRegistrationRequests from "./_components/IndividualRegistrationRequests";
 import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
 
@@ -28,6 +29,7 @@ export default function ResourceManagementPage({
     | "location"
     | "roundMarkCriteria"
     | "teamRequest"
+    | "individualRequest"
     | "userManagement"
     | "assignJudgeToRound"
     | "judge"
@@ -50,8 +52,11 @@ export default function ResourceManagementPage({
       {activeTab === "roundMarkCriteria" && (
         <RoundMarkCriteria hackathonId={hackathonId} />
       )}
-      {activeTab === "teamRequest" && ( // Added new tab condition
+      {activeTab === "teamRequest" && (
         <TeamRequests hackathonId={hackathonId} />
+      )}
+      {activeTab === "individualRequest" && (
+        <IndividualRegistrationRequests hackathonId={hackathonId} />
       )}
       {activeTab === "userManagement" && (
         <UserManagement hackathonId={hackathonId} />

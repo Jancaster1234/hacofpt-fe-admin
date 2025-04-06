@@ -28,6 +28,7 @@ export default function Tabs({ activeTab, setActiveTab }: TabsProps) {
     { id: "location", label: "Locations" },
     { id: "roundMarkCriteria", label: "Round Mark Criteria" },
     { id: "teamRequest", label: "Team Requests" },
+    { id: "individualRequest", label: "Individual Registration Requests" },
     { id: "userManagement", label: "User Management" },
     { id: "assignJudgeToRound", label: "Assign Judge to Round" },
     { id: "judge", label: "Judge Assign" },
