@@ -4,20 +4,17 @@ export const handleApiError = <T>(
   defaultValue: T,
   errorMessage?: string
 ): { data: T; aborted: boolean; message?: string } => {
-  // Log the error
-  console.error(errorMessage || "API Error:", error?.message);
-
-  // Check if the error is due to component unmount
-  if (
-    error?.name === "AbortError" &&
-    error?.message?.includes("component unmounted")
-  ) {
+  // Check if the error is due to an AbortSignal
+  if (error?.name === "AbortError") {
+    // Don't show error for any aborted requests
     return {
       data: defaultValue,
       aborted: true,
       message: "Request aborted",
     };
   }
+  // Log the error
+  console.error(errorMessage || "API Error:", error?.message);
 
   // Extract error message if available
   let message = "An error occurred";
