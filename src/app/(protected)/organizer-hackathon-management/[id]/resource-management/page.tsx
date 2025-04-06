@@ -14,6 +14,7 @@ import Notifications from "./_components/Notifications";
 import RoundMarkCriteria from "./_components/RoundMarkCriteria";
 import TeamRequests from "./_components/TeamRequests";
 import IndividualRegistrationRequests from "./_components/IndividualRegistrationRequests";
+import TeamFormation from "./_components/TeamFormation"; // Import the new component
 import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
 
@@ -30,6 +31,7 @@ export default function ResourceManagementPage({
     | "roundMarkCriteria"
     | "teamRequest"
     | "individualRequest"
+    | "teamFormation" // Add the new tab type
     | "userManagement"
     | "assignJudgeToRound"
     | "judge"
@@ -40,6 +42,7 @@ export default function ResourceManagementPage({
     | "sponsorship"
   >("round"); // Default to "round"
   const { modalState, hideModal } = useApiModal();
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">
@@ -57,6 +60,9 @@ export default function ResourceManagementPage({
       )}
       {activeTab === "individualRequest" && (
         <IndividualRegistrationRequests hackathonId={hackathonId} />
+      )}
+      {activeTab === "teamFormation" && ( // Add the new tab content
+        <TeamFormation hackathonId={hackathonId} />
       )}
       {activeTab === "userManagement" && (
         <UserManagement hackathonId={hackathonId} />

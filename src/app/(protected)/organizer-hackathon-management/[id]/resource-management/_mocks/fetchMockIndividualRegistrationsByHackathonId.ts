@@ -10,6 +10,7 @@ export const fetchMockIndividualRegistrationsByHackathonId = (
         {
           id: "reg1",
           status: "PENDING",
+          hackathonId: hackathonId,
           reviewedBy: undefined,
           createdByUserName: "Alice Smith",
           createdAt: new Date().toISOString(),
@@ -18,6 +19,7 @@ export const fetchMockIndividualRegistrationsByHackathonId = (
         {
           id: "reg2",
           status: "APPROVED",
+          hackathonId: hackathonId,
           reviewedBy: {
             id: "adminUser",
             firstName: "Admin",
