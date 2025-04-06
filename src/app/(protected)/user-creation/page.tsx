@@ -29,7 +29,7 @@ export default function UserCreationPage() {
     username: "",
     firstName: "",
     lastName: "",
-    roleId: "5", // Default to MENTOR
+    roleId: "7", // Default to MENTOR
     password: "12345678", // Default password
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -133,7 +133,7 @@ export default function UserCreationPage() {
           username: "",
           firstName: "",
           lastName: "",
-          roleId: "5",
+          roleId: "7",
           password: "12345678",
         });
 
@@ -167,7 +167,7 @@ export default function UserCreationPage() {
     setEditFormData({
       firstName: userToEdit.firstName || "",
       lastName: userToEdit.lastName || "",
-      roleId: userToEdit.userRoles?.[0]?.role?.id || "5",
+      roleId: userToEdit.userRoles?.[0]?.role?.id || "7",
     });
   };
 
@@ -364,8 +364,8 @@ export default function UserCreationPage() {
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="5">MENTOR</option>
-                    <option value="2">JUDGE</option>
+                    <option value="7">MENTOR</option>
+                    <option value="3">JUDGE</option>
                   </select>
                 </div>
                 <div>

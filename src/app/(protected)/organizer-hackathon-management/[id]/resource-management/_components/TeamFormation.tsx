@@ -1,9 +1,10 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/TeamFormation.tsx
 import React, { useState, useEffect } from "react";
-import { fetchMockIndividualRegistrationsByHackathonIdAndStatus } from "../_mocks/fetchMockIndividualRegistrationsByHackathonIdAndStatus";
-import { fetchMockUserByUsername } from "../_mocks/fetchMockUserByUsername";
 import { User } from "@/types/entities/user";
 import { useApiModal } from "@/hooks/useApiModal";
+import { userService } from "@/services/user.service";
+import { individualRegistrationRequestService } from "@/services/individualRegistrationRequest.service";
+import { teamService } from "@/services/team.service";
 
 // Types
 interface TeamMember {
@@ -30,6 +31,7 @@ export default function TeamFormation({
   const [unassignedUsers, setUnassignedUsers] = useState<TeamMember[]>([]);
   const [minTeamSize, setMinTeamSize] = useState(3);
   const [maxTeamSize, setMaxTeamSize] = useState(5);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const { showModal } = useApiModal();
 
   // Fetch approved registrations and related user data
@@ -37,17 +39,30 @@ export default function TeamFormation({
     const fetchParticipants = async () => {
       try {
         setLoading(true);
-        // Fetch all approved registrations
-        const registrations =
-          await fetchMockIndividualRegistrationsByHackathonIdAndStatus(
+
+        // Get all approved individual registrations for this hackathon
+        const approvedRegistrations =
+          await individualRegistrationRequestService.getIndividualRegistrationsByHackathonIdAndStatus(
             hackathonId,
             "APPROVED"
           );
 
+        if (
+          !approvedRegistrations.data ||
+          approvedRegistrations.data.length === 0
+        ) {
+          setLoading(false);
+          return;
+        }
+
         // For each registration, get user details
-        const userPromises = registrations.map(async (reg) => {
+        const userPromises = approvedRegistrations.data.map(async (reg) => {
           try {
-            const user = await fetchMockUserByUsername(reg.createdByUserName);
+            const userResponse = await userService.getUserByUsername(
+              reg.createdByUserName
+            );
+            const user = userResponse.data;
+
             return {
               id: user?.id || `temp-${reg.id}`,
               fullName:
@@ -254,7 +269,7 @@ export default function TeamFormation({
   };
 
   // Submit teams
-  const submitTeams = () => {
+  const submitTeams = async () => {
     // Check if all teams have leaders
     const teamsWithoutLeaders = teams.filter((team) => !team.teamLeaderId);
     if (teamsWithoutLeaders.length > 0) {
@@ -266,22 +281,46 @@ export default function TeamFormation({
       return;
     }
 
-    // Format teams for API
+    // Format teams for API according to the expected structure
     const formattedTeamsForApi = teams.map((team) => ({
       teamLeaderId: team.teamLeaderId,
-      teamMembers: team.teamMembers
-        .filter((member) => member.id !== team.teamLeaderId)
-        .map((member) => ({
-          userId: member.id,
-        })),
+      // Include all team members, including the leader
+      teamMembers: team.teamMembers.map((member) => ({
+        userId: member.id,
+      })),
+      teamHackathons: [
+        {
+          hackathonId: hackathonId,
+          status: "ACTIVE" as const,
+        },
+      ],
     }));
 
-    console.log("Submitting teams:", formattedTeamsForApi);
-    showModal({
-      type: "success",
-      title: "Teams Submitted",
-      message: `Successfully created ${formattedTeamsForApi.length} teams.`,
-    });
+    try {
+      setSubmitLoading(true);
+
+      // Call the API to create teams
+      const response = await teamService.createBulkTeams(formattedTeamsForApi);
+
+      if (response.data) {
+        showModal({
+          type: "success",
+          title: "Teams Created",
+          message: `Successfully created ${response.data.length} teams.`,
+        });
+      } else {
+        throw new Error("Failed to create teams");
+      }
+    } catch (error) {
+      console.error("Error submitting teams:", error);
+      showModal({
+        type: "error",
+        title: "Error",
+        message: "Failed to create teams. Please try again.",
+      });
+    } finally {
+      setSubmitLoading(false);
+    }
   };
 
   if (loading) {
@@ -488,14 +527,14 @@ export default function TeamFormation({
       <div className="text-right">
         <button
           onClick={submitTeams}
-          disabled={teams.length === 0}
+          disabled={teams.length === 0 || submitLoading}
           className={`px-4 py-2 rounded-md ${
-            teams.length === 0
+            teams.length === 0 || submitLoading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-green-600 hover:bg-green-700"
           } text-white`}
         >
-          Submit Teams
+          {submitLoading ? "Creating Teams..." : "Submit Teams"}
         </button>
       </div>
     </div>

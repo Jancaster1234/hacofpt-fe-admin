@@ -123,6 +123,35 @@ class IndividualRegistrationRequestService {
     }
   }
 
+  async getIndividualRegistrationsByHackathonIdAndStatus(
+    hackathonId: string,
+    status: "PENDING" | "APPROVED" | "REJECTED"
+  ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<
+        IndividualRegistrationRequest[]
+      >(
+        `/hackathon-service/api/v1/individuals/filter-by-hackathon-and-status?hackathonId=${hackathonId}&status=${status}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve registration requests");
+      }
+
+      return {
+        data: response.data,
+        message:
+          response.message || "Registration requests retrieved successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<IndividualRegistrationRequest[]>(
+        error,
+        [],
+        "[Individual Registration Service] Error fetching registration requests by hackathon and status:"
+      );
+    }
+  }
+
   async deleteIndividualRegistration(
     id: string
   ): Promise<{ message?: string }> {
