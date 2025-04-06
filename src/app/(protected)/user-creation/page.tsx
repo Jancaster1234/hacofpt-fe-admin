@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { User } from "@/types/entities/user";
+import { Role } from "@/types/entities/role";
 import {
   Loader2,
   Plus,
@@ -16,12 +17,14 @@ import {
 } from "lucide-react";
 import Pagination from "@/components/common/Pagination";
 import { userService } from "@/services/user.service";
+import { roleService } from "@/services/role.service";
 import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
 
 export default function UserCreationPage() {
   const { user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -29,7 +32,7 @@ export default function UserCreationPage() {
     username: "",
     firstName: "",
     lastName: "",
-    roleId: "7", // Default to MENTOR
+    roleId: "", // Will be set dynamically after roles are loaded
     password: "12345678", // Default password
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,8 +76,34 @@ export default function UserCreationPage() {
     }
   };
 
+  const loadRoles = async () => {
+    try {
+      const response = await roleService.getAllRoles();
+      if (response.data && response.data.length > 0) {
+        setRoles(response.data);
+
+        // Set default roleId to the first role
+        if (response.data.length > 0) {
+          const mentorRole = response.data.find(
+            (role) => role.name === "MENTOR"
+          );
+          setCreateFormData((prev) => ({
+            ...prev,
+            roleId: mentorRole?.id || response.data[0].id,
+          }));
+        }
+      } else {
+        console.error("No roles found or error fetching roles");
+      }
+    } catch (err: any) {
+      console.error("Error loading roles:", err);
+      showError("Error Loading Roles", "Failed to load user roles");
+    }
+  };
+
   useEffect(() => {
     loadUsers();
+    loadRoles();
   }, []);
 
   const handleInputChange = (
@@ -129,13 +158,13 @@ export default function UserCreationPage() {
         setUsers((prev) => [response.data, ...prev]);
 
         // Reset the form
-        setCreateFormData({
+        setCreateFormData((prev) => ({
           username: "",
           firstName: "",
           lastName: "",
-          roleId: "7",
+          roleId: prev.roleId, // Keep the current roleId
           password: "12345678",
-        });
+        }));
 
         setShowCreateForm(false);
         const successMsg = `User ${response.data.username} created successfully! Default password: 12345678`;
@@ -167,7 +196,7 @@ export default function UserCreationPage() {
     setEditFormData({
       firstName: userToEdit.firstName || "",
       lastName: userToEdit.lastName || "",
-      roleId: userToEdit.userRoles?.[0]?.role?.id || "7",
+      roleId: userToEdit.userRoles?.[0]?.role?.id || "",
     });
   };
 
@@ -262,6 +291,19 @@ export default function UserCreationPage() {
     }
   };
 
+  // Get role options for filters
+  const getRoleOptions = () => {
+    const roleOptions = [{ id: "all", name: "All Roles" }];
+
+    roles.forEach((role) => {
+      if (role.name) {
+        roleOptions.push({ id: role.name, name: role.name });
+      }
+    });
+
+    return roleOptions;
+  };
+
   // Filter users based on search query and role filter
   const filteredUsers = users.filter((user) => {
     const searchLower = searchQuery.toLowerCase();
@@ -274,9 +316,7 @@ export default function UserCreationPage() {
     // Apply role filter
     const userRole = user.userRoles?.[0]?.role?.name;
     const matchesRole =
-      roleFilter === "all" ||
-      (roleFilter === "MENTOR" && userRole === "MENTOR") ||
-      (roleFilter === "JUDGE" && userRole === "JUDGE");
+      roleFilter === "all" || (userRole && roleFilter === userRole);
 
     return matchesSearch && matchesRole;
   });
@@ -364,8 +404,15 @@ export default function UserCreationPage() {
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="7">MENTOR</option>
-                    <option value="3">JUDGE</option>
+                    {roles.length === 0 ? (
+                      <option value="">Loading roles...</option>
+                    ) : (
+                      roles.map((role) => (
+                        <option key={role.id} value={role.id}>
+                          {role.name}
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
                 <div>
@@ -459,9 +506,11 @@ export default function UserCreationPage() {
                 onChange={(e) => setRoleFilter(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="all">All Roles</option>
-                <option value="MENTOR">MENTOR</option>
-                <option value="JUDGE">JUDGE</option>
+                {getRoleOptions().map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -611,8 +660,11 @@ export default function UserCreationPage() {
                               onChange={handleEditInputChange}
                               className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm"
                             >
-                              <option value="5">MENTOR</option>
-                              <option value="2">JUDGE</option>
+                              {roles.map((role) => (
+                                <option key={role.id} value={role.id}>
+                                  {role.name}
+                                </option>
+                              ))}
                             </select>
                           ) : (
                             user.userRoles?.[0]?.role?.name || "No role"
