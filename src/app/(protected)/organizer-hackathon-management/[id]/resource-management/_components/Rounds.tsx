@@ -68,6 +68,12 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
   // Handle form submission
   const handleFormSubmit = async (roundData: Round) => {
     try {
+      // Extract location data correctly for API call
+      const locationData = roundData.roundLocations?.map((rl) => ({
+        locationId: rl.locationId,
+        type: rl.type,
+      }));
+
       if (isEditing) {
         // Update existing round
         const response = await roundService.updateRound({
@@ -82,7 +88,7 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
             | "ONGOING"
             | "COMPLETED"
             | "CANCELLED",
-          roundLocations: roundData.roundLocations?.map((rl) => rl.id),
+          roundLocations: locationData,
         });
 
         // Update state with the response data
@@ -109,7 +115,7 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
             | "ONGOING"
             | "COMPLETED"
             | "CANCELLED",
-          roundLocations: roundData.roundLocations?.map((rl) => rl.id),
+          roundLocations: locationData,
         });
 
         // Add new round to state

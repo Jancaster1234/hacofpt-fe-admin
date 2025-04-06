@@ -165,7 +165,6 @@ export default function RoundForm({
         createdAt: formData.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       } as Round;
-
       await onSubmit(roundData);
     } catch (error) {
       console.error("Form submission error:", error);
