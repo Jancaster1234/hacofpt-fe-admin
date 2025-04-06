@@ -168,7 +168,7 @@ class UserService {
     lastName: string;
     userRoles: {
       roleId: string;
-    }[];
+    };
   }): Promise<{ data: User; message?: string }> {
     try {
       const response = await apiService.auth.post<User>(

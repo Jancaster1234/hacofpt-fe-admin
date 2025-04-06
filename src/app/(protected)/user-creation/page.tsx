@@ -116,11 +116,9 @@ export default function UserCreationPage() {
         firstName: createFormData.firstName || "",
         lastName: createFormData.lastName || "",
         password: createFormData.password,
-        userRoles: [
-          {
-            roleId: createFormData.roleId,
-          },
-        ],
+        userRoles: {
+          roleId: createFormData.roleId,
+        },
       };
 
       // Make API call to create user
