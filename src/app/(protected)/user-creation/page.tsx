@@ -266,10 +266,10 @@ export default function UserCreationPage() {
     try {
       // Note: The provided user service doesn't have a delete method
       // This would normally be implemented as:
-      // const response = await userService.deleteUser(userId);
+      const response = await userService.deleteUser(userId);
 
       // For now, we'll simulate success and just update the UI
-      console.log("Deleting user with ID:", userId);
+      //console.log("Deleting user with ID:", userId);
 
       // Update the local state by removing the user
       setUsers((prevUsers) => prevUsers.filter((u) => u.id !== userId));

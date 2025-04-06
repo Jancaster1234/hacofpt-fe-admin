@@ -219,6 +219,28 @@ class UserService {
       return handleApiError<User>(error, {} as User, "Error updating user:");
     }
   }
+
+  async deleteUser(userId: string): Promise<{ message?: string }> {
+    try {
+      const response = await apiService.auth.delete(
+        `/identity-service/api/v1/users/${userId}`
+      );
+
+      if (!response) {
+        throw new Error("Failed to delete user");
+      }
+
+      return {
+        message: response.message || "User deleted successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<void>(
+        error,
+        undefined,
+        "[User Service] Error deleting user:"
+      );
+    }
+  }
 }
 
 export const userService = new UserService();
