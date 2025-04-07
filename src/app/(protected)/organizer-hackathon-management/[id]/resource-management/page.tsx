@@ -14,7 +14,8 @@ import Notifications from "./_components/Notifications";
 import RoundMarkCriteria from "./_components/RoundMarkCriteria";
 import TeamRequests from "./_components/TeamRequests";
 import IndividualRegistrationRequests from "./_components/IndividualRegistrationRequests";
-import TeamFormation from "./_components/TeamFormation"; // Import the new component
+import TeamFormation from "./_components/TeamFormation";
+import DeviceManagement from "./_components/DeviceManagement"; // Import the new component
 import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
 
@@ -31,7 +32,7 @@ export default function ResourceManagementPage({
     | "roundMarkCriteria"
     | "teamRequest"
     | "individualRequest"
-    | "teamFormation" // Add the new tab type
+    | "teamFormation"
     | "userManagement"
     | "assignJudgeToRound"
     | "judge"
@@ -61,7 +62,7 @@ export default function ResourceManagementPage({
       {activeTab === "individualRequest" && (
         <IndividualRegistrationRequests hackathonId={hackathonId} />
       )}
-      {activeTab === "teamFormation" && ( // Add the new tab content
+      {activeTab === "teamFormation" && (
         <TeamFormation hackathonId={hackathonId} />
       )}
       {activeTab === "userManagement" && (
@@ -78,9 +79,7 @@ export default function ResourceManagementPage({
       {activeTab === "hackathonResult" && (
         <HackathonResults hackathonId={hackathonId} />
       )}
-      {activeTab === "device" && (
-        <p>Device Management Feature Coming Soon...</p>
-      )}
+      {activeTab === "device" && <DeviceManagement hackathonId={hackathonId} />}
       {activeTab === "sponsorship" && <p>Sponsorship Feature Coming Soon...</p>}
       <ApiResponseModal
         isOpen={modalState.isOpen}
