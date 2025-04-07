@@ -9,10 +9,10 @@ export type SponsorshipHackathonDetail = {
   id: string;
   sponsorshipHackathon?: SponsorshipHackathon;
   sponsorshipHackathonId?: string;
-  moneySpent: number;
-  content: string;
-  status: SponsorshipDetailStatus;
-  timeFrom: string;
-  timeTo: string;
-  fileUrls: FileUrl[];
+  moneySpent?: number;
+  content?: string;
+  status?: SponsorshipDetailStatus;
+  timeFrom?: string;
+  timeTo?: string;
+  fileUrls?: FileUrl[];
 } & AuditBase;

@@ -19,5 +19,5 @@ export type UserDeviceTrack = {
   userDeviceId?: string;
   deviceQualityStatus: DeviceQualityStatus;
   note?: string;
-  fileUrls: FileUrl[];
+  fileUrls?: FileUrl[];
 } & AuditBase;

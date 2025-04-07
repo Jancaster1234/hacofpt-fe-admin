@@ -10,6 +10,6 @@ export type SponsorshipHackathon = {
   hackathonId?: string;
   sponsorship?: Sponsorship;
   sponsorshipId?: string;
-  totalMoney: number;
-  sponsorshipHackathonDetails: SponsorshipHackathonDetail[];
+  totalMoney?: number;
+  sponsorshipHackathonDetails?: SponsorshipHackathonDetail[];
 } & AuditBase;

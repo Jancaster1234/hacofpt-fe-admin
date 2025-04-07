@@ -12,8 +12,8 @@ export type UserDevice = {
   userId?: string;
   device?: Device;
   deviceId?: string;
-  timeFrom: string; // ISO date
-  timeTo: string; // ISO date
-  status: UserDeviceStatus;
-  fileUrls: FileUrl[];
+  timeFrom?: string;
+  timeTo?: string;
+  status?: UserDeviceStatus;
+  fileUrls?: FileUrl[];
 } & AuditCreatedBase;

@@ -6,16 +6,16 @@ export type SponsorshipStatus =
   | "PENDING"
   | "ACTIVE"
   | "COMPLETED"
-  | "CANCELLED"; // adjust to your actual enum values
+  | "CANCELLED";
 
 export type Sponsorship = {
   id: string;
-  name: string;
-  brand: string;
-  content: string;
-  money: number;
-  timeFrom: string;
-  timeTo: string;
-  status: SponsorshipStatus;
-  sponsorshipHackathons: SponsorshipHackathon[];
+  name?: string;
+  brand?: string;
+  content?: string;
+  money?: number;
+  timeFrom?: string;
+  timeTo?: string;
+  status?: SponsorshipStatus;
+  sponsorshipHackathons?: SponsorshipHackathon[];
 } & AuditCreatedBase;
