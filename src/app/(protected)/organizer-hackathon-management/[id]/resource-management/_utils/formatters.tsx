@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_utils/formatters.ts
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_utils/formatters.tsx
 
 /**
  * Format a file size in bytes to a human-readable string
