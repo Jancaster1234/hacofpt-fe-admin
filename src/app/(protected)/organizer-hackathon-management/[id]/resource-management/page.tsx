@@ -15,7 +15,8 @@ import RoundMarkCriteria from "./_components/RoundMarkCriteria";
 import TeamRequests from "./_components/TeamRequests";
 import IndividualRegistrationRequests from "./_components/IndividualRegistrationRequests";
 import TeamFormation from "./_components/TeamFormation";
-import DeviceManagement from "./_components/DeviceManagement"; // Import the new component
+import DeviceManagement from "./_components/DeviceManagement";
+import Sponsorship from "./_components/Sponsorship";
 import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
 
@@ -80,7 +81,7 @@ export default function ResourceManagementPage({
         <HackathonResults hackathonId={hackathonId} />
       )}
       {activeTab === "device" && <DeviceManagement hackathonId={hackathonId} />}
-      {activeTab === "sponsorship" && <p>Sponsorship Feature Coming Soon...</p>}
+      {activeTab === "sponsorship" && <Sponsorship hackathonId={hackathonId} />}
       <ApiResponseModal
         isOpen={modalState.isOpen}
         onClose={hideModal}

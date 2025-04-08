@@ -58,26 +58,62 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
   const getFileTypeIcon = (fileType: string) => {
     if (fileType.startsWith("image/")) {
       return (
-        <svg className="w-8 h-8 text-blue-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+        <svg
+          className="w-8 h-8 text-blue-500"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fillRule="evenodd"
+            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+            clipRule="evenodd"
+          />
         </svg>
       );
     } else if (fileType.includes("pdf")) {
       return (
-        <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+        <svg
+          className="w-8 h-8 text-red-500"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fillRule="evenodd"
+            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+            clipRule="evenodd"
+          />
         </svg>
       );
     } else if (fileType.includes("word") || fileType.includes("doc")) {
       return (
-        <svg className="w-8 h-8 text-blue-700" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+        <svg
+          className="w-8 h-8 text-blue-700"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fillRule="evenodd"
+            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+            clipRule="evenodd"
+          />
         </svg>
       );
     } else {
       return (
-        <svg className="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+        <svg
+          className="w-8 h-8 text-gray-500"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fillRule="evenodd"
+            d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+            clipRule="evenodd"
+          />
         </svg>
       );
     }
@@ -97,8 +133,17 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
         onClick={onBack}
         className="mb-4 flex items-center text-blue-600 hover:text-blue-800"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clipRule="evenodd" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5 mr-1"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fillRule="evenodd"
+            d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+            clipRule="evenodd"
+          />
         </svg>
         Back to Details
       </button>
@@ -108,7 +153,11 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
           Files for {detail.content}
         </h3>
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          <span className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeColor(detail.status)}`}>
+          <span
+            className={`px-2 py-1 text-xs rounded-full ${getStatusBadgeColor(
+              detail.status
+            )}`}
+          >
             {detail.status}
           </span>
           <span className="text-sm text-gray-500">
@@ -151,7 +200,7 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
                 {formatDate(file.createdAt)}
               </div>
               <div className="mt-auto flex justify-end gap-2">
-                
+                <a
                   href={file.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
