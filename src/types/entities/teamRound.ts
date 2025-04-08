@@ -5,11 +5,11 @@ import { Round } from "./round";
 import { TeamRoundJudge } from "./teamRoundJudge";
 
 export type TeamRoundStatus =
-  | "Pending"
-  | "AwaitingJudging"
-  | "Passed"
-  | "Failed"
-  | "DisqualifiedDueToViolation";
+  | "PENDING"
+  | "AWAITING_JUDGING"
+  | "PASSED"
+  | "FAILED"
+  | "DISQUALIFIED_DUE_TO_VIOLATION";
 
 export type TeamRound = {
   id: string;
