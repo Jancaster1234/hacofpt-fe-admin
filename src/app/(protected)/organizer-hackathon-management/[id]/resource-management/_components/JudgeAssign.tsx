@@ -192,7 +192,7 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
         <div className="space-y-6">
           {teamRounds[activeRoundId]?.map((teamRound) => {
             const isDisqualified =
-              teamRound.status === "DisqualifiedDueToViolation";
+              teamRound.status === "DISQUALIFIED_DUE_TO_VIOLATION";
 
             return (
               <div
