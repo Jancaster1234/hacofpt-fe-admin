@@ -20,7 +20,7 @@ async function request<T>(
   payload?: Record<string, any>,
   customHeaders: HeadersInit = {},
   useAuthHeader: boolean = false,
-  timeoutMs: number = 10000,
+  timeoutMs: number = 30000,
   retry: boolean = true,
   abortPrevious: boolean = true
 ): Promise<ApiResponse<T>> {
