@@ -132,8 +132,8 @@ class NotificationService {
   }
 
   async updateReadStatusBulk(data: {
-    notificationIds: string[]; //NotificationDelivery id
-    isRead: boolean;
+    notificationIds: string[]; //NotificationDelivery id BE: //deliveryIds
+    read: boolean; //this is isRead in entity
   }): Promise<{ message?: string }> {
     try {
       const response = await apiService.auth.put(
