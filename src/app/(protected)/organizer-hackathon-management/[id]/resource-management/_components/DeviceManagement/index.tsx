@@ -1,12 +1,12 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/index.tsx
 import React, { useState, useEffect } from "react";
-import { fetchMockDevices } from "../../_mocks/fetchMockDevices";
-import { fetchMockRounds } from "../../_mocks/fetchMockRounds";
 import { Device } from "@/types/entities/device";
 import { Round } from "@/types/entities/round";
 import RoundNavigation from "./RoundNavigation";
 import LocationFilter from "./LocationFilter";
 import DeviceList from "./DeviceList";
+import { deviceService } from "@/services/device.service";
+import { roundService } from "@/services/round.service";
 
 interface DeviceManagementProps {
   hackathonId: string;
@@ -18,20 +18,32 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [activeRoundId, setActiveRoundId] = useState<string | null>(null);
   const [activeLocationId, setActiveLocationId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch rounds and initial devices on component mount
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
+      setError(null);
       try {
-        const fetchedRounds = await fetchMockRounds(hackathonId);
-        setRounds(fetchedRounds);
+        // Load rounds first
+        const roundsResponse = await roundService.getRoundsByHackathonId(
+          hackathonId
+        );
+        if (roundsResponse.data) {
+          setRounds(roundsResponse.data);
+        }
 
-        // Initially load all devices without round/location filter
-        const allDevices = await fetchMockDevices({ hackathonId });
-        setDevices(allDevices);
+        // Load all devices for the hackathon
+        const devicesResponse = await deviceService.getDevicesByHackathonId(
+          hackathonId
+        );
+        if (devicesResponse.data) {
+          setDevices(devicesResponse.data);
+        }
       } catch (error) {
         console.error("Error loading initial data:", error);
+        setError("Failed to load data. Please refresh and try again.");
       } finally {
         setLoading(false);
       }
@@ -43,28 +55,34 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
   // Fetch devices when round or location selection changes
   useEffect(() => {
     const loadDevices = async () => {
-      setLoading(true);
-      try {
-        let params: {
-          hackathonId?: string;
-          roundId?: string;
-          roundLocationId?: string;
-        } = {
-          hackathonId,
-        };
+      if (!activeRoundId && !activeLocationId) {
+        // Skip API call if no filters are applied (we already have all devices)
+        return;
+      }
 
-        if (activeRoundId) {
-          params.roundId = activeRoundId;
-        }
+      setLoading(true);
+      setError(null);
+      try {
+        let devicesResponse;
 
         if (activeLocationId) {
-          params.roundLocationId = activeLocationId;
+          // If location is selected, filter by location ID
+          devicesResponse = await deviceService.getDevicesByRoundLocationId(
+            activeLocationId
+          );
+        } else if (activeRoundId) {
+          // If only round is selected, filter by round ID
+          devicesResponse = await deviceService.getDevicesByRoundId(
+            activeRoundId
+          );
         }
 
-        const fetchedDevices = await fetchMockDevices(params);
-        setDevices(fetchedDevices);
+        if (devicesResponse && devicesResponse.data) {
+          setDevices(devicesResponse.data);
+        }
       } catch (error) {
         console.error("Error loading devices:", error);
+        setError("Failed to load devices for the selected filters.");
       } finally {
         setLoading(false);
       }
@@ -84,6 +102,16 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
     setActiveLocationId(locationId);
   };
 
+  // Handle device added
+  const handleDeviceAdded = (newDevice: Device) => {
+    setDevices([...devices, newDevice]);
+  };
+
+  // Handle device deletion
+  const handleDeviceDeleted = (deviceId: string) => {
+    setDevices(devices.filter((device) => device.id !== deviceId));
+  };
+
   // Get the active round
   const activeRound = activeRoundId
     ? rounds.find((round) => round.id === activeRoundId)
@@ -92,6 +120,10 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-2xl font-bold mb-6">Device Management</h2>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded">{error}</div>
+      )}
 
       {loading && <p className="text-gray-500">Loading...</p>}
 
@@ -118,6 +150,8 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
             activeRound={activeRound}
             activeLocationId={activeLocationId}
             hackathonId={hackathonId}
+            onDeviceAdded={handleDeviceAdded}
+            onDeviceDeleted={handleDeviceDeleted}
           />
         </>
       )}

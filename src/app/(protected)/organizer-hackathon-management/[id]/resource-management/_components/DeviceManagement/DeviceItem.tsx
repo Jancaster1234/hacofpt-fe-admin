@@ -1,20 +1,23 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/DeviceItem.tsx
 import React, { useState, useEffect } from "react";
 import { Device } from "@/types/entities/device";
-import { fetchMockFileUrls } from "../../_mocks/fetchMockFileUrls";
-import { fetchMockUserDevices } from "../../_mocks/fetchMockUserDevices";
 import { FileUrl } from "@/types/entities/fileUrl";
 import { UserDevice } from "@/types/entities/userDevice";
+import { User } from "@/types/entities/user";
 import DeviceFiles from "./DeviceFiles";
 import UserDevicesTabs from "./UserDevicesTabs";
-import { fetchMockUserById } from "../../_mocks/fetchMockUserById";
-import { User } from "@/types/entities/user";
+import { fileUrlService } from "@/services/fileUrl.service";
+import { userDeviceService } from "@/services/userDevice.service";
+import { userService } from "@/services/user.service";
+import { deviceService } from "@/services/device.service";
+import { useRouter } from "next/navigation";
 
 interface DeviceItemProps {
   device: Device;
   isExpanded: boolean;
   onToggleExpand: () => void;
   hackathonId: string;
+  onDeviceDeleted: (deviceId: string) => void;
 }
 
 const DeviceItem: React.FC<DeviceItemProps> = ({
@@ -22,7 +25,9 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
   isExpanded,
   onToggleExpand,
   hackathonId,
+  onDeviceDeleted,
 }) => {
+  const router = useRouter();
   // Device files state
   const [deviceFiles, setDeviceFiles] = useState<FileUrl[]>([]);
   const [loadingDeviceFiles, setLoadingDeviceFiles] = useState<boolean>(false);
@@ -37,6 +42,9 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
   // User info state
   const [userInfo, setUserInfo] = useState<{ [userId: string]: User }>({});
 
+  // Delete loading state
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
   useEffect(() => {
     if (isExpanded) {
       loadDeviceFiles();
@@ -48,8 +56,10 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
     if (!deviceFiles.length && !loadingDeviceFiles) {
       setLoadingDeviceFiles(true);
       try {
-        const files = await fetchMockFileUrls({ deviceId: device.id });
-        setDeviceFiles(files);
+        const response = await fileUrlService.getFileUrlsByDeviceId(device.id);
+        if (response.data) {
+          setDeviceFiles(response.data);
+        }
       } catch (error) {
         console.error(`Error fetching files for device ${device.id}:`, error);
       } finally {
@@ -62,28 +72,35 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
     if (!userDevices.length && !loadingUserDevices) {
       setLoadingUserDevices(true);
       try {
-        const fetchedUserDevices = await fetchMockUserDevices({
-          deviceId: device.id,
-        });
-        setUserDevices(fetchedUserDevices);
+        const response = await userDeviceService.getUserDevicesByDeviceId(
+          device.id
+        );
+        if (response.data) {
+          setUserDevices(response.data);
 
-        // If we got user devices, set the first one as active
-        if (fetchedUserDevices.length > 0) {
-          setActiveUserDeviceId(fetchedUserDevices[0].id);
+          // If we got user devices, set the first one as active
+          if (response.data.length > 0) {
+            setActiveUserDeviceId(response.data[0].id);
 
-          // Fetch user info for each user device
-          for (const userDevice of fetchedUserDevices) {
-            if (userDevice.userId && !userInfo[userDevice.userId]) {
-              try {
-                const user = await fetchMockUserById(userDevice.userId);
-                if (user) {
-                  setUserInfo((prev) => ({ ...prev, [user.id]: user }));
+            // Fetch user info for each user device
+            for (const userDevice of response.data) {
+              if (userDevice.userId && !userInfo[userDevice.userId]) {
+                try {
+                  const userResponse = await userService.getUserById(
+                    userDevice.userId
+                  );
+                  if (userResponse.data) {
+                    setUserInfo((prev) => ({
+                      ...prev,
+                      [userResponse.data.id]: userResponse.data,
+                    }));
+                  }
+                } catch (error) {
+                  console.error(
+                    `Error fetching user info for ${userDevice.userId}:`,
+                    error
+                  );
                 }
-              } catch (error) {
-                console.error(
-                  `Error fetching user info for ${userDevice.userId}:`,
-                  error
-                );
               }
             }
           }
@@ -103,12 +120,47 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
     setActiveUserDeviceId(userDeviceId);
   };
 
+  const handleEditDevice = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(
+      `/organizer-hackathon-management/${hackathonId}/resource-management/devices/edit/${device.id}`
+    );
+  };
+
+  const handleDeleteDevice = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (window.confirm(`Are you sure you want to delete ${device.name}?`)) {
+      setIsDeleting(true);
+      try {
+        const response = await deviceService.deleteDevice(device.id);
+        if (response.message) {
+          onDeviceDeleted(device.id);
+        }
+      } catch (error) {
+        console.error(`Error deleting device ${device.id}:`, error);
+        alert("Failed to delete device. Please try again.");
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
+
+  const handleUploadFiles = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Keep the alert for now as requested
+    alert(`Upload files for device ${device.id}`);
+  };
+
   // Render status badge
   const renderStatusBadge = (status: string) => {
     const colorMap: { [key: string]: string } = {
       AVAILABLE: "bg-green-100 text-green-800",
       IN_USE: "bg-blue-100 text-blue-800",
       DAMAGED: "bg-red-100 text-red-800",
+      LOST: "bg-orange-100 text-orange-800",
+      RETIRED: "bg-gray-100 text-gray-800",
+      PENDING: "bg-yellow-100 text-yellow-800",
     };
 
     return (
@@ -172,30 +224,24 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
           <div className="mt-4 ml-14 flex gap-2">
             <button
               className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                alert(`Edit device ${device.id}`);
-              }}
+              onClick={handleEditDevice}
+              disabled={isDeleting}
             >
               Edit
             </button>
             <button
               className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                alert(`Upload files for device ${device.id}`);
-              }}
+              onClick={handleUploadFiles}
+              disabled={isDeleting}
             >
               Upload Files
             </button>
             <button
               className="bg-red-100 hover:bg-red-200 text-red-800 py-1 px-3 rounded text-sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                alert(`Delete device ${device.id}`);
-              }}
+              onClick={handleDeleteDevice}
+              disabled={isDeleting}
             >
-              Delete
+              {isDeleting ? "Deleting..." : "Delete"}
             </button>
           </div>
         </>
