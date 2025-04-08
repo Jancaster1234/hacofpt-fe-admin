@@ -75,7 +75,7 @@ class MentorshipRequestService {
   ): Promise<{ data: MentorshipRequest[]; message?: string }> {
     try {
       const response = await apiService.auth.get<MentorshipRequest[]>(
-        `/hackathon-service/api/v1/mentorship/filter-by-team-and-hackathon?teamId=${teamId}&hackathonId=${hackathonId}`
+        `/hackathon-service/api/v1/mentorships/filter-by-team-and-hackathon?teamId=${teamId}&hackathonId=${hackathonId}`
       );
 
       if (!response || !response.data) {
