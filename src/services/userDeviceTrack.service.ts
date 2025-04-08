@@ -1,97 +1,107 @@
 // src/services/userDeviceTrack.service.ts
+import { apiService } from "@/services/apiService_v0";
 import { UserDeviceTrack } from "@/types/entities/userDeviceTrack";
-import { tokenService_v0 } from "@/services/token.service_v0";
-
-type UserDeviceTrackPayload = {
-  userDeviceId: string;
-  deviceQualityStatus:
-    | "EXCELLENT"
-    | "GOOD"
-    | "FAIR"
-    | "DAMAGED"
-    | "NEEDS_REPAIR"
-    | "REPAIRING"
-    | "REPAIRED"
-    | "LOST";
-  note?: string;
-  files: File[];
-};
+import { handleApiError } from "@/utils/errorHandler";
 
 class UserDeviceTrackService {
-  async createUserDeviceTrack(
-    payload: UserDeviceTrackPayload
-  ): Promise<UserDeviceTrack> {
+  async createUserDeviceTrack(data: {
+    userDeviceId: string;
+    deviceQualityStatus:
+      | "EXCELLENT"
+      | "GOOD"
+      | "FAIR"
+      | "DAMAGED"
+      | "NEEDS_REPAIR"
+      | "REPAIRING"
+      | "REPAIRED"
+      | "LOST";
+    note?: string;
+    files: File[];
+  }): Promise<{ data: UserDeviceTrack; message?: string }> {
     try {
       const formData = new FormData();
 
-      formData.append("userDeviceId", payload.userDeviceId);
-      formData.append("deviceQualityStatus", payload.deviceQualityStatus);
-      if (payload.note) formData.append("note", payload.note);
+      formData.append("userDeviceId", data.userDeviceId);
+      formData.append("deviceQualityStatus", data.deviceQualityStatus);
+      if (data.note) formData.append("note", data.note);
 
-      payload.files.forEach((file) => {
+      data.files.forEach((file) => {
         formData.append("files", file);
       });
 
-      const response = await fetch(
+      const response = await apiService.auth.post<UserDeviceTrack>(
         "/identity-service/api/v1/user-device-tracks",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${tokenService_v0.getAccessToken()}`,
-          },
-          body: formData,
-        }
+        formData
       );
 
-      if (!response.ok) {
+      if (!response || !response.data) {
         throw new Error(
-          `Failed to create UserDeviceTrack: ${response.statusText}`
+          response?.message || "Failed to create user device track"
         );
       }
 
-      return await response.json();
-    } catch (error) {
-      console.error("Error creating UserDeviceTrack:", error);
-      throw error;
+      return {
+        data: response.data,
+        message: response.message || "User device track created successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<UserDeviceTrack>(
+        error,
+        {} as UserDeviceTrack,
+        "[UserDeviceTrack Service] Error creating user device track:"
+      );
     }
   }
 
   async updateUserDeviceTrack(
     id: string,
-    payload: UserDeviceTrackPayload
-  ): Promise<UserDeviceTrack> {
+    data: {
+      userDeviceId: string;
+      deviceQualityStatus:
+        | "EXCELLENT"
+        | "GOOD"
+        | "FAIR"
+        | "DAMAGED"
+        | "NEEDS_REPAIR"
+        | "REPAIRING"
+        | "REPAIRED"
+        | "LOST";
+      note?: string;
+      files: File[];
+    }
+  ): Promise<{ data: UserDeviceTrack; message?: string }> {
     try {
       const formData = new FormData();
 
-      formData.append("userDeviceId", payload.userDeviceId);
-      formData.append("deviceQualityStatus", payload.deviceQualityStatus);
-      if (payload.note) formData.append("note", payload.note);
+      formData.append("userDeviceId", data.userDeviceId);
+      formData.append("deviceQualityStatus", data.deviceQualityStatus);
+      if (data.note) formData.append("note", data.note);
 
-      payload.files.forEach((file) => {
+      data.files.forEach((file) => {
         formData.append("files", file);
       });
 
-      const response = await fetch(
+      const response = await apiService.auth.put<UserDeviceTrack>(
         `/identity-service/api/v1/user-device-tracks/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${tokenService_v0.getAccessToken()}`,
-          },
-          body: formData,
-        }
+        formData
       );
 
-      if (!response.ok) {
+      if (!response || !response.data) {
         throw new Error(
-          `Failed to update UserDeviceTrack: ${response.statusText}`
+          response?.message || "Failed to update user device track"
         );
       }
 
-      return await response.json();
-    } catch (error) {
-      console.error("Error updating UserDeviceTrack:", error);
-      throw error;
+      return {
+        data: response.data,
+        message: response.message || "User device track updated successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<UserDeviceTrack>(
+        error,
+        {} as UserDeviceTrack,
+        "[UserDeviceTrack Service] Error updating user device track:"
+      );
     }
   }
 }
