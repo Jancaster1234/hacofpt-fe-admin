@@ -1,3 +1,4 @@
+// src/services/sponsorshipHackathon.service.ts
 import { apiService } from "@/services/apiService_v0";
 import { SponsorshipHackathon } from "@/types/entities/sponsorshipHackathon";
 import { handleApiError } from "@/utils/errorHandler";

@@ -1,3 +1,4 @@
+// src/services/sponsorship.service.ts
 import { apiService } from "@/services/apiService_v0";
 import { Sponsorship } from "@/types/entities/sponsorship";
 import { handleApiError } from "@/utils/errorHandler";
