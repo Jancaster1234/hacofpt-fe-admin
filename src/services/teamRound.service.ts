@@ -37,10 +37,8 @@ class TeamRoundService {
       const response = await apiService.auth.post<TeamRound[]>(
         "/hackathon-service/api/v1/team-rounds/filter-by-judge-and-round",
         {
-          data: {
-            judgeId: judgeId,
-            roundId: roundId,
-          },
+          judgeId: judgeId,
+          roundId: roundId,
         }
       );
 
