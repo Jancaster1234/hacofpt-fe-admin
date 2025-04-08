@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { TeamRound } from "@/types/entities/teamRound";
 import { Submission } from "@/types/entities/submission";
+import { TeamRoundJudge } from "@/types/entities/teamRoundJudge";
 import { TeamCard } from "./TeamCard";
 
 interface TeamListProps {
@@ -12,6 +13,9 @@ interface TeamListProps {
   teamSubmissions: {
     [teamId: string]: Submission[];
   };
+  teamRoundJudges: {
+    [teamRoundId: string]: TeamRoundJudge[];
+  };
   showPopup: (type: string, id: string, note: string) => void;
 }
 
@@ -19,6 +23,7 @@ export function TeamList({
   selectedRoundId,
   teamRounds,
   teamSubmissions,
+  teamRoundJudges,
   showPopup,
 }: TeamListProps) {
   if (!selectedRoundId || !teamRounds[selectedRoundId]?.length) {
@@ -37,6 +42,7 @@ export function TeamList({
         <TeamCard
           key={teamRound.id}
           teamRound={teamRound}
+          judges={teamRoundJudges[teamRound.id] || []}
           submissions={teamSubmissions[teamRound.team.id] || []}
           showPopup={showPopup}
         />

@@ -5,9 +5,12 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Submission } from "@/types/entities/submission";
 import { TeamRound } from "@/types/entities/teamRound";
+import { TeamRoundJudge } from "@/types/entities/teamRoundJudge";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { submissionService } from "@/services/submission.service";
 import { teamRoundService } from "@/services/teamRound.service";
+import { teamRoundJudgeService } from "@/services/teamRoundJudge.service";
+import { judgeSubmissionService } from "@/services/judgeSubmission.service";
 import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
 
@@ -21,16 +24,20 @@ export default function JudgeSubmissionPage() {
   const { user } = useAuth();
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [teamRound, setTeamRound] = useState<TeamRound | null>(null);
+  const [teamRoundJudges, setTeamRoundJudges] = useState<TeamRoundJudge[]>([]);
   const [activeJudgeIndex, setActiveJudgeIndex] = useState(0);
   const [criteriaScores, setCriteriaScores] = useState<{
     [key: string]: number;
   }>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [existingJudgeSubmissionId, setExistingJudgeSubmissionId] = useState<
+    string | null
+  >(null);
 
   const { modalState, hideModal, showError, showSuccess } = useApiModal();
 
   useEffect(() => {
-    const fetchSubmissionAndTeamRound = async () => {
+    const fetchSubmissionAndRelatedData = async () => {
       if (!user || !submissionId || !roundId) return;
 
       try {
@@ -58,16 +65,30 @@ export default function JudgeSubmissionPage() {
 
           if (teamRoundResponse.data) {
             setTeamRound(teamRoundResponse.data);
+
+            // Step 3: Fetch team round judges separately
+            if (teamRoundResponse.data.id) {
+              const teamRoundJudgesResponse =
+                await teamRoundJudgeService.getTeamRoundJudgesByTeamRoundId(
+                  teamRoundResponse.data.id
+                );
+
+              if (teamRoundJudgesResponse.data) {
+                setTeamRoundJudges(teamRoundJudgesResponse.data);
+              }
+            }
           }
         }
 
-        // Step 3: Set initial scores from the current judge's submission if it exists
+        // Step 4: Set initial scores from the current judge's submission if it exists
         const currentJudgeSubmission =
           submissionResponse.data.judgeSubmissions?.find(
             (js) => js.judge?.id === user.id
           );
 
         if (currentJudgeSubmission) {
+          setExistingJudgeSubmissionId(currentJudgeSubmission.id);
+
           const initialScores: { [key: string]: number } = {};
           currentJudgeSubmission.judgeSubmissionDetails?.forEach((jsd) => {
             initialScores[jsd.roundMarkCriterion.id] = jsd.score;
@@ -99,7 +120,7 @@ export default function JudgeSubmissionPage() {
       }
     };
 
-    fetchSubmissionAndTeamRound();
+    fetchSubmissionAndRelatedData();
   }, [user, submissionId, roundId, id, router, showError]);
 
   const handleScoreChange = (criterionId: string, score: number) => {
@@ -127,50 +148,99 @@ export default function JudgeSubmissionPage() {
     if (!user || !submission) return;
 
     try {
-      // Prepare judgeSubmission data
-      const judgeSubmissionData = {
-        submissionId: submission.id,
-        judgeId: user.id,
-        criteriaScores: criteriaScores,
-      };
+      setIsLoading(true);
 
-      // Call the service to save the judge submission
-      const response = await submissionService.saveJudgeSubmission(
-        judgeSubmissionData
+      // Calculate total score from criteria scores
+      const totalScore = Object.values(criteriaScores).reduce(
+        (sum, score) => sum + score,
+        0
       );
 
-      if (response.data) {
-        showSuccess(
-          "Success",
-          "Your evaluation has been submitted successfully"
+      // Prepare judge submission details
+      const judgeSubmissionDetails = Object.entries(criteriaScores).map(
+        ([criterionId, score]) => ({
+          roundMarkCriterionId: criterionId,
+          score,
+          note: "",
+        })
+      );
+
+      // Prepare submission data
+      const submissionData = {
+        judgeId: user.id,
+        submissionId: submission.id,
+        score: totalScore,
+        note: "",
+        judgeSubmissionDetails,
+      };
+
+      let response;
+
+      // Update or create based on whether we have an existing submission
+      if (existingJudgeSubmissionId) {
+        response = await judgeSubmissionService.updateJudgeSubmission(
+          existingJudgeSubmissionId,
+          submissionData
         );
-        // Refresh the submission data
-        const updatedSubmission = await submissionService.getSubmissionById(
-          submissionId
-        );
-        if (updatedSubmission.data) {
-          setSubmission(updatedSubmission.data);
+
+        if (response.data) {
+          showSuccess(
+            "Success",
+            "Your evaluation has been updated successfully"
+          );
         }
       } else {
-        showError("Error", response.message || "Failed to submit evaluation");
+        response = await judgeSubmissionService.createJudgeSubmission(
+          submissionData
+        );
+
+        if (response.data) {
+          setExistingJudgeSubmissionId(response.data.id);
+          showSuccess(
+            "Success",
+            "Your evaluation has been submitted successfully"
+          );
+        }
+      }
+
+      // Refresh the submission data to show the updated judge submissions
+      const updatedSubmission = await submissionService.getSubmissionById(
+        submissionId
+      );
+
+      if (updatedSubmission.data) {
+        setSubmission(updatedSubmission.data);
       }
     } catch (error) {
       console.error("Error submitting evaluation:", error);
       showError("Error", "Failed to submit your evaluation");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Check if the current user is assigned as a judge to this team round
-  const isAssignedJudge = teamRound?.teamRoundJudges?.some(
+  // Check if the current user is assigned as a judge to this team
+  const isAssignedJudge = teamRoundJudges.some(
     (trj) => trj.judge?.id === user?.id
   );
 
-  if (isLoading) return <div>Loading...</div>;
-  if (!submission) return <div>Submission not found</div>;
-  if (!teamRound) return <div>Team round information not found</div>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
 
-  // Get list of judges from teamRound
-  const judges = teamRound.teamRoundJudges?.map((trj) => trj.judge) || [];
+  if (!submission)
+    return (
+      <div className="text-center text-red-500 p-4">Submission not found</div>
+    );
+  if (!teamRound)
+    return (
+      <div className="text-center text-red-500 p-4">
+        Team round information not found
+      </div>
+    );
 
   // Get list of judgeSubmissions for this submission
   const judgeSubmissions = submission.judgeSubmissions || [];
@@ -181,7 +251,7 @@ export default function JudgeSubmissionPage() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Judge Submission</h1>
-      <div className="mb-6">
+      <div className="mb-6 bg-gray-50 p-4 rounded-lg shadow-sm">
         <h2 className="text-xl font-semibold">Team: {submission.team?.name}</h2>
         <p className="text-gray-600">Round: {submission.round?.roundTitle}</p>
         <p className="text-gray-600">Status: {submission.status}</p>
@@ -190,21 +260,21 @@ export default function JudgeSubmissionPage() {
         </p>
       </div>
 
-      {/* Judge Tabs - based on teamRoundJudges */}
+      {/* Judge Tabs */}
       <div className="flex border-b mb-4 overflow-x-auto">
-        {judges.map((judge, index) => {
+        {teamRoundJudges.map((trj, index) => {
           // Find corresponding judgeSubmission if it exists
           const judgeSubmission = judgeSubmissions.find(
-            (js) => js.judge?.id === judge?.id
+            (js) => js.judge?.id === trj.judge?.id
           );
 
           return (
             <button
-              key={judge?.id || index}
+              key={trj.id || index}
               onClick={() => {
                 // If this judge has a submission, set the active index to it
                 const submissionIndex = judgeSubmissions.findIndex(
-                  (js) => js.judge?.id === judge?.id
+                  (js) => js.judge?.id === trj.judge?.id
                 );
                 setActiveJudgeIndex(
                   submissionIndex !== -1 ? submissionIndex : activeJudgeIndex
@@ -214,12 +284,12 @@ export default function JudgeSubmissionPage() {
                 (judgeSubmission &&
                   judgeSubmissions.indexOf(judgeSubmission) ===
                     activeJudgeIndex) ||
-                (!judgeSubmission && judge?.id === user?.id)
+                (!judgeSubmission && trj.judge?.id === user?.id)
                   ? "text-blue-600 font-bold border-b-2 border-blue-600"
-                  : "text-gray-600"
+                  : "text-gray-600 hover:text-gray-800"
               }`}
             >
-              {judge?.firstName} {judge?.lastName}
+              {trj.judge?.firstName} {trj.judge?.lastName}
               {judgeSubmission && " ✓"}
             </button>
           );
@@ -234,7 +304,10 @@ export default function JudgeSubmissionPage() {
           // Show existing judge submission
           <div>
             {activeJudgeSubmission.judgeSubmissionDetails?.map((detail) => (
-              <div key={detail.roundMarkCriterion.id} className="mb-4">
+              <div
+                key={detail.roundMarkCriterion.id}
+                className="mb-4 p-3 bg-gray-50 rounded-lg"
+              >
                 <div className="flex justify-between items-center mb-2">
                   <label className="font-medium">
                     {detail.roundMarkCriterion.name}
@@ -257,7 +330,7 @@ export default function JudgeSubmissionPage() {
                         Number(e.target.value)
                       )
                     }
-                    className="w-20 p-2 border rounded"
+                    className="w-20 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     disabled={activeJudgeSubmission.judge?.id !== user?.id}
                   />
                 </div>
@@ -287,9 +360,10 @@ export default function JudgeSubmissionPage() {
             {activeJudgeSubmission.judge?.id === user?.id && (
               <button
                 onClick={handleSubmit}
-                className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                disabled={isLoading}
+                className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-300"
               >
-                Update Evaluation
+                {isLoading ? "Updating..." : "Update Evaluation"}
               </button>
             )}
           </div>
@@ -306,7 +380,10 @@ export default function JudgeSubmissionPage() {
             judgeSubmissions[0].judgeSubmissionDetails ? (
               <div>
                 {judgeSubmissions[0].judgeSubmissionDetails.map((detail) => (
-                  <div key={detail.roundMarkCriterion.id} className="mb-4">
+                  <div
+                    key={detail.roundMarkCriterion.id}
+                    className="mb-4 p-3 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex justify-between items-center mb-2">
                       <label className="font-medium">
                         {detail.roundMarkCriterion.name}
@@ -327,7 +404,7 @@ export default function JudgeSubmissionPage() {
                             Number(e.target.value)
                           )
                         }
-                        className="w-20 p-2 border rounded"
+                        className="w-20 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                     <p className="text-sm text-gray-500">
@@ -352,44 +429,51 @@ export default function JudgeSubmissionPage() {
 
                 <button
                   onClick={handleSubmit}
-                  className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                  disabled={isLoading}
+                  className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-300"
                 >
-                  Submit Evaluation
+                  {isLoading ? "Submitting..." : "Submit Evaluation"}
                 </button>
               </div>
             ) : (
-              <p>No evaluation criteria available.</p>
+              <p className="text-red-500">No evaluation criteria available.</p>
             )}
           </div>
         ) : (
           // Not an assigned judge
-          <p className="text-red-600">
-            You are not assigned as a judge for this team submission.
-          </p>
+          <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-red-600">
+              You are not assigned as a judge for this team submission.
+            </p>
+          </div>
         )}
       </div>
 
       {/* Submission Files */}
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-3">Submitted Files</h3>
-        <div className="grid grid-cols-2 gap-4">
-          {submission.fileUrls?.map((file) => (
-            <div
-              key={file.id}
-              className="border p-3 rounded flex items-center justify-between"
-            >
-              <span>{file.fileName}</span>
-              <a
-                href={file.fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
+        {submission.fileUrls && submission.fileUrls.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {submission.fileUrls?.map((file) => (
+              <div
+                key={file.id}
+                className="border p-3 rounded flex items-center justify-between hover:bg-gray-50"
               >
-                Download
-              </a>
-            </div>
-          ))}
-        </div>
+                <span className="truncate">{file.fileName}</span>
+                <a
+                  href={file.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline ml-2 flex-shrink-0"
+                >
+                  Download
+                </a>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">No files have been submitted.</p>
+        )}
       </div>
 
       {/* API Response Modal */}

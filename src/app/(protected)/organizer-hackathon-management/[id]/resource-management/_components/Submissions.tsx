@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { roundService } from "@/services/round.service";
 import { teamRoundService } from "@/services/teamRound.service";
 import { submissionService } from "@/services/submission.service";
+import { teamRoundJudgeService } from "@/services/teamRoundJudge.service";
 import { RoundTabs } from "./RoundTabs";
 import { TeamList } from "./TeamList";
 import { NotePopup } from "./NotePopup";
@@ -10,6 +11,7 @@ import { HackathonResultsButton } from "./HackathonResultsButton";
 import { Round } from "@/types/entities/round";
 import { TeamRound } from "@/types/entities/teamRound";
 import { Submission } from "@/types/entities/submission";
+import { TeamRoundJudge } from "@/types/entities/teamRoundJudge";
 import { useApiModal } from "@/hooks/useApiModal";
 
 export default function Submissions({ hackathonId }: { hackathonId: string }) {
@@ -20,6 +22,9 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
   }>({});
   const [teamSubmissions, setTeamSubmissions] = useState<{
     [teamId: string]: Submission[];
+  }>({});
+  const [teamRoundJudges, setTeamRoundJudges] = useState<{
+    [teamRoundId: string]: TeamRoundJudge[];
   }>({});
   const [activePopup, setActivePopup] = useState<{
     type: string;
@@ -87,29 +92,13 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
         [roundId]: teamRoundsResponse.data,
       }));
 
-      // Fetch submissions for each team
+      // Fetch team round judges and submissions for each team round
       for (const teamRound of teamRoundsResponse.data) {
-        // For team leader
-        if (teamRound.team.teamLeader) {
-          await fetchAndSetSubmissions(
-            teamRound.team.id,
-            teamRound.team.teamLeader.id,
-            roundId
-          );
-        }
+        // Fetch team round judges
+        await fetchTeamRoundJudges(teamRound.id);
 
-        // For each team member
-        if (teamRound.team.teamMembers) {
-          for (const teamMember of teamRound.team.teamMembers) {
-            if (teamMember.user.id !== teamRound.team.teamLeader.id) {
-              await fetchAndSetSubmissions(
-                teamRound.team.id,
-                teamMember.user.id,
-                roundId
-              );
-            }
-          }
-        }
+        // Fetch submissions for the team
+        await fetchTeamSubmissions(teamRound.team.id, roundId);
       }
     } catch (error) {
       console.error(`Error fetching team rounds for round ${roundId}:`, error);
@@ -120,28 +109,41 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
     }
   };
 
-  const fetchAndSetSubmissions = async (
-    teamId: string,
-    userId: string,
-    roundId: string
-  ) => {
+  const fetchTeamRoundJudges = async (teamRoundId: string) => {
     try {
-      const submissionsResponse =
-        await submissionService.getSubmissionsByRoundAndCreator(
-          roundId,
-          userId
+      const judgesResponse =
+        await teamRoundJudgeService.getTeamRoundJudgesByTeamRoundId(
+          teamRoundId
         );
 
-      setTeamSubmissions((prev) => ({
+      setTeamRoundJudges((prev) => ({
         ...prev,
-        [teamId]: [...(prev[teamId] || []), ...submissionsResponse.data],
+        [teamRoundId]: judgesResponse.data,
       }));
     } catch (error) {
       console.error(
-        `Error fetching submissions for user ${userId} in round ${roundId}:`,
+        `Error fetching judges for team round ${teamRoundId}:`,
         error
       );
-      // We don't show error modal here to avoid multiple error messages for the same team
+      // Don't show error modal to avoid multiple messages
+    }
+  };
+
+  const fetchTeamSubmissions = async (teamId: string, roundId: string) => {
+    try {
+      const submissionsResponse =
+        await submissionService.getSubmissionsByTeamAndRound(teamId, roundId);
+
+      setTeamSubmissions((prev) => ({
+        ...prev,
+        [teamId]: submissionsResponse.data,
+      }));
+    } catch (error) {
+      console.error(
+        `Error fetching submissions for team ${teamId} in round ${roundId}:`,
+        error
+      );
+      // Don't show error modal to avoid multiple error messages
     }
   };
 
@@ -167,6 +169,7 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
         selectedRoundId={selectedRoundId}
         teamRounds={teamRounds}
         teamSubmissions={teamSubmissions}
+        teamRoundJudges={teamRoundJudges}
         showPopup={showPopup}
       />
 

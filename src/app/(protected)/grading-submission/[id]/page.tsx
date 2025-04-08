@@ -5,12 +5,14 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { Round } from "@/types/entities/round";
 import { TeamRound } from "@/types/entities/teamRound";
+import { TeamRoundJudge } from "@/types/entities/teamRoundJudge";
 import { Submission } from "@/types/entities/submission";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { FileDownloader } from "@/components/FileDownloader";
 import { roundService } from "@/services/round.service";
 import { teamRoundService } from "@/services/teamRound.service";
+import { teamRoundJudgeService } from "@/services/teamRoundJudge.service";
 import { submissionService } from "@/services/submission.service";
 import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
@@ -20,7 +22,12 @@ export default function GradingSubmissionPage() {
   const [rounds, setRounds] = useState<Round[]>([]);
   const [activeRoundId, setActiveRoundId] = useState<string | null>(null);
   const [teamRounds, setTeamRounds] = useState<TeamRound[]>([]);
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [teamRoundJudges, setTeamRoundJudges] = useState<
+    Record<string, TeamRoundJudge[]>
+  >({});
+  const [submissions, setSubmissions] = useState<Record<string, Submission[]>>(
+    {}
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   const params = useParams<{ id: string }>();
@@ -56,7 +63,7 @@ export default function GradingSubmissionPage() {
         setActiveRoundId(firstRoundId);
 
         // Fetch team rounds for the first round
-        await fetchTeamRoundsAndSubmissions(firstRoundId);
+        await fetchTeamRounds(firstRoundId);
       } catch (error) {
         console.error("Error fetching data:", error);
         showError("Error", "Failed to load hackathon data");
@@ -68,7 +75,7 @@ export default function GradingSubmissionPage() {
     fetchData();
   }, [user, hackathonId, showError]);
 
-  const fetchTeamRoundsAndSubmissions = async (roundId: string) => {
+  const fetchTeamRounds = async (roundId: string) => {
     if (!user) return;
 
     try {
@@ -83,50 +90,80 @@ export default function GradingSubmissionPage() {
 
       setTeamRounds(teamRoundsResponse.data);
 
-      // Fetch submissions for each team
-      const submissionsPromises = teamRoundsResponse.data.map((teamRound) => {
-        // Using the username of the first team member for demonstration
-        // In a real app, you might want to fetch by team ID instead
-        const username = teamRound.team.teamMembers[0]?.user.username;
-        return username
-          ? submissionService.getSubmissionsByRoundAndCreator(roundId, username)
-          : Promise.resolve({ data: [] });
+      // For each team round, fetch judges and submissions in parallel
+      const teamRoundIds = teamRoundsResponse.data.map((tr) => tr.id);
+
+      // Start fetching judges and submissions for each team round
+      await Promise.all([
+        fetchTeamRoundJudges(teamRoundIds),
+        fetchSubmissions(teamRoundsResponse.data, roundId),
+      ]);
+    } catch (error) {
+      console.error("Error fetching team rounds:", error);
+      showError("Error", "Failed to load team data");
+    }
+  };
+
+  const fetchTeamRoundJudges = async (teamRoundIds: string[]) => {
+    try {
+      // Fetch judges for each team round
+      const judgesPromises = teamRoundIds.map((trId) =>
+        teamRoundJudgeService.getTeamRoundJudgesByTeamRoundId(trId)
+      );
+
+      const judgesResponses = await Promise.all(judgesPromises);
+
+      // Create a map of team round ID to judges
+      const judgesMap: Record<string, TeamRoundJudge[]> = {};
+      teamRoundIds.forEach((trId, index) => {
+        if (judgesResponses[index].data) {
+          judgesMap[trId] = judgesResponses[index].data;
+        }
       });
 
-      const submissionsResponses = await Promise.all(submissionsPromises);
-      const allSubmissions = submissionsResponses
-        .filter((response) => response.data)
-        .flatMap((response) => response.data);
-
-      setSubmissions(allSubmissions);
+      setTeamRoundJudges(judgesMap);
     } catch (error) {
-      console.error("Error fetching team rounds and submissions:", error);
-      showError("Error", "Failed to load team and submission data");
+      console.error("Error fetching team round judges:", error);
+    }
+  };
+
+  const fetchSubmissions = async (
+    teamRoundsData: TeamRound[],
+    roundId: string
+  ) => {
+    try {
+      // Fetch submissions for each team
+      const submissionsPromises = teamRoundsData.map((teamRound) =>
+        submissionService.getSubmissionsByTeamAndRound(
+          teamRound.team.id,
+          roundId
+        )
+      );
+
+      const submissionsResponses = await Promise.all(submissionsPromises);
+
+      // Create a map of team ID to submissions
+      const submissionsMap: Record<string, Submission[]> = {};
+      teamRoundsData.forEach((teamRound, index) => {
+        if (submissionsResponses[index].data) {
+          submissionsMap[teamRound.team.id] = submissionsResponses[index].data;
+        }
+      });
+
+      setSubmissions(submissionsMap);
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
     }
   };
 
   const handleRoundChange = async (roundId: string) => {
     setActiveRoundId(roundId);
-    await fetchTeamRoundsAndSubmissions(roundId);
+    setIsLoading(true);
+    await fetchTeamRounds(roundId);
+    setIsLoading(false);
   };
 
   const renderTeamSubmissions = (roundId: string) => {
-    // Create a map of submissions by team
-    const teamSubmissionMap = new Map<string, Submission>();
-
-    // Associate submissions with teams based on team members' usernames
-    submissions.forEach((submission) => {
-      teamRounds.forEach((tr) => {
-        if (
-          tr.team.teamMembers.some(
-            (member) => member.user.username === submission.createdByUserName
-          )
-        ) {
-          teamSubmissionMap.set(tr.team.id, submission);
-        }
-      });
-    });
-
     // Filter team rounds for the active round
     const roundTeams = teamRounds
       .filter((tr) => tr.round.id === roundId)
@@ -146,7 +183,20 @@ export default function GradingSubmissionPage() {
         <tbody>
           {roundTeams.map((team) => {
             // Find the submission for this team
-            const submission = teamSubmissionMap.get(team.id);
+            const teamSubmissions = submissions[team.id] || [];
+            const submission =
+              teamSubmissions.length > 0 ? teamSubmissions[0] : undefined;
+
+            // Find the team round for this team
+            const teamRound = teamRounds.find(
+              (tr) => tr.team.id === team.id && tr.round.id === roundId
+            );
+
+            // Get judges for this team round
+            const judges = teamRound ? teamRoundJudges[teamRound.id] || [] : [];
+
+            // Check if current user is a judge for this team round
+            const isJudge = judges.some((judge) => judge.judge.id === user?.id);
 
             // Get current judge's score for this submission
             const currentJudgeScore = submission?.judgeSubmissions?.find(
@@ -177,7 +227,7 @@ export default function GradingSubmissionPage() {
                   )}
                 </td>
                 <td className="p-3">
-                  {submission ? (
+                  {submission && isJudge ? (
                     <Link
                       href={`/grading-submission/${hackathonId}/round/${roundId}/submission/${submission.id}/judge-submission`}
                       className="text-blue-600 hover:underline"
@@ -185,7 +235,7 @@ export default function GradingSubmissionPage() {
                       {currentJudgeScore !== undefined ? "Edit Mark" : "Mark"}
                     </Link>
                   ) : (
-                    "No submission"
+                    "No submission or not assigned"
                   )}
                 </td>
               </tr>

@@ -2,7 +2,7 @@
 import { apiService } from "@/services/apiService_v0";
 import { Submission } from "@/types/entities/submission";
 import { handleApiError } from "@/utils/errorHandler";
-
+import { judgeSubmissionService } from "@/services/judgeSubmission.service";
 class SubmissionService {
   async getSubmissionById(
     submissionId: string
@@ -156,6 +156,70 @@ class SubmissionService {
         error,
         {} as Submission,
         "[Submission Service] Error updating submission:"
+      );
+    }
+  }
+
+  async saveJudgeSubmission(data: {
+    submissionId: string;
+    judgeId: string;
+    criteriaScores: { [key: string]: number };
+  }): Promise<{ data: any; message?: string }> {
+    try {
+      // Calculate total score
+      const totalScore = Object.values(data.criteriaScores).reduce(
+        (sum, score) => sum + score,
+        0
+      );
+
+      // Format the data for the judgeSubmissionService
+      const judgeSubmissionDetails = Object.entries(data.criteriaScores).map(
+        ([criterionId, score]) => ({
+          roundMarkCriterionId: criterionId,
+          score,
+          note: "",
+        })
+      );
+
+      const formattedData = {
+        judgeId: data.judgeId,
+        submissionId: data.submissionId,
+        score: totalScore,
+        note: "",
+        judgeSubmissionDetails,
+      };
+
+      // Get existing judge submissions for this submission
+      const submissionResponse = await this.getSubmissionById(
+        data.submissionId
+      );
+      const submission = submissionResponse.data;
+
+      // Check if this judge already has a submission
+      const existingJudgeSubmission = submission.judgeSubmissions?.find(
+        (js) => js.judge?.id === data.judgeId
+      );
+
+      let response;
+
+      // Update or create based on whether we have an existing submission
+      if (existingJudgeSubmission?.id) {
+        response = await judgeSubmissionService.updateJudgeSubmission(
+          existingJudgeSubmission.id,
+          formattedData
+        );
+      } else {
+        response = await judgeSubmissionService.createJudgeSubmission(
+          formattedData
+        );
+      }
+
+      return response;
+    } catch (error: any) {
+      return handleApiError(
+        error,
+        {},
+        "[Submission Service] Error saving judge submission:"
       );
     }
   }
