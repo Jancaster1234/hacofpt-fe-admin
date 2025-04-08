@@ -102,6 +102,122 @@ class DeviceService {
       );
     }
   }
+
+  async getDevicesByHackathonId(
+    hackathonId: string
+  ): Promise<{ data: Device[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<Device[]>(
+        `/identity-service/api/v1/devices?hackathonId=${hackathonId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve devices");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Devices retrieved successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<Device[]>(
+        error,
+        [],
+        "[Device Service] Error fetching devices by hackathon ID:"
+      );
+    }
+  }
+
+  async getDevicesByRoundId(
+    roundId: string
+  ): Promise<{ data: Device[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<Device[]>(
+        `/identity-service/api/v1/devices?roundId=${roundId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve devices");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Devices retrieved successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<Device[]>(
+        error,
+        [],
+        "[Device Service] Error fetching devices by round ID:"
+      );
+    }
+  }
+
+  async getDevicesByRoundLocationId(
+    roundLocationId: string
+  ): Promise<{ data: Device[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<Device[]>(
+        `/identity-service/api/v1/devices?roundLocationId=${roundLocationId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve devices");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Devices retrieved successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<Device[]>(
+        error,
+        [],
+        "[Device Service] Error fetching devices by round location ID:"
+      );
+    }
+  }
+
+  async getDeviceById(id: string): Promise<{ data: Device; message?: string }> {
+    try {
+      const response = await apiService.auth.get<Device>(
+        `/identity-service/api/v1/devices/${id}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve device");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Device retrieved successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<Device>(
+        error,
+        {} as Device,
+        "[Device Service] Error fetching device by ID:"
+      );
+    }
+  }
+
+  async deleteDevice(id: string): Promise<{ message?: string }> {
+    try {
+      const response = await apiService.auth.delete<void>(
+        `/identity-service/api/v1/devices/${id}`
+      );
+
+      return {
+        message: response.message || "Device deleted successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<void>(
+        error,
+        undefined,
+        "[Device Service] Error deleting device:"
+      );
+    }
+  }
 }
 
 export const deviceService = new DeviceService();
