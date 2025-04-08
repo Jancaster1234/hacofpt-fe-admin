@@ -12,10 +12,8 @@ class MentorTeamService {
       const response = await apiService.auth.post<MentorTeam[]>(
         "/hackathon-service/api/v1/mentor-teams/filter-by-hackathon-and-team",
         {
-          data: {
-            hackathonId: hackathonId,
-            teamId: teamId,
-          },
+          hackathonId: hackathonId,
+          teamId: teamId,
         }
       );
 
