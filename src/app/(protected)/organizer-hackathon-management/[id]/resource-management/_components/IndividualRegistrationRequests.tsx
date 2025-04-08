@@ -10,9 +10,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { IndividualRegistrationRequest } from "@/types/entities/individualRegistrationRequest";
-import { fetchMockIndividualRegistrationsByHackathonId } from "../_mocks/fetchMockIndividualRegistrationsByHackathonId";
 import { useApiModal } from "@/hooks/useApiModal";
 import { Badge } from "@/components/ui/badge";
+import { individualRegistrationRequestService } from "@/services/individualRegistrationRequest.service";
+import { useAuth } from "@/hooks/useAuth_v0";
 
 interface IndividualRegistrationRequestsProps {
   hackathonId: string;
@@ -26,14 +27,21 @@ export default function IndividualRegistrationRequests({
   >([]);
   const [loading, setLoading] = useState(true);
   const { showModal } = useApiModal();
+  const { user } = useAuth();
 
   useEffect(() => {
     const loadRegistrations = async () => {
       try {
-        const data = await fetchMockIndividualRegistrationsByHackathonId(
-          hackathonId
-        );
-        setRegistrations(data);
+        const { data, message } =
+          await individualRegistrationRequestService.getIndividualRegistrationsByHackathonId(
+            hackathonId
+          );
+
+        if (data) {
+          setRegistrations(data);
+        } else {
+          throw new Error(message || "Failed to load registration requests");
+        }
       } catch (error) {
         showModal(
           "Error",
@@ -53,21 +61,35 @@ export default function IndividualRegistrationRequests({
     status: "APPROVED" | "REJECTED"
   ) => {
     try {
-      // This would be replaced with an actual API call in production
-      // Mock implementation for now
-      setRegistrations((prevRegistrations) =>
-        prevRegistrations.map((reg) =>
-          reg.id === registrationId ? { ...reg, status } : reg
-        )
-      );
+      const { data, message } =
+        await individualRegistrationRequestService.updateIndividualRegistrationRequest(
+          {
+            id: registrationId,
+            hackathonId,
+            status,
+            reviewedById: user?.id,
+          }
+        );
 
-      showModal(
-        "Success",
-        `Registration ${
-          status === "APPROVED" ? "approved" : "rejected"
-        } successfully`,
-        "success"
-      );
+      if (data) {
+        // Update the local state after successful API call
+        setRegistrations((prevRegistrations) =>
+          prevRegistrations.map((reg) =>
+            reg.id === registrationId ? data : reg
+          )
+        );
+
+        showModal(
+          "Success",
+          message ||
+            `Registration ${
+              status === "APPROVED" ? "approved" : "rejected"
+            } successfully`,
+          "success"
+        );
+      } else {
+        throw new Error(message || "Failed to update registration status");
+      }
     } catch (error) {
       showModal("Error", "Failed to update registration status", "error");
     }

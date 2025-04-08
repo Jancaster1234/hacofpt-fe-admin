@@ -96,6 +96,33 @@ class IndividualRegistrationRequestService {
     }
   }
 
+  async getIndividualRegistrationsByHackathonId(
+    hackathonId: string
+  ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<
+        IndividualRegistrationRequest[]
+      >(
+        `/hackathon-service/api/v1/individuals/filter-by-hackathon?hackathonId=${hackathonId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve registration requests");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<IndividualRegistrationRequest[]>(
+        error,
+        [],
+        "[Individual Registration Service] Error fetching registration requests by hackathon ID:"
+      );
+    }
+  }
+
   async getIndividualRegistrationRequestsByUser(
     createdByUsername: string
   ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {
