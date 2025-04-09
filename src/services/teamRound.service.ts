@@ -62,9 +62,9 @@ class TeamRoundService {
   async getTeamRoundsByRoundIdAndTeamId(
     roundId: string,
     teamId: string
-  ): Promise<{ data: TeamRound; message?: string }> {
+  ): Promise<{ data: TeamRound[]; message?: string }> {
     try {
-      const response = await apiService.auth.get<TeamRound>(
+      const response = await apiService.auth.get<TeamRound[]>(
         `/hackathon-service/api/v1/team-rounds?teamId=${teamId}&roundId=${roundId}`
       );
 
@@ -77,9 +77,9 @@ class TeamRoundService {
         message: response.message,
       };
     } catch (error: any) {
-      return handleApiError<TeamRound>(
+      return handleApiError<TeamRound[]>(
         error,
-        {} as TeamRound,
+        [],
         "Error fetching team rounds by roundId and teamId:"
       );
     }

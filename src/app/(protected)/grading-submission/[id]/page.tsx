@@ -47,23 +47,26 @@ export default function GradingSubmissionPage() {
           hackathonId
         );
 
-        if (!roundsResponse.data || roundsResponse.data.length === 0) {
+        // More defensive approach
+        if (roundsResponse?.data?.length > 0) {
+          setRounds(roundsResponse.data);
+          console.log("Rounds data:", roundsResponse.data);
+
+          const firstRoundId = roundsResponse.data[0]?.id;
+          if (firstRoundId) {
+            setActiveRoundId(firstRoundId);
+
+            // Fetch team rounds for the first round
+            await fetchTeamRounds(firstRoundId);
+          } else {
+            showError("Error", "Invalid round data structure");
+          }
+        } else {
           showError(
             "No Rounds Found",
             "No rounds available for this hackathon"
           );
-          setIsLoading(false);
-          return;
         }
-
-        setRounds(roundsResponse.data);
-
-        // Set the first round as the active round
-        const firstRoundId = roundsResponse.data[0].id;
-        setActiveRoundId(firstRoundId);
-
-        // Fetch team rounds for the first round
-        await fetchTeamRounds(firstRoundId);
       } catch (error) {
         console.error("Error fetching data:", error);
         showError("Error", "Failed to load hackathon data");

@@ -158,7 +158,7 @@ class IndividualRegistrationRequestService {
       const response = await apiService.auth.get<
         IndividualRegistrationRequest[]
       >(
-        `/hackathon-service/api/v1/individuals/filter-by-hackathon-and-status?hackathonId=${hackathonId}&status=${status}`
+        `/hackathon-service/api/v1/individuals/filter-by-hackathon-and-status-approved?hackathonId=${hackathonId}`
       );
 
       if (!response || !response.data) {

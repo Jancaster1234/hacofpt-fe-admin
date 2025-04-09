@@ -6,11 +6,13 @@ import { useParams, useRouter } from "next/navigation";
 import { Submission } from "@/types/entities/submission";
 import { TeamRound } from "@/types/entities/teamRound";
 import { TeamRoundJudge } from "@/types/entities/teamRoundJudge";
+import { RoundMarkCriterion } from "@/types/entities/roundMarkCriterion";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { submissionService } from "@/services/submission.service";
 import { teamRoundService } from "@/services/teamRound.service";
 import { teamRoundJudgeService } from "@/services/teamRoundJudge.service";
 import { judgeSubmissionService } from "@/services/judgeSubmission.service";
+import { roundMarkCriterionService } from "@/services/roundMarkCriterion.service";
 import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
 
@@ -25,6 +27,9 @@ export default function JudgeSubmissionPage() {
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [teamRound, setTeamRound] = useState<TeamRound | null>(null);
   const [teamRoundJudges, setTeamRoundJudges] = useState<TeamRoundJudge[]>([]);
+  const [roundMarkCriteria, setRoundMarkCriteria] = useState<
+    RoundMarkCriterion[]
+  >([]);
   const [activeJudgeIndex, setActiveJudgeIndex] = useState(0);
   const [criteriaScores, setCriteriaScores] = useState<{
     [key: string]: number;
@@ -49,29 +54,90 @@ export default function JudgeSubmissionPage() {
 
         if (!submissionResponse.data) {
           showError("Error", "Failed to load submission");
-          router.push(`/grading-submission/${id}`);
+          console.error("No submission data received from API");
           return;
         }
 
+        console.log(
+          "🔹🔹🔹🔹Submission data structure:",
+          submissionResponse.data
+        );
+        console.log(
+          "🔹🔹🔹🔹🔹🔹🔹Round ID:",
+          submissionResponse.data.round?.id
+        );
+        console.log(
+          "🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹Team ID:",
+          submissionResponse.data.team?.id
+        );
+
         setSubmission(submissionResponse.data);
 
-        // Step 2: Fetch team round data using roundId and teamId from submission
-        if (submissionResponse.data.roundId && submissionResponse.data.teamId) {
-          const teamRoundResponse =
-            await teamRoundService.getTeamRoundsByRoundIdAndTeamId(
-              submissionResponse.data.roundId,
-              submissionResponse.data.teamId
+        // Step 2: Fetch round mark criteria directly from the API
+        if (submissionResponse.data.round?.id) {
+          const roundMarkCriteriaResponse =
+            await roundMarkCriterionService.getRoundMarkCriteriaByRoundId(
+              submissionResponse.data.round.id
             );
 
-          if (teamRoundResponse.data) {
-            setTeamRound(teamRoundResponse.data);
+          if (roundMarkCriteriaResponse.data) {
+            console.log(
+              "🔹 Round Mark Criteria:",
+              roundMarkCriteriaResponse.data
+            );
+            setRoundMarkCriteria(roundMarkCriteriaResponse.data);
 
-            // Step 3: Fetch team round judges separately
-            if (teamRoundResponse.data.id) {
+            // Initialize criteria scores with zeros
+            const initialScores: { [key: string]: number } = {};
+            roundMarkCriteriaResponse.data.forEach((criterion) => {
+              initialScores[criterion.id] = 0;
+            });
+            setCriteriaScores(initialScores);
+          }
+        }
+
+        // Step 3: Fetch team round data using roundId and teamId from submission
+        if (
+          submissionResponse.data.round?.id &&
+          submissionResponse.data.team?.id
+        ) {
+          const teamRoundResponse =
+            await teamRoundService.getTeamRoundsByRoundIdAndTeamId(
+              submissionResponse.data.round.id,
+              submissionResponse.data.team.id
+            );
+
+          if (teamRoundResponse.data.length > 0) {
+            // Sort by createdAt (latest first), keeping items with null createdAt at the end
+            const sortedTeamRounds = teamRoundResponse.data.sort((a, b) => {
+              if (!a.createdAt) return 1; // Push null values to the end
+              if (!b.createdAt) return -1;
+              return (
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+              );
+            });
+
+            // Get the latest team round or the first one if createdAt is null
+            const latestTeamRound = sortedTeamRounds[0];
+
+            setTeamRound(latestTeamRound);
+            console.log("🔹 Latest Team Round:", latestTeamRound);
+
+            // Step 4: Fetch team round judges separately
+            if (latestTeamRound.id) {
+              console.log(
+                "🔹 Fetching Team Round Judges for ID:",
+                latestTeamRound.id
+              );
               const teamRoundJudgesResponse =
                 await teamRoundJudgeService.getTeamRoundJudgesByTeamRoundId(
-                  teamRoundResponse.data.id
+                  latestTeamRound.id
                 );
+              console.log(
+                "🔹 Team Round Judges data structure:",
+                teamRoundJudgesResponse.data
+              );
 
               if (teamRoundJudgesResponse.data) {
                 setTeamRoundJudges(teamRoundJudgesResponse.data);
@@ -80,7 +146,7 @@ export default function JudgeSubmissionPage() {
           }
         }
 
-        // Step 4: Set initial scores from the current judge's submission if it exists
+        // Step 5: Set scores from the current judge's submission if it exists
         const currentJudgeSubmission =
           submissionResponse.data.judgeSubmissions?.find(
             (js) => js.judge?.id === user.id
@@ -89,11 +155,14 @@ export default function JudgeSubmissionPage() {
         if (currentJudgeSubmission) {
           setExistingJudgeSubmissionId(currentJudgeSubmission.id);
 
-          const initialScores: { [key: string]: number } = {};
+          const existingScores: { [key: string]: number } = {};
           currentJudgeSubmission.judgeSubmissionDetails?.forEach((jsd) => {
-            initialScores[jsd.roundMarkCriterion.id] = jsd.score;
+            existingScores[jsd.roundMarkCriterion.id] = jsd.score;
           });
-          setCriteriaScores(initialScores);
+          setCriteriaScores((prev) => ({
+            ...prev,
+            ...existingScores, // Override initial zeros with actual scores
+          }));
 
           // Find the index of the current judge's submission
           const judgeIndex = submissionResponse.data.judgeSubmissions.findIndex(
@@ -102,19 +171,10 @@ export default function JudgeSubmissionPage() {
           if (judgeIndex !== -1) {
             setActiveJudgeIndex(judgeIndex);
           }
-        } else if (submissionResponse.data.judgeSubmissions?.length > 0) {
-          // If current judge hasn't submitted yet, initialize with zeros
-          const firstJudgeSubmission =
-            submissionResponse.data.judgeSubmissions[0];
-          const initialScores: { [key: string]: number } = {};
-          firstJudgeSubmission.judgeSubmissionDetails?.forEach((jsd) => {
-            initialScores[jsd.roundMarkCriterion.id] = 0;
-          });
-          setCriteriaScores(initialScores);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        showError("Error", "Failed to load submission data");
+        showError("Error", `Failed to load submission: ${error.message}`);
       } finally {
         setIsLoading(false);
       }
@@ -130,16 +190,13 @@ export default function JudgeSubmissionPage() {
     }));
   };
 
-  const calculateTotalScore = (judgeSubmission: any) => {
-    return judgeSubmission.judgeSubmissionDetails.reduce(
-      (sum: number, detail: any) => sum + detail.score,
-      0
-    );
+  const calculateTotalScore = () => {
+    return Object.values(criteriaScores).reduce((sum, score) => sum + score, 0);
   };
 
-  const calculateMaxTotalScore = (judgeSubmission: any) => {
-    return judgeSubmission.judgeSubmissionDetails.reduce(
-      (sum: number, detail: any) => sum + detail.roundMarkCriterion.maxScore,
+  const calculateMaxTotalScore = () => {
+    return roundMarkCriteria.reduce(
+      (sum, criterion) => sum + criterion.maxScore,
       0
     );
   };
@@ -151,10 +208,7 @@ export default function JudgeSubmissionPage() {
       setIsLoading(true);
 
       // Calculate total score from criteria scores
-      const totalScore = Object.values(criteriaScores).reduce(
-        (sum, score) => sum + score,
-        0
-      );
+      const totalScore = calculateTotalScore();
 
       // Prepare judge submission details
       const judgeSubmissionDetails = Object.entries(criteriaScores).map(
@@ -300,8 +354,9 @@ export default function JudgeSubmissionPage() {
       <div className="bg-white shadow-md rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-4">Evaluation Criteria</h2>
 
-        {activeJudgeSubmission ? (
-          // Show existing judge submission
+        {activeJudgeSubmission &&
+        activeJudgeSubmission.judge?.id !== user?.id ? (
+          // Show another judge's submission (view-only)
           <div>
             {activeJudgeSubmission.judgeSubmissionDetails?.map((detail) => (
               <div
@@ -317,21 +372,9 @@ export default function JudgeSubmissionPage() {
                   </label>
                   <input
                     type="number"
-                    min="0"
-                    max={detail.roundMarkCriterion.maxScore}
-                    value={
-                      activeJudgeSubmission.judge?.id === user?.id
-                        ? criteriaScores[detail.roundMarkCriterion.id] || 0
-                        : detail.score
-                    }
-                    onChange={(e) =>
-                      handleScoreChange(
-                        detail.roundMarkCriterion.id,
-                        Number(e.target.value)
-                      )
-                    }
+                    value={detail.score}
                     className="w-20 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={activeJudgeSubmission.judge?.id !== user?.id}
+                    disabled
                   />
                 </div>
                 <p className="text-sm text-gray-500">
@@ -345,71 +388,52 @@ export default function JudgeSubmissionPage() {
               <div className="flex justify-between items-center">
                 <span className="font-bold">Total Score:</span>
                 <span className="text-xl font-bold">
-                  {activeJudgeSubmission.judge?.id === user?.id
-                    ? Object.values(criteriaScores).reduce(
-                        (sum, score) => sum + score,
-                        0
-                      )
-                    : calculateTotalScore(activeJudgeSubmission)}{" "}
-                  /{calculateMaxTotalScore(activeJudgeSubmission)}
+                  {activeJudgeSubmission.score ||
+                    activeJudgeSubmission.judgeSubmissionDetails?.reduce(
+                      (sum, detail) => sum + detail.score,
+                      0
+                    )}{" "}
+                  /
+                  {activeJudgeSubmission.judgeSubmissionDetails?.reduce(
+                    (sum, detail) => sum + detail.roundMarkCriterion.maxScore,
+                    0
+                  )}
                 </span>
               </div>
             </div>
-
-            {/* Submit Button - Only show for current user's submission */}
-            {activeJudgeSubmission.judge?.id === user?.id && (
-              <button
-                onClick={handleSubmit}
-                disabled={isLoading}
-                className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-300"
-              >
-                {isLoading ? "Updating..." : "Update Evaluation"}
-              </button>
-            )}
           </div>
-        ) : // Show empty form for new evaluation (only for assigned judges)
-        isAssignedJudge ? (
+        ) : isAssignedJudge ? (
+          // Show editable form for current judge (either new or existing submission)
           <div>
-            <p className="mb-4 text-yellow-600">
-              You haven't submitted an evaluation yet. Please fill out the form
-              below.
-            </p>
-
-            {/* Create an empty form based on criteria from another judge's submission if available */}
-            {judgeSubmissions.length > 0 &&
-            judgeSubmissions[0].judgeSubmissionDetails ? (
+            {roundMarkCriteria.length > 0 ? (
               <div>
-                {judgeSubmissions[0].judgeSubmissionDetails.map((detail) => (
+                {roundMarkCriteria.map((criterion) => (
                   <div
-                    key={detail.roundMarkCriterion.id}
+                    key={criterion.id}
                     className="mb-4 p-3 bg-gray-50 rounded-lg"
                   >
                     <div className="flex justify-between items-center mb-2">
                       <label className="font-medium">
-                        {detail.roundMarkCriterion.name}
+                        {criterion.name}
                         <span className="text-sm text-gray-500 ml-2">
-                          (Max: {detail.roundMarkCriterion.maxScore})
+                          (Max: {criterion.maxScore})
                         </span>
                       </label>
                       <input
                         type="number"
                         min="0"
-                        max={detail.roundMarkCriterion.maxScore}
-                        value={
-                          criteriaScores[detail.roundMarkCriterion.id] || 0
-                        }
+                        max={criterion.maxScore}
+                        value={criteriaScores[criterion.id] || 0}
                         onChange={(e) =>
                           handleScoreChange(
-                            detail.roundMarkCriterion.id,
+                            criterion.id,
                             Number(e.target.value)
                           )
                         }
                         className="w-20 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
-                    <p className="text-sm text-gray-500">
-                      {detail.roundMarkCriterion.note}
-                    </p>
+                    <p className="text-sm text-gray-500">{criterion.note}</p>
                   </div>
                 ))}
 
@@ -418,11 +442,7 @@ export default function JudgeSubmissionPage() {
                   <div className="flex justify-between items-center">
                     <span className="font-bold">Total Score:</span>
                     <span className="text-xl font-bold">
-                      {Object.values(criteriaScores).reduce(
-                        (sum, score) => sum + score,
-                        0
-                      )}{" "}
-                      /{calculateMaxTotalScore(judgeSubmissions[0])}
+                      {calculateTotalScore()} /{calculateMaxTotalScore()}
                     </span>
                   </div>
                 </div>
@@ -432,11 +452,19 @@ export default function JudgeSubmissionPage() {
                   disabled={isLoading}
                   className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-300"
                 >
-                  {isLoading ? "Submitting..." : "Submit Evaluation"}
+                  {isLoading
+                    ? existingJudgeSubmissionId
+                      ? "Updating..."
+                      : "Submitting..."
+                    : existingJudgeSubmissionId
+                    ? "Update Evaluation"
+                    : "Submit Evaluation"}
                 </button>
               </div>
             ) : (
-              <p className="text-red-500">No evaluation criteria available.</p>
+              <p className="text-red-500">
+                No evaluation criteria available for this round.
+              </p>
             )}
           </div>
         ) : (

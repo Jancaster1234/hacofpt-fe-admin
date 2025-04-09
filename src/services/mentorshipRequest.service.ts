@@ -13,7 +13,7 @@ class MentorshipRequestService {
   }): Promise<{ data: MentorshipRequest; message?: string }> {
     try {
       const response = await apiService.auth.post<MentorshipRequest>(
-        "hackathon-service/api/v1/mentors/request",
+        "/hackathon-service/api/v1/mentors/request",
         data
       );
 
@@ -46,7 +46,7 @@ class MentorshipRequestService {
   }): Promise<{ data: MentorshipRequest; message?: string }> {
     try {
       const response = await apiService.auth.put<MentorshipRequest>(
-        "hackathon-service/api/v1/mentors/request",
+        "/hackathon-service/api/v1/mentors/request",
         data
       );
 
