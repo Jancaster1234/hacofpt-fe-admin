@@ -9,7 +9,7 @@ class HackathonResultService {
   ): Promise<{ data: HackathonResult[]; message?: string }> {
     try {
       const response = await apiService.auth.get<HackathonResult[]>(
-        `/hackathon-service/api/v1/hackathons/results/${hackathonId}`
+        `/hackathon-service/api/v1/hackathons/results/filter-by-hackathonId?hackathonId=${hackathonId}`
       );
 
       if (!response || !response.data) {

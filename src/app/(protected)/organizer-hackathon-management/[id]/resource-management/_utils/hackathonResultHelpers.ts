@@ -23,6 +23,7 @@ export const calculateTeamTotalScores = (
   const teamsWithMissingScores: string[] = [];
 
   // For each team in the final round
+  // For each team in the final round
   finalRoundTeams.forEach((teamRound) => {
     const teamId = teamRound.team.id;
     const teamName = teamRound.team.name;
@@ -31,14 +32,14 @@ export const calculateTeamTotalScores = (
 
     // Check all rounds for this team
     rounds.forEach((round) => {
-      const roundTeams = teamRounds[round.id] || [];
+      const roundId = round.id;
+      const roundTeams = teamRounds[roundId] || [];
       const isTeamInRound = roundTeams.some((tr) => tr.team.id === teamId);
 
       if (isTeamInRound) {
-        // Filter submissions for this team and round
-        const teamSubmissionsForRound = (teamSubmissions[teamId] || []).filter(
-          (submission) => submission.round && submission.round.id === round.id
-        );
+        // Use the composite key to access submissions
+        const key = `${teamId}-${roundId}`;
+        const teamSubmissionsForRound = teamSubmissions[key] || [];
 
         // Find the latest submitted submission for this round
         const latestSubmission = teamSubmissionsForRound
