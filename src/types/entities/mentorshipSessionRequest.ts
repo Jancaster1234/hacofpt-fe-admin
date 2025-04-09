@@ -4,11 +4,11 @@ import { MentorTeam } from "./mentorTeam";
 import { User } from "./user";
 
 export type MentorshipSessionStatus =
-  | "pending"
-  | "approved"
-  | "rejected"
-  | "deleted"
-  | "completed";
+  | "PENDING"
+  | "APPROVED"
+  | "REJECTED"
+  | "DELETED"
+  | "COMPLETED";
 
 export type MentorshipSessionRequest = {
   id: string;

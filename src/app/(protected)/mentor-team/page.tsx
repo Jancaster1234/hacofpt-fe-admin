@@ -8,7 +8,8 @@ import { MentorshipSessionRequest } from "@/types/entities/mentorshipSessionRequ
 import { ChevronDown, ChevronUp, Users, Info } from "lucide-react";
 import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
-import { mentorshipRequestService } from "@/services/mentorshipRequest.service";
+import { mentorTeamService } from "@/services/mentorTeam.service";
+import { mentorshipSessionRequestService } from "@/services/mentorshipSessionRequest.service";
 
 export default function MentorTeamsPage() {
   const { user } = useAuth();
@@ -36,39 +37,29 @@ export default function MentorTeamsPage() {
 
     setLoading(true);
     try {
-      // Use the real service to fetch mentor teams by mentor ID
-      const response =
-        await mentorshipRequestService.getMentorshipRequestsByMentorId(user.id);
+      // Use mentorTeamService to fetch mentor teams by mentor ID
+      const response = await mentorTeamService.getMentorTeamsByMentorId(
+        user.id
+      );
 
-      if (response.data) {
-        // Process the data to match the expected MentorTeam structure
-        // This part depends on your API response structure and might need adjustment
-        const formattedTeams = response.data.map((request) => ({
-          id: request.id || "",
-          createdAt: request.createdAt || new Date().toISOString(),
-          hackathon: request.hackathon || { title: "Unknown Hackathon" },
-          team: request.team || { name: "Unknown Team" },
-          mentorshipSessionRequests: [
-            {
-              id: request.id || "",
-              status: request.status.toLowerCase() as
-                | "pending"
-                | "approved"
-                | "rejected",
-              description: request.description || "",
-              location: request.location || "",
-              startTime: request.startTime || "",
-              endTime: request.endTime || "",
-              evaluatedById: request.evaluatedById || "",
-              evaluatedBy: request.evaluatedBy || null,
-              evaluatedAt: request.evaluatedAt || null,
-            },
-          ],
-        }));
+      if (response.data && response.data.length > 0) {
+        // Store teams but also fetch session requests for each team
+        const teamsWithSessions = [...response.data];
+        setMentorTeams(teamsWithSessions);
 
-        setMentorTeams(formattedTeams);
+        // For each mentor team, fetch their session requests
+        await Promise.all(
+          teamsWithSessions.map(async (team) => {
+            if (team.id) {
+              await fetchSessionRequests(team.id);
+            }
+          })
+        );
       } else {
-        showError("Error", response.message || "Failed to fetch mentor teams");
+        setMentorTeams([]);
+        if (response.message) {
+          showError("Notice", response.message);
+        }
       }
     } catch (error) {
       console.error("Error fetching mentor teams:", error);
@@ -78,6 +69,36 @@ export default function MentorTeamsPage() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSessionRequests = async (mentorTeamId: string) => {
+    try {
+      const response =
+        await mentorshipSessionRequestService.getMentorshipSessionRequestsByMentorTeamId(
+          mentorTeamId
+        );
+
+      if (response.data) {
+        // Update the mentor teams state with the session requests
+        setMentorTeams((prevTeams) =>
+          prevTeams.map((team) => {
+            if (team.id === mentorTeamId) {
+              return {
+                ...team,
+                mentorshipSessionRequests: response.data,
+              };
+            }
+            return team;
+          })
+        );
+      }
+    } catch (error) {
+      console.error(
+        `Error fetching session requests for team ${mentorTeamId}:`,
+        error
+      );
+      // Don't show an error modal here to avoid multiple error popups
     }
   };
 
@@ -112,95 +133,85 @@ export default function MentorTeamsPage() {
     }));
   };
 
-  // Update to use real service calls
   const updateMentorshipSessionStatus = async (
     sessionId: string,
-    newStatus: "approved" | "rejected"
+    mentorTeamId: string,
+    newStatus: "APPROVED" | "REJECTED"
   ) => {
     if (!user) return;
 
     // Find the session to update
-    let sessionToUpdate: MentorshipSessionRequest | null = null;
-    let teamId = "";
-    let hackathonId = "";
+    let sessionToUpdate: MentorshipSessionRequest | undefined;
 
-    // Find the session and its associated team and hackathon IDs
-    mentorTeams.forEach((team) => {
-      if (team.mentorshipSessionRequests) {
-        team.mentorshipSessionRequests.forEach((request) => {
-          if (request.id === sessionId) {
-            sessionToUpdate = request;
-            teamId = team.team?.id || "";
-            hackathonId = team.hackathon?.id || "";
-          }
-        });
-      }
-    });
+    // Find the mentor team and session
+    const mentorTeam = mentorTeams.find((team) => team.id === mentorTeamId);
+    if (mentorTeam?.mentorshipSessionRequests) {
+      sessionToUpdate = mentorTeam.mentorshipSessionRequests.find(
+        (session) => session.id === sessionId
+      ) as MentorshipSessionRequest;
+    }
 
     if (!sessionToUpdate) return;
 
     // Update local state first for immediate UI feedback
-    const updatedTeams = mentorTeams.map((team) => {
-      if (team.mentorshipSessionRequests) {
-        const updatedRequests = team.mentorshipSessionRequests.map(
-          (request) => {
-            if (request.id === sessionId && request.status === "pending") {
-              return {
-                ...request,
-                status: newStatus,
-                evaluatedById: user.id,
-                evaluatedBy: {
-                  id: user.id,
-                  firstName: user.firstName || "Unknown",
-                  lastName: user.lastName || "Unknown",
-                },
-                evaluatedAt: new Date().toISOString(),
-              };
-            }
-            return request;
-          }
-        );
-
-        return {
-          ...team,
-          mentorshipSessionRequests: updatedRequests,
-        };
-      }
-      return team;
-    });
-
-    setMentorTeams(updatedTeams);
+    setMentorTeams((prevTeams) =>
+      prevTeams.map((team) => {
+        if (team.id === mentorTeamId && team.mentorshipSessionRequests) {
+          return {
+            ...team,
+            mentorshipSessionRequests: team.mentorshipSessionRequests.map(
+              (request) => {
+                if (request.id === sessionId) {
+                  return {
+                    ...request,
+                    status: newStatus,
+                    evaluatedById: user.id,
+                    evaluatedBy: {
+                      id: user.id,
+                      firstName: user.firstName || "Unknown",
+                      lastName: user.lastName || "Unknown",
+                    },
+                    evaluatedAt: new Date().toISOString(),
+                  };
+                }
+                return request;
+              }
+            ),
+          };
+        }
+        return team;
+      })
+    );
 
     try {
-      // Call the real service to update the mentorship request
-      const response = await mentorshipRequestService.updateMentorshipRequest({
-        id: sessionId,
-        hackathonId: hackathonId,
-        mentorId: user.id,
-        teamId: teamId,
-        status: newStatus.toUpperCase() as
-          | "PENDING"
-          | "APPROVED"
-          | "REJECTED"
-          | "DELETED"
-          | "COMPLETED",
-        evaluatedById: user.id,
-      });
+      // Call the real service to update the mentorship session request
+      const response =
+        await mentorshipSessionRequestService.updateMentorshipSessionRequest({
+          id: sessionId,
+          mentorTeamId: mentorTeamId,
+          startTime: sessionToUpdate.startTime || new Date().toISOString(),
+          endTime: sessionToUpdate.endTime || new Date().toISOString(),
+          location: sessionToUpdate.location || "",
+          description: sessionToUpdate.description,
+          status: newStatus,
+          evaluatedById: user.id,
+          evaluatedAt: new Date().toISOString(),
+        });
 
       if (response.data) {
         showSuccess(
           "Status Updated",
           `Session has been successfully ${
-            newStatus === "approved" ? "approved" : "rejected"
+            newStatus === "APPROVED" ? "approved" : "rejected"
           }.`
         );
       } else {
-        // If the API call fails, revert the local state change
+        // If the API call fails, refresh the data
         showError(
           "Update Failed",
           response.message || "Failed to update session status."
         );
-        fetchMentorTeams(); // Refresh data from server
+        fetchSessionRequests(mentorTeamId);
       }
     } catch (error: any) {
       console.error("Failed to update session status:", error);
@@ -208,8 +219,33 @@ export default function MentorTeamsPage() {
         "Update Failed",
         error.message || "Failed to update session status. Please try again."
       );
-      fetchMentorTeams(); // Refresh data from server
+      fetchSessionRequests(mentorTeamId);
     }
+  };
+
+  // Function to format date for display
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleString();
+  };
+
+  // Status label with appropriate color
+  const StatusLabel = ({ status }: { status?: string }) => {
+    let color = "text-gray-500";
+
+    if (status) {
+      const lowerStatus = status.toLowerCase();
+      if (lowerStatus === "pending") color = "text-yellow-500";
+      else if (lowerStatus === "approved") color = "text-green-600";
+      else if (lowerStatus === "rejected") color = "text-red-600";
+      else if (lowerStatus === "completed") color = "text-blue-600";
+    }
+
+    return (
+      <span className={`font-semibold ${color}`}>
+        {status?.toLowerCase() || "unknown"}
+      </span>
+    );
   };
 
   return (
@@ -274,10 +310,16 @@ export default function MentorTeamsPage() {
                             <strong>Team Name:</strong>{" "}
                             {team.team?.name || "N/A"}
                           </p>
-
+                          <p>
+                            <strong>Team ID:</strong> {team.team?.id || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Hackathon:</strong>{" "}
+                            {team.hackathon?.title || "N/A"}
+                          </p>
                           <p>
                             <strong>Created At:</strong>{" "}
-                            {new Date(team.createdAt).toLocaleString()}
+                            {formatDate(team.createdAt)}
                           </p>
                         </div>
                       )}
@@ -287,19 +329,28 @@ export default function MentorTeamsPage() {
                         className="mt-2 cursor-pointer"
                         onClick={() => toggleTeam(team.id)}
                       >
-                        <p className="text-blue-600 font-semibold">
-                          {expandedTeams[team.id]
-                            ? "Hide Sessions"
-                            : "View Sessions"}
+                        <p className="text-blue-600 font-semibold flex items-center">
+                          {expandedTeams[team.id] ? (
+                            <>
+                              Hide Sessions{" "}
+                              <ChevronUp className="ml-1 h-4 w-4" />
+                            </>
+                          ) : (
+                            <>
+                              View Sessions{" "}
+                              <ChevronDown className="ml-1 h-4 w-4" />
+                            </>
+                          )}
                         </p>
                       </div>
+
                       {expandedTeams[team.id] && (
                         <div className="mt-3 space-y-2">
                           {team.mentorshipSessionRequests?.length ? (
                             team.mentorshipSessionRequests.map((session) => (
                               <div
                                 key={session.id}
-                                className="border-l-4 border-blue-500 p-2 bg-white shadow-sm rounded-md"
+                                className="border-l-4 border-blue-500 p-3 bg-white shadow-sm rounded-md"
                               >
                                 <p>
                                   <strong>Location:</strong>{" "}
@@ -307,50 +358,46 @@ export default function MentorTeamsPage() {
                                 </p>
                                 <p>
                                   <strong>Description:</strong>{" "}
-                                  {session.description}
+                                  {session.description ||
+                                    "No description provided"}
                                 </p>
                                 <p>
-                                  <strong>Time:</strong>{" "}
-                                  {session.startTime &&
-                                    new Date(
-                                      session.startTime
-                                    ).toLocaleString()}{" "}
-                                  {session.endTime &&
-                                    "- " +
-                                      new Date(
-                                        session.endTime
-                                      ).toLocaleString()}
+                                  <strong>Start Time:</strong>{" "}
+                                  {formatDate(session.startTime)}
+                                </p>
+                                <p>
+                                  <strong>End Time:</strong>{" "}
+                                  {formatDate(session.endTime)}
                                 </p>
                                 <p>
                                   <strong>Status:</strong>{" "}
-                                  <span
-                                    className={`font-semibold ${
-                                      session.status === "pending"
-                                        ? "text-yellow-500"
-                                        : session.status === "approved"
-                                        ? "text-green-600"
-                                        : "text-red-600"
-                                    }`}
-                                  >
-                                    {session.status}
-                                  </span>
+                                  <StatusLabel status={session.status} />
                                 </p>
                                 {session.evaluatedBy && (
-                                  <p>
-                                    <strong>Evaluated By:</strong>{" "}
-                                    {session.evaluatedBy.firstName}{" "}
-                                    {session.evaluatedBy.lastName}
-                                  </p>
+                                  <>
+                                    <p>
+                                      <strong>Evaluated By:</strong>{" "}
+                                      {session.evaluatedBy.firstName}{" "}
+                                      {session.evaluatedBy.lastName}
+                                    </p>
+                                    <p>
+                                      <strong>Evaluated At:</strong>{" "}
+                                      {formatDate(session.evaluatedAt)}
+                                    </p>
+                                  </>
                                 )}
-                                {/* Add action buttons for pending sessions */}
-                                {session.status === "pending" && (
-                                  <div className="mt-2 flex space-x-2">
+
+                                {/* Action buttons for pending sessions */}
+                                {session.status?.toLowerCase() ===
+                                  "pending" && (
+                                  <div className="mt-3 flex space-x-2">
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
                                         updateMentorshipSessionStatus(
                                           session.id,
-                                          "approved"
+                                          team.id,
+                                          "APPROVED"
                                         );
                                       }}
                                       className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 text-sm"
@@ -362,7 +409,8 @@ export default function MentorTeamsPage() {
                                         e.stopPropagation();
                                         updateMentorshipSessionStatus(
                                           session.id,
-                                          "rejected"
+                                          team.id,
+                                          "REJECTED"
                                         );
                                       }}
                                       className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm"
@@ -374,7 +422,7 @@ export default function MentorTeamsPage() {
                               </div>
                             ))
                           ) : (
-                            <p className="text-gray-600 text-sm">
+                            <p className="text-gray-600 text-sm p-2">
                               No mentorship sessions available.
                             </p>
                           )}
@@ -389,7 +437,7 @@ export default function MentorTeamsPage() {
         </div>
       )}
 
-      {/* Include the ApiResponseModal component at the bottom of the component */}
+      {/* Include the ApiResponseModal component */}
       <ApiResponseModal
         isOpen={modalState.isOpen}
         onClose={hideModal}
