@@ -13,6 +13,7 @@ interface TeamCardProps {
   judges: TeamRoundJudge[];
   submissions: Submission[];
   showPopup: (type: string, id: string, note: string) => void;
+  refreshData: () => void;
 }
 
 export function TeamCard({
@@ -20,6 +21,7 @@ export function TeamCard({
   judges,
   submissions,
   showPopup,
+  refreshData,
 }: TeamCardProps) {
   const [expandedTeamInfo, setExpandedTeamInfo] = useState(false);
   const [expandedSubmissions, setExpandedSubmissions] = useState(false);
@@ -77,10 +79,17 @@ export function TeamCard({
       {expandedJudges && <JudgesList judges={judges} />}
 
       {/* Latest Submission Section */}
-      <LatestSubmission submissions={submissions} showPopup={showPopup} />
+      <LatestSubmission
+        submissions={submissions}
+        teamRound={teamRound}
+        showPopup={showPopup}
+        refreshData={refreshData}
+      />
 
       {/* All Submissions Section */}
-      {expandedSubmissions && <AllSubmissions submissions={submissions} />}
+      {expandedSubmissions && (
+        <AllSubmissions submissions={submissions} roundId={teamRound.roundId} />
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Submissions.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { roundService } from "@/services/round.service";
 import { teamRoundService } from "@/services/teamRound.service";
 import { submissionService } from "@/services/submission.service";
@@ -8,6 +8,7 @@ import { RoundTabs } from "./RoundTabs";
 import { TeamList } from "./TeamList";
 import { NotePopup } from "./NotePopup";
 import { HackathonResultsButton } from "./HackathonResultsButton";
+import { BulkTeamRoundUpdate } from "./BulkTeamRoundUpdate";
 import { Round } from "@/types/entities/round";
 import { TeamRound } from "@/types/entities/teamRound";
 import { Submission } from "@/types/entities/submission";
@@ -33,81 +34,6 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { showError } = useApiModal();
-
-  useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true);
-      try {
-        // Fetch rounds
-        const roundsResponse = await roundService.getRoundsByHackathonId(
-          hackathonId
-        );
-
-        if (!roundsResponse.data.length) {
-          setIsLoading(false);
-          return;
-        }
-
-        // Sort rounds by roundNumber
-        const sortedRounds = [...roundsResponse.data].sort(
-          (a, b) => a.roundNumber - b.roundNumber
-        );
-        setRounds(sortedRounds);
-
-        // Select the first round by default
-        if (sortedRounds.length > 0) {
-          setSelectedRoundId(sortedRounds[0].id);
-          await fetchTeamRoundsAndSubmissions(sortedRounds[0].id);
-        }
-
-        // Fetch team rounds for each round
-        for (const round of sortedRounds) {
-          if (round.id !== sortedRounds[0].id) {
-            // Skip the first round as it's already fetched
-            await fetchTeamRoundsAndSubmissions(round.id);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching submissions data:", error);
-        showError(
-          "Data Loading Error",
-          "Failed to load submission data. Please try again later."
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchData();
-  }, [hackathonId, showError]);
-
-  const fetchTeamRoundsAndSubmissions = async (roundId: string) => {
-    try {
-      // Fetch team rounds for the round
-      const teamRoundsResponse = await teamRoundService.getTeamRoundsByRoundId(
-        roundId
-      );
-      setTeamRounds((prev) => ({
-        ...prev,
-        [roundId]: teamRoundsResponse.data,
-      }));
-
-      // Fetch team round judges and submissions for each team round
-      for (const teamRound of teamRoundsResponse.data) {
-        // Fetch team round judges
-        await fetchTeamRoundJudges(teamRound.id);
-
-        // Fetch submissions for the team
-        await fetchTeamSubmissions(teamRound.team.id, roundId);
-      }
-    } catch (error) {
-      console.error(`Error fetching team rounds for round ${roundId}:`, error);
-      showError(
-        "Data Loading Error",
-        `Failed to load team data for round ${roundId}`
-      );
-    }
-  };
 
   const fetchTeamRoundJudges = async (teamRoundId: string) => {
     try {
@@ -147,6 +73,84 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
     }
   };
 
+  const fetchTeamRoundsAndSubmissions = async (roundId: string) => {
+    try {
+      // Fetch team rounds for the round
+      const teamRoundsResponse = await teamRoundService.getTeamRoundsByRoundId(
+        roundId
+      );
+      setTeamRounds((prev) => ({
+        ...prev,
+        [roundId]: teamRoundsResponse.data,
+      }));
+
+      // Fetch team round judges and submissions for each team round
+      for (const teamRound of teamRoundsResponse.data) {
+        // Fetch team round judges
+        await fetchTeamRoundJudges(teamRound.id);
+
+        // Fetch submissions for the team
+        await fetchTeamSubmissions(teamRound.team.id, roundId);
+      }
+    } catch (error) {
+      console.error(`Error fetching team rounds for round ${roundId}:`, error);
+      showError(
+        "Data Loading Error",
+        `Failed to load team data for round ${roundId}`
+      );
+    }
+  };
+
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // Fetch rounds
+      const roundsResponse = await roundService.getRoundsByHackathonId(
+        hackathonId
+      );
+
+      if (!roundsResponse.data.length) {
+        setIsLoading(false);
+        return;
+      }
+
+      // Sort rounds by roundNumber
+      const sortedRounds = [...roundsResponse.data].sort(
+        (a, b) => a.roundNumber - b.roundNumber
+      );
+      setRounds(sortedRounds);
+
+      // Select the first round by default if none is selected
+      if (sortedRounds.length > 0 && !selectedRoundId) {
+        setSelectedRoundId(sortedRounds[0].id);
+        await fetchTeamRoundsAndSubmissions(sortedRounds[0].id);
+      } else if (selectedRoundId) {
+        // If a round is already selected, refresh its data
+        await fetchTeamRoundsAndSubmissions(selectedRoundId);
+      }
+
+      // Fetch team rounds for each round
+      for (const round of sortedRounds) {
+        if (!selectedRoundId || round.id !== selectedRoundId) {
+          // Skip the selected round as it's already fetched
+          await fetchTeamRoundsAndSubmissions(round.id);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching submissions data:", error);
+      showError(
+        "Data Loading Error",
+        "Failed to load submission data. Please try again later."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [hackathonId, selectedRoundId, showError]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const showPopup = (type: string, id: string, note: string) => {
     setActivePopup({ type, id, note });
   };
@@ -164,6 +168,16 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
         setSelectedRoundId={setSelectedRoundId}
       />
 
+      {/* Bulk Team Round Update Section */}
+      {selectedRoundId && (
+        <BulkTeamRoundUpdate
+          selectedRoundId={selectedRoundId}
+          teamRounds={teamRounds}
+          teamSubmissions={teamSubmissions}
+          refreshData={fetchData}
+        />
+      )}
+
       {/* Team List for Selected Round */}
       <TeamList
         selectedRoundId={selectedRoundId}
@@ -171,6 +185,7 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
         teamSubmissions={teamSubmissions}
         teamRoundJudges={teamRoundJudges}
         showPopup={showPopup}
+        refreshData={fetchData}
       />
 
       {/* Hackathon Results Button */}

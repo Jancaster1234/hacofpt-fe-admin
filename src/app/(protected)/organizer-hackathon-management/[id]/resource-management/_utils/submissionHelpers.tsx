@@ -1,4 +1,5 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_utils/submissionHelpers.tsx
+
 import { Submission } from "@/types/entities/submission";
 
 /**
@@ -30,26 +31,36 @@ export function formatDate(dateString: string | undefined): string {
 /**
  * Gets the latest submission from an array of submissions
  * @param submissions Array of submission objects
+ * @param roundId Round ID to filter submissions by
  * @returns The most recent submitted submission or undefined if none
  */
 export function getLatestSubmission(
-  submissions: Submission[] | undefined
+  submissions: Submission[] | undefined,
+  roundId: string
 ): Submission | undefined {
   if (!submissions || submissions.length === 0) {
     return undefined;
   }
 
-  // Filter for only SUBMITTED status submissions
-  const submittedSubmissions = submissions.filter(
-    (submission) => submission.status === "SUBMITTED"
-  );
+  // Filter for only SUBMITTED status submissions that belong to this round
+  const submittedRoundSubmissions = submissions.filter((submission) => {
+    // Check if submission.status is SUBMITTED
+    const statusMatches = submission.status === "SUBMITTED";
 
-  if (submittedSubmissions.length === 0) {
+    // Check if roundId matches, handling both direct roundId and nested round.id
+    const roundMatches =
+      submission.roundId === roundId ||
+      (submission.round && submission.round.id === roundId);
+
+    return statusMatches && roundMatches;
+  });
+
+  if (submittedRoundSubmissions.length === 0) {
     return undefined;
   }
 
   // Sort by submission date (newest first)
-  return submittedSubmissions.sort((a, b) => {
+  return submittedRoundSubmissions.sort((a, b) => {
     if (!a.submittedAt || !b.submittedAt) {
       return 0;
     }

@@ -17,6 +17,7 @@ interface TeamListProps {
     [teamRoundId: string]: TeamRoundJudge[];
   };
   showPopup: (type: string, id: string, note: string) => void;
+  refreshData: () => void;
 }
 
 export function TeamList({
@@ -25,6 +26,7 @@ export function TeamList({
   teamSubmissions,
   teamRoundJudges,
   showPopup,
+  refreshData,
 }: TeamListProps) {
   if (!selectedRoundId || !teamRounds[selectedRoundId]?.length) {
     return (
@@ -45,6 +47,7 @@ export function TeamList({
           judges={teamRoundJudges[teamRound.id] || []}
           submissions={teamSubmissions[teamRound.team.id] || []}
           showPopup={showPopup}
+          refreshData={refreshData}
         />
       ))}
     </div>

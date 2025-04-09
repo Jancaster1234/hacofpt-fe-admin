@@ -1,21 +1,28 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/LatestSubmission.tsx
 import { useState } from "react";
 import { Submission } from "@/types/entities/submission";
+import { TeamRound } from "@/types/entities/teamRound";
 import { JudgeEvaluations } from "./JudgeEvaluations";
+import { TeamRoundStatusUpdate } from "./TeamRoundStatusUpdate";
 import { formatDate, getLatestSubmission } from "../_utils/submissionHelpers";
 
 interface LatestSubmissionProps {
   submissions: Submission[];
+  teamRound: TeamRound;
   showPopup: (type: string, id: string, note: string) => void;
+  refreshData: () => void;
 }
 
 export function LatestSubmission({
   submissions,
+  teamRound,
   showPopup,
+  refreshData,
 }: LatestSubmissionProps) {
   const [expandedJudgeSubmissions, setExpandedJudgeSubmissions] =
     useState(false);
-  const latestSubmission = getLatestSubmission(submissions);
+  // Pass the round ID to get only submissions for this specific round
+  const latestSubmission = getLatestSubmission(submissions, teamRound.roundId);
 
   const toggleJudgeSubmissionsExpand = () => {
     setExpandedJudgeSubmissions(!expandedJudgeSubmissions);
@@ -96,6 +103,13 @@ export function LatestSubmission({
             showPopup={showPopup}
           />
         )}
+
+        {/* Team Round Status Update */}
+        <TeamRoundStatusUpdate
+          teamRound={teamRound}
+          latestSubmission={latestSubmission}
+          refreshData={refreshData}
+        />
       </div>
     </div>
   );
