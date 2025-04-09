@@ -40,16 +40,26 @@ export function TeamList({
 
   return (
     <div className="space-y-4">
-      {teamRounds[selectedRoundId].map((teamRound) => (
-        <TeamCard
-          key={teamRound.id}
-          teamRound={teamRound}
-          judges={teamRoundJudges[teamRound.id] || []}
-          submissions={teamSubmissions[teamRound.team.id] || []}
-          showPopup={showPopup}
-          refreshData={refreshData}
-        />
-      ))}
+      {teamRounds[selectedRoundId].map((teamRound) => {
+        // Create the same composite key
+        const teamIdString = String(teamRound.team.id);
+        const roundIdString = String(teamRound.roundId);
+        const key = `${teamIdString}-${roundIdString}`;
+
+        // Get submissions using the composite key
+        const submissions = teamSubmissions[key] || [];
+
+        return (
+          <TeamCard
+            key={teamRound.id}
+            teamRound={teamRound}
+            judges={teamRoundJudges[teamRound.id] || []}
+            submissions={submissions}
+            showPopup={showPopup}
+            refreshData={refreshData}
+          />
+        );
+      })}
     </div>
   );
 }

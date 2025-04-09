@@ -21,8 +21,25 @@ export function LatestSubmission({
 }: LatestSubmissionProps) {
   const [expandedJudgeSubmissions, setExpandedJudgeSubmissions] =
     useState(false);
+
+  // Add the debug log here
+  console.log("LatestSubmission receiving submissions:", {
+    teamId: teamRound.team.id,
+    roundId: teamRound.roundId,
+    submissions: submissions,
+    submissionCount: submissions?.length || 0,
+  });
+
+  console.log("LatestSubmission props:", {
+    submissions,
+    teamRound,
+    roundId: teamRound.roundId,
+  });
+
   // Pass the round ID to get only submissions for this specific round
   const latestSubmission = getLatestSubmission(submissions, teamRound.roundId);
+
+  console.log("LatestSubmission result:", latestSubmission);
 
   const toggleJudgeSubmissionsExpand = () => {
     setExpandedJudgeSubmissions(!expandedJudgeSubmissions);

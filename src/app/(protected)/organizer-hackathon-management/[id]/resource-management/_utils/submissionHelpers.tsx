@@ -42,18 +42,40 @@ export function getLatestSubmission(
     return undefined;
   }
 
+  console.log("Filtering submissions:", {
+    totalSubmissions: submissions.length,
+    roundIdToMatch: roundId,
+    submissions: submissions,
+  });
+
   // Filter for only SUBMITTED status submissions that belong to this round
   const submittedRoundSubmissions = submissions.filter((submission) => {
     // Check if submission.status is SUBMITTED
     const statusMatches = submission.status === "SUBMITTED";
 
-    // Check if roundId matches, handling both direct roundId and nested round.id
+    // Extract the round ID from the submission, handling different data structures
+    let submissionRoundId;
+    if (submission.roundId) {
+      // Direct roundId property
+      submissionRoundId = submission.roundId;
+    } else if (submission.round && submission.round.id) {
+      // Nested round object
+      submissionRoundId = submission.round.id;
+    }
+
+    // Compare round IDs as strings to handle type differences
     const roundMatches =
-      submission.roundId === roundId ||
-      (submission.round && submission.round.id === roundId);
+      submissionRoundId !== undefined &&
+      String(submissionRoundId) === String(roundId);
+
+    console.log(
+      `Submission ${submission.id}: status match=${statusMatches}, round match=${roundMatches}, submission round=${submissionRoundId}, target round=${roundId}`
+    );
 
     return statusMatches && roundMatches;
   });
+
+  console.log(`Found ${submittedRoundSubmissions.length} matching submissions`);
 
   if (submittedRoundSubmissions.length === 0) {
     return undefined;

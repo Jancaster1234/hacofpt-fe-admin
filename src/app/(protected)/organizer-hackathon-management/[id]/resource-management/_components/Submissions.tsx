@@ -22,7 +22,7 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
     [roundId: string]: TeamRound[];
   }>({});
   const [teamSubmissions, setTeamSubmissions] = useState<{
-    [teamId: string]: Submission[];
+    [key: string]: Submission[];
   }>({});
   const [teamRoundJudges, setTeamRoundJudges] = useState<{
     [teamRoundId: string]: TeamRoundJudge[];
@@ -60,16 +60,17 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
       const submissionsResponse =
         await submissionService.getSubmissionsByTeamAndRound(teamId, roundId);
 
+      // Create a composite key with both teamId and roundId
+      const key = `${teamId}-${roundId}`;
       setTeamSubmissions((prev) => ({
         ...prev,
-        [teamId]: submissionsResponse.data,
+        [key]: submissionsResponse.data,
       }));
     } catch (error) {
       console.error(
         `Error fetching submissions for team ${teamId} in round ${roundId}:`,
         error
       );
-      // Don't show error modal to avoid multiple error messages
     }
   };
 
