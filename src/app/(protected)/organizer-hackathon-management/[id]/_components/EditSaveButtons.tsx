@@ -4,9 +4,29 @@
 import { useState } from "react";
 import EditHackathonModal from "./EditHackathonModal";
 
+interface Hackathon {
+  id: string;
+  title: string;
+  subTitle: string;
+  bannerImageUrl: string;
+  enrollStartDate: string;
+  enrollEndDate: string;
+  startDate: string;
+  endDate: string;
+  information: string;
+  description: string;
+  contact: string;
+  category: string;
+  organization: string;
+  status: string;
+  minimumTeamMembers: number;
+  maximumTeamMembers: number;
+  documentation: string[];
+}
+
 type EditSaveButtonsProps = {
   hackathonId: string;
-  initialHackathonData: any; // Replace `any` with proper type if available
+  initialHackathonData: Hackathon;
 };
 
 export default function EditSaveButtons({
@@ -14,11 +34,10 @@ export default function EditSaveButtons({
   initialHackathonData,
 }: EditSaveButtonsProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [hackathonData, setHackathonData] = useState(initialHackathonData);
 
   const handleEdit = () => {
-    setIsModalOpen(true);
+    setIsEditing(true);
   };
 
   const handleSave = async () => {
@@ -45,25 +64,30 @@ export default function EditSaveButtons({
         {!isEditing ? (
           <button
             onClick={handleEdit}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+            className="bg-blue-500 font-bold text-white px-4 py-2 rounded-md"
           >
             Edit
           </button>
         ) : (
           <button
             onClick={handleSave}
-            className="bg-green-500 text-white px-4 py-2 rounded-md"
+            className="bg-green-500 font-bold text-white px-4 py-2 rounded-md"
           >
             Save
           </button>
         )}
       </div>
 
-      <EditHackathonModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-      />
+      {isEditing && (
+        <EditHackathonModal
+          hackathon={hackathonData}
+          onClose={() => setIsEditing(false)}
+          onSuccess={(updatedHackathon) => {
+            setHackathonData(updatedHackathon);
+            setIsEditing(false);
+          }}
+        />
+      )}
     </>
   );
 }
