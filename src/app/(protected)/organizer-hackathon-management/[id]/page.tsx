@@ -129,7 +129,6 @@ export default function HackathonDetail() {
           participant: hackathon.participant,
           documentation: hackathon.documentation,
           contact: hackathon.contact,
-          mark_criteria: "",
         }}
       />
     </div>
