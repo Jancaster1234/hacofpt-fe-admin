@@ -42,7 +42,7 @@ class FileUrlService {
       });
 
       const response = await apiService.auth.post<FileUrl[]>(
-        "/hackathon-service/api/v1/upload/multiple",
+        "/hackathon-service/api/v1/files/upload",
         formData
       );
 
