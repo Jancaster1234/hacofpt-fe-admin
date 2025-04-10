@@ -46,7 +46,7 @@ const navItems: NavItem[] = [
     icon: <CalenderIcon />,
     name: "User Management",
     allowedRoles: ["ADMIN"],
-    path: "/user-management",
+    path: "/user-manage",
   },
   // {
   //   icon: <CalenderIcon />,
