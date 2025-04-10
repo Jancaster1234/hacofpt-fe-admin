@@ -74,10 +74,7 @@ export default function MentorshipRequestsPage() {
     }));
   };
 
-  const handleUpdateStatus = async (
-    requestId: string,
-    status: "APPROVED" | "REJECTED"
-  ) => {
+  const handleApproveRequest = async (requestId: string) => {
     if (!user) return;
 
     // Set loading state for this specific request
@@ -93,12 +90,11 @@ export default function MentorshipRequestsPage() {
         throw new Error("Request not found");
       }
 
-      const response = await mentorshipRequestService.updateMentorshipRequest({
+      const response = await mentorshipRequestService.approveMentorshipRequest({
         id: requestId,
         hackathonId: requestToUpdate.hackathonId,
         mentorId: requestToUpdate.mentorId,
         teamId: requestToUpdate.teamId,
-        status: status,
         evaluatedById: user.id,
       });
 
@@ -109,7 +105,7 @@ export default function MentorshipRequestsPage() {
             request.id === requestId
               ? {
                   ...request,
-                  status: response.data.status,
+                  status: "APPROVED",
                   evaluatedAt: response.data.evaluatedAt,
                   evaluatedBy: user
                     ? {
@@ -126,18 +122,86 @@ export default function MentorshipRequestsPage() {
 
         showSuccess(
           "Success",
-          `Mentorship request has been ${status.toLowerCase()} successfully`
+          response.message ||
+            "Mentorship request has been approved successfully"
         );
       } else {
         throw new Error(
-          response.message || "Failed to update mentorship request"
+          response.message || "Failed to approve mentorship request"
         );
       }
     } catch (error: any) {
       showError(
-        "Update Failed",
+        "Approval Failed",
         error.message ||
-          "An error occurred while updating the mentorship request"
+          "An error occurred while approving the mentorship request"
+      );
+    } finally {
+      setLoading((prev) => ({ ...prev, [requestId]: false }));
+    }
+  };
+
+  const handleRejectRequest = async (requestId: string) => {
+    if (!user) return;
+
+    // Set loading state for this specific request
+    setLoading((prev) => ({ ...prev, [requestId]: true }));
+
+    try {
+      // Find the request to update
+      const requestToUpdate = mentorshipRequests.find(
+        (req) => req.id === requestId
+      );
+
+      if (!requestToUpdate) {
+        throw new Error("Request not found");
+      }
+
+      const response = await mentorshipRequestService.rejectMentorshipRequest({
+        id: requestId,
+        hackathonId: requestToUpdate.hackathonId,
+        mentorId: requestToUpdate.mentorId,
+        teamId: requestToUpdate.teamId,
+        evaluatedById: user.id,
+      });
+
+      if (response.data) {
+        // Update the state with the updated request
+        setMentorshipRequests((prev) =>
+          prev.map((request) =>
+            request.id === requestId
+              ? {
+                  ...request,
+                  status: "REJECTED",
+                  evaluatedAt: response.data.evaluatedAt,
+                  evaluatedBy: user
+                    ? {
+                        id: user.id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                      }
+                    : undefined,
+                  evaluatedById: user.id,
+                }
+              : request
+          )
+        );
+
+        showSuccess(
+          "Success",
+          response.message ||
+            "Mentorship request has been rejected successfully"
+        );
+      } else {
+        throw new Error(
+          response.message || "Failed to reject mentorship request"
+        );
+      }
+    } catch (error: any) {
+      showError(
+        "Rejection Failed",
+        error.message ||
+          "An error occurred while rejecting the mentorship request"
       );
     } finally {
       setLoading((prev) => ({ ...prev, [requestId]: false }));
@@ -226,7 +290,7 @@ export default function MentorshipRequestsPage() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleUpdateStatus(request.id, "APPROVED");
+                                handleApproveRequest(request.id);
                               }}
                               disabled={loading[request.id]}
                               className="flex items-center px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 disabled:opacity-50"
@@ -244,7 +308,7 @@ export default function MentorshipRequestsPage() {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleUpdateStatus(request.id, "REJECTED");
+                                handleRejectRequest(request.id);
                               }}
                               disabled={loading[request.id]}
                               className="flex items-center px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"

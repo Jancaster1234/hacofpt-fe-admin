@@ -69,6 +69,72 @@ class MentorshipRequestService {
     }
   }
 
+  async rejectMentorshipRequest(data: {
+    id: string;
+    hackathonId: string;
+    mentorId: string;
+    teamId: string;
+    evaluatedById: string;
+  }): Promise<{ data: MentorshipRequest; message?: string }> {
+    try {
+      const response = await apiService.auth.post<MentorshipRequest>(
+        "/hackathon-service/api/v1/mentorships/reject",
+        {
+          ...data,
+          status: "REJECTED",
+        }
+      );
+
+      if (!response) {
+        throw new Error("Failed to reject mentorship request");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Mentorship request rejected successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<MentorshipRequest>(
+        error,
+        {} as MentorshipRequest,
+        "[Mentorship Service] Error rejecting mentorship request:"
+      );
+    }
+  }
+
+  async approveMentorshipRequest(data: {
+    id: string;
+    hackathonId: string;
+    mentorId: string;
+    teamId: string;
+    evaluatedById: string;
+  }): Promise<{ data: MentorshipRequest; message?: string }> {
+    try {
+      const response = await apiService.auth.post<MentorshipRequest>(
+        "/hackathon-service/api/v1/mentorships/approve",
+        {
+          ...data,
+          status: "APPROVED",
+        }
+      );
+
+      if (!response) {
+        throw new Error("Failed to approve mentorship request");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "Mentorship request approved successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<MentorshipRequest>(
+        error,
+        {} as MentorshipRequest,
+        "[Mentorship Service] Error approving mentorship request:"
+      );
+    }
+  }
+
   async getMentorshipRequestsByTeamAndHackathon(
     teamId: string,
     hackathonId: string

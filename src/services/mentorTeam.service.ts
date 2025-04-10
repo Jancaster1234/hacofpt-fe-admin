@@ -38,11 +38,8 @@ class MentorTeamService {
     mentorId: string
   ): Promise<{ data: MentorTeam[]; message?: string }> {
     try {
-      const response = await apiService.auth.post<MentorTeam[]>(
-        "/hackathon-service/api/v1/mentor-teams/filter-by-mentor",
-        {
-          data: mentorId,
-        }
+      const response = await apiService.auth.get<MentorTeam[]>(
+        `/hackathon-service/api/v1/mentor-teams/filter-by-mentor?mentorId=${mentorId}`
       );
 
       if (!response || !response.data) {

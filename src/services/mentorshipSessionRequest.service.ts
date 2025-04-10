@@ -53,7 +53,7 @@ class MentorshipSessionRequestService {
   }): Promise<{ data: MentorshipSessionRequest; message?: string }> {
     try {
       const response = await apiService.auth.put<MentorshipSessionRequest>(
-        `/hackathon-service/api/v1/mentorship/sessions`,
+        `/hackathon-service/api/v1/mentorships/sessions`,
         data
       );
 
@@ -82,7 +82,7 @@ class MentorshipSessionRequestService {
   ): Promise<{ data: MentorshipSessionRequest[]; message?: string }> {
     try {
       const response = await apiService.auth.get<MentorshipSessionRequest[]>(
-        `/hackathon-service/api/v1/mentorship/sessions/filter-by-mentor-team?mentorTeamId=${mentorTeamId}`
+        `/hackathon-service/api/v1/mentorships/sessions/filter-by-mentor-team?mentorTeamId=${mentorTeamId}`
       );
 
       if (!response || !response.data) {
@@ -107,7 +107,7 @@ class MentorshipSessionRequestService {
   ): Promise<{ message?: string }> {
     try {
       const response = await apiService.auth.delete(
-        `/hackathon-service/api/v1/mentorship/sessions/${id}`
+        `/hackathon-service/api/v1/mentorships/sessions/${id}`
       );
 
       return {
