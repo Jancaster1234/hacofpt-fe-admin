@@ -437,14 +437,14 @@ export default function MentorTeamsPage() {
         </div>
       )}
 
-      {/* Include the ApiResponseModal component */}
+      {/* Include the ApiResponseModal component
       <ApiResponseModal
         isOpen={modalState.isOpen}
         onClose={hideModal}
         title={modalState.title}
         message={modalState.message}
         type={modalState.type}
-      />
+      /> */}
     </div>
   );
 }

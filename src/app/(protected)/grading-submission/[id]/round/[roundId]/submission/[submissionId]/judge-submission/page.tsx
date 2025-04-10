@@ -612,13 +612,13 @@ export default function JudgeSubmissionPage() {
       </div>
 
       {/* API Response Modal */}
-      <ApiResponseModal
+      {/* <ApiResponseModal
         isOpen={modalState.isOpen}
         onClose={hideModal}
         title={modalState.title}
         message={modalState.message}
         type={modalState.type}
-      />
+      /> */}
     </div>
   );
 }
