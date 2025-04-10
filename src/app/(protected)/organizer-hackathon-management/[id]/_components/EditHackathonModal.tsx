@@ -5,6 +5,8 @@ import React, { useState } from "react";
 import { toast } from "sonner";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { hackathonService } from "@/services/hackathon.service";
+import { fileUrlService } from "@/services/fileUrl.service";
 import {
   FaFile,
   FaFileWord,
@@ -122,9 +124,6 @@ export default function EditHackathonModal({
     }
 
     try {
-      const formData = new FormData();
-      formData.append("files", file);
-
       const token = localStorage.getItem("accessToken");
       if (!token) {
         toast.error("Please login to upload image");
@@ -132,36 +131,16 @@ export default function EditHackathonModal({
       }
 
       console.log("Uploading file...");
-      const response = await fetch("/api/files/upload", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fileUrlService.uploadMultipleFilesCommunication([
+        file,
+      ]);
 
-      console.log("Response status:", response.status);
-      const responseText = await response.text();
-      console.log("Response text:", responseText);
-
-      if (!response.ok) {
-        throw new Error(`Upload failed with status ${response.status}`);
-      }
-
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        console.error("Failed to parse response as JSON:", e);
-        throw new Error("Invalid response from server");
-      }
-
-      if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
+      if (response.data && response.data.length > 0) {
+        setBannerImageUrl(response.data[0].fileUrl);
+        toast.success("Banner image uploaded successfully!");
+      } else {
         throw new Error("Invalid response format");
       }
-
-      setBannerImageUrl(data.data[0].fileUrl);
-      toast.success("Banner image uploaded successfully!");
     } catch (error) {
       console.error("Error uploading banner image:", error);
       toast.error(
@@ -174,7 +153,7 @@ export default function EditHackathonModal({
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const files = event.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
     try {
       const token = localStorage.getItem("accessToken");
@@ -183,45 +162,18 @@ export default function EditHackathonModal({
         return;
       }
 
-      const uploadPromises = Array.from(files).map(async (file) => {
-        const formData = new FormData();
-        formData.append("files", file);
+      console.log("Uploading documents...");
+      const response = await fileUrlService.uploadMultipleFilesCommunication(
+        Array.from(files)
+      );
 
-        console.log("Uploading document...");
-        const response = await fetch("/api/files/upload", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        });
-
-        console.log("Response status:", response.status);
-        const responseText = await response.text();
-        console.log("Response text:", responseText);
-
-        if (!response.ok) {
-          throw new Error(`Upload failed with status ${response.status}`);
-        }
-
-        let data;
-        try {
-          data = JSON.parse(responseText);
-        } catch (e) {
-          console.error("Failed to parse response as JSON:", e);
-          throw new Error("Invalid response from server");
-        }
-
-        if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
-          throw new Error("Invalid response format");
-        }
-
-        return data.data[0].fileUrl;
-      });
-
-      const urls = await Promise.all(uploadPromises);
-      setUploadedDocs((prev) => [...prev, ...urls]);
-      toast.success("Documents uploaded successfully!");
+      if (response.data && response.data.length > 0) {
+        const fileUrls = response.data.map((file) => file.fileUrl);
+        setUploadedDocs((prev) => [...prev, ...fileUrls]);
+        toast.success("Documents uploaded successfully!");
+      } else {
+        throw new Error("Invalid response format");
+      }
     } catch (error) {
       console.error("Error uploading documents:", error);
       toast.error(
@@ -286,7 +238,8 @@ export default function EditHackathonModal({
         toast.error("Please login to update hackathon");
         return;
       }
-      const json = JSON.stringify({
+
+      const hackathonData = {
         id: hackathon.id,
         title,
         subTitle: subtitle,
@@ -304,23 +257,16 @@ export default function EditHackathonModal({
         maximumTeamMembers: maxTeamMembers,
         documentation: uploadedDocs,
         status: "ACTIVE",
-      });
-      const response = await fetch("/api/hackathons", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: json,
-      });
+      };
 
-      const data = await response.json();
-      if (data?.result?.responseCode === "0000") {
+      const response = await hackathonService.updateHackathon(hackathonData);
+
+      if (response.data) {
         toast.success("Hackathon updated successfully!");
-        onSuccess?.(data.data);
+        onSuccess?.(response.data);
         onClose();
       } else {
-        throw new Error(data.result.message || "Failed to update hackathon");
+        throw new Error(response.message || "Failed to update hackathon");
       }
     } catch (error) {
       console.error("Error updating hackathon:", error);
