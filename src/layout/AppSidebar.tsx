@@ -30,24 +30,30 @@ const navItems: NavItem[] = [
     allowedRoles: ["ADMIN"],
     subItems: [{ name: "Ecommerce", path: "/dashboard", pro: false }],
   },
+  // {
+  //   icon: <CalenderIcon />,
+  //   name: "Hackathon",
+  //   allowedRoles: ["ADMIN"],
+  //   path: "/admin-hackathon-management",
+  // },
+  // {
+  //   icon: <CalenderIcon />,
+  //   name: "User",
+  //   allowedRoles: ["ADMIN"],
+  //   path: "/user-management",
+  // },
   {
     icon: <CalenderIcon />,
-    name: "Hackathon",
-    allowedRoles: ["ADMIN"],
-    path: "/admin-hackathon-management",
-  },
-  {
-    icon: <CalenderIcon />,
-    name: "User",
+    name: "User Management",
     allowedRoles: ["ADMIN"],
     path: "/user-management",
   },
-  {
-    icon: <CalenderIcon />,
-    name: "Organization",
-    allowedRoles: ["ADMIN"],
-    path: "/organization-management",
-  },
+  // {
+  //   icon: <CalenderIcon />,
+  //   name: "Organization",
+  //   allowedRoles: ["ADMIN"],
+  //   path: "/organization-management",
+  // },
   {
     icon: <CalenderIcon />,
     name: "Mentorship Request",
@@ -108,12 +114,12 @@ const navItems: NavItem[] = [
     allowedRoles: ["ADMIN"],
     path: "/send-notification",
   },
-  {
-    icon: <CalenderIcon />,
-    name: "Blog",
-    allowedRoles: ["ADMIN"],
-    path: "/blog-management",
-  },
+  // {
+  //   icon: <CalenderIcon />,
+  //   name: "Blog",
+  //   allowedRoles: ["ADMIN"],
+  //   path: "/blog-management",
+  // },
 ];
 
 const othersItems: NavItem[] = [];
