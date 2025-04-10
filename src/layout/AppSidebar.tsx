@@ -105,7 +105,7 @@ const navItems: NavItem[] = [
   {
     icon: <CalenderIcon />,
     name: "Send Notification",
-    allowedRoles: ["ADMIN", "ORGANIZER"],
+    allowedRoles: ["ADMIN"],
     path: "/send-notification",
   },
   {
