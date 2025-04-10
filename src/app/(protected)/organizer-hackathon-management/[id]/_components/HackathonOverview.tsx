@@ -40,7 +40,7 @@ export default function HackathonOverview({
       <p className="text-gray-600 mt-1 text-sm sm:text-base">📅 {date}</p>
       <p className="mt-4 text-gray-700 text-sm sm:text-base">{subtitle}</p>
       <div className="mt-6 flex gap-4">
-        {isEnrolled ? (
+        {/* {isEnrolled ? (
           <>
             <button className="bg-gray-400 text-white font-bold py-2 px-6 rounded-full cursor-not-allowed">
               Enrolled
@@ -59,7 +59,7 @@ export default function HackathonOverview({
           >
             Enroll
           </button>
-        )}
+        )} */}
       </div>
       <p className="mt-2 text-gray-500 text-sm">
         {enrollmentCount === 1
