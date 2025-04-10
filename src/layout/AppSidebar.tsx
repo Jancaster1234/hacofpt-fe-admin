@@ -48,6 +48,12 @@ const navItems: NavItem[] = [
     allowedRoles: ["ADMIN"],
     path: "/user-manage",
   },
+  {
+    icon: <CalenderIcon />,
+    name: "Thread Post Report",
+    allowedRoles: ["ADMIN"],
+    path: "/thread-post-report-management",
+  },
   // {
   //   icon: <CalenderIcon />,
   //   name: "Organization",
