@@ -36,6 +36,7 @@ export default function Tabs({ activeTab, setActiveTab }: TabsProps) {
     { id: "submission", label: "Submissions" },
     { id: "notification", label: "Notifications" },
     { id: "hackathonResult", label: "Results" },
+    { id: "feedback", label: "Feedback" },
     { id: "device", label: "Device Management" },
     { id: "sponsorship", label: "Sponsorship" },
   ];

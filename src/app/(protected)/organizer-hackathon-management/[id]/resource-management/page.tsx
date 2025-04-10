@@ -15,6 +15,7 @@ import RoundMarkCriteria from "./_components/RoundMarkCriteria";
 import TeamRequests from "./_components/TeamRequests";
 import IndividualRegistrationRequests from "./_components/IndividualRegistrationRequests";
 import TeamFormation from "./_components/TeamFormation";
+import Feedback from "./_components/Feedback";
 import DeviceManagement from "./_components/DeviceManagement";
 import Sponsorship from "./_components/Sponsorship";
 import ApiResponseModal from "@/components/common/ApiResponseModal";
@@ -40,6 +41,7 @@ export default function ResourceManagementPage({
     | "submission"
     | "notification"
     | "hackathonResult"
+    | "feedback"
     | "device"
     | "sponsorship"
   >("round"); // Default to "round"
@@ -80,6 +82,7 @@ export default function ResourceManagementPage({
       {activeTab === "hackathonResult" && (
         <HackathonResults hackathonId={hackathonId} />
       )}
+      {activeTab === "feedback" && <Feedback hackathonId={hackathonId} />}
       {activeTab === "device" && <DeviceManagement hackathonId={hackathonId} />}
       {activeTab === "sponsorship" && <Sponsorship hackathonId={hackathonId} />}
       <ApiResponseModal
