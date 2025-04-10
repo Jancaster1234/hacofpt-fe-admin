@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/_components/CreateHackathonModal.tsx
 import { useState } from "react";
 import { toast } from "sonner";
 import DatePicker from "react-datepicker";
@@ -15,6 +14,8 @@ import {
   FaFileAlt,
   FaTimes,
 } from "react-icons/fa";
+import { hackathonService } from "@/services/hackathon.service";
+import { fileUrlService } from "@/services/fileUrl.service";
 
 interface Hackathon {
   id: string;
@@ -111,46 +112,15 @@ export default function CreateHackathonModal({
     }
 
     try {
-      const formData = new FormData();
-      formData.append("files", file);
-
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        toast.error("Please login to upload image");
-        return;
+      const response = await fileUrlService.uploadMultipleFilesCommunication([
+        file,
+      ]);
+      if (response.data && response.data.length > 0) {
+        setBannerImageUrl(response.data[0].fileUrl);
+        toast.success("Banner image uploaded successfully!");
+      } else {
+        throw new Error("No file URL returned from server");
       }
-
-      console.log("Uploading file...");
-      const response = await fetch("/api/files/upload", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      console.log("Response status:", response.status);
-      const responseText = await response.text();
-      console.log("Response text:", responseText);
-
-      if (!response.ok) {
-        throw new Error(`Upload failed with status ${response.status}`);
-      }
-
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (e) {
-        console.error("Failed to parse response as JSON:", e);
-        throw new Error("Invalid response from server");
-      }
-
-      if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
-        throw new Error("Invalid response format");
-      }
-
-      setBannerImageUrl(data.data[0].fileUrl);
-      toast.success("Banner image uploaded successfully!");
     } catch (error) {
       console.error("Error uploading banner image:", error);
       toast.error(
@@ -164,55 +134,22 @@ export default function CreateHackathonModal({
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const files = event.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
     try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        toast.error("Please login to upload documents");
-        return;
+      const fileArray = Array.from(files);
+      const response = await fileUrlService.uploadMultipleFilesCommunication(
+        fileArray
+      );
+
+      if (response.data && response.data.length > 0) {
+        // Extract fileUrls from the response
+        const newFileUrls = response.data.map((file) => file.fileUrl);
+        setUploadedDocs((prev) => [...prev, ...newFileUrls]);
+        toast.success("Documents uploaded successfully!");
+      } else {
+        throw new Error("No file URLs returned from server");
       }
-
-      // Upload each file and collect URLs
-      const uploadPromises = Array.from(files).map(async (file) => {
-        const formData = new FormData();
-        formData.append("files", file);
-
-        console.log("Uploading document...");
-        const response = await fetch("/api/files/upload", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        });
-
-        console.log("Response status:", response.status);
-        const responseText = await response.text();
-        console.log("Response text:", responseText);
-
-        if (!response.ok) {
-          throw new Error(`Upload failed with status ${response.status}`);
-        }
-
-        let data;
-        try {
-          data = JSON.parse(responseText);
-        } catch (e) {
-          console.error("Failed to parse response as JSON:", e);
-          throw new Error("Invalid response from server");
-        }
-
-        if (!data.data || !Array.isArray(data.data) || data.data.length === 0) {
-          throw new Error("Invalid response format");
-        }
-
-        return data.data[0].fileUrl;
-      });
-
-      const urls = await Promise.all(uploadPromises);
-      setUploadedDocs((prev) => [...prev, ...urls]);
-      toast.success("Documents uploaded successfully!");
     } catch (error) {
       console.error("Error uploading documents:", error);
       toast.error(
@@ -227,11 +164,11 @@ export default function CreateHackathonModal({
   };
 
   const getFileName = (fileUrl: string) => {
-    // Trích xuất tên file từ URL
+    // Extract file name from URL
     const decodedUrl = decodeURIComponent(fileUrl);
     const parts = decodedUrl.split("/");
     const lastPart = parts[parts.length - 1];
-    // Nếu có UUID trong tên file (format: uuid_filename)
+    // If there's a UUID in the filename (format: uuid_filename)
     if (lastPart.includes("_")) {
       return lastPart.split("_").slice(1).join("_");
     }
@@ -274,7 +211,6 @@ export default function CreateHackathonModal({
   };
 
   const handleCreate = async () => {
-    console.log("handleCreate called");
     console.log("Submitting hackathon details...");
 
     const hackathonData = {
@@ -300,37 +236,13 @@ export default function CreateHackathonModal({
     console.log("Hackathon data:", hackathonData);
 
     try {
-      const token = localStorage.getItem("accessToken");
-      console.log("Token:", token);
-      if (!token) {
-        toast.error("Please login to create a hackathon");
-        return;
-      }
-
-      console.log("Calling API...");
-      const response = await fetch("/api/hackathons", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(hackathonData),
-      });
-
-      console.log("API Response status:", response.status);
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.log("API Error:", errorData);
-        throw new Error(errorData.error || "Failed to create hackathon");
-      }
-
-      const result = await response.json();
-      console.log("API Success:", result);
+      const result = await hackathonService.createHackathon(hackathonData);
 
       toast.success("Hackathon created successfully!", {
         duration: 3000,
         position: "top-right",
       });
+
       onSuccess?.(result.data);
       onClose();
     } catch (error) {
