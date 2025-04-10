@@ -74,6 +74,12 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
+    name: "Grading Submission",
+    allowedRoles: ["JUDGE"],
+    path: "/grading-submission",
+  },
+  {
+    icon: <CalenderIcon />,
     name: "Calendar",
     allowedRoles: ["ADMIN", "ORGANIZER", "MENTOR", "JUDGE"],
     path: "/calendar",
@@ -96,12 +102,6 @@ const navItems: NavItem[] = [
   //   allowedRoles: ["Admin", "Organizer", "Judge", "Mentor"],
   //   path: "/inbox",
   // },
-  {
-    icon: <CalenderIcon />,
-    name: "Grading Submission",
-    allowedRoles: ["JUDGE"],
-    path: "/grading-submission",
-  },
   {
     icon: <CalenderIcon />,
     name: "Send Notification",
