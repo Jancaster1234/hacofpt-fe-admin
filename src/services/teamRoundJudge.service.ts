@@ -36,7 +36,7 @@ class TeamRoundJudgeService {
     try {
       const response = await apiService.auth.post<TeamRoundJudge>(
         "/submission-service/api/v1/teamroundjudges",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -68,7 +68,7 @@ class TeamRoundJudgeService {
     try {
       const response = await apiService.auth.put<TeamRoundJudge>(
         `/submission-service/api/v1/teamroundjudges/${id}`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

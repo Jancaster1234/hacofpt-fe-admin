@@ -132,7 +132,9 @@ class FeedbackService {
   ): Promise<{ data: Feedback[]; message?: string }> {
     try {
       const response = await apiService.auth.get<Feedback[]>(
-        `/feedback-service/api/v1/feedbacks/by-creator?username=${encodeURIComponent(username)}`
+        `/feedback-service/api/v1/feedbacks/by-creator?username=${encodeURIComponent(
+          username
+        )}`
       );
 
       if (!response || !response.data) {
@@ -160,7 +162,7 @@ class FeedbackService {
     try {
       const response = await apiService.auth.post<Feedback>(
         "/feedback-service/api/v1/feedbacks",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -191,7 +193,7 @@ class FeedbackService {
     try {
       const response = await apiService.auth.put<Feedback>(
         `/feedback-service/api/v1/feedbacks/${id}`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

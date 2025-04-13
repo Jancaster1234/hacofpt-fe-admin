@@ -13,7 +13,7 @@ class IndividualRegistrationRequestService {
       const response =
         await apiService.auth.post<IndividualRegistrationRequest>(
           "/hackathon-service/api/v1/individuals",
-          data
+          { data: data }
         );
 
       if (!response || !response.data) {
@@ -45,7 +45,7 @@ class IndividualRegistrationRequestService {
     try {
       const response = await apiService.auth.put<IndividualRegistrationRequest>(
         `/hackathon-service/api/v1/individuals`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

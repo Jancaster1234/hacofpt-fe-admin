@@ -45,7 +45,7 @@ class NotificationService {
     try {
       const response = await apiService.auth.post(
         "/communication-service/api/v1/notifications",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -138,7 +138,7 @@ class NotificationService {
     try {
       const response = await apiService.auth.put(
         "/communication-service/api/v1/notifications/notification-deliveries/read-status",
-        data
+        { data: data }
       );
 
       return {

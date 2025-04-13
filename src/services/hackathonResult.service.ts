@@ -39,7 +39,7 @@ class HackathonResultService {
     try {
       const response = await apiService.auth.post<HackathonResult>(
         "/hackathon-service/api/v1/hackathons/results",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -72,7 +72,7 @@ class HackathonResultService {
     try {
       const response = await apiService.auth.put<HackathonResult>(
         "/hackathon-service/api/v1/hackathons/results",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -106,7 +106,7 @@ class HackathonResultService {
     try {
       const response = await apiService.auth.post<HackathonResult[]>(
         "/hackathon-service/api/v1/hackathons/results/bulk-create",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -142,7 +142,7 @@ class HackathonResultService {
     try {
       const response = await apiService.auth.put<HackathonResult[]>(
         "/hackathon-service/api/v1/hackathons/results/bulk-update",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

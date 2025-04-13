@@ -63,7 +63,7 @@ class UserHackathonService {
     try {
       const response = await apiService.auth.post<UserHackathon>(
         "/identity-service/api/v1/user-hackathons",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -94,7 +94,7 @@ class UserHackathonService {
     try {
       const response = await apiService.auth.put<UserHackathon>(
         `/identity-service/api/v1/user-hackathons/${id}`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

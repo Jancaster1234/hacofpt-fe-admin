@@ -16,7 +16,7 @@ class RoundService {
     try {
       const response = await apiService.auth.post<Round>(
         "/hackathon-service/api/v1/rounds",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -49,7 +49,7 @@ class RoundService {
     try {
       const response = await apiService.auth.put<Round>(
         `/hackathon-service/api/v1/rounds`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

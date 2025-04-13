@@ -95,7 +95,7 @@ class TeamRoundService {
     try {
       const response = await apiService.auth.put<TeamRound>(
         "/hackathon-service/api/v1/team-rounds",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -127,7 +127,7 @@ class TeamRoundService {
     try {
       const response = await apiService.auth.put<TeamRound[]>(
         "/hackathon-service/api/v1/team-rounds/bulk-update",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

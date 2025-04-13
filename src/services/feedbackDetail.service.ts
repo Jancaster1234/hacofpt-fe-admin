@@ -92,7 +92,7 @@ class FeedbackDetailService {
     try {
       const response = await apiService.auth.post<FeedbackDetail>(
         "/feedback-service/api/v1/feedback-details",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -127,7 +127,7 @@ class FeedbackDetailService {
     try {
       const response = await apiService.auth.put<FeedbackDetail>(
         `/feedback-service/api/v1/feedback-details/${id}`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

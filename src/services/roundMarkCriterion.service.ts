@@ -13,7 +13,7 @@ class RoundMarkCriterionService {
     try {
       const response = await apiService.auth.post<RoundMarkCriterion>(
         "/submission-service/api/v1/roundmarkcriteria",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -48,7 +48,7 @@ class RoundMarkCriterionService {
     try {
       const response = await apiService.auth.put<RoundMarkCriterion>(
         `/submission-service/api/v1/roundmarkcriteria/${id}`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

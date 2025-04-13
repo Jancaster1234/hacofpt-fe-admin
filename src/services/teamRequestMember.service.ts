@@ -13,7 +13,7 @@ class TeamRequestMemberService {
     try {
       const response = await apiService.auth.post<TeamRequestMember>(
         "/hackathon-service/api/v1/teams/requests/respond",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

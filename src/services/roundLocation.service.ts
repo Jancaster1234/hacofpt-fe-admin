@@ -12,7 +12,7 @@ class RoundLocationService {
     try {
       const response = await apiService.auth.post<RoundLocation>(
         "hackathon-service/api/v1/round-locations",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -41,7 +41,7 @@ class RoundLocationService {
     try {
       const response = await apiService.auth.put<RoundLocation>(
         `hackathon-service/api/v1/round-locations`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

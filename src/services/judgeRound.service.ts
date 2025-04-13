@@ -36,7 +36,7 @@ class JudgeRoundService {
     try {
       const response = await apiService.auth.post<JudgeRound>(
         "/submission-service/api/v1/judge-rounds",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -66,7 +66,7 @@ class JudgeRoundService {
     try {
       const response = await apiService.auth.put<JudgeRound>(
         `/submission-service/api/v1/judge-rounds/${id}`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

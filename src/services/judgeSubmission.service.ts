@@ -18,7 +18,7 @@ class JudgeSubmissionService {
     try {
       const response = await apiService.auth.post<JudgeSubmission>(
         "/submission-service/api/v1/judge-submissions",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -55,7 +55,7 @@ class JudgeSubmissionService {
     try {
       const response = await apiService.auth.put<JudgeSubmission>(
         `/submission-service/api/v1/judge-submissions/${id}`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

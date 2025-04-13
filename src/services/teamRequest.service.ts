@@ -91,7 +91,7 @@ class TeamRequestService {
     try {
       const response = await apiService.auth.post<TeamRequest>(
         "/hackathon-service/api/v1/teams/requests",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -119,7 +119,7 @@ class TeamRequestService {
     try {
       const response = await apiService.auth.post<TeamRequest>(
         "/hackathon-service/api/v1/teams/requests/review",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

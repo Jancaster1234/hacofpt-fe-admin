@@ -16,7 +16,7 @@ class SponsorshipService {
     try {
       const response = await apiService.auth.post<Sponsorship>(
         "/hackathon-service/api/v1/sponsorships",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -49,7 +49,7 @@ class SponsorshipService {
     try {
       const response = await apiService.auth.put<Sponsorship>(
         `/hackathon-service/api/v1/sponsorships`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

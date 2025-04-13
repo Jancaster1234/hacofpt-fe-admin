@@ -47,7 +47,10 @@ export function BulkTeamRoundUpdate({
       if (!teamId) return false;
 
       const submissions = teamSubmissions[teamId] || [];
-      const latestSubmission = getLatestSubmission(submissions);
+      const latestSubmission = getLatestSubmission(
+        submissions,
+        teamRound.roundId
+      );
 
       // Check if the latest submission has a final score
       return latestSubmission && latestSubmission.finalScore !== undefined;
@@ -55,7 +58,10 @@ export function BulkTeamRoundUpdate({
     .map((teamRound) => {
       const teamId = teamRound.teamId || teamRound.team?.id || "";
       const submissions = teamSubmissions[teamId] || [];
-      const latestSubmission = getLatestSubmission(submissions);
+      const latestSubmission = getLatestSubmission(
+        submissions,
+        teamRound.roundId
+      );
 
       return {
         teamRound,
@@ -73,7 +79,10 @@ export function BulkTeamRoundUpdate({
       if (!teamId) return false;
 
       const submissions = teamSubmissions[teamId] || [];
-      const latestSubmission = getLatestSubmission(submissions);
+      const latestSubmission = getLatestSubmission(
+        submissions,
+        teamRound.roundId
+      );
 
       return !latestSubmission || latestSubmission.finalScore === undefined;
     }

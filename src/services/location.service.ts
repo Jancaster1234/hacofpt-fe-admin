@@ -36,7 +36,7 @@ class LocationService {
     try {
       const response = await apiService.auth.post<Location>(
         "/hackathon-service/api/v1/locations",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -66,7 +66,7 @@ class LocationService {
     try {
       const response = await apiService.auth.put<Location>(
         `/hackathon-service/api/v1/locations`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

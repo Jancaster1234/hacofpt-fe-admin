@@ -112,7 +112,7 @@ class HackathonService {
     try {
       const response = await apiService.auth.put<Hackathon>(
         "/hackathon-service/api/v1/hackathons",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {

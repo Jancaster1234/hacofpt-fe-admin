@@ -17,7 +17,7 @@ class MentorshipSessionRequestService {
     try {
       const response = await apiService.auth.post<MentorshipSessionRequest>(
         "/hackathon-service/api/v1/mentors/sessions",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -54,7 +54,7 @@ class MentorshipSessionRequestService {
     try {
       const response = await apiService.auth.put<MentorshipSessionRequest>(
         `/hackathon-service/api/v1/mentorships/sessions`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
