@@ -1,3 +1,4 @@
+// src/app/(protected)/thread-post-report-management/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";

@@ -4,6 +4,87 @@ import { SponsorshipHackathonDetail } from "@/types/entities/sponsorshipHackatho
 import { handleApiError } from "@/utils/errorHandler";
 
 class SponsorshipHackathonDetailService {
+  async getAllSponsorshipHackathonDetails(): Promise<{
+    data: SponsorshipHackathonDetail[];
+    message?: string;
+  }> {
+    try {
+      const response = await apiService.auth.get<SponsorshipHackathonDetail[]>(
+        "/hackathon-service/api/v1/sponsorships/details"
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve sponsorship hackathon details");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<SponsorshipHackathonDetail[]>(
+        error,
+        [],
+        "[Sponsorship Hackathon Detail Service] Error getting sponsorship hackathon details:"
+      );
+    }
+  }
+
+  async getSponsorshipHackathonDetailById(
+    id: string
+  ): Promise<{ data: SponsorshipHackathonDetail; message?: string }> {
+    try {
+      const response = await apiService.auth.get<SponsorshipHackathonDetail>(
+        `/hackathon-service/api/v1/sponsorships/details/${id}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error(
+          response?.message || "Failed to retrieve sponsorship hackathon detail"
+        );
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<SponsorshipHackathonDetail>(
+        error,
+        {} as SponsorshipHackathonDetail,
+        "[Sponsorship Hackathon Detail Service] Error getting sponsorship hackathon detail:"
+      );
+    }
+  }
+
+  async getSponsorshipHackathonDetailsBySponsorshipHackathonId(
+    sponsorshipHackathonId: string
+  ): Promise<{ data: SponsorshipHackathonDetail[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<SponsorshipHackathonDetail[]>(
+        `/hackathon-service/api/v1/sponsorships/details/sponsorshipHackathon/${sponsorshipHackathonId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error(
+          response?.message ||
+            "Failed to retrieve sponsorship hackathon details by sponsorship hackathon id"
+        );
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<SponsorshipHackathonDetail[]>(
+        error,
+        [],
+        "[Sponsorship Hackathon Detail Service] Error getting sponsorship hackathon details by sponsorship hackathon id:"
+      );
+    }
+  }
+
   async createSponsorshipHackathonDetail(data: {
     sponsorshipHackathonId: string;
     moneySpent: number;
@@ -106,6 +187,28 @@ class SponsorshipHackathonDetailService {
         {} as SponsorshipHackathonDetail,
         "[Sponsorship Hackathon Detail Service] Error updating sponsorship hackathon detail:"
       );
+    }
+  }
+
+  async deleteSponsorshipHackathonDetail(
+    id: string
+  ): Promise<{ message?: string }> {
+    try {
+      const response = await apiService.auth.delete(
+        `/hackathon-service/api/v1/sponsorships/details/${id}`
+      );
+
+      return {
+        message:
+          response.message ||
+          "Sponsorship hackathon detail deleted successfully",
+      };
+    } catch (error: any) {
+      console.error(
+        "[Sponsorship Hackathon Detail Service] Error deleting sponsorship hackathon detail:",
+        error.message
+      );
+      throw error;
     }
   }
 }
