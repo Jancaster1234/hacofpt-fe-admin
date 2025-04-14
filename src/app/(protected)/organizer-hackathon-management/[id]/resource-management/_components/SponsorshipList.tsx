@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/SponsorshipList.tsx
 import React from "react";
 import { Sponsorship } from "@/types/entities/sponsorship";
 import { formatDate } from "@/utils/dateFormatter";
@@ -27,6 +26,18 @@ const SponsorshipList: React.FC<SponsorshipListProps> = ({
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  // Format date to include both date and time
+  const formatDateTime = (dateTimeStr: string): string => {
+    const date = new Date(dateTimeStr);
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
@@ -85,8 +96,8 @@ const SponsorshipList: React.FC<SponsorshipListProps> = ({
                     ${sponsorship.money.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {formatDate(sponsorship.timeFrom)} -{" "}
-                    {formatDate(sponsorship.timeTo)}
+                    {formatDateTime(sponsorship.timeFrom)} -{" "}
+                    {formatDateTime(sponsorship.timeTo)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span

@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/SponsorshipForm.tsx
 import React, { useState, useEffect } from "react";
 import { Sponsorship } from "@/types/entities/sponsorship";
 import { sponsorshipService } from "@/services/sponsorship.service";
@@ -31,6 +30,20 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Format datetime string for input fields
+  const formatDateTimeForInput = (dateString: string): string => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().slice(0, 16); // Format as "YYYY-MM-DDThh:mm"
+  };
+
+  // Parse datetime from backend to local format
+  const parseDateTime = (dateString: string): string => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().slice(0, 16); // "YYYY-MM-DDThh:mm" format
+  };
+
   // Load sponsorship data if in edit mode
   useEffect(() => {
     if (sponsorship) {
@@ -39,8 +52,8 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
         brand: sponsorship.brand,
         content: sponsorship.content || "",
         money: sponsorship.money,
-        timeFrom: new Date(sponsorship.timeFrom).toISOString().split("T")[0],
-        timeTo: new Date(sponsorship.timeTo).toISOString().split("T")[0],
+        timeFrom: parseDateTime(sponsorship.timeFrom),
+        timeTo: parseDateTime(sponsorship.timeTo),
         status: sponsorship.status as
           | "PENDING"
           | "ACTIVE"
@@ -68,13 +81,25 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
     setError(null);
 
     try {
+      // Create a copy of form data to send to backend
+      const submissionData = {
+        ...formData,
+        // Ensure we have time component, default to 00:00:00 if not provided
+        timeFrom: formData.timeFrom.includes("T")
+          ? formData.timeFrom
+          : `${formData.timeFrom}T00:00:00`,
+        timeTo: formData.timeTo.includes("T")
+          ? formData.timeTo
+          : `${formData.timeTo}T00:00:00`,
+      };
+
       if (isEditMode) {
         await sponsorshipService.updateSponsorship({
           id: sponsorship?.id,
-          ...formData,
+          ...submissionData,
         });
       } else {
-        await sponsorshipService.createSponsorship(formData);
+        await sponsorshipService.createSponsorship(submissionData);
       }
       onSuccess();
     } catch (err: any) {
@@ -167,10 +192,10 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Start Date
+              Start Date & Time
             </label>
             <input
-              type="date"
+              type="datetime-local"
               name="timeFrom"
               value={formData.timeFrom}
               onChange={handleChange}
@@ -181,10 +206,10 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              End Date
+              End Date & Time
             </label>
             <input
-              type="date"
+              type="datetime-local"
               name="timeTo"
               value={formData.timeTo}
               onChange={handleChange}
