@@ -1,5 +1,6 @@
 // src/types/entities/sponsorshipHackathon.ts
 import { AuditBase } from "./auditBase";
+import { AuditCreatedBase } from "./auditCreatedBase";
 import { Hackathon } from "./hackathon";
 import { Sponsorship } from "./sponsorship";
 import { SponsorshipHackathonDetail } from "./sponsorshipHackathonDetail";
@@ -12,4 +13,4 @@ export type SponsorshipHackathon = {
   sponsorshipId?: string;
   totalMoney?: number;
   sponsorshipHackathonDetails?: SponsorshipHackathonDetail[];
-} & AuditBase;
+} & AuditCreatedBase;
