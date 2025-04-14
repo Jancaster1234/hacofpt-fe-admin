@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/SponsorshipForm.tsx
 import React, { useState, useEffect } from "react";
 import { Sponsorship } from "@/types/entities/sponsorship";
 import { sponsorshipService } from "@/services/sponsorship.service";

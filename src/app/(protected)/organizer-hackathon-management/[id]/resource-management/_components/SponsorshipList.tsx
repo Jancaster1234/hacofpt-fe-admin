@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/SponsorshipList.tsx
 import React from "react";
 import { Sponsorship } from "@/types/entities/sponsorship";
 import { formatDate } from "@/utils/dateFormatter";
