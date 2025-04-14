@@ -1,15 +1,18 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Sponsorship.tsx
 import React, { useState, useEffect } from "react";
-import { fetchMockSponsorships } from "../_mocks/fetchMockSponsorships";
 import { Sponsorship as SponsorshipType } from "@/types/entities/sponsorship";
+import { sponsorshipService } from "@/services/sponsorship.service";
 import SponsorshipList from "./SponsorshipList";
 import SponsorshipDetails from "./SponsorshipDetails";
+import SponsorshipForm from "./SponsorshipForm";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
 
 interface SponsorshipProps {
   hackathonId: string;
 }
+
+type ViewMode = "LIST" | "DETAILS" | "ADD" | "EDIT";
 
 const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
   const [sponsorships, setSponsorships] = useState<SponsorshipType[]>([]);
@@ -18,38 +21,87 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
   const [selectedSponsorshipId, setSelectedSponsorshipId] = useState<
     string | null
   >(null);
+  const [currentSponsorship, setCurrentSponsorship] = useState<
+    SponsorshipType | undefined
+  >(undefined);
+  const [viewMode, setViewMode] = useState<ViewMode>("LIST");
+
+  const loadSponsorships = async () => {
+    try {
+      setLoading(true);
+      const response = await sponsorshipService.getAllSponsorships();
+      setSponsorships(response.data);
+      setError(null);
+    } catch (err: any) {
+      setError(
+        err.message || "Failed to load sponsorships. Please try again later."
+      );
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadSponsorships = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchMockSponsorships();
-        setSponsorships(data);
-        setError(null);
-      } catch (err) {
-        setError("Failed to load sponsorships. Please try again later.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadSponsorships();
   }, []);
 
+  useEffect(() => {
+    const loadSponsorshipDetails = async () => {
+      if (selectedSponsorshipId) {
+        try {
+          setLoading(true);
+          const response = await sponsorshipService.getSponsorshipById(
+            selectedSponsorshipId
+          );
+          setCurrentSponsorship(response.data);
+        } catch (err: any) {
+          setError(err.message || "Failed to load sponsorship details");
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setCurrentSponsorship(undefined);
+      }
+    };
+
+    if (viewMode === "DETAILS" || viewMode === "EDIT") {
+      loadSponsorshipDetails();
+    }
+  }, [selectedSponsorshipId, viewMode]);
+
   const handleSelectSponsorship = (id: string) => {
     setSelectedSponsorshipId(id);
+    setViewMode("DETAILS");
   };
 
-  const handleBackToList = () => {
+  const handleAddNewSponsorship = () => {
+    setSelectedSponsorshipId(null);
+    setCurrentSponsorship(undefined);
+    setViewMode("ADD");
+  };
+
+  const handleEditSponsorship = () => {
+    setViewMode("EDIT");
+  };
+
+  const handleFormSuccess = () => {
+    loadSponsorships();
+    setViewMode("LIST");
     setSelectedSponsorshipId(null);
   };
 
-  if (loading) {
+  const handleBackToList = () => {
+    setViewMode("LIST");
+    setSelectedSponsorshipId(null);
+  };
+
+  if (loading && viewMode === "LIST") {
     return <LoadingSpinner />;
   }
 
-  if (error) {
+  if (error && viewMode === "LIST") {
     return <ErrorMessage message={error} />;
   }
 
@@ -59,16 +111,32 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
         Sponsorship Management
       </h2>
 
-      {selectedSponsorshipId ? (
-        <SponsorshipDetails
-          sponsorshipId={selectedSponsorshipId}
-          hackathonId={hackathonId}
-          onBack={handleBackToList}
-        />
-      ) : (
+      {viewMode === "LIST" && (
         <SponsorshipList
           sponsorships={sponsorships}
           onSelectSponsorship={handleSelectSponsorship}
+          onAddNewSponsorship={handleAddNewSponsorship}
+        />
+      )}
+
+      {viewMode === "DETAILS" && selectedSponsorshipId && (
+        <SponsorshipDetails
+          sponsorshipId={selectedSponsorshipId}
+          sponsorship={currentSponsorship}
+          hackathonId={hackathonId}
+          onBack={handleBackToList}
+          onEdit={handleEditSponsorship}
+          loading={loading}
+          error={error}
+        />
+      )}
+
+      {(viewMode === "ADD" || viewMode === "EDIT") && (
+        <SponsorshipForm
+          hackathonId={hackathonId}
+          sponsorship={currentSponsorship}
+          onSuccess={handleFormSuccess}
+          onCancel={handleBackToList}
         />
       )}
     </div>

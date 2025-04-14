@@ -6,11 +6,13 @@ import { formatDate } from "@/utils/dateFormatter";
 interface SponsorshipListProps {
   sponsorships: Sponsorship[];
   onSelectSponsorship: (id: string) => void;
+  onAddNewSponsorship: () => void;
 }
 
 const SponsorshipList: React.FC<SponsorshipListProps> = ({
   sponsorships,
   onSelectSponsorship,
+  onAddNewSponsorship,
 }) => {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
@@ -20,6 +22,8 @@ const SponsorshipList: React.FC<SponsorshipListProps> = ({
         return "bg-blue-100 text-blue-800";
       case "PENDING":
         return "bg-yellow-100 text-yellow-800";
+      case "CANCELLED":
+        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -29,7 +33,10 @@ const SponsorshipList: React.FC<SponsorshipListProps> = ({
     <div>
       <div className="mb-4 flex justify-between items-center">
         <h3 className="text-lg font-semibold">All Sponsorships</h3>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button
+          onClick={onAddNewSponsorship}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
           Add New Sponsorship
         </button>
       </div>
