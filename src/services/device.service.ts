@@ -7,12 +7,19 @@ import { FileUrl } from "@/types/entities/fileUrl";
 class DeviceService {
   async createDevice(data: {
     hackathonId: string;
-    roundId: string;
-    roundLocationId: string;
+    roundId?: string;
+    roundLocationId?: string;
     name: string;
     description?: string;
-    status: "AVAILABLE" | "IN_USE" | "DAMAGED" | "LOST" | "RETIRED" | "PENDING";
-    quantity: number;
+    status?:
+      | "AVAILABLE"
+      | "IN_USE"
+      | "DAMAGED"
+      | "LOST"
+      | "RETIRED"
+      | "PENDING";
+    quantity?: number;
+    files?: File[];
   }): Promise<{ data: Device; message?: string }> {
     try {
       const formData = new FormData();
@@ -24,6 +31,10 @@ class DeviceService {
       formData.append("description", data.description || "");
       formData.append("status", data.status);
       formData.append("quantity", String(data.quantity));
+
+      data.files.forEach((file) => {
+        formData.append("files", file);
+      });
 
       const response = await apiService.auth.post<Device>(
         "/identity-service/api/v1/devices",
@@ -51,18 +62,19 @@ class DeviceService {
     id: string,
     data: {
       hackathonId: string;
-      roundId: string;
-      roundLocationId: string;
+      roundId?: string;
+      roundLocationId?: string;
       name: string;
       description?: string;
-      status:
+      status?:
         | "AVAILABLE"
         | "IN_USE"
         | "DAMAGED"
         | "LOST"
         | "RETIRED"
         | "PENDING";
-      quantity: number;
+      quantity?: number;
+      files?: File[];
     }
   ): Promise<{ data: Device; message?: string }> {
     try {
@@ -75,6 +87,10 @@ class DeviceService {
       formData.append("description", data.description || "");
       formData.append("status", data.status);
       formData.append("quantity", String(data.quantity));
+
+      data.files.forEach((file) => {
+        formData.append("files", file);
+      });
 
       const response = await apiService.auth.put<Device>(
         `/identity-service/api/v1/devices/${id}`,

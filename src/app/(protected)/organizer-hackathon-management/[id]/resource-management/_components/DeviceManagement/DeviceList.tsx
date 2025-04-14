@@ -29,6 +29,7 @@ const DeviceList: React.FC<DeviceListProps> = ({
     description: "",
     status: "AVAILABLE" as DeviceStatus,
     files: [] as File[],
+    quantity: 1, // Default quantity
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -73,6 +74,7 @@ const DeviceList: React.FC<DeviceListProps> = ({
         description: "",
         status: "AVAILABLE" as DeviceStatus,
         files: [],
+        quantity: 1,
       });
       setErrors({});
     }
@@ -86,7 +88,7 @@ const DeviceList: React.FC<DeviceListProps> = ({
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: name === "quantity" ? parseInt(value) || 1 : value,
     });
 
     // Clear error for this field when user changes input
@@ -114,12 +116,8 @@ const DeviceList: React.FC<DeviceListProps> = ({
       newErrors.name = "Device name is required";
     }
 
-    if (!activeRound) {
-      newErrors.round = "Please select a round";
-    }
-
-    if (activeRound && !activeLocationId) {
-      newErrors.location = "Please select a location";
+    if (formData.quantity <= 0) {
+      newErrors.quantity = "Quantity must be at least 1";
     }
 
     setErrors(newErrors);
@@ -136,11 +134,13 @@ const DeviceList: React.FC<DeviceListProps> = ({
     try {
       const deviceData = {
         hackathonId,
+        // Make round and location optional now
         roundId: activeRound?.id || "",
         roundLocationId: activeLocationId || "",
         name: formData.name,
         description: formData.description,
         status: formData.status,
+        quantity: formData.quantity,
         files: formData.files,
       };
 
@@ -219,6 +219,25 @@ const DeviceList: React.FC<DeviceListProps> = ({
                 </select>
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Quantity
+                </label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleInputChange}
+                  min="1"
+                  className={`w-full px-3 py-2 border ${
+                    errors.quantity ? "border-red-500" : "border-gray-300"
+                  } rounded-md`}
+                />
+                {errors.quantity && (
+                  <p className="text-red-500 text-xs mt-1">{errors.quantity}</p>
+                )}
+              </div>
+
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
@@ -249,10 +268,15 @@ const DeviceList: React.FC<DeviceListProps> = ({
               </div>
             </div>
 
-            {(errors.round || errors.location) && (
-              <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded">
-                {errors.round && <p>{errors.round}</p>}
-                {errors.location && <p>{errors.location}</p>}
+            {activeRound && (
+              <div className="mb-4 p-3 bg-yellow-50 text-yellow-700 text-sm rounded">
+                <p>
+                  This device will be assigned to{" "}
+                  {activeLocationId
+                    ? `${getLocationName()} in ${activeRound.roundTitle}`
+                    : activeRound.roundTitle}
+                  . You can change this assignment later.
+                </p>
               </div>
             )}
 
