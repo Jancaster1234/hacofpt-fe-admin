@@ -24,5 +24,6 @@ export type Device = {
   name: string;
   description?: string;
   status: DeviceStatus;
+  quantity: number;
   fileUrls?: FileUrl[];
 } & AuditCreatedBase;

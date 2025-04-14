@@ -2,6 +2,7 @@
 import { apiService } from "@/services/apiService_v0";
 import { UserDevice } from "@/types/entities/userDevice";
 import { handleApiError } from "@/utils/errorHandler";
+import { FileUrl } from "@/types/entities/fileUrl";
 
 class UserDeviceService {
   async createUserDevice(data: {
@@ -10,7 +11,6 @@ class UserDeviceService {
     timeFrom: string;
     timeTo: string;
     status: "ASSIGNED" | "RETURNED" | "LOST" | "DAMAGED";
-    files: File[];
   }): Promise<{ data: UserDevice; message?: string }> {
     try {
       const formData = new FormData();
@@ -20,10 +20,6 @@ class UserDeviceService {
       formData.append("timeFrom", data.timeFrom);
       formData.append("timeTo", data.timeTo);
       formData.append("status", data.status);
-
-      data.files.forEach((file) => {
-        formData.append("files", file);
-      });
 
       const response = await apiService.auth.post<UserDevice>(
         "/identity-service/api/v1/user-devices",
@@ -55,7 +51,6 @@ class UserDeviceService {
       timeFrom: string;
       timeTo: string;
       status: "ASSIGNED" | "RETURNED" | "LOST" | "DAMAGED";
-      files: File[];
     }
   ): Promise<{ data: UserDevice; message?: string }> {
     try {
@@ -66,10 +61,6 @@ class UserDeviceService {
       formData.append("timeFrom", data.timeFrom);
       formData.append("timeTo", data.timeTo);
       formData.append("status", data.status);
-
-      data.files.forEach((file) => {
-        formData.append("files", file);
-      });
 
       const response = await apiService.auth.put<UserDevice>(
         `/identity-service/api/v1/user-devices/${id}`,
@@ -89,6 +80,41 @@ class UserDeviceService {
         error,
         {} as UserDevice,
         "[UserDevice Service] Error updating user device:"
+      );
+    }
+  }
+
+  async createUserDeviceFiles(
+    userDeviceId: string,
+    files: File[]
+  ): Promise<{ data: FileUrl[]; message?: string }> {
+    try {
+      const formData = new FormData();
+
+      files.forEach((file) => {
+        formData.append("files", file);
+      });
+
+      const response = await apiService.auth.post<FileUrl[]>(
+        `/identity-service/api/v1/user-devices/${userDeviceId}/files`,
+        formData
+      );
+
+      if (!response || !response.data) {
+        throw new Error(
+          response?.message || "Failed to add files to user device"
+        );
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "User device files added successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<FileUrl[]>(
+        error,
+        [],
+        "[UserDevice Service] Error adding files to user device:"
       );
     }
   }
