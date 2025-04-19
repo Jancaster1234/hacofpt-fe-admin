@@ -134,9 +134,14 @@ class SponsorshipHackathonDetailService {
     }
   ): Promise<{ data: SponsorshipHackathonDetail; message?: string }> {
     try {
+      const payload = {
+        ...data,
+        id,
+      };
+
       const response = await apiService.auth.put<SponsorshipHackathonDetail>(
-        `/hackathon-service/api/v1/sponsorships/details/${id}`,
-        { data: data }
+        "/hackathon-service/api/v1/sponsorships/details",
+        { data: payload }
       );
 
       if (!response || !response.data) {
