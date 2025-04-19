@@ -63,7 +63,7 @@ class SponsorshipHackathonDetailService {
   ): Promise<{ data: SponsorshipHackathonDetail[]; message?: string }> {
     try {
       const response = await apiService.auth.get<SponsorshipHackathonDetail[]>(
-        `/hackathon-service/api/v1/sponsorships/details/sponsorshipHackathon/${sponsorshipHackathonId}`
+        `/hackathon-service/api/v1/sponsorships/details/by-sponsorship-hackathon/${sponsorshipHackathonId}`
       );
 
       if (!response || !response.data) {
