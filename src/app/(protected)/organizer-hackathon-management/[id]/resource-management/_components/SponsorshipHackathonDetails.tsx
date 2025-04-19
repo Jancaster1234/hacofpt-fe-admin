@@ -172,6 +172,17 @@ const SponsorshipHackathonDetails: React.FC<
     );
   }
 
+  const formatDateTime = (dateTimeStr: string): string => {
+    const date = new Date(dateTimeStr);
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <button
@@ -268,7 +279,8 @@ const SponsorshipHackathonDetails: React.FC<
                     ${detail.moneySpent.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {formatDate(detail.timeFrom)} - {formatDate(detail.timeTo)}
+                    {formatDateTime(detail.timeFrom)} -{" "}
+                    {formatDateTime(detail.timeTo)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span

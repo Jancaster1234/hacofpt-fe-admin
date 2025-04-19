@@ -174,6 +174,17 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
     return <ErrorMessage message="Sponsorship not found" />;
   }
 
+  const formatDateTime = (dateTimeStr: string): string => {
+    const date = new Date(dateTimeStr);
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
     <div>
       <button
@@ -219,8 +230,8 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
           <div>
             <p className="text-sm text-gray-500">Period</p>
             <p className="font-medium">
-              {formatDate(sponsorship.timeFrom)} -{" "}
-              {formatDate(sponsorship.timeTo)}
+              {formatDateTime(sponsorship.timeFrom)} -{" "}
+              {formatDateTime(sponsorship.timeTo)}
             </p>
           </div>
           <div>
@@ -341,7 +352,7 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
                           {hackathon.createdByUserName || "Unknown"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {formatDate(hackathon.createdAt || "")}
+                          {formatDateTime(hackathon.createdAt || "")}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <button

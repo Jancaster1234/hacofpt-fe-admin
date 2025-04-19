@@ -27,10 +27,10 @@ const SponsorshipHackathonDetailForm: React.FC<
     status:
       (detail?.status as "PLANNED" | "COMPLETED" | "CANCELLED") || "PLANNED",
     timeFrom: detail?.timeFrom
-      ? new Date(detail.timeFrom).toISOString().split("T")[0]
+      ? new Date(detail.timeFrom).toISOString().slice(0, 16)
       : "",
     timeTo: detail?.timeTo
-      ? new Date(detail.timeTo).toISOString().split("T")[0]
+      ? new Date(detail.timeTo).toISOString().slice(0, 16)
       : "",
   });
 
@@ -94,7 +94,7 @@ const SponsorshipHackathonDetailForm: React.FC<
         </h3>
       </div>
 
-      {error && <ErrorMessage message={error} className="mb-4" />}
+      {error && <ErrorMessage message={error} />}
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
@@ -152,10 +152,10 @@ const SponsorshipHackathonDetailForm: React.FC<
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              From Date*
+              From Date & Time*
             </label>
             <input
-              type="date"
+              type="datetime-local"
               name="timeFrom"
               value={formData.timeFrom}
               onChange={handleChange}
@@ -166,10 +166,10 @@ const SponsorshipHackathonDetailForm: React.FC<
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              To Date*
+              To Date & Time*
             </label>
             <input
-              type="date"
+              type="datetime-local"
               name="timeTo"
               value={formData.timeTo}
               onChange={handleChange}
