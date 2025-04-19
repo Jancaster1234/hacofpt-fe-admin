@@ -34,8 +34,8 @@ class SponsorshipService {
     id: string
   ): Promise<{ data: Sponsorship; message?: string }> {
     try {
-      const response = await apiService.auth.get<Sponsorship>(
-        `/hackathon-service/api/v1/sponsorships/${id}`
+      const response = await apiService.auth.get<Sponsorship[]>(
+        `/hackathon-service/api/v1/sponsorships?id=${id}`
       );
 
       if (!response || !response.data) {
@@ -43,7 +43,7 @@ class SponsorshipService {
       }
 
       return {
-        data: response.data,
+        data: response.data[0],
         message: response.message,
       };
     } catch (error: any) {

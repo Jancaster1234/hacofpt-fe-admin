@@ -152,7 +152,7 @@ class DeviceService {
   ): Promise<{ data: Device[]; message?: string }> {
     try {
       const response = await apiService.auth.get<Device[]>(
-        `/identity-service/api/v1/devices?hackathonId=${hackathonId}`
+        `/identity-service/api/v1/devices/hackathon/${hackathonId}`
       );
 
       if (!response || !response.data) {
@@ -177,7 +177,7 @@ class DeviceService {
   ): Promise<{ data: Device[]; message?: string }> {
     try {
       const response = await apiService.auth.get<Device[]>(
-        `/identity-service/api/v1/devices?roundId=${roundId}`
+        `/identity-service/api/v1/devices/round/${roundId}`
       );
 
       if (!response || !response.data) {
@@ -202,7 +202,7 @@ class DeviceService {
   ): Promise<{ data: Device[]; message?: string }> {
     try {
       const response = await apiService.auth.get<Device[]>(
-        `/identity-service/api/v1/devices?roundLocationId=${roundLocationId}`
+        `/identity-service/api/v1/devices/round-location/${roundLocationId}`
       );
 
       if (!response || !response.data) {
