@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Device, DeviceStatus } from "@/types/entities/device";
 import { Round } from "@/types/entities/round";
 import DeviceItem from "./DeviceItem";
+import DeviceForm from "./DeviceForm";
 import { deviceService } from "@/services/device.service";
 
 interface DeviceListProps {
@@ -24,14 +25,7 @@ const DeviceList: React.FC<DeviceListProps> = ({
 }) => {
   const [expandedDeviceIds, setExpandedDeviceIds] = useState<string[]>([]);
   const [isAddingDevice, setIsAddingDevice] = useState<boolean>(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    status: "AVAILABLE" as DeviceStatus,
-    files: [] as File[],
-    quantity: 1, // Default quantity
-  });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [formError, setFormError] = useState<string | null>(null);
 
   const toggleDeviceExpansion = (deviceId: string) => {
     if (expandedDeviceIds.includes(deviceId)) {
@@ -67,76 +61,15 @@ const DeviceList: React.FC<DeviceListProps> = ({
 
   const toggleAddDeviceForm = () => {
     setIsAddingDevice(!isAddingDevice);
-    // Reset form when toggling
-    if (!isAddingDevice) {
-      setFormData({
-        name: "",
-        description: "",
-        status: "AVAILABLE" as DeviceStatus,
-        files: [],
-        quantity: 1,
-      });
-      setErrors({});
-    }
+    setFormError(null);
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: name === "quantity" ? parseInt(value) || 1 : value,
-    });
-
-    // Clear error for this field when user changes input
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: "",
-      });
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFormData({
-        ...formData,
-        files: Array.from(e.target.files),
-      });
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = "Device name is required";
-    }
-
-    if (formData.quantity <= 0) {
-      newErrors.quantity = "Quantity must be at least 1";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+  const handleSubmitDevice = async (formData: any) => {
     try {
       const deviceData = {
         hackathonId,
-        // Make round and location optional now
-        roundId: activeRound?.id || "",
-        roundLocationId: activeLocationId || "",
+        roundId: formData.roundId || "",
+        roundLocationId: formData.roundLocationId || "",
         name: formData.name,
         description: formData.description,
         status: formData.status,
@@ -152,10 +85,8 @@ const DeviceList: React.FC<DeviceListProps> = ({
       }
     } catch (error) {
       console.error("Error creating device:", error);
-      setErrors({
-        ...errors,
-        form: "Failed to create device. Please try again.",
-      });
+      setFormError("Failed to create device. Please try again.");
+      throw error;
     }
   };
 
@@ -177,131 +108,20 @@ const DeviceList: React.FC<DeviceListProps> = ({
       </div>
 
       {isAddingDevice && (
-        <div className="bg-gray-50 p-4 rounded-md mb-6">
+        <div className="mb-6">
           <h4 className="text-md font-medium mb-4">Add New Device</h4>
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Device Name*
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border ${
-                    errors.name ? "border-red-500" : "border-gray-300"
-                  } rounded-md`}
-                  placeholder="Enter device name"
-                />
-                {errors.name && (
-                  <p className="text-red-500 text-xs mt-1">{errors.name}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                >
-                  <option value="AVAILABLE">AVAILABLE</option>
-                  <option value="IN_USE">IN USE</option>
-                  <option value="DAMAGED">DAMAGED</option>
-                  <option value="LOST">LOST</option>
-                  <option value="RETIRED">RETIRED</option>
-                  <option value="PENDING">PENDING</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Quantity
-                </label>
-                <input
-                  type="number"
-                  name="quantity"
-                  value={formData.quantity}
-                  onChange={handleInputChange}
-                  min="1"
-                  className={`w-full px-3 py-2 border ${
-                    errors.quantity ? "border-red-500" : "border-gray-300"
-                  } rounded-md`}
-                />
-                {errors.quantity && (
-                  <p className="text-red-500 text-xs mt-1">{errors.quantity}</p>
-                )}
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  rows={3}
-                  placeholder="Enter device description"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Device Files
-                </label>
-                <input
-                  type="file"
-                  multiple
-                  onChange={handleFileChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Upload device manuals, specifications, etc.
-                </p>
-              </div>
+          <DeviceForm
+            hackathonId={hackathonId}
+            activeRound={activeRound}
+            activeLocationId={activeLocationId}
+            onSubmit={handleSubmitDevice}
+            onCancel={toggleAddDeviceForm}
+          />
+          {formError && (
+            <div className="mt-2 p-3 bg-red-50 text-red-600 text-sm rounded">
+              {formError}
             </div>
-
-            {activeRound && (
-              <div className="mb-4 p-3 bg-yellow-50 text-yellow-700 text-sm rounded">
-                <p>
-                  This device will be assigned to{" "}
-                  {activeLocationId
-                    ? `${getLocationName()} in ${activeRound.roundTitle}`
-                    : activeRound.roundTitle}
-                  . You can change this assignment later.
-                </p>
-              </div>
-            )}
-
-            {errors.form && (
-              <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded">
-                {errors.form}
-              </div>
-            )}
-
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={toggleAddDeviceForm}
-                className="mr-2 px-4 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded-md"
-              >
-                Create Device
-              </button>
-            </div>
-          </form>
+          )}
         </div>
       )}
 

@@ -6,11 +6,11 @@ import { UserDevice } from "@/types/entities/userDevice";
 import { User } from "@/types/entities/user";
 import DeviceFiles from "./DeviceFiles";
 import UserDevicesTabs from "./UserDevicesTabs";
+import DeviceForm from "./DeviceForm";
 import { fileUrlService } from "@/services/fileUrl.service";
 import { userDeviceService } from "@/services/userDevice.service";
 import { userService } from "@/services/user.service";
 import { deviceService } from "@/services/device.service";
-import { useRouter } from "next/navigation";
 
 interface DeviceItemProps {
   device: Device;
@@ -27,7 +27,6 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
   hackathonId,
   onDeviceDeleted,
 }) => {
-  const router = useRouter();
   // Device files state
   const [deviceFiles, setDeviceFiles] = useState<FileUrl[]>([]);
   const [loadingDeviceFiles, setLoadingDeviceFiles] = useState<boolean>(false);
@@ -42,8 +41,10 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
   // User info state
   const [userInfo, setUserInfo] = useState<{ [userId: string]: User }>({});
 
-  // Delete loading state
+  // Delete and edit loading state
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isExpanded) {
@@ -122,9 +123,41 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
 
   const handleEditDevice = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(
-      `/organizer-hackathon-management/${hackathonId}/resource-management/devices/edit/${device.id}`
-    );
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setUpdateError(null);
+  };
+
+  const handleUpdateDevice = async (formData: any) => {
+    try {
+      const deviceData = {
+        hackathonId,
+        roundId: formData.roundId || "",
+        roundLocationId: formData.roundLocationId || "",
+        name: formData.name,
+        description: formData.description,
+        status: formData.status,
+        quantity: formData.quantity,
+        files: formData.files || [],
+      };
+
+      const response = await deviceService.updateDevice(device.id, deviceData);
+
+      if (response.data) {
+        // Update the device in the parent component
+        // For now we'll just close the edit form and refresh the page
+        // In a real app, you might want to update the device in the parent's state
+        setIsEditing(false);
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error(`Error updating device ${device.id}:`, error);
+      setUpdateError("Failed to update device. Please try again.");
+      throw error;
+    }
   };
 
   const handleDeleteDevice = async (e: React.MouseEvent) => {
@@ -150,6 +183,17 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
     e.stopPropagation();
     // Keep the alert for now as requested
     alert(`Upload files for device ${device.id}`);
+  };
+
+  // Prepare initial data for the form
+  const initialDeviceData = {
+    id: device.id,
+    name: device.name,
+    description: device.description || "",
+    status: device.status,
+    quantity: device.quantity || 1,
+    roundId: device.roundId || "",
+    roundLocationId: device.roundLocationId || "",
   };
 
   // Render status badge
@@ -197,53 +241,85 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
 
       {isExpanded && (
         <>
-          <div className="mt-4 ml-14 grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-gray-500">Created by</p>
-              <p>{device.createdByUserName}</p>
+          {isEditing ? (
+            <div className="mt-4 ml-14">
+              <h4 className="text-md font-medium mb-4">Edit Device</h4>
+              <DeviceForm
+                hackathonId={hackathonId}
+                initialData={initialDeviceData}
+                onSubmit={handleUpdateDevice}
+                onCancel={handleCancelEdit}
+                submitButtonText="Update Device"
+              />
+              {updateError && (
+                <div className="mt-2 p-3 bg-red-50 text-red-600 text-sm rounded">
+                  {updateError}
+                </div>
+              )}
             </div>
-            <div>
-              <p className="text-gray-500">Last updated</p>
-              <p>{new Date(device.updatedAt).toLocaleDateString()}</p>
-            </div>
-          </div>
+          ) : (
+            <>
+              <div className="mt-4 ml-14 grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-500">Created by</p>
+                  <p>{device.createdByUserName}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Last updated</p>
+                  <p>{new Date(device.updatedAt).toLocaleDateString()}</p>
+                </div>
+                {device.roundId && (
+                  <div>
+                    <p className="text-gray-500">Round</p>
+                    <p>{device.roundName}</p>
+                  </div>
+                )}
+                {device.roundLocationId && (
+                  <div>
+                    <p className="text-gray-500">Location</p>
+                    <p>{device.locationName}</p>
+                  </div>
+                )}
+              </div>
 
-          {/* Device files */}
-          <DeviceFiles files={deviceFiles} isLoading={loadingDeviceFiles} />
+              {/* Device files */}
+              <DeviceFiles files={deviceFiles} isLoading={loadingDeviceFiles} />
 
-          {/* User devices */}
-          <UserDevicesTabs
-            userDevices={userDevices}
-            isLoading={loadingUserDevices}
-            activeUserDeviceId={activeUserDeviceId}
-            userInfo={userInfo}
-            onUserDeviceSelect={handleUserDeviceSelect}
-            hackathonId={hackathonId}
-          />
+              {/* User devices */}
+              <UserDevicesTabs
+                userDevices={userDevices}
+                isLoading={loadingUserDevices}
+                activeUserDeviceId={activeUserDeviceId}
+                userInfo={userInfo}
+                onUserDeviceSelect={handleUserDeviceSelect}
+                hackathonId={hackathonId}
+              />
 
-          <div className="mt-4 ml-14 flex gap-2">
-            <button
-              className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
-              onClick={handleEditDevice}
-              disabled={isDeleting}
-            >
-              Edit
-            </button>
-            <button
-              className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
-              onClick={handleUploadFiles}
-              disabled={isDeleting}
-            >
-              Upload Files
-            </button>
-            <button
-              className="bg-red-100 hover:bg-red-200 text-red-800 py-1 px-3 rounded text-sm"
-              onClick={handleDeleteDevice}
-              disabled={isDeleting}
-            >
-              {isDeleting ? "Deleting..." : "Delete"}
-            </button>
-          </div>
+              <div className="mt-4 ml-14 flex gap-2">
+                <button
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
+                  onClick={handleEditDevice}
+                  disabled={isDeleting}
+                >
+                  Edit
+                </button>
+                <button
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
+                  onClick={handleUploadFiles}
+                  disabled={isDeleting || isEditing}
+                >
+                  Upload Files
+                </button>
+                <button
+                  className="bg-red-100 hover:bg-red-200 text-red-800 py-1 px-3 rounded text-sm"
+                  onClick={handleDeleteDevice}
+                  disabled={isDeleting || isEditing}
+                >
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </>
+          )}
         </>
       )}
     </li>
