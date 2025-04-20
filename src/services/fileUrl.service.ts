@@ -134,7 +134,7 @@ class FileUrlService {
   ): Promise<{ data: FileUrl[]; message?: string }> {
     try {
       const response = await apiService.auth.get<FileUrl[]>(
-        `/identity-service/api/v1/devices/file-urls/${deviceId}`
+        `/identity-service/api/v1/devices/${deviceId}/file-urls`
       );
 
       if (!response || !response.data) {
