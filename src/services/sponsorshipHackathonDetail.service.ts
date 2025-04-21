@@ -140,7 +140,7 @@ class SponsorshipHackathonDetailService {
       };
 
       const response = await apiService.auth.put<SponsorshipHackathonDetail>(
-        "/hackathon-service/api/v1/sponsorships/details",
+        "/hackathon-service/api/v1/sponsorships/details/update-info",
         { data: payload }
       );
 

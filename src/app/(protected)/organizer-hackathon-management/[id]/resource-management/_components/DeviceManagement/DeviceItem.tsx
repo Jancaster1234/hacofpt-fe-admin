@@ -143,7 +143,7 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
         quantity: formData.quantity,
         files: formData.files || [],
       };
-
+      console.log("🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹Device data to update:", deviceData); // Debugging line
       const response = await deviceService.updateDevice(device.id, deviceData);
 
       if (response.data) {
