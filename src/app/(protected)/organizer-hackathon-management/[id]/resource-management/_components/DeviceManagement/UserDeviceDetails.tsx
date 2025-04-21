@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/UserDeviceDetails.tsx
 import React, { useState, useEffect } from "react";
 import { UserDevice } from "@/types/entities/userDevice";
 import { User } from "@/types/entities/user";
@@ -37,48 +38,52 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
   const user = userDevice.userId ? userInfo[userDevice.userId] : null;
 
   useEffect(() => {
-    const loadTracks = async () => {
-      setLoadingTracks(true);
-      try {
-        const response =
-          await userDeviceTrackService.getUserDeviceTracksByUserDeviceId(
-            userDevice.id
-          );
-        if (response.data) {
-          setTracks(response.data);
-        }
-      } catch (error) {
-        console.error(
-          `Error fetching user device tracks for ${userDevice.id}:`,
-          error
-        );
-      } finally {
-        setLoadingTracks(false);
-      }
-    };
+    loadTracksAndFiles();
+  }, [userDevice.id]);
 
-    const loadFiles = async () => {
-      setLoadingFiles(true);
-      try {
-        const response = await fileUrlService.getFileUrlsByUserDeviceId(
-          userDevice.id
-        );
-        if (response.data) {
-          setUserDeviceFiles(response.data);
-        }
-      } catch (error) {
-        console.error(
-          `Error fetching files for user device ${userDevice.id}:`,
-          error
-        );
-      } finally {
-        setLoadingFiles(false);
-      }
-    };
-
+  const loadTracksAndFiles = () => {
     loadTracks();
     loadFiles();
-  }, [userDevice.id]);
+  };
+
+  const loadTracks = async () => {
+    setLoadingTracks(true);
+    try {
+      const response =
+        await userDeviceTrackService.getUserDeviceTracksByUserDeviceId(
+          userDevice.id
+        );
+      if (response.data) {
+        setTracks(response.data);
+      }
+    } catch (error) {
+      console.error(
+        `Error fetching user device tracks for ${userDevice.id}:`,
+        error
+      );
+    } finally {
+      setLoadingTracks(false);
+    }
+  };
+
+  const loadFiles = async () => {
+    setLoadingFiles(true);
+    try {
+      const response = await fileUrlService.getFileUrlsByUserDeviceId(
+        userDevice.id
+      );
+      if (response.data) {
+        setUserDeviceFiles(response.data);
+      }
+    } catch (error) {
+      console.error(
+        `Error fetching files for user device ${userDevice.id}:`,
+        error
+      );
+    } finally {
+      setLoadingFiles(false);
+    }
+  };
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -136,39 +141,15 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
   };
 
   const handleTrackCreated = () => {
-    // Refresh tracks after a new one is created
-    userDeviceTrackService
-      .getUserDeviceTracksByUserDeviceId(userDevice.id)
-      .then((response) => {
-        if (response.data) {
-          setTracks(response.data);
-        }
-      })
-      .catch((error) => console.error("Error refreshing tracks:", error));
+    loadTracks();
   };
 
   const handleTrackUpdated = () => {
-    // Refresh tracks after one is updated
-    userDeviceTrackService
-      .getUserDeviceTracksByUserDeviceId(userDevice.id)
-      .then((response) => {
-        if (response.data) {
-          setTracks(response.data);
-        }
-      })
-      .catch((error) => console.error("Error refreshing tracks:", error));
+    loadTracks();
   };
 
   const handleTrackDeleted = () => {
-    // Refresh tracks after one is deleted
-    userDeviceTrackService
-      .getUserDeviceTracksByUserDeviceId(userDevice.id)
-      .then((response) => {
-        if (response.data) {
-          setTracks(response.data);
-        }
-      })
-      .catch((error) => console.error("Error refreshing tracks:", error));
+    loadTracks();
   };
 
   // Initial data for the form
@@ -228,13 +209,13 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
             </p>
             <p className="text-sm">To: {formatDateTime(userDevice.timeTo)}</p>
             <p className="text-sm">
-              Created by: {userDevice.createdByUserName}
+              Created by: {userDevice.createdByUserName || "Unknown"}
             </p>
           </div>
 
           {/* Assignment Files */}
           <div className="mb-4">
-            <h5 className="font-medium">Assignment Files</h5>
+            <h5 className="font-medium mb-2">Assignment Files</h5>
             {loadingFiles ? (
               <p className="text-sm text-gray-500">Loading files...</p>
             ) : userDeviceFiles.length > 0 ? (
