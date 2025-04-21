@@ -56,8 +56,8 @@ const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
       const response = await userDeviceService.createUserDevice({
         userId: formData.userId,
         deviceId: formData.deviceId,
-        timeFrom: formData.timeFrom,
-        timeTo: formData.timeTo,
+        timeFrom: formData.timeFrom, // Now properly formatted as ISO string
+        timeTo: formData.timeTo, // Now properly formatted as ISO string
         status: formData.status,
       });
 

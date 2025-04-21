@@ -63,7 +63,7 @@ class UserDeviceService {
       formData.append("timeTo", data.timeTo);
       formData.append("status", data.status);
 
-      data.files.forEach((file) => {
+      data.files?.forEach((file) => {
         formData.append("files", file);
       });
 

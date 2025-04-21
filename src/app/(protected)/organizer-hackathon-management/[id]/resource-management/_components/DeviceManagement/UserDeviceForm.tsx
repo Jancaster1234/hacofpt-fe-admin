@@ -28,10 +28,35 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
   onCancel,
   submitButtonText,
 }) => {
+  // Format initial date and time
+  const formatInitialDateTime = (dateTimeString: string) => {
+    if (!dateTimeString) return { date: "", time: "" };
+
+    try {
+      const dateTime = new Date(dateTimeString);
+      const date = dateTime.toISOString().split("T")[0];
+      const time = dateTime.toISOString().split("T")[1].substring(0, 5);
+      return { date, time };
+    } catch (e) {
+      return { date: "", time: "" };
+    }
+  };
+
+  const initialTimeFrom = formatInitialDateTime(
+    initialData?.timeFrom || new Date().toISOString()
+  );
+  const initialTimeTo = formatInitialDateTime(initialData?.timeTo || "");
+
   const [formData, setFormData] = useState({
     userId: initialData?.userId || "",
-    timeFrom: initialData?.timeFrom || new Date().toISOString().split("T")[0],
-    timeTo: initialData?.timeTo || "",
+    timeFrom: {
+      date: initialTimeFrom.date,
+      time: initialTimeFrom.time || "08:00",
+    },
+    timeTo: {
+      date: initialTimeTo.date,
+      time: initialTimeTo.time || "18:00",
+    },
     status: initialData?.status || "ASSIGNED",
     files: [] as File[],
   });
@@ -70,7 +95,20 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    // Handle date and time inputs
+    if (name.includes(".")) {
+      const [fieldName, subField] = name.split(".");
+      setFormData((prev) => ({
+        ...prev,
+        [fieldName]: {
+          ...prev[fieldName as keyof typeof prev],
+          [subField]: value,
+        },
+      }));
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,10 +126,16 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
     setError(null);
 
     try {
+      // Combine date and time into ISO strings
+      const timeFromISO = `${formData.timeFrom.date}T${formData.timeFrom.time}:00`;
+      const timeToISO = `${formData.timeTo.date}T${formData.timeTo.time}:00`;
+
       // Add deviceId to the form data
       const submitData = {
         ...formData,
         deviceId,
+        timeFrom: timeFromISO,
+        timeTo: timeToISO,
       };
 
       await onSubmit(submitData);
@@ -140,44 +184,68 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
         )}
       </div>
 
-      {/* Time From */}
+      {/* Time From - date and time */}
       <div>
         <label
-          htmlFor="timeFrom"
+          htmlFor="timeFrom.date"
           className="block text-sm font-medium text-gray-700"
         >
-          Start Date
+          Start Date & Time
         </label>
-        <input
-          type="date"
-          id="timeFrom"
-          name="timeFrom"
-          value={formData.timeFrom}
-          onChange={handleChange}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          required
-          disabled={isSubmitting}
-        />
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="date"
+            id="timeFrom.date"
+            name="timeFrom.date"
+            value={formData.timeFrom.date}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            required
+            disabled={isSubmitting}
+          />
+          <input
+            type="time"
+            id="timeFrom.time"
+            name="timeFrom.time"
+            value={formData.timeFrom.time}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            required
+            disabled={isSubmitting}
+          />
+        </div>
       </div>
 
-      {/* Time To */}
+      {/* Time To - date and time */}
       <div>
         <label
-          htmlFor="timeTo"
+          htmlFor="timeTo.date"
           className="block text-sm font-medium text-gray-700"
         >
-          End Date
+          End Date & Time
         </label>
-        <input
-          type="date"
-          id="timeTo"
-          name="timeTo"
-          value={formData.timeTo}
-          onChange={handleChange}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          required
-          disabled={isSubmitting}
-        />
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="date"
+            id="timeTo.date"
+            name="timeTo.date"
+            value={formData.timeTo.date}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            required
+            disabled={isSubmitting}
+          />
+          <input
+            type="time"
+            id="timeTo.time"
+            name="timeTo.time"
+            value={formData.timeTo.time}
+            onChange={handleChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            required
+            disabled={isSubmitting}
+          />
+        </div>
       </div>
 
       {/* Status */}

@@ -68,8 +68,8 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
       const updateData = {
         userId: formData.userId,
         deviceId: userDevice.deviceId,
-        timeFrom: formData.timeFrom,
-        timeTo: formData.timeTo,
+        timeFrom: formData.timeFrom, // Now properly formatted as ISO string
+        timeTo: formData.timeTo, // Now properly formatted as ISO string
         status: formData.status,
       };
 
