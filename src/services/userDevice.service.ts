@@ -11,6 +11,7 @@ class UserDeviceService {
     timeFrom: string;
     timeTo: string;
     status: "ASSIGNED" | "RETURNED" | "LOST" | "DAMAGED";
+    files?: File[];
   }): Promise<{ data: UserDevice; message?: string }> {
     try {
       const formData = new FormData();
@@ -20,6 +21,10 @@ class UserDeviceService {
       formData.append("timeFrom", data.timeFrom);
       formData.append("timeTo", data.timeTo);
       formData.append("status", data.status);
+
+      data.files?.forEach((file) => {
+        formData.append("files", file);
+      });
 
       const response = await apiService.auth.post<UserDevice>(
         "/identity-service/api/v1/user-devices",

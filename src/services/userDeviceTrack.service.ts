@@ -17,6 +17,7 @@ class UserDeviceTrackService {
       | "REPAIRED"
       | "LOST";
     note?: string;
+    files?: File[];
   }): Promise<{ data: UserDeviceTrack; message?: string }> {
     try {
       const formData = new FormData();
@@ -24,6 +25,10 @@ class UserDeviceTrackService {
       formData.append("userDeviceId", data.userDeviceId);
       formData.append("deviceQualityStatus", data.deviceQualityStatus);
       if (data.note) formData.append("note", data.note);
+
+      data.files?.forEach((file) => {
+        formData.append("files", file);
+      });
 
       const response = await apiService.auth.post<UserDeviceTrack>(
         "/identity-service/api/v1/user-device-tracks",
@@ -63,6 +68,7 @@ class UserDeviceTrackService {
         | "REPAIRED"
         | "LOST";
       note?: string;
+      files?: File[];
     }
   ): Promise<{ data: UserDeviceTrack; message?: string }> {
     try {
@@ -71,6 +77,10 @@ class UserDeviceTrackService {
       formData.append("userDeviceId", data.userDeviceId);
       formData.append("deviceQualityStatus", data.deviceQualityStatus);
       if (data.note) formData.append("note", data.note);
+
+      data.files?.forEach((file) => {
+        formData.append("files", file);
+      });
 
       const response = await apiService.auth.put<UserDeviceTrack>(
         `/identity-service/api/v1/user-device-tracks/${id}`,

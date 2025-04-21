@@ -32,7 +32,7 @@ class DeviceService {
       formData.append("status", data.status);
       formData.append("quantity", String(data.quantity));
 
-      data.files.forEach((file) => {
+      data.files?.forEach((file) => {
         formData.append("files", file);
       });
 
