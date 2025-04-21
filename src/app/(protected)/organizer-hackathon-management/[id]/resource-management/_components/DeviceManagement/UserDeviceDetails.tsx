@@ -8,6 +8,8 @@ import { fetchMockUserDeviceTracks } from "../../_mocks/fetchMockUserDeviceTrack
 import { UserDeviceTrack } from "@/types/entities/userDeviceTrack";
 import UserDeviceForm from "./UserDeviceForm";
 import { userDeviceService } from "@/services/userDevice.service";
+import { FileUrl } from "@/types/entities/fileUrl";
+import { fileUrlService } from "@/services/fileUrl.service";
 
 interface UserDeviceDetailsProps {
   userDevice: UserDevice;
@@ -28,6 +30,8 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
   const [loadingTracks, setLoadingTracks] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [userDeviceFiles, setUserDeviceFiles] = useState<FileUrl[]>([]);
+  const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
 
   // Get the user from userInfo
   const user = userDevice.userId ? userInfo[userDevice.userId] : null;
@@ -50,7 +54,27 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
       }
     };
 
+    const loadFiles = async () => {
+      setLoadingFiles(true);
+      try {
+        const response = await fileUrlService.getFileUrlsByUserDeviceId(
+          userDevice.id
+        );
+        if (response.data) {
+          setUserDeviceFiles(response.data);
+        }
+      } catch (error) {
+        console.error(
+          `Error fetching files for user device ${userDevice.id}:`,
+          error
+        );
+      } finally {
+        setLoadingFiles(false);
+      }
+    };
+
     loadTracks();
+    loadFiles();
   }, [userDevice.id]);
 
   const handleEditClick = () => {
@@ -71,6 +95,7 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
         timeFrom: formData.timeFrom, // Now properly formatted as ISO string
         timeTo: formData.timeTo, // Now properly formatted as ISO string
         status: formData.status,
+        files: formData.files || [],
       };
 
       const response = await userDeviceService.updateUserDevice(
@@ -113,6 +138,34 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
     timeFrom: userDevice.timeFrom || "",
     timeTo: userDevice.timeTo || "",
     status: userDevice.status || "ASSIGNED",
+  };
+
+  // Render file list
+  const renderFiles = () => {
+    if (loadingFiles) {
+      return <p className="text-sm text-gray-500">Loading files...</p>;
+    }
+
+    if (userDeviceFiles.length === 0) {
+      return <p className="text-sm text-gray-500">No files attached</p>;
+    }
+
+    return (
+      <ul className="text-sm">
+        {userDeviceFiles.map((file) => (
+          <li key={file.id} className="mb-1">
+            <a
+              href={file.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              {file.fileName}
+            </a>
+          </li>
+        ))}
+      </ul>
+    );
   };
 
   return (
@@ -166,6 +219,12 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
             <p className="text-sm">
               Created by: {userDevice.createdByUserName}
             </p>
+          </div>
+
+          {/* Assignment Files */}
+          <div className="mb-4">
+            <h5 className="font-medium">Assignment Files</h5>
+            {renderFiles()}
           </div>
 
           {/* User device tracks */}

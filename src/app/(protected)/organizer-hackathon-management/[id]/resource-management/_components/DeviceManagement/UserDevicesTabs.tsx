@@ -59,6 +59,7 @@ const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
         timeFrom: formData.timeFrom, // Now properly formatted as ISO string
         timeTo: formData.timeTo, // Now properly formatted as ISO string
         status: formData.status,
+        files: formData.files || [], // Add files to create request
       });
 
       if (response.data) {

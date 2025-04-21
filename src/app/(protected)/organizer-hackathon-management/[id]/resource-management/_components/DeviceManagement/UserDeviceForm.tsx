@@ -58,7 +58,7 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
       time: initialTimeTo.time || "18:00",
     },
     status: initialData?.status || "ASSIGNED",
-    files: [] as File[],
+    files: initialData?.files || ([] as File[]),
   });
 
   const [organizers, setOrganizers] = useState<User[]>([]);
@@ -289,6 +289,12 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
           multiple
           disabled={isSubmitting}
         />
+        {initialData?.id && (
+          <p className="text-xs text-gray-500 mt-1">
+            Upload new files to add to this assignment. Existing files will be
+            preserved.
+          </p>
+        )}
       </div>
 
       {/* Form Actions */}
