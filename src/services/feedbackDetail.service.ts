@@ -10,7 +10,7 @@ class FeedbackDetailService {
   }> {
     try {
       const response = await apiService.auth.get<FeedbackDetail[]>(
-        "/feedback-service/api/v1/feedback-details"
+        "/analytics-service/api/v1/feedback-details"
       );
 
       if (!response || !response.data) {
@@ -35,7 +35,7 @@ class FeedbackDetailService {
   ): Promise<{ data: FeedbackDetail; message?: string }> {
     try {
       const response = await apiService.auth.get<FeedbackDetail>(
-        `/feedback-service/api/v1/feedback-details/${id}`
+        `/analytics-service/api/v1/feedback-details/${id}`
       );
 
       if (!response || !response.data) {
@@ -62,7 +62,7 @@ class FeedbackDetailService {
   ): Promise<{ data: FeedbackDetail[]; message?: string }> {
     try {
       const response = await apiService.auth.get<FeedbackDetail[]>(
-        `/feedback-service/api/v1/feedback-details/by-feedback?feedbackId=${feedbackId}`
+        `/analytics-service/api/v1/feedback-details/by-feedback?feedbackId=${feedbackId}`
       );
 
       if (!response || !response.data) {
@@ -91,7 +91,7 @@ class FeedbackDetailService {
   }): Promise<{ data: FeedbackDetail; message?: string }> {
     try {
       const response = await apiService.auth.post<FeedbackDetail>(
-        "/feedback-service/api/v1/feedback-details",
+        "/analytics-service/api/v1/feedback-details",
         { data: data }
       );
 
@@ -126,7 +126,7 @@ class FeedbackDetailService {
   ): Promise<{ data: FeedbackDetail; message?: string }> {
     try {
       const response = await apiService.auth.put<FeedbackDetail>(
-        `/feedback-service/api/v1/feedback-details/${id}`,
+        `/analytics-service/api/v1/feedback-details/${id}`,
         { data: data }
       );
 
@@ -152,7 +152,7 @@ class FeedbackDetailService {
   async deleteFeedbackDetail(id: string): Promise<{ message?: string }> {
     try {
       const response = await apiService.auth.delete(
-        `/feedback-service/api/v1/feedback-details/${id}`
+        `/analytics-service/api/v1/feedback-details/${id}`
       );
 
       return {
@@ -177,9 +177,16 @@ class FeedbackDetailService {
     }>
   ): Promise<{ data: FeedbackDetail[]; message?: string }> {
     try {
+      const payload = {
+        data: details.map((detail) => ({
+          ...detail,
+          feedbackId: Number(feedbackId),
+        })),
+      };
+
       const response = await apiService.auth.post<FeedbackDetail[]>(
-        `/feedback-service/api/v1/feedback-details/bulk?feedbackId=${feedbackId}`,
-        { details }
+        "/analytics-service/api/v1/feedback-details/bulk",
+        payload
       );
 
       if (!response || !response.data) {
@@ -214,7 +221,7 @@ class FeedbackDetailService {
   ): Promise<{ data: FeedbackDetail[]; message?: string }> {
     try {
       const response = await apiService.auth.put<FeedbackDetail[]>(
-        `/feedback-service/api/v1/feedback-details/bulk?feedbackId=${feedbackId}`,
+        `/analytics-service/api/v1/feedback-details/bulk?feedbackId=${feedbackId}`,
         { details }
       );
 
