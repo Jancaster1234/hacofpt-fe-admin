@@ -70,55 +70,65 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
   };
 
   const loadUserDevices = async () => {
-    if (!userDevices.length && !loadingUserDevices) {
-      setLoadingUserDevices(true);
-      try {
-        const response = await userDeviceService.getUserDevicesByDeviceId(
-          device.id
-        );
-        if (response.data) {
-          setUserDevices(response.data);
+    setLoadingUserDevices(true);
+    try {
+      const response = await userDeviceService.getUserDevicesByDeviceId(
+        device.id
+      );
+      if (response.data) {
+        setUserDevices(response.data);
 
-          // If we got user devices, set the first one as active
-          if (response.data.length > 0) {
-            setActiveUserDeviceId(response.data[0].id);
+        // If we got user devices, set the first one as active
+        if (response.data.length > 0) {
+          setActiveUserDeviceId(response.data[0].id);
 
-            // Fetch user info for each user device
-            for (const userDevice of response.data) {
-              if (userDevice.userId && !userInfo[userDevice.userId]) {
-                try {
-                  const userResponse = await userService.getUserById(
-                    userDevice.userId
-                  );
-                  if (userResponse.data) {
-                    setUserInfo((prev) => ({
-                      ...prev,
-                      [userResponse.data.id]: userResponse.data,
-                    }));
-                  }
-                } catch (error) {
-                  console.error(
-                    `Error fetching user info for ${userDevice.userId}:`,
-                    error
-                  );
-                }
-              }
-            }
-          }
+          // Fetch user info for each user device
+          await fetchUsersInfo(response.data);
         }
-      } catch (error) {
-        console.error(
-          `Error fetching user devices for device ${device.id}:`,
-          error
-        );
-      } finally {
-        setLoadingUserDevices(false);
+      }
+    } catch (error) {
+      console.error(
+        `Error fetching user devices for device ${device.id}:`,
+        error
+      );
+    } finally {
+      setLoadingUserDevices(false);
+    }
+  };
+
+  const fetchUsersInfo = async (userDevices: UserDevice[]) => {
+    const userIdsToFetch = userDevices
+      .filter((ud) => ud.userId && !userInfo[ud.userId])
+      .map((ud) => ud.userId);
+
+    // Remove duplicates
+    const uniqueUserIds = [...new Set(userIdsToFetch)];
+
+    // Fetch user info for each unique user ID
+    for (const userId of uniqueUserIds) {
+      if (userId) {
+        try {
+          const userResponse = await userService.getUserById(userId);
+          if (userResponse.data) {
+            setUserInfo((prev) => ({
+              ...prev,
+              [userResponse.data.id]: userResponse.data,
+            }));
+          }
+        } catch (error) {
+          console.error(`Error fetching user info for ${userId}:`, error);
+        }
       }
     }
   };
 
   const handleUserDeviceSelect = (userDeviceId: string) => {
     setActiveUserDeviceId(userDeviceId);
+  };
+
+  const handleUserDevicesUpdated = () => {
+    // Reload user devices
+    loadUserDevices();
   };
 
   const handleEditDevice = (e: React.MouseEvent) => {
@@ -293,6 +303,8 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
                 userInfo={userInfo}
                 onUserDeviceSelect={handleUserDeviceSelect}
                 hackathonId={hackathonId}
+                deviceId={device.id}
+                onUserDevicesUpdated={handleUserDevicesUpdated}
               />
 
               <div className="mt-4 ml-14 flex gap-2">
