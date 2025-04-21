@@ -51,6 +51,7 @@ class UserDeviceService {
       timeFrom: string;
       timeTo: string;
       status: "ASSIGNED" | "RETURNED" | "LOST" | "DAMAGED";
+      files?: File[];
     }
   ): Promise<{ data: UserDevice; message?: string }> {
     try {
@@ -61,6 +62,10 @@ class UserDeviceService {
       formData.append("timeFrom", data.timeFrom);
       formData.append("timeTo", data.timeTo);
       formData.append("status", data.status);
+
+      data.files.forEach((file) => {
+        formData.append("files", file);
+      });
 
       const response = await apiService.auth.put<UserDevice>(
         `/identity-service/api/v1/user-devices/${id}`,
@@ -190,6 +195,32 @@ class UserDeviceService {
         error,
         [],
         "[UserDevice Service] Error fetching user devices by user ID:"
+      );
+    }
+  }
+
+  async getUserDevicesByDeviceIdAndUserId(
+    deviceId: string,
+    userId: string
+  ): Promise<{ data: UserDevice[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<UserDevice[]>(
+        `/identity-service/api/v1/user-devices?deviceId=${deviceId}&userId=${userId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve user devices");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "User devices retrieved successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<UserDevice[]>(
+        error,
+        [],
+        "[UserDevice Service] Error fetching user devices by device ID and user ID:"
       );
     }
   }
