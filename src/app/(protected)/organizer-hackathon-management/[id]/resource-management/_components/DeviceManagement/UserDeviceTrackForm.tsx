@@ -1,7 +1,7 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/UserDeviceTrackForm.tsx
 import React, { useState } from "react";
 import { UserDevice } from "@/types/entities/userDevice";
-import { FileUploader } from "../common/FileUploader";
+import { FileUploader } from "../../../../../../../components/common/FileUploader";
 
 interface UserDeviceTrackFormProps {
   userDeviceId: string;

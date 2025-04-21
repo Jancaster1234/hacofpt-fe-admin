@@ -1,15 +1,15 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/UserDeviceDetails.tsx
 import React, { useState, useEffect } from "react";
 import { UserDevice } from "@/types/entities/userDevice";
 import { User } from "@/types/entities/user";
 import { formatDateTime, getStatusColorClass } from "../../_utils/formatters";
 import TrackingHistory from "./TrackingHistory";
-import { fetchMockUserDeviceTracks } from "../../_mocks/fetchMockUserDeviceTracks";
 import { UserDeviceTrack } from "@/types/entities/userDeviceTrack";
 import UserDeviceForm from "./UserDeviceForm";
 import { userDeviceService } from "@/services/userDevice.service";
 import { FileUrl } from "@/types/entities/fileUrl";
 import { fileUrlService } from "@/services/fileUrl.service";
+import { userDeviceTrackService } from "@/services/userDeviceTrack.service";
+import FilesList from "./FilesList";
 
 interface UserDeviceDetailsProps {
   userDevice: UserDevice;
@@ -40,10 +40,13 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
     const loadTracks = async () => {
       setLoadingTracks(true);
       try {
-        const fetchedTracks = await fetchMockUserDeviceTracks({
-          userDeviceId: userDevice.id,
-        });
-        setTracks(fetchedTracks);
+        const response =
+          await userDeviceTrackService.getUserDeviceTracksByUserDeviceId(
+            userDevice.id
+          );
+        if (response.data) {
+          setTracks(response.data);
+        }
       } catch (error) {
         console.error(
           `Error fetching user device tracks for ${userDevice.id}:`,
@@ -92,8 +95,8 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
       const updateData = {
         userId: formData.userId,
         deviceId: userDevice.deviceId,
-        timeFrom: formData.timeFrom, // Now properly formatted as ISO string
-        timeTo: formData.timeTo, // Now properly formatted as ISO string
+        timeFrom: formData.timeFrom,
+        timeTo: formData.timeTo,
         status: formData.status,
         files: formData.files || [],
       };
@@ -132,40 +135,48 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
     }
   };
 
+  const handleTrackCreated = () => {
+    // Refresh tracks after a new one is created
+    userDeviceTrackService
+      .getUserDeviceTracksByUserDeviceId(userDevice.id)
+      .then((response) => {
+        if (response.data) {
+          setTracks(response.data);
+        }
+      })
+      .catch((error) => console.error("Error refreshing tracks:", error));
+  };
+
+  const handleTrackUpdated = () => {
+    // Refresh tracks after one is updated
+    userDeviceTrackService
+      .getUserDeviceTracksByUserDeviceId(userDevice.id)
+      .then((response) => {
+        if (response.data) {
+          setTracks(response.data);
+        }
+      })
+      .catch((error) => console.error("Error refreshing tracks:", error));
+  };
+
+  const handleTrackDeleted = () => {
+    // Refresh tracks after one is deleted
+    userDeviceTrackService
+      .getUserDeviceTracksByUserDeviceId(userDevice.id)
+      .then((response) => {
+        if (response.data) {
+          setTracks(response.data);
+        }
+      })
+      .catch((error) => console.error("Error refreshing tracks:", error));
+  };
+
   // Initial data for the form
   const initialData = {
     userId: userDevice.userId || "",
     timeFrom: userDevice.timeFrom || "",
     timeTo: userDevice.timeTo || "",
     status: userDevice.status || "ASSIGNED",
-  };
-
-  // Render file list
-  const renderFiles = () => {
-    if (loadingFiles) {
-      return <p className="text-sm text-gray-500">Loading files...</p>;
-    }
-
-    if (userDeviceFiles.length === 0) {
-      return <p className="text-sm text-gray-500">No files attached</p>;
-    }
-
-    return (
-      <ul className="text-sm">
-        {userDeviceFiles.map((file) => (
-          <li key={file.id} className="mb-1">
-            <a
-              href={file.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              {file.fileName}
-            </a>
-          </li>
-        ))}
-      </ul>
-    );
   };
 
   return (
@@ -224,16 +235,26 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
           {/* Assignment Files */}
           <div className="mb-4">
             <h5 className="font-medium">Assignment Files</h5>
-            {renderFiles()}
+            {loadingFiles ? (
+              <p className="text-sm text-gray-500">Loading files...</p>
+            ) : userDeviceFiles.length > 0 ? (
+              <FilesList files={userDeviceFiles} />
+            ) : (
+              <p className="text-sm text-gray-500">No files attached</p>
+            )}
           </div>
 
           {/* User device tracks */}
           <div className="mt-4 mb-4">
             <h5 className="font-medium mb-2">Device Tracking History</h5>
             <TrackingHistory
-              tracks={tracks}
-              isLoading={loadingTracks}
+              userDeviceId={userDevice.id}
+              initialTracks={tracks}
+              initialIsLoading={loadingTracks}
               hackathonId={hackathonId}
+              onTrackCreated={handleTrackCreated}
+              onTrackUpdated={handleTrackUpdated}
+              onTrackDeleted={handleTrackDeleted}
             />
           </div>
 

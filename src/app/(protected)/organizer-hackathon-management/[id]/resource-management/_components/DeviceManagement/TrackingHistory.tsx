@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/TrackingHistory.tsx
 import React, { useState, useEffect } from "react";
 import { UserDeviceTrack } from "@/types/entities/userDeviceTrack";
 import {
@@ -44,12 +43,13 @@ const TrackingHistory: React.FC<TrackingHistoryProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (initialTracks.length === 0) {
+    setTracks(initialTracks);
+    setIsLoading(initialIsLoading);
+
+    if (initialTracks.length === 0 && !initialIsLoading) {
       fetchTracks();
-    } else {
-      setTracks(initialTracks);
     }
-  }, [userDeviceId, initialTracks]);
+  }, [userDeviceId, initialTracks, initialIsLoading]);
 
   const fetchTracks = async () => {
     setIsLoading(true);
