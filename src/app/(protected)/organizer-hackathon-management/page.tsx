@@ -55,7 +55,11 @@ export default function HackathonPage() {
     return hackathons.filter((hackathon) => {
       const matchesStatus =
         filters.enrollmentStatus.length > 0
-          ? filters.enrollmentStatus.includes(hackathon.enrollmentStatus)
+          ? filters.enrollmentStatus.some(
+              (status) =>
+                hackathon.enrollmentStatus.toLowerCase() ===
+                status.toLowerCase()
+            )
           : true;
       const matchesCategory =
         filters.categories.length > 0
