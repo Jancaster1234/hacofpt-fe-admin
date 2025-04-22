@@ -1,11 +1,12 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/SponsorshipDetailFiles.tsx
 import React, { useState, useEffect } from "react";
-import { fetchMockFileUrls } from "../_mocks/fetchMockFileUrls";
 import { FileUrl } from "@/types/entities/fileUrl";
 import { SponsorshipHackathonDetail } from "@/types/entities/sponsorshipHackathonDetail";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { formatDate } from "@/utils/dateFormatter";
+import { fileUrlService } from "@/services/fileUrl.service";
+import { sponsorshipHackathonDetailService } from "@/services/sponsorshipHackathonDetail.service";
 
 interface SponsorshipDetailFilesProps {
   sponsorshipHackathonDetailId: string;
@@ -20,27 +21,106 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
 }) => {
   const [files, setFiles] = useState<FileUrl[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [uploading, setUploading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const loadFiles = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchMockFileUrls({
-          sponsorshipHackathonDetailId,
-        });
-        setFiles(data);
-        setError(null);
-      } catch (err) {
-        setError("Failed to load files. Please try again later.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadFiles();
   }, [sponsorshipHackathonDetailId]);
+
+  const loadFiles = async () => {
+    try {
+      setLoading(true);
+      const response =
+        await fileUrlService.getFileUrlsBySponsorshipHackathonDetailId(
+          sponsorshipHackathonDetailId
+        );
+
+      if (response.data) {
+        setFiles(response.data);
+      }
+      setError(null);
+    } catch (err) {
+      setError("Failed to load files. Please try again later.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const selectedFiles = event.target.files;
+    if (!selectedFiles || selectedFiles.length === 0) return;
+
+    try {
+      setUploadError(null);
+      setUploading(true);
+
+      // Upload the files to communication service
+      const filesArray = Array.from(selectedFiles);
+      const uploadResponse =
+        await fileUrlService.uploadMultipleFilesCommunication(filesArray);
+
+      if (!uploadResponse.data || uploadResponse.data.length === 0) {
+        throw new Error("Failed to upload files");
+      }
+
+      // Get file URLs from the response
+      const fileUrls = uploadResponse.data.map((file) => file.fileUrl);
+
+      // Create sponsorship hackathon detail files
+      const detailFilesResponse =
+        await sponsorshipHackathonDetailService.createSponsorshipHackathonDetailFiles(
+          sponsorshipHackathonDetailId,
+          fileUrls
+        );
+
+      if (detailFilesResponse.data) {
+        // Refresh files list
+        loadFiles();
+      }
+
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (err: any) {
+      setUploadError(
+        err.message || "Failed to upload files. Please try again."
+      );
+      console.error(err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleDeleteFile = async (fileId: string) => {
+    if (!window.confirm("Are you sure you want to delete this file?")) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await fileUrlService.deleteFileUrl(fileId);
+      // Refresh the files list
+      loadFiles();
+    } catch (err) {
+      setError("Failed to delete file. Please try again later.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
@@ -119,11 +199,11 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
     }
   };
 
-  if (loading) {
+  if (loading && !uploading) {
     return <LoadingSpinner />;
   }
 
-  if (error) {
+  if (error && !uploading) {
     return <ErrorMessage message={error} />;
   }
 
@@ -171,10 +251,57 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
 
       <div className="flex justify-between items-center mb-4">
         <h4 className="text-md font-medium">Related Files</h4>
-        <button className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700">
-          Upload New File
-        </button>
+        <div>
+          <input
+            type="file"
+            multiple
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <button
+            className={`px-3 py-1 ${
+              uploading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+            } text-white text-sm rounded-md flex items-center`}
+            onClick={handleUploadClick}
+            disabled={uploading}
+          >
+            {uploading ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Uploading...
+              </>
+            ) : (
+              "Upload New File"
+            )}
+          </button>
+        </div>
       </div>
+
+      {uploadError && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+          {uploadError}
+        </div>
+      )}
 
       {files.length === 0 ? (
         <div className="text-center py-8">
@@ -208,7 +335,10 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
                 >
                   Download
                 </a>
-                <button className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded hover:bg-red-200">
+                <button
+                  onClick={() => handleDeleteFile(file.id)}
+                  className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded hover:bg-red-200"
+                >
                   Delete
                 </button>
               </div>
