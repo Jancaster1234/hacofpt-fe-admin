@@ -168,18 +168,12 @@ class SponsorshipHackathonDetailService {
   // Create files for sponsorship hackathon detail
   async createSponsorshipHackathonDetailFiles(
     detailId: string,
-    files: File[]
+    fileUrls: string[]
   ): Promise<{ data: FileUrl[]; message?: string }> {
     try {
-      const formData = new FormData();
-
-      files.forEach((file) => {
-        formData.append("files", file);
-      });
-
-      const response = await apiService.auth.post<FileUrl[]>(
-        `/hackathon-service/api/v1/sponsorships/details/${detailId}/files`,
-        formData
+      const response = await apiService.auth.put<FileUrl[]>(
+        `/hackathon-service/v1/sponsorships/details/update-files/${detailId}`,
+        { data: fileUrls }
       );
 
       if (!response || !response.data) {
