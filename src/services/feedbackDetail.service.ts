@@ -62,7 +62,7 @@ class FeedbackDetailService {
   ): Promise<{ data: FeedbackDetail[]; message?: string }> {
     try {
       const response = await apiService.auth.get<FeedbackDetail[]>(
-        `/analytics-service/api/v1/feedback-details/by-feedback?feedbackId=${feedbackId}`
+        `/analytics-service/api/v1/feedback-details/by-feedback/${feedbackId}`
       );
 
       if (!response || !response.data) {
