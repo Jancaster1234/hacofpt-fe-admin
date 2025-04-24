@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/UserDeviceDetails.tsx
 import React, { useState, useEffect } from "react";
 import { UserDevice } from "@/types/entities/userDevice";
 import { User } from "@/types/entities/user";
@@ -11,6 +10,7 @@ import { FileUrl } from "@/types/entities/fileUrl";
 import { fileUrlService } from "@/services/fileUrl.service";
 import { userDeviceTrackService } from "@/services/userDeviceTrack.service";
 import FilesList from "./FilesList";
+import { useAuth } from "@/hooks/useAuth_v0";
 
 interface UserDeviceDetailsProps {
   userDevice: UserDevice;
@@ -18,7 +18,7 @@ interface UserDeviceDetailsProps {
   hackathonId: string;
   onUserDeviceUpdated: () => void;
   onUserDeviceDeleted: () => void;
-  isHackathonCreator: boolean; // Added this prop
+  isHackathonCreator: boolean;
 }
 
 const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
@@ -27,7 +27,7 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
   hackathonId,
   onUserDeviceUpdated,
   onUserDeviceDeleted,
-  isHackathonCreator, // Added this prop
+  isHackathonCreator,
 }) => {
   const [tracks, setTracks] = useState<UserDeviceTrack[]>([]);
   const [loadingTracks, setLoadingTracks] = useState<boolean>(false);
@@ -36,8 +36,14 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
   const [userDeviceFiles, setUserDeviceFiles] = useState<FileUrl[]>([]);
   const [loadingFiles, setLoadingFiles] = useState<boolean>(false);
 
+  // Get current user information
+  const { user } = useAuth();
+
   // Get the user from userInfo
-  const user = userDevice.userId ? userInfo[userDevice.userId] : null;
+  const deviceOwner = userDevice.userId ? userInfo[userDevice.userId] : null;
+
+  // Check if current user is the device owner
+  const isDeviceOwner = user?.id === userDevice.userId;
 
   useEffect(() => {
     loadTracksAndFiles();
@@ -183,16 +189,16 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
         </div>
       ) : (
         <>
-          {user && (
+          {deviceOwner && (
             <div className="mb-4">
               <h5 className="font-medium">User Information</h5>
               <p className="text-sm">
-                Name: {user.firstName} {user.lastName}
+                Name: {deviceOwner.firstName} {deviceOwner.lastName}
               </p>
-              <p className="text-sm">Email: {user.email}</p>
-              {user.userRoles && user.userRoles.length > 0 && (
+              <p className="text-sm">Email: {deviceOwner.email}</p>
+              {deviceOwner.userRoles && deviceOwner.userRoles.length > 0 && (
                 <p className="text-sm">
-                  Role: {user.userRoles[0]?.role.name || "Unknown"}
+                  Role: {deviceOwner.userRoles[0]?.role.name || "Unknown"}
                 </p>
               )}
             </div>
@@ -239,6 +245,7 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
               onTrackUpdated={handleTrackUpdated}
               onTrackDeleted={handleTrackDeleted}
               isHackathonCreator={isHackathonCreator}
+              deviceAssignedUserId={userDevice.userId} // Pass the assigned user ID
             />
           </div>
 

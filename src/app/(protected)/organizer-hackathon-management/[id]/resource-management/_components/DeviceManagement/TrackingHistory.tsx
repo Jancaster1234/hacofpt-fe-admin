@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/TrackingHistory.tsx
 import React, { useState, useEffect } from "react";
 import { UserDeviceTrack } from "@/types/entities/userDeviceTrack";
 import {
@@ -10,6 +9,7 @@ import FilesList from "./FilesList";
 import { fileUrlService } from "@/services/fileUrl.service";
 import { userDeviceTrackService } from "@/services/userDeviceTrack.service";
 import UserDeviceTrackForm from "./UserDeviceTrackForm";
+import { useAuth } from "@/hooks/useAuth_v0";
 
 interface TrackingHistoryProps {
   userDeviceId: string;
@@ -19,6 +19,8 @@ interface TrackingHistoryProps {
   onTrackCreated?: () => void;
   onTrackUpdated?: () => void;
   onTrackDeleted?: () => void;
+  isHackathonCreator?: boolean;
+  deviceAssignedUserId?: string; // Added prop for assigned user ID
 }
 
 const TrackingHistory: React.FC<TrackingHistoryProps> = ({
@@ -29,6 +31,8 @@ const TrackingHistory: React.FC<TrackingHistoryProps> = ({
   onTrackCreated,
   onTrackUpdated,
   onTrackDeleted,
+  isHackathonCreator,
+  deviceAssignedUserId,
 }) => {
   const [tracks, setTracks] = useState<UserDeviceTrack[]>(initialTracks);
   const [isLoading, setIsLoading] = useState<boolean>(initialIsLoading);
@@ -42,6 +46,16 @@ const TrackingHistory: React.FC<TrackingHistoryProps> = ({
   const [isAddingTrack, setIsAddingTrack] = useState<boolean>(false);
   const [isEditingTrack, setIsEditingTrack] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Get current user information
+  const { user } = useAuth();
+
+  // Check if current user is the device owner
+  const isDeviceOwner = user?.id === deviceAssignedUserId;
+
+  // User can edit if they're the device owner or hackathon creator
+  //const canEditTracks = isDeviceOwner || isHackathonCreator;
+  const canEditTracks = isDeviceOwner;
 
   useEffect(() => {
     // Set state from props first
@@ -180,7 +194,7 @@ const TrackingHistory: React.FC<TrackingHistoryProps> = ({
       {/* Actions */}
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-medium">Tracking History</h3>
-        {!isAddingTrack && !isEditingTrack && (
+        {!isAddingTrack && !isEditingTrack && canEditTracks && (
           <button
             className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-800 py-1 px-2 rounded"
             onClick={handleAddTrackClick}
@@ -198,7 +212,7 @@ const TrackingHistory: React.FC<TrackingHistoryProps> = ({
       )}
 
       {/* Add/Edit Form */}
-      {isAddingTrack && (
+      {isAddingTrack && canEditTracks && (
         <div className="mb-4 p-3 border rounded-md bg-gray-50">
           <h4 className="text-sm font-medium mb-3">Add New Tracking Record</h4>
           <UserDeviceTrackForm
@@ -210,7 +224,7 @@ const TrackingHistory: React.FC<TrackingHistoryProps> = ({
         </div>
       )}
 
-      {isEditingTrack && (
+      {isEditingTrack && canEditTracks && (
         <div className="mb-4 p-3 border rounded-md bg-gray-50">
           <h4 className="text-sm font-medium mb-3">Edit Tracking Record</h4>
           <UserDeviceTrackForm
@@ -252,32 +266,42 @@ const TrackingHistory: React.FC<TrackingHistoryProps> = ({
                     {formatDate(track.createdAt)} • {track.note}
                   </p>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditTrackClick(track.id, track);
-                    }}
-                    className="text-xs text-gray-500 hover:text-gray-700"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteTrackClick(track.id);
-                    }}
-                    className="text-xs text-red-500 hover:text-red-700"
-                  >
-                    Delete
-                  </button>
+                {canEditTracks && (
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditTrackClick(track.id, track);
+                      }}
+                      className="text-xs text-gray-500 hover:text-gray-700"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteTrackClick(track.id);
+                      }}
+                      className="text-xs text-red-500 hover:text-red-700"
+                    >
+                      Delete
+                    </button>
+                    <span
+                      className="cursor-pointer text-gray-500"
+                      onClick={() => toggleTrackExpansion(track.id)}
+                    >
+                      {expandedTrackIds.includes(track.id) ? "▼" : "►"}
+                    </span>
+                  </div>
+                )}
+                {!canEditTracks && (
                   <span
                     className="cursor-pointer text-gray-500"
                     onClick={() => toggleTrackExpansion(track.id)}
                   >
                     {expandedTrackIds.includes(track.id) ? "▼" : "►"}
                   </span>
-                </div>
+                )}
               </div>
 
               {/* Expanded track files */}
