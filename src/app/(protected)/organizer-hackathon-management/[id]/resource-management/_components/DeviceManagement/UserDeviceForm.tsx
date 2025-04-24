@@ -28,7 +28,7 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
   submitButtonText,
 }) => {
   // Determine if we're in edit mode (when initialData has an id)
-  const isEditMode = !!initialData?.id;
+  const isEditMode = !!initialData?.userId;
 
   // Format initial date and time
   const formatInitialDateTime = (dateTimeString: string) => {
