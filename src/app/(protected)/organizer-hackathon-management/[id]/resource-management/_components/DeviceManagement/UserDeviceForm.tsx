@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/UserDeviceForm.tsx
 import React, { useState, useEffect } from "react";
 import { User } from "@/types/entities/user";
 import { UserHackathon } from "@/types/entities/userHackathon";
@@ -28,6 +27,9 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
   onCancel,
   submitButtonText,
 }) => {
+  // Determine if we're in edit mode (when initialData has an id)
+  const isEditMode = !!initialData?.id;
+
   // Format initial date and time
   const formatInitialDateTime = (dateTimeString: string) => {
     if (!dateTimeString) return { date: "", time: "" };
@@ -65,10 +67,25 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedUserName, setSelectedUserName] = useState<string>("");
 
   useEffect(() => {
     fetchOrganizers();
   }, []);
+
+  // Effect to find and set the selected user's name when in edit mode
+  useEffect(() => {
+    if (isEditMode && formData.userId && organizers.length > 0) {
+      const selectedUser = organizers.find(
+        (user) => user.id === formData.userId
+      );
+      if (selectedUser) {
+        setSelectedUserName(
+          `${selectedUser.firstName} ${selectedUser.lastName}`
+        );
+      }
+    }
+  }, [formData.userId, organizers, isEditMode]);
 
   const fetchOrganizers = async () => {
     setIsLoading(true);
@@ -158,7 +175,7 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
         </div>
       )}
 
-      {/* User Selection */}
+      {/* User Selection - shown as dropdown in create mode, read-only text in edit mode */}
       <div>
         <label
           htmlFor="userId"
@@ -166,23 +183,36 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
         >
           Assigned User
         </label>
-        <select
-          id="userId"
-          name="userId"
-          value={formData.userId}
-          onChange={handleChange}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-          required
-          disabled={isLoading || isSubmitting}
-        >
-          <option value="">Select a user</option>
-          {organizers.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.firstName} {user.lastName}
-            </option>
-          ))}
-        </select>
-        {isLoading && (
+
+        {isEditMode ? (
+          // In edit mode, show read-only user information
+          <div className="mt-1 py-2 px-3 bg-gray-100 border border-gray-300 rounded-md text-gray-700">
+            {selectedUserName || "Loading user information..."}
+            <p className="text-xs text-gray-500 mt-1">
+              User assignments cannot be changed after creation
+            </p>
+          </div>
+        ) : (
+          // In create mode, show dropdown selector
+          <select
+            id="userId"
+            name="userId"
+            value={formData.userId}
+            onChange={handleChange}
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            required
+            disabled={isLoading || isSubmitting}
+          >
+            <option value="">Select a user</option>
+            {organizers.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.firstName} {user.lastName}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {!isEditMode && isLoading && (
           <p className="text-sm text-gray-500 mt-1">Loading users...</p>
         )}
       </div>
@@ -292,7 +322,7 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
           multiple
           disabled={isSubmitting}
         />
-        {initialData?.id && (
+        {isEditMode && (
           <p className="text-xs text-gray-500 mt-1">
             Upload new files to add to this assignment. Existing files will be
             preserved.

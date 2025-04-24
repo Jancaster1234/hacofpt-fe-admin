@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/TrackingHistory.tsx
 import React, { useState, useEffect } from "react";
 import { UserDeviceTrack } from "@/types/entities/userDeviceTrack";
 import {
