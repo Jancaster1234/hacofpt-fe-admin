@@ -7,12 +7,14 @@ interface SponsorshipListProps {
   sponsorships: Sponsorship[];
   onSelectSponsorship: (id: string) => void;
   onAddNewSponsorship: () => void;
+  isOrganizer: boolean;
 }
 
 const SponsorshipList: React.FC<SponsorshipListProps> = ({
   sponsorships,
   onSelectSponsorship,
   onAddNewSponsorship,
+  isOrganizer,
 }) => {
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
@@ -45,12 +47,14 @@ const SponsorshipList: React.FC<SponsorshipListProps> = ({
     <div>
       <div className="mb-4 flex justify-between items-center">
         <h3 className="text-lg font-semibold">All Sponsorships</h3>
-        <button
-          onClick={onAddNewSponsorship}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          Add New Sponsorship
-        </button>
+        {isOrganizer && (
+          <button
+            onClick={onAddNewSponsorship}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Add New Sponsorship
+          </button>
+        )}
       </div>
 
       <div className="overflow-x-auto">

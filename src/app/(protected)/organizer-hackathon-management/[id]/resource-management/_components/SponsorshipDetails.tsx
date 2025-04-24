@@ -7,6 +7,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { formatDate } from "@/utils/dateFormatter";
 import { sponsorshipHackathonService } from "@/services/sponsorshipHackathon.service";
 import { useAuth } from "@/hooks/useAuth_v0";
+import { hasOrganizerRole } from "@/utils/roleUtils";
 import SponsorshipHackathonForm from "./SponsorshipHackathonForm";
 import SponsorshipHackathonDetails from "./SponsorshipHackathonDetails";
 
@@ -18,6 +19,7 @@ interface SponsorshipDetailsProps {
   onEdit: () => void;
   loading: boolean;
   error: string | null;
+  isOrganizer: boolean;
 }
 
 const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
@@ -28,6 +30,7 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
   onEdit,
   loading: sponsorshipLoading,
   error: sponsorshipError,
+  isOrganizer,
 }) => {
   const { user } = useAuth();
   const [sponsorshipHackathons, setSponsorshipHackathons] = useState<
@@ -94,6 +97,11 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
   };
 
   const handleAddHackathonAllocation = () => {
+    if (!isOrganizer) {
+      setError("Only organizers can add hackathon allocations");
+      return;
+    }
+
     setCurrentSponsorshipHackathon(undefined);
     setViewMode("FORM");
   };
@@ -101,11 +109,21 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
   const handleEditHackathonAllocation = (
     sponsorshipHackathon: SponsorshipHackathon
   ) => {
+    if (!isOrganizer) {
+      setError("Only organizers can edit hackathon allocations");
+      return;
+    }
+
     setCurrentSponsorshipHackathon(sponsorshipHackathon);
     setViewMode("FORM");
   };
 
   const handleDeleteHackathonAllocation = async (id: string) => {
+    if (!isOrganizer) {
+      setError("Only organizers can delete hackathon allocations");
+      return;
+    }
+
     if (!window.confirm("Are you sure you want to delete this allocation?")) {
       return;
     }
@@ -138,9 +156,9 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
     setSelectedSponsorshipHackathonId(null);
   };
 
-  // Check if user is the creator of the sponsorship hackathon
+  // Check if user is the creator of the sponsorship hackathon and is an organizer
   const canModify = (createdByUserName?: string) => {
-    return user && createdByUserName === user.username;
+    return isOrganizer && user && createdByUserName === user.username;
   };
 
   const getStatusBadgeColor = (status: string) => {
@@ -245,14 +263,16 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
           <p className="text-gray-700">{sponsorship.content}</p>
         </div>
 
-        <div className="flex justify-end space-x-3">
-          <button
-            onClick={onEdit}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Edit Sponsorship
-          </button>
-        </div>
+        {isOrganizer && (
+          <div className="flex justify-end space-x-3">
+            <button
+              onClick={onEdit}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Edit Sponsorship
+            </button>
+          </div>
+        )}
       </div>
 
       {viewMode === "DETAILS" && selectedSponsorshipHackathonId && (
@@ -281,7 +301,7 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
         />
       )}
 
-      {viewMode === "FORM" && (
+      {viewMode === "FORM" && isOrganizer && (
         <SponsorshipHackathonForm
           hackathonId={hackathonId}
           sponsorshipId={sponsorshipId}
@@ -289,6 +309,18 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
           onSuccess={handleFormSuccess}
           onCancel={handleBackToList}
         />
+      )}
+
+      {viewMode === "FORM" && !isOrganizer && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+          <p>Only organizers can add or edit hackathon allocations.</p>
+          <button
+            onClick={handleBackToList}
+            className="mt-2 bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded"
+          >
+            Back to List
+          </button>
+        </div>
       )}
 
       {viewMode === "LIST" && (
@@ -300,23 +332,27 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
               <p className="text-gray-500">
                 No hackathon allocations found for this sponsorship.
               </p>
-              <button
-                onClick={handleAddHackathonAllocation}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Add Hackathon Allocation
-              </button>
-            </div>
-          ) : (
-            <>
-              <div className="mb-4 flex justify-end">
+              {isOrganizer && (
                 <button
                   onClick={handleAddHackathonAllocation}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
                   Add Hackathon Allocation
                 </button>
-              </div>
+              )}
+            </div>
+          ) : (
+            <>
+              {isOrganizer && (
+                <div className="mb-4 flex justify-end">
+                  <button
+                    onClick={handleAddHackathonAllocation}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Add Hackathon Allocation
+                  </button>
+                </div>
+              )}
 
               <div className="overflow-x-auto">
                 <table className="min-w-full border-collapse">

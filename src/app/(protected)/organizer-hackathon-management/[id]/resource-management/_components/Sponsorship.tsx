@@ -7,6 +7,8 @@ import SponsorshipDetails from "./SponsorshipDetails";
 import SponsorshipForm from "./SponsorshipForm";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
+import { useAuth } from "@/hooks/useAuth_v0";
+import { hasOrganizerRole } from "@/utils/roleUtils";
 
 interface SponsorshipProps {
   hackathonId: string;
@@ -15,6 +17,9 @@ interface SponsorshipProps {
 type ViewMode = "LIST" | "DETAILS" | "ADD" | "EDIT";
 
 const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
+  const { user } = useAuth();
+  const isOrganizer = hasOrganizerRole(user);
+
   const [sponsorships, setSponsorships] = useState<SponsorshipType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,12 +82,22 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
   };
 
   const handleAddNewSponsorship = () => {
+    if (!isOrganizer) {
+      setError("Only organizers can add new sponsorships");
+      return;
+    }
+
     setSelectedSponsorshipId(null);
     setCurrentSponsorship(undefined);
     setViewMode("ADD");
   };
 
   const handleEditSponsorship = () => {
+    if (!isOrganizer) {
+      setError("Only organizers can edit sponsorships");
+      return;
+    }
+
     setViewMode("EDIT");
   };
 
@@ -116,6 +131,7 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
           sponsorships={sponsorships}
           onSelectSponsorship={handleSelectSponsorship}
           onAddNewSponsorship={handleAddNewSponsorship}
+          isOrganizer={isOrganizer}
         />
       )}
 
@@ -128,16 +144,29 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
           onEdit={handleEditSponsorship}
           loading={loading}
           error={error}
+          isOrganizer={isOrganizer}
         />
       )}
 
-      {(viewMode === "ADD" || viewMode === "EDIT") && (
+      {(viewMode === "ADD" || viewMode === "EDIT") && isOrganizer && (
         <SponsorshipForm
           hackathonId={hackathonId}
           sponsorship={currentSponsorship}
           onSuccess={handleFormSuccess}
           onCancel={handleBackToList}
         />
+      )}
+
+      {(viewMode === "ADD" || viewMode === "EDIT") && !isOrganizer && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+          <p>Only organizers can add or edit sponsorships.</p>
+          <button
+            onClick={handleBackToList}
+            className="mt-2 bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded"
+          >
+            Back to List
+          </button>
+        </div>
       )}
     </div>
   );
