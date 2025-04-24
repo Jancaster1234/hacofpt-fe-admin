@@ -17,6 +17,7 @@ export type Round = {
   endTime?: string;
   roundNumber?: number; // Represents the sequential order of a round in the hackathon, starting from 1
   roundTitle?: string;
+  totalTeams?: number; // Maximum number of teams that can advance from this round
   status?: RoundStatus;
   submissions?: Submission[];
   roundMarkCriteria?: RoundMarkCriterion[];
