@@ -221,7 +221,7 @@ class UserDeviceTrackService {
   ): Promise<{ data: UserDeviceTrack[]; message?: string }> {
     try {
       const response = await apiService.auth.get<UserDeviceTrack[]>(
-        `/identity-service/api/v1/user-device-tracks?userDeviceId=${userDeviceId}`
+        `/identity-service/api/v1/user-device-tracks/user-device/${userDeviceId}`
       );
 
       if (!response || !response.data) {

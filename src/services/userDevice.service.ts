@@ -159,7 +159,7 @@ class UserDeviceService {
   ): Promise<{ data: UserDevice[]; message?: string }> {
     try {
       const response = await apiService.auth.get<UserDevice[]>(
-        `/identity-service/api/v1/user-devices?deviceId=${deviceId}`
+        `/identity-service/api/v1/user-devices/device/${deviceId}`
       );
 
       if (!response || !response.data) {

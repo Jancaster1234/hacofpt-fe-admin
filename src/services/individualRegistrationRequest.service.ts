@@ -39,7 +39,7 @@ class IndividualRegistrationRequestService {
   async updateIndividualRegistrationRequest(data: {
     id?: string;
     hackathonId: string;
-    status: "PENDING" | "APPROVED" | "REJECTED";
+    status: "PENDING" | "APPROVED" | "REJECTED" | "COMPLETED";
     reviewedById?: string;
   }): Promise<{ data: IndividualRegistrationRequest; message?: string }> {
     try {
