@@ -18,6 +18,7 @@ interface UserDeviceDetailsProps {
   hackathonId: string;
   onUserDeviceUpdated: () => void;
   onUserDeviceDeleted: () => void;
+  isHackathonCreator: boolean; // Added this prop
 }
 
 const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
@@ -26,6 +27,7 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
   hackathonId,
   onUserDeviceUpdated,
   onUserDeviceDeleted,
+  isHackathonCreator, // Added this prop
 }) => {
   const [tracks, setTracks] = useState<UserDeviceTrack[]>([]);
   const [loadingTracks, setLoadingTracks] = useState<boolean>(false);
@@ -162,7 +164,7 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
 
   return (
     <div className="bg-gray-50 p-4 rounded-lg mt-4">
-      {isEditing ? (
+      {isEditing && isHackathonCreator ? (
         <div className="mb-4">
           <h4 className="text-md font-medium mb-4">Edit Device Assignment</h4>
           <UserDeviceForm
@@ -236,24 +238,27 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
               onTrackCreated={handleTrackCreated}
               onTrackUpdated={handleTrackUpdated}
               onTrackDeleted={handleTrackDeleted}
+              isHackathonCreator={isHackathonCreator}
             />
           </div>
 
-          {/* Action buttons */}
-          <div className="mt-4 flex gap-2">
-            <button
-              className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
-              onClick={handleEditClick}
-            >
-              Edit Assignment
-            </button>
-            <button
-              className="bg-red-100 hover:bg-red-200 text-red-800 py-1 px-3 rounded text-sm"
-              onClick={handleDeleteUserDevice}
-            >
-              Delete Assignment
-            </button>
-          </div>
+          {/* Action buttons - only show for hackathon creator */}
+          {isHackathonCreator && (
+            <div className="mt-4 flex gap-2">
+              <button
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
+                onClick={handleEditClick}
+              >
+                Edit Assignment
+              </button>
+              <button
+                className="bg-red-100 hover:bg-red-200 text-red-800 py-1 px-3 rounded text-sm"
+                onClick={handleDeleteUserDevice}
+              >
+                Delete Assignment
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>

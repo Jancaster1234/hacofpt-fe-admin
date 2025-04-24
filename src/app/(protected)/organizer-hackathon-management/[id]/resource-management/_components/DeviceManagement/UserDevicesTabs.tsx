@@ -15,6 +15,7 @@ interface UserDevicesTabsProps {
   hackathonId: string;
   deviceId: string;
   onUserDevicesUpdated: () => void;
+  isHackathonCreator: boolean; // Added this prop
 }
 
 const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
@@ -26,6 +27,7 @@ const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
   hackathonId,
   deviceId,
   onUserDevicesUpdated,
+  isHackathonCreator, // Added this prop
 }) => {
   const [isAddingUserDevice, setIsAddingUserDevice] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +87,7 @@ const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
     <div className="mt-6 ml-14">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-medium">Device Assignments</h3>
-        {!isAddingUserDevice && (
+        {!isAddingUserDevice && isHackathonCreator && (
           <button
             className="bg-blue-100 hover:bg-blue-200 text-blue-800 py-1 px-3 rounded text-sm"
             onClick={handleAddUserDeviceClick}
@@ -101,7 +103,7 @@ const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
         </div>
       )}
 
-      {isAddingUserDevice ? (
+      {isAddingUserDevice && isHackathonCreator ? (
         <div className="mb-6 p-4 border rounded-md bg-gray-50">
           <h4 className="text-md font-medium mb-4">
             Add New Device Assignment
@@ -158,6 +160,7 @@ const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
               hackathonId={hackathonId}
               onUserDeviceUpdated={handleUserDeviceUpdated}
               onUserDeviceDeleted={handleUserDeviceDeleted}
+              isHackathonCreator={isHackathonCreator}
             />
           )}
         </>
