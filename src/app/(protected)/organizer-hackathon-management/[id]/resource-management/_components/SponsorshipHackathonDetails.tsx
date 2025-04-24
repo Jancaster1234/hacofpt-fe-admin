@@ -17,6 +17,7 @@ interface SponsorshipHackathonDetailsProps {
   onDelete?: () => void;
   loading?: boolean;
   error?: string | null;
+  sponsorshipCreatedByUserName?: string;
 }
 
 const SponsorshipHackathonDetails: React.FC<
@@ -29,6 +30,7 @@ const SponsorshipHackathonDetails: React.FC<
   onDelete,
   loading: initialLoading,
   error: initialError,
+  sponsorshipCreatedByUserName,
 }) => {
   const { user } = useAuth();
   const [details, setDetails] = useState<SponsorshipHackathonDetail[]>([]);
@@ -65,6 +67,9 @@ const SponsorshipHackathonDetails: React.FC<
       setLoading(false);
     }
   };
+
+  const isCreatorOfSponsorship =
+    user && sponsorshipCreatedByUserName === user.username;
 
   const handleSelectDetail = (id: string) => {
     const detail = details.find((d) => d.id === id);
@@ -209,13 +214,15 @@ const SponsorshipHackathonDetails: React.FC<
           Sponsorship Allocation Details
         </h3>
         <div className="flex space-x-2">
-          <button
-            onClick={handleAddDetail}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Add New Detail
-          </button>
-          {onEdit && (
+          {isCreatorOfSponsorship && (
+            <button
+              onClick={handleAddDetail}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Add New Detail
+            </button>
+          )}
+          {onEdit && isCreatorOfSponsorship && (
             <button
               onClick={onEdit}
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
@@ -223,7 +230,7 @@ const SponsorshipHackathonDetails: React.FC<
               Edit Allocation
             </button>
           )}
-          {onDelete && (
+          {onDelete && isCreatorOfSponsorship && (
             <button
               onClick={onDelete}
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"

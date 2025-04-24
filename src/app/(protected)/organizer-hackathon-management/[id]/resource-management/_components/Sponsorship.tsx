@@ -81,6 +81,11 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
     setViewMode("DETAILS");
   };
 
+  // Add a check to determine if the user is the creator
+  const isCreator = (sponsorship: SponsorshipType) => {
+    return user && sponsorship.createdByUserName === user.username;
+  };
+
   const handleAddNewSponsorship = () => {
     if (!isOrganizer) {
       setError("Only organizers can add new sponsorships");
@@ -148,26 +153,36 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
         />
       )}
 
-      {(viewMode === "ADD" || viewMode === "EDIT") && isOrganizer && (
-        <SponsorshipForm
-          hackathonId={hackathonId}
-          sponsorship={currentSponsorship}
-          onSuccess={handleFormSuccess}
-          onCancel={handleBackToList}
-        />
-      )}
+      {(viewMode === "ADD" || viewMode === "EDIT") &&
+        isOrganizer &&
+        (viewMode === "ADD" ||
+          (currentSponsorship && isCreator(currentSponsorship))) && (
+          <SponsorshipForm
+            hackathonId={hackathonId}
+            sponsorship={currentSponsorship}
+            onSuccess={handleFormSuccess}
+            onCancel={handleBackToList}
+          />
+        )}
 
-      {(viewMode === "ADD" || viewMode === "EDIT") && !isOrganizer && (
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
-          <p>Only organizers can add or edit sponsorships.</p>
-          <button
-            onClick={handleBackToList}
-            className="mt-2 bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded"
-          >
-            Back to List
-          </button>
-        </div>
-      )}
+      {(viewMode === "ADD" || viewMode === "EDIT") &&
+        (!isOrganizer ||
+          (viewMode === "EDIT" &&
+            currentSponsorship &&
+            !isCreator(currentSponsorship))) && (
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+            <p>
+              Only the organizer who created this sponsorship can add or edit
+              sponsorships.
+            </p>
+            <button
+              onClick={handleBackToList}
+              className="mt-2 bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded"
+            >
+              Back to List
+            </button>
+          </div>
+        )}
     </div>
   );
 };

@@ -96,9 +96,15 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
     }
   };
 
+  const isCreator =
+    sponsorship && user && sponsorship.createdByUserName === user.username;
+
+  // Only allow adding hackathon allocation if user is organizer AND creator of the sponsorship
   const handleAddHackathonAllocation = () => {
-    if (!isOrganizer) {
-      setError("Only organizers can add hackathon allocations");
+    if (!isOrganizer || !isCreator) {
+      setError(
+        "Only the organizer who created this sponsorship can add hackathon allocations"
+      );
       return;
     }
 
@@ -109,8 +115,10 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
   const handleEditHackathonAllocation = (
     sponsorshipHackathon: SponsorshipHackathon
   ) => {
-    if (!isOrganizer) {
-      setError("Only organizers can edit hackathon allocations");
+    if (!isOrganizer || !isCreator) {
+      setError(
+        "Only the organizer who created this sponsorship can edit hackathon allocations"
+      );
       return;
     }
 
@@ -119,8 +127,10 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
   };
 
   const handleDeleteHackathonAllocation = async (id: string) => {
-    if (!isOrganizer) {
-      setError("Only organizers can delete hackathon allocations");
+    if (!isOrganizer || !isCreator) {
+      setError(
+        "Only the organizer who created this sponsorship can delete hackathon allocations"
+      );
       return;
     }
 
@@ -156,9 +166,8 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
     setSelectedSponsorshipHackathonId(null);
   };
 
-  // Check if user is the creator of the sponsorship hackathon and is an organizer
-  const canModify = (createdByUserName?: string) => {
-    return isOrganizer && user && createdByUserName === user.username;
+  const canModify = () => {
+    return isOrganizer && isCreator;
   };
 
   const getStatusBadgeColor = (status: string) => {
@@ -279,16 +288,17 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
         <SponsorshipHackathonDetails
           sponsorshipHackathonId={selectedSponsorshipHackathonId}
           sponsorshipHackathon={currentSponsorshipHackathon}
+          sponsorshipCreatedByUserName={sponsorship.createdByUserName}
           onBack={handleBackToList}
           onEdit={
-            canModify(currentSponsorshipHackathon?.createdByUserName)
+            isCreator // Use the isCreator variable we defined earlier
               ? () =>
                   currentSponsorshipHackathon &&
                   handleEditHackathonAllocation(currentSponsorshipHackathon)
               : undefined
           }
           onDelete={
-            canModify(currentSponsorshipHackathon?.createdByUserName)
+            isCreator // Use the isCreator variable we defined earlier
               ? () =>
                   selectedSponsorshipHackathonId &&
                   handleDeleteHackathonAllocation(
@@ -332,7 +342,7 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
               <p className="text-gray-500">
                 No hackathon allocations found for this sponsorship.
               </p>
-              {isOrganizer && (
+              {isOrganizer && isCreator && (
                 <button
                   onClick={handleAddHackathonAllocation}
                   className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -343,7 +353,7 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
             </div>
           ) : (
             <>
-              {isOrganizer && (
+              {isOrganizer && isCreator && (
                 <div className="mb-4 flex justify-end">
                   <button
                     onClick={handleAddHackathonAllocation}
@@ -399,7 +409,7 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
                           >
                             View Details
                           </button>
-                          {canModify(hackathon.createdByUserName) && (
+                          {isOrganizer && isCreator && (
                             <>
                               <button
                                 onClick={() =>
