@@ -12,12 +12,14 @@ interface SponsorshipDetailFilesProps {
   sponsorshipHackathonDetailId: string;
   detail: SponsorshipHackathonDetail;
   onBack: () => void;
+  isCreator: boolean; // New prop to indicate if user is creator
 }
 
 const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
   sponsorshipHackathonDetailId,
   detail,
   onBack,
+  isCreator,
 }) => {
   const [files, setFiles] = useState<FileUrl[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -53,6 +55,12 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    // Only allow if user is the creator
+    if (!isCreator) {
+      alert("Only the creator of this sponsorship can upload files.");
+      return;
+    }
+
     const selectedFiles = event.target.files;
     if (!selectedFiles || selectedFiles.length === 0) return;
 
@@ -105,6 +113,12 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
   };
 
   const handleDeleteFile = async (fileId: string) => {
+    // Only allow if user is the creator
+    if (!isCreator) {
+      alert("Only the creator of this sponsorship can delete files.");
+      return;
+    }
+
     if (!window.confirm("Are you sure you want to delete this file?")) {
       return;
     }
@@ -251,50 +265,52 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
 
       <div className="flex justify-between items-center mb-4">
         <h4 className="text-md font-medium">Related Files</h4>
-        <div>
-          <input
-            type="file"
-            multiple
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-          <button
-            className={`px-3 py-1 ${
-              uploading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
-            } text-white text-sm rounded-md flex items-center`}
-            onClick={handleUploadClick}
-            disabled={uploading}
-          >
-            {uploading ? (
-              <>
-                <svg
-                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Uploading...
-              </>
-            ) : (
-              "Upload New File"
-            )}
-          </button>
-        </div>
+        {isCreator && (
+          <div>
+            <input
+              type="file"
+              multiple
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <button
+              className={`px-3 py-1 ${
+                uploading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+              } text-white text-sm rounded-md flex items-center`}
+              onClick={handleUploadClick}
+              disabled={uploading}
+            >
+              {uploading ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Uploading...
+                </>
+              ) : (
+                "Upload New File"
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       {uploadError && (
@@ -335,12 +351,14 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
                 >
                   Download
                 </a>
-                <button
-                  onClick={() => handleDeleteFile(file.id)}
-                  className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded hover:bg-red-200"
-                >
-                  Delete
-                </button>
+                {isCreator && (
+                  <button
+                    onClick={() => handleDeleteFile(file.id)}
+                    className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded hover:bg-red-200"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             </div>
           ))}

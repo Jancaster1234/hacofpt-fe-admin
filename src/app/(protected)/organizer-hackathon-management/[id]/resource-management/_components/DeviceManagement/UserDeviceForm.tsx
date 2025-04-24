@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/UserDeviceForm.tsx
 import React, { useState, useEffect } from "react";
 import { User } from "@/types/entities/user";
 import { UserHackathon } from "@/types/entities/userHackathon";

@@ -68,8 +68,9 @@ const SponsorshipHackathonDetails: React.FC<
     }
   };
 
+  // Check if current user is the creator of the sponsorship
   const isCreatorOfSponsorship =
-    user && sponsorshipCreatedByUserName === user.username;
+    user && user.username === sponsorshipCreatedByUserName;
 
   const handleSelectDetail = (id: string) => {
     const detail = details.find((d) => d.id === id);
@@ -81,16 +82,34 @@ const SponsorshipHackathonDetails: React.FC<
   };
 
   const handleAddDetail = () => {
+    // Only allow if user is the creator
+    if (!isCreatorOfSponsorship) {
+      alert("Only the creator of this sponsorship can add details.");
+      return;
+    }
+
     setCurrentDetail(undefined);
     setViewMode("FORM");
   };
 
   const handleEditDetail = (detail: SponsorshipHackathonDetail) => {
+    // Only allow if user is the creator
+    if (!isCreatorOfSponsorship) {
+      alert("Only the creator of this sponsorship can edit details.");
+      return;
+    }
+
     setCurrentDetail(detail);
     setViewMode("FORM");
   };
 
   const handleDeleteDetail = async (id: string) => {
+    // Only allow if user is the creator
+    if (!isCreatorOfSponsorship) {
+      alert("Only the creator of this sponsorship can delete details.");
+      return;
+    }
+
     if (!window.confirm("Are you sure you want to delete this detail?")) {
       return;
     }
@@ -125,11 +144,6 @@ const SponsorshipHackathonDetails: React.FC<
     setSelectedDetailId(null);
   };
 
-  // Check if user is the creator of the detail
-  const canModify = (createdByUserName?: string) => {
-    return user && createdByUserName === user.username;
-  };
-
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "COMPLETED":
@@ -162,11 +176,27 @@ const SponsorshipHackathonDetails: React.FC<
         sponsorshipHackathonDetailId={selectedDetailId}
         detail={detail}
         onBack={handleBackToList}
+        isCreator={isCreatorOfSponsorship}
       />
     );
   }
 
   if (viewMode === "FORM") {
+    // Additional check in case user navigates directly to this state
+    if (!isCreatorOfSponsorship) {
+      return (
+        <div className="p-6">
+          <ErrorMessage message="You don't have permission to add or edit details." />
+          <button
+            onClick={handleBackToList}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Back to List
+          </button>
+        </div>
+      );
+    }
+
     return (
       <SponsorshipHackathonDetailForm
         sponsorshipHackathonId={sponsorshipHackathonId}
@@ -244,12 +274,14 @@ const SponsorshipHackathonDetails: React.FC<
       {details.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-gray-500">No sponsorship details found.</p>
-          <button
-            onClick={handleAddDetail}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Add Detail
-          </button>
+          {isCreatorOfSponsorship && (
+            <button
+              onClick={handleAddDetail}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Add Detail
+            </button>
+          )}
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -308,7 +340,7 @@ const SponsorshipHackathonDetails: React.FC<
                     >
                       View Files
                     </button>
-                    {canModify(detail.createdByUserName) && (
+                    {isCreatorOfSponsorship && (
                       <>
                         <button
                           onClick={() => handleEditDetail(detail)}
