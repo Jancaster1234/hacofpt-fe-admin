@@ -90,17 +90,17 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
   // Fetch devices when round or roundLocation selection changes
   useEffect(() => {
     const loadDevices = async () => {
-      if (!activeRoundId && !activeRoundLocationId) {
-        // Skip API call if no filters are applied (we already have all devices)
-        return;
-      }
-
       setLoading(true);
       setError(null);
       try {
         let devicesResponse;
 
-        if (activeRoundLocationId) {
+        if (activeRoundId === null && activeRoundLocationId === null) {
+          // If no filters are applied, load all devices for the hackathon
+          devicesResponse = await deviceService.getDevicesByHackathonId(
+            hackathonId
+          );
+        } else if (activeRoundLocationId) {
           // If roundLocation is selected, filter by roundLocation ID
           devicesResponse = await deviceService.getDevicesByRoundLocationId(
             activeRoundLocationId

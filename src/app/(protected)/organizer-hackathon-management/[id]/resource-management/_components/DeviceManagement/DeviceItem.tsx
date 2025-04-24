@@ -18,7 +18,9 @@ interface DeviceItemProps {
   onToggleExpansion: () => void;
   hackathonId: string;
   onDeviceDeleted: (deviceId: string) => void;
-  isHackathonCreator: boolean; // Added missing prop
+  isHackathonCreator: boolean;
+  roundTitle?: string; // Add this prop
+  locationName?: string; // Add this prop
 }
 
 const DeviceItem: React.FC<DeviceItemProps> = ({
@@ -27,7 +29,9 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
   onToggleExpansion,
   hackathonId,
   onDeviceDeleted,
-  isHackathonCreator, // Added prop
+  isHackathonCreator,
+  roundTitle,
+  locationName,
 }) => {
   // Device files state
   const [deviceFiles, setDeviceFiles] = useState<FileUrl[]>([]);
@@ -283,13 +287,13 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
                 {device.roundId && (
                   <div>
                     <p className="text-gray-500">Round</p>
-                    <p>{device.roundName}</p>
+                    <p>{roundTitle || device.roundId}</p>
                   </div>
                 )}
                 {device.roundLocationId && (
                   <div>
                     <p className="text-gray-500">Location</p>
-                    <p>{device.locationName}</p>
+                    <p>{locationName || device.roundLocationId}</p>
                   </div>
                 )}
               </div>
