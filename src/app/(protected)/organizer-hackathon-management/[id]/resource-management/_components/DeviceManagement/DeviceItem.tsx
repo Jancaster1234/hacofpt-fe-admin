@@ -15,17 +15,19 @@ import { deviceService } from "@/services/device.service";
 interface DeviceItemProps {
   device: Device;
   isExpanded: boolean;
-  onToggleExpand: () => void;
+  onToggleExpansion: () => void;
   hackathonId: string;
   onDeviceDeleted: (deviceId: string) => void;
+  isHackathonCreator: boolean; // Added missing prop
 }
 
 const DeviceItem: React.FC<DeviceItemProps> = ({
   device,
   isExpanded,
-  onToggleExpand,
+  onToggleExpansion,
   hackathonId,
   onDeviceDeleted,
+  isHackathonCreator, // Added prop
 }) => {
   // Device files state
   const [deviceFiles, setDeviceFiles] = useState<FileUrl[]>([]);
@@ -153,7 +155,7 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
         quantity: formData.quantity,
         files: formData.files || [],
       };
-      console.log("🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹Device data to update:", deviceData); // Debugging line
+
       const response = await deviceService.updateDevice(device.id, deviceData);
 
       if (response.data) {
@@ -232,7 +234,7 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
     <li className="py-4">
       <div
         className="flex items-center justify-between cursor-pointer"
-        onClick={onToggleExpand}
+        onClick={onToggleExpansion}
       >
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
@@ -307,29 +309,32 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
                 onUserDevicesUpdated={handleUserDevicesUpdated}
               />
 
-              <div className="mt-4 ml-14 flex gap-2">
-                <button
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
-                  onClick={handleEditDevice}
-                  disabled={isDeleting}
-                >
-                  Edit
-                </button>
-                <button
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
-                  onClick={handleUploadFiles}
-                  disabled={isDeleting || isEditing}
-                >
-                  Upload Files
-                </button>
-                <button
-                  className="bg-red-100 hover:bg-red-200 text-red-800 py-1 px-3 rounded text-sm"
-                  onClick={handleDeleteDevice}
-                  disabled={isDeleting || isEditing}
-                >
-                  {isDeleting ? "Deleting..." : "Delete"}
-                </button>
-              </div>
+              {/* Only render action buttons if user is hackathon creator */}
+              {isHackathonCreator && (
+                <div className="mt-4 ml-14 flex gap-2">
+                  <button
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
+                    onClick={handleEditDevice}
+                    disabled={isDeleting}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
+                    onClick={handleUploadFiles}
+                    disabled={isDeleting || isEditing}
+                  >
+                    Upload Files
+                  </button>
+                  <button
+                    className="bg-red-100 hover:bg-red-200 text-red-800 py-1 px-3 rounded text-sm"
+                    onClick={handleDeleteDevice}
+                    disabled={isDeleting || isEditing}
+                  >
+                    {isDeleting ? "Deleting..." : "Delete"}
+                  </button>
+                </div>
+              )}
             </>
           )}
         </>
