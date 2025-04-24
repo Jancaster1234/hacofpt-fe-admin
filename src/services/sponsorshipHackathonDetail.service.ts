@@ -167,7 +167,7 @@ class SponsorshipHackathonDetailService {
   ): Promise<{ data: FileUrl[]; message?: string }> {
     try {
       const response = await apiService.auth.put<FileUrl[]>(
-        `/hackathon-service/v1/sponsorships/details/update-files/${detailId}`,
+        `/hackathon-service/api/v1/sponsorships/details/update-files/${detailId}`,
         { data: fileUrls }
       );
 
