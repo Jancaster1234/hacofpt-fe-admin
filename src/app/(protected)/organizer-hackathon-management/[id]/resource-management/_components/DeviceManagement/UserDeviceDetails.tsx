@@ -12,6 +12,7 @@ import { fileUrlService } from "@/services/fileUrl.service";
 import { userDeviceTrackService } from "@/services/userDeviceTrack.service";
 import FilesList from "./FilesList";
 import { useAuth } from "@/hooks/useAuth_v0";
+import { id_ID } from "@faker-js/faker";
 
 interface UserDeviceDetailsProps {
   userDevice: UserDevice;
@@ -163,6 +164,7 @@ const UserDeviceDetails: React.FC<UserDeviceDetailsProps> = ({
 
   // Initial data for the form
   const initialData = {
+    id: userDevice.id || "",
     userId: userDevice.userId || "",
     timeFrom: userDevice.timeFrom || "",
     timeTo: userDevice.timeTo || "",
