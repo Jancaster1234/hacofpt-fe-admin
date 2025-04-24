@@ -1,3 +1,4 @@
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Rounds.tsx
 import { useEffect, useState } from "react";
 import { Round } from "@/types/entities/round";
 import { Location } from "@/types/entities/location";

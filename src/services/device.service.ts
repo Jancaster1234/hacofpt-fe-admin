@@ -91,7 +91,7 @@ class DeviceService {
       data.files?.forEach((file) => {
         formData.append("files", file);
       });
-
+      console.log("FormData", formData);
       const response = await apiService.auth.put<Device>(
         `/identity-service/api/v1/devices/${id}`,
         formData

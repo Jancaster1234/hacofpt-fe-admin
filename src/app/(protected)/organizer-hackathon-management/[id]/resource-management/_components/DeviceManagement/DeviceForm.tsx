@@ -169,7 +169,22 @@ const DeviceForm: React.FC<DeviceFormProps> = ({
     }
 
     try {
-      await onSubmit(formData);
+      // Create a copy of formData to send to API
+      const submissionData = { ...formData };
+
+      // If a location is selected and active round exists, find the actual roundLocation ID
+      if (submissionData.roundLocationId && activeRound) {
+        const selectedRoundLocation = activeRound.roundLocations.find(
+          (rl) => rl.location.id === submissionData.roundLocationId
+        );
+
+        if (selectedRoundLocation) {
+          // Replace location.id with the actual roundLocation.id
+          submissionData.roundLocationId = selectedRoundLocation.id;
+        }
+      }
+
+      await onSubmit(submissionData);
     } catch (error) {
       console.error("Error submitting device form:", error);
       setErrors({
