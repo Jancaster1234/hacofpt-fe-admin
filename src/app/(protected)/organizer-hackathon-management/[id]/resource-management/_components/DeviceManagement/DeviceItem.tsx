@@ -19,8 +19,8 @@ interface DeviceItemProps {
   hackathonId: string;
   onDeviceDeleted: (deviceId: string) => void;
   isHackathonCreator: boolean;
-  roundTitle?: string; // Add this prop
-  locationName?: string; // Add this prop
+  roundTitle?: string;
+  locationName?: string;
 }
 
 const DeviceItem: React.FC<DeviceItemProps> = ({
@@ -257,7 +257,7 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
 
       {isExpanded && (
         <>
-          {isEditing ? (
+          {isEditing && isHackathonCreator ? (
             <div className="mt-4 ml-14">
               <h4 className="text-md font-medium mb-4">Edit Device</h4>
               <DeviceForm
@@ -311,6 +311,7 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
                 hackathonId={hackathonId}
                 deviceId={device.id}
                 onUserDevicesUpdated={handleUserDevicesUpdated}
+                isHackathonCreator={isHackathonCreator}
               />
 
               {/* Only render action buttons if user is hackathon creator */}

@@ -162,14 +162,15 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
 
       {loading && <p className="text-gray-500">Loading...</p>}
 
-      {!isHackathonCreator && !loading && (
-        <div className="mb-4 p-3 bg-yellow-50 text-yellow-700 rounded">
-          You need to be the hackathon creator to manage devices.
-        </div>
-      )}
-
-      {!loading && isHackathonCreator && (
+      {!loading && (
         <>
+          {!isHackathonCreator && (
+            <div className="mb-4 p-3 bg-yellow-50 text-yellow-700 rounded">
+              You are in view-only mode. Only the hackathon creator can create,
+              update, or delete devices.
+            </div>
+          )}
+
           <RoundNavigation
             rounds={rounds}
             activeRoundId={activeRoundId}

@@ -114,26 +114,6 @@ const DeviceList: React.FC<DeviceListProps> = ({
     return { roundTitle, locationName };
   };
 
-  // In the render section of DeviceList component, update the DeviceItem mapping
-  {
-    devices.map((device) => {
-      const { roundTitle, locationName } = getDeviceInfo(device);
-      return (
-        <DeviceItem
-          key={device.id}
-          device={device}
-          isExpanded={expandedDeviceIds.includes(device.id)}
-          onToggleExpansion={() => toggleDeviceExpansion(device.id)}
-          hackathonId={hackathonId}
-          onDeviceDeleted={onDeviceDeleted}
-          isHackathonCreator={isHackathonCreator}
-          roundTitle={roundTitle}
-          locationName={locationName}
-        />
-      );
-    });
-  }
-
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -177,33 +157,22 @@ const DeviceList: React.FC<DeviceListProps> = ({
         </div>
       ) : (
         <ul className="divide-y divide-gray-200">
-          {devices.map((device) => (
-            <DeviceItem
-              key={device.id}
-              device={device}
-              isExpanded={expandedDeviceIds.includes(device.id)}
-              onToggleExpansion={() => toggleDeviceExpansion(device.id)}
-              hackathonId={hackathonId}
-              onDeviceDeleted={onDeviceDeleted}
-              isHackathonCreator={isHackathonCreator}
-              roundTitle={
-                device.roundId &&
-                activeRound &&
-                activeRound.id === device.roundId
-                  ? activeRound.roundTitle
-                  : undefined
-              }
-              locationName={
-                device.roundLocationId &&
-                activeRound &&
-                activeRound.roundLocations
-                  ? activeRound.roundLocations.find(
-                      (rl) => rl.id === device.roundLocationId
-                    )?.location?.name
-                  : undefined
-              }
-            />
-          ))}
+          {devices.map((device) => {
+            const { roundTitle, locationName } = getDeviceInfo(device);
+            return (
+              <DeviceItem
+                key={device.id}
+                device={device}
+                isExpanded={expandedDeviceIds.includes(device.id)}
+                onToggleExpansion={() => toggleDeviceExpansion(device.id)}
+                hackathonId={hackathonId}
+                onDeviceDeleted={onDeviceDeleted}
+                isHackathonCreator={isHackathonCreator}
+                roundTitle={roundTitle}
+                locationName={locationName}
+              />
+            );
+          })}
         </ul>
       )}
     </div>
