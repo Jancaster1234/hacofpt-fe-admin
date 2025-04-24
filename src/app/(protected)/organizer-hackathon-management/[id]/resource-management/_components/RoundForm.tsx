@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/RoundForm.tsx
 import { useState, useEffect } from "react";
 import { Round } from "@/types/entities/round";
 import { Location } from "@/types/entities/location";
@@ -34,6 +33,7 @@ export default function RoundForm({
       startTime: "",
       endTime: "",
       status: "UPCOMING",
+      totalTeam: 0,
       roundLocations: [],
     }
   );
@@ -42,6 +42,7 @@ export default function RoundForm({
   const [formErrors, setFormErrors] = useState<{
     startTime?: string;
     endTime?: string;
+    totalTeam?: string;
   }>({});
 
   // Loading state for form submission
@@ -54,7 +55,7 @@ export default function RoundForm({
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: name === "totalTeam" ? parseInt(value) || 0 : value,
     });
 
     // Clear validation errors when field is updated
@@ -84,6 +85,21 @@ export default function RoundForm({
       });
     }
   }, [formData.startTime, formData.endTime]);
+
+  // Validate totalTeam when it changes
+  useEffect(() => {
+    if (formData.totalTeam !== undefined && formData.totalTeam < 0) {
+      setFormErrors({
+        ...formErrors,
+        totalTeam: "Total teams cannot be negative",
+      });
+    } else {
+      setFormErrors({
+        ...formErrors,
+        totalTeam: undefined,
+      });
+    }
+  }, [formData.totalTeam]);
 
   // Handle location selection for the round
   const handleLocationChange = (
@@ -150,6 +166,16 @@ export default function RoundForm({
         setFormErrors({
           ...formErrors,
           endTime: "End time must be after start time",
+        });
+        setSubmitting(false);
+        return;
+      }
+
+      // Validate totalTeam
+      if (formData.totalTeam !== undefined && formData.totalTeam < 0) {
+        setFormErrors({
+          ...formErrors,
+          totalTeam: "Total teams cannot be negative",
         });
         setSubmitting(false);
         return;
@@ -257,6 +283,27 @@ export default function RoundForm({
               <option value="CANCELLED">Cancelled</option>
             </select>
           </div>
+          <div>
+            <label className="block text-gray-700 mb-1">
+              Total Teams (Max teams that can advance)
+            </label>
+            <input
+              type="number"
+              name="totalTeam"
+              value={formData.totalTeam || ""}
+              onChange={handleInputChange}
+              className={`w-full p-2 border rounded ${
+                formErrors.totalTeam ? "border-red-500" : ""
+              }`}
+              min="0"
+              disabled={submitting}
+            />
+            {formErrors.totalTeam && (
+              <p className="text-red-500 text-sm mt-1">
+                {formErrors.totalTeam}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Locations Selection */}
@@ -356,7 +403,10 @@ export default function RoundForm({
               submitting ? "opacity-70 cursor-not-allowed" : ""
             }`}
             disabled={
-              !!formErrors.startTime || !!formErrors.endTime || submitting
+              !!formErrors.startTime ||
+              !!formErrors.endTime ||
+              !!formErrors.totalTeam ||
+              submitting
             }
           >
             {submitting

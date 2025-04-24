@@ -10,6 +10,7 @@ class RoundService {
     endTime: string;
     roundNumber: number;
     roundTitle: string;
+    totalTeam?: number;
     status: "UPCOMING" | "ONGOING" | "COMPLETED" | "CANCELLED";
     roundLocations?: string[];
   }): Promise<{ data: Round; message?: string }> {
@@ -43,6 +44,7 @@ class RoundService {
     endTime: string;
     roundNumber: number;
     roundTitle: string;
+    totalTeam?: number;
     status: "UPCOMING" | "ONGOING" | "COMPLETED" | "CANCELLED";
     roundLocations?: string[];
   }): Promise<{ data: Round; message?: string }> {

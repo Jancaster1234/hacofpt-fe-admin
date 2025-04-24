@@ -137,7 +137,10 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
         timeFrom: timeFromISO,
         timeTo: timeToISO,
       };
-
+      console.log(
+        "🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹Submitting form data:",
+        submitData
+      );
       await onSubmit(submitData);
     } catch (error) {
       console.error("Error submitting form:", error);

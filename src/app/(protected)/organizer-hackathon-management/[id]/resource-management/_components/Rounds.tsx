@@ -1,4 +1,3 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Rounds.tsx
 import { useEffect, useState } from "react";
 import { Round } from "@/types/entities/round";
 import { Location } from "@/types/entities/location";
@@ -83,6 +82,7 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
           endTime: roundData.endTime,
           roundNumber: roundData.roundNumber,
           roundTitle: roundData.roundTitle,
+          totalTeam: roundData.totalTeam,
           status: roundData.status as
             | "UPCOMING"
             | "ONGOING"
@@ -110,6 +110,7 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
           endTime: roundData.endTime,
           roundNumber: roundData.roundNumber,
           roundTitle: roundData.roundTitle,
+          totalTeam: roundData.totalTeam,
           status: roundData.status as
             | "UPCOMING"
             | "ONGOING"
@@ -263,6 +264,9 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
               <p className="text-gray-600">
                 <strong>End:</strong>{" "}
                 {new Date(round.endTime || "").toLocaleString()}
+              </p>
+              <p className="text-gray-600">
+                <strong>Max Teams:</strong> {round.totalTeam || "Not specified"}
               </p>
             </div>
 
