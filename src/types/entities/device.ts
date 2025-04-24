@@ -21,9 +21,9 @@ export type Device = {
   roundId?: string;
   roundLocation?: RoundLocation;
   roundLocationId?: string;
-  name: string;
+  name?: string;
   description?: string;
-  status: DeviceStatus;
-  quantity: number;
+  status?: DeviceStatus;
+  quantity?: number;
   fileUrls?: FileUrl[];
 } & AuditCreatedBase;

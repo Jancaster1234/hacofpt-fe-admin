@@ -1,6 +1,6 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/DeviceList.tsx
 import React, { useState } from "react";
-import { Device, DeviceStatus } from "@/types/entities/device";
+import { Device } from "@/types/entities/device";
 import { Round } from "@/types/entities/round";
 import DeviceItem from "./DeviceItem";
 import DeviceForm from "./DeviceForm";
@@ -9,19 +9,21 @@ import { deviceService } from "@/services/device.service";
 interface DeviceListProps {
   devices: Device[];
   activeRound: Round | null;
-  activeLocationId: string | null;
+  activeLocationId: string | null; // This is actually a roundLocationId
   hackathonId: string;
   onDeviceAdded: (device: Device) => void;
   onDeviceDeleted: (deviceId: string) => void;
+  isHackathonCreator: boolean;
 }
 
 const DeviceList: React.FC<DeviceListProps> = ({
   devices,
   activeRound,
-  activeLocationId,
+  activeLocationId, // This is already the roundLocationId
   hackathonId,
   onDeviceAdded,
   onDeviceDeleted,
+  isHackathonCreator,
 }) => {
   const [expandedDeviceIds, setExpandedDeviceIds] = useState<string[]>([]);
   const [isAddingDevice, setIsAddingDevice] = useState<boolean>(false);
@@ -40,11 +42,11 @@ const DeviceList: React.FC<DeviceListProps> = ({
   const getLocationName = () => {
     if (!activeRound || !activeLocationId) return null;
 
-    const location = activeRound.roundLocations.find(
-      (rl) => rl.location.id === activeLocationId
+    const roundLocation = activeRound.roundLocations?.find(
+      (rl) => rl.id === activeLocationId
     );
 
-    return location?.location.name;
+    return roundLocation?.location?.name || "Unknown Location";
   };
 
   const getTitle = () => {
@@ -95,25 +97,27 @@ const DeviceList: React.FC<DeviceListProps> = ({
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-medium">{getTitle()}</h3>
 
-        <button
-          className={`${
-            isAddingDevice
-              ? "bg-gray-500 hover:bg-gray-600"
-              : "bg-blue-500 hover:bg-blue-600"
-          } text-white py-1 px-4 rounded-md text-sm`}
-          onClick={toggleAddDeviceForm}
-        >
-          {isAddingDevice ? "Cancel" : "Add Device"}
-        </button>
+        {isHackathonCreator && (
+          <button
+            className={`${
+              isAddingDevice
+                ? "bg-gray-500 hover:bg-gray-600"
+                : "bg-blue-500 hover:bg-blue-600"
+            } text-white py-1 px-4 rounded-md text-sm`}
+            onClick={toggleAddDeviceForm}
+          >
+            {isAddingDevice ? "Cancel" : "Add Device"}
+          </button>
+        )}
       </div>
 
-      {isAddingDevice && (
+      {isAddingDevice && isHackathonCreator && (
         <div className="mb-6">
           <h4 className="text-md font-medium mb-4">Add New Device</h4>
           <DeviceForm
             hackathonId={hackathonId}
             activeRound={activeRound}
-            activeLocationId={activeLocationId}
+            activeRoundLocationId={activeLocationId} // Pass the roundLocationId
             onSubmit={handleSubmitDevice}
             onCancel={toggleAddDeviceForm}
           />
@@ -136,9 +140,10 @@ const DeviceList: React.FC<DeviceListProps> = ({
               key={device.id}
               device={device}
               isExpanded={expandedDeviceIds.includes(device.id)}
-              onToggleExpand={() => toggleDeviceExpansion(device.id)}
+              onToggleExpansion={() => toggleDeviceExpansion(device.id)}
               hackathonId={hackathonId}
               onDeviceDeleted={onDeviceDeleted}
+              isHackathonCreator={isHackathonCreator}
             />
           ))}
         </ul>

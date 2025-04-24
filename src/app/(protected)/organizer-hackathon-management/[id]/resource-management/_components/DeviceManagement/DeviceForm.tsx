@@ -17,7 +17,7 @@ interface DeviceFormProps {
     files?: File[];
   };
   activeRound?: Round | null;
-  activeLocationId?: string | null;
+  activeRoundLocationId?: string | null;
   onSubmit: (formData: any) => Promise<void>;
   onCancel: () => void;
   submitButtonText?: string;
@@ -27,7 +27,7 @@ const DeviceForm: React.FC<DeviceFormProps> = ({
   hackathonId,
   initialData,
   activeRound: propActiveRound,
-  activeLocationId: propActiveLocationId,
+  activeRoundLocationId: propActiveLocationId,
   onSubmit,
   onCancel,
   submitButtonText = "Create Device",
@@ -46,7 +46,6 @@ const DeviceForm: React.FC<DeviceFormProps> = ({
   };
 
   const [formData, setFormData] = useState(initialData || defaultFormData);
-
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Load rounds for the form
@@ -172,17 +171,8 @@ const DeviceForm: React.FC<DeviceFormProps> = ({
       // Create a copy of formData to send to API
       const submissionData = { ...formData };
 
-      // If a location is selected and active round exists, find the actual roundLocation ID
-      if (submissionData.roundLocationId && activeRound) {
-        const selectedRoundLocation = activeRound.roundLocations.find(
-          (rl) => rl.location.id === submissionData.roundLocationId
-        );
-
-        if (selectedRoundLocation) {
-          // Replace location.id with the actual roundLocation.id
-          submissionData.roundLocationId = selectedRoundLocation.id;
-        }
-      }
+      // We're already using the correct roundLocationId directly in the form
+      // No need for conversion between location.id and roundLocation.id
 
       await onSubmit(submissionData);
     } catch (error) {
@@ -192,16 +182,6 @@ const DeviceForm: React.FC<DeviceFormProps> = ({
         form: "Failed to save device. Please try again.",
       });
     }
-  };
-
-  const getLocationName = (locationId: string) => {
-    if (!activeRound) return "";
-
-    const location = activeRound.roundLocations.find(
-      (rl) => rl.location.id === locationId
-    );
-
-    return location?.location.name || "";
   };
 
   return (
@@ -304,10 +284,10 @@ const DeviceForm: React.FC<DeviceFormProps> = ({
                   <option value="">None (General Round Device)</option>
                   {activeRound.roundLocations.map((roundLocation) => (
                     <option
-                      key={roundLocation.location.id}
-                      value={roundLocation.location.id}
+                      key={roundLocation.id}
+                      value={roundLocation.id} // Use roundLocation.id directly
                     >
-                      {roundLocation.location.name}
+                      {roundLocation.location?.name || "Unknown Location"}
                     </option>
                   ))}
                 </select>
@@ -355,8 +335,7 @@ const DeviceForm: React.FC<DeviceFormProps> = ({
         {activeRound && formData.roundLocationId && (
           <div className="mb-4 p-3 bg-yellow-50 text-yellow-700 text-sm rounded">
             <p>
-              This device will be assigned to{" "}
-              {getLocationName(formData.roundLocationId)} in{" "}
+              This device will be assigned to a specific location in{" "}
               {activeRound.roundTitle}.
             </p>
           </div>

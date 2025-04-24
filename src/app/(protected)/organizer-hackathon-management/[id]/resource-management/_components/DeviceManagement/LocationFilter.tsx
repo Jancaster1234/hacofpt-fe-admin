@@ -4,13 +4,13 @@ import { RoundLocation } from "@/types/entities/roundLocation";
 
 interface LocationFilterProps {
   locations: RoundLocation[];
-  activeLocationId: string | null;
-  onLocationSelect: (locationId: string | null) => void;
+  activeRoundLocationId: string | null;
+  onLocationSelect: (roundLocationId: string | null) => void;
 }
 
 const LocationFilter: React.FC<LocationFilterProps> = ({
   locations,
-  activeLocationId,
+  activeRoundLocationId,
   onLocationSelect,
 }) => {
   return (
@@ -20,7 +20,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
         <button
           onClick={() => onLocationSelect(null)}
           className={`py-1 px-3 rounded-full text-sm ${
-            activeLocationId === null
+            activeRoundLocationId === null
               ? "bg-blue-100 text-blue-800"
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
@@ -31,14 +31,14 @@ const LocationFilter: React.FC<LocationFilterProps> = ({
         {locations.map((rl) => (
           <button
             key={rl.id}
-            onClick={() => onLocationSelect(rl.location.id)}
+            onClick={() => onLocationSelect(rl.id)}
             className={`py-1 px-3 rounded-full text-sm ${
-              activeLocationId === rl.location.id
+              activeRoundLocationId === rl.id
                 ? "bg-blue-100 text-blue-800"
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
           >
-            {rl.location.name} ({rl.type})
+            {rl.location?.name || "Unknown Location"} ({rl.type})
           </button>
         ))}
       </div>

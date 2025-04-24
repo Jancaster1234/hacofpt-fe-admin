@@ -2,23 +2,58 @@
 import React, { useState, useEffect } from "react";
 import { Device } from "@/types/entities/device";
 import { Round } from "@/types/entities/round";
+import { Hackathon } from "@/types/entities/hackathon";
 import RoundNavigation from "./RoundNavigation";
 import LocationFilter from "./LocationFilter";
 import DeviceList from "./DeviceList";
 import { deviceService } from "@/services/device.service";
 import { roundService } from "@/services/round.service";
+import { hackathonService } from "@/services/hackathon.service";
+import { useAuth } from "@/hooks/useAuth_v0";
 
 interface DeviceManagementProps {
   hackathonId: string;
 }
 
 const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
+  const { user } = useAuth();
   const [rounds, setRounds] = useState<Round[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeRoundId, setActiveRoundId] = useState<string | null>(null);
-  const [activeLocationId, setActiveLocationId] = useState<string | null>(null);
+  const [activeRoundLocationId, setActiveRoundLocationId] = useState<
+    string | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
+  const [hackathon, setHackathon] = useState<Hackathon | null>(null);
+  const [isHackathonCreator, setIsHackathonCreator] = useState<boolean>(false);
+
+  // Fetch hackathon data to check permissions
+  useEffect(() => {
+    const fetchHackathon = async () => {
+      try {
+        const response = await hackathonService.getHackathonById(hackathonId);
+        if (response.data && response.data.length > 0) {
+          const hackathonData = response.data[0];
+          setHackathon(hackathonData);
+
+          // Check if current user is the hackathon creator
+          if (user && hackathonData.createdByUserName === user.username) {
+            setIsHackathonCreator(true);
+          }
+        } else {
+          setHackathon(null); // or maybe show an error?
+        }
+      } catch (error) {
+        console.error("Error fetching hackathon data:", error);
+        setError("Failed to fetch hackathon information");
+      }
+    };
+
+    if (hackathonId && user) {
+      fetchHackathon();
+    }
+  }, [hackathonId, user]);
 
   // Fetch rounds and initial devices on component mount
   useEffect(() => {
@@ -52,10 +87,10 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
     loadInitialData();
   }, [hackathonId]);
 
-  // Fetch devices when round or location selection changes
+  // Fetch devices when round or roundLocation selection changes
   useEffect(() => {
     const loadDevices = async () => {
-      if (!activeRoundId && !activeLocationId) {
+      if (!activeRoundId && !activeRoundLocationId) {
         // Skip API call if no filters are applied (we already have all devices)
         return;
       }
@@ -65,10 +100,10 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
       try {
         let devicesResponse;
 
-        if (activeLocationId) {
-          // If location is selected, filter by location ID
+        if (activeRoundLocationId) {
+          // If roundLocation is selected, filter by roundLocation ID
           devicesResponse = await deviceService.getDevicesByRoundLocationId(
-            activeLocationId
+            activeRoundLocationId
           );
         } else if (activeRoundId) {
           // If only round is selected, filter by round ID
@@ -89,17 +124,17 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
     };
 
     loadDevices();
-  }, [hackathonId, activeRoundId, activeLocationId]);
+  }, [hackathonId, activeRoundId, activeRoundLocationId]);
 
   // Handle round selection
   const handleRoundSelect = (roundId: string | null) => {
     setActiveRoundId(roundId);
-    setActiveLocationId(null);
+    setActiveRoundLocationId(null);
   };
 
-  // Handle location selection
-  const handleLocationSelect = (locationId: string | null) => {
-    setActiveLocationId(locationId);
+  // Handle roundLocation selection
+  const handleLocationSelect = (roundLocationId: string | null) => {
+    setActiveRoundLocationId(roundLocationId);
   };
 
   // Handle device added
@@ -127,7 +162,13 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
 
       {loading && <p className="text-gray-500">Loading...</p>}
 
-      {!loading && (
+      {!isHackathonCreator && !loading && (
+        <div className="mb-4 p-3 bg-yellow-50 text-yellow-700 rounded">
+          You need to be the hackathon creator to manage devices.
+        </div>
+      )}
+
+      {!loading && isHackathonCreator && (
         <>
           <RoundNavigation
             rounds={rounds}
@@ -140,7 +181,7 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
             activeRound.roundLocations.length > 0 && (
               <LocationFilter
                 locations={activeRound.roundLocations}
-                activeLocationId={activeLocationId}
+                activeRoundLocationId={activeRoundLocationId}
                 onLocationSelect={handleLocationSelect}
               />
             )}
@@ -148,10 +189,11 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
           <DeviceList
             devices={devices}
             activeRound={activeRound}
-            activeLocationId={activeLocationId}
+            activeLocationId={activeRoundLocationId}
             hackathonId={hackathonId}
             onDeviceAdded={handleDeviceAdded}
             onDeviceDeleted={handleDeviceDeleted}
+            isHackathonCreator={isHackathonCreator}
           />
         </>
       )}
