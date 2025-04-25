@@ -1,7 +1,7 @@
-// src/hooks/useHackathonMentors.ts
 import { useState, useEffect } from "react";
 import { User } from "@/types/entities/user";
 import { userHackathonService } from "@/services/userHackathon.service";
+import { UserHackathon } from "@/types/entities/userHackathon";
 
 export function useHackathonMentors(hackathonId: string) {
   const [mentors, setMentors] = useState<User[]>([]);
@@ -12,14 +12,16 @@ export function useHackathonMentors(hackathonId: string) {
     const fetchMentors = async () => {
       setLoading(true);
       try {
-        // Adjust this endpoint to match your actual API
         const response = await userHackathonService.getUserHackathonsByRole(
           hackathonId,
           "MENTOR"
         );
 
         if (response && response.data) {
-          setMentors(response.data);
+          const users = response.data
+            .map((uh: UserHackathon) => uh.user)
+            .filter((user): user is User => Boolean(user)); // filter out undefined/null
+          setMentors(users);
         } else {
           setError("Failed to load mentors");
         }
