@@ -1,3 +1,4 @@
+// src/hooks/useHackathonMentors.ts
 import { useState, useEffect } from "react";
 import { User } from "@/types/entities/user";
 import { userHackathonService } from "@/services/userHackathon.service";

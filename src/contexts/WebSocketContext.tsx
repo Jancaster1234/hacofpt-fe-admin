@@ -1,3 +1,4 @@
+// src/contexts/WebSocketContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
