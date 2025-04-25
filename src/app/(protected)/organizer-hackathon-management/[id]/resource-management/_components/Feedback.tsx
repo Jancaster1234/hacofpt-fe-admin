@@ -1,10 +1,13 @@
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Feedback.tsx
 import React, { useState, useEffect } from "react";
+import { Tab } from "@headlessui/react";
 import { feedbackService } from "@/services/feedback.service";
-import { feedbackDetailService } from "@/services/feedbackDetail.service";
 import { Feedback as FeedbackType } from "@/types/entities/feedback";
-import { FeedbackDetail } from "@/types/entities/feedbackDetail";
 import { useApiModal } from "@/hooks/useApiModal";
+import { useAuth } from "@/hooks/useAuth_v0";
+import FeedbackDetails from "./FeedbackDetails";
+import CreateFeedbackForm from "./CreateFeedbackForm";
+import { Button } from "@/components/ui/button";
 
 interface FeedbackProps {
   hackathonId: string;
@@ -12,14 +15,16 @@ interface FeedbackProps {
 
 export default function Feedback({ hackathonId }: FeedbackProps) {
   const [feedbacks, setFeedbacks] = useState<FeedbackType[]>([]);
-  const [expandedFeedbackId, setExpandedFeedbackId] = useState<string | null>(
-    null
-  );
-  const [feedbackDetails, setFeedbackDetails] = useState<
-    Record<string, FeedbackDetail[]>
-  >({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
+  const [hackathonFeedbacks, setHackathonFeedbacks] = useState<FeedbackType[]>(
+    []
+  );
+  const [mentorFeedbacks, setMentorFeedbacks] = useState<
+    Record<string, FeedbackType[]>
+  >({});
   const { showModal } = useApiModal();
+  const { user } = useAuth();
 
   // Fetch all feedbacks when component mounts
   useEffect(() => {
@@ -31,6 +36,24 @@ export default function Feedback({ hackathonId }: FeedbackProps) {
         );
         if (response.data) {
           setFeedbacks(response.data);
+
+          // Separate feedbacks into hackathon and mentor categories
+          const hackathonFeedbacks = response.data.filter(
+            (feedback) => !feedback.mentorId && !feedback.teamId
+          );
+          setHackathonFeedbacks(hackathonFeedbacks);
+
+          // Group mentor feedbacks by mentorId
+          const mentorFeedbacksMap: Record<string, FeedbackType[]> = {};
+          response.data.forEach((feedback) => {
+            if (feedback.mentorId && !feedback.teamId) {
+              if (!mentorFeedbacksMap[feedback.mentorId]) {
+                mentorFeedbacksMap[feedback.mentorId] = [];
+              }
+              mentorFeedbacksMap[feedback.mentorId].push(feedback);
+            }
+          });
+          setMentorFeedbacks(mentorFeedbacksMap);
         } else {
           showModal({
             title: "Error",
@@ -53,44 +76,33 @@ export default function Feedback({ hackathonId }: FeedbackProps) {
     fetchFeedbacks();
   }, [hackathonId, showModal]);
 
-  // Fetch feedback details only when a feedback item is expanded
-  const handleExpandFeedback = async (feedbackId: string) => {
-    // Toggle expansion
-    if (expandedFeedbackId === feedbackId) {
-      setExpandedFeedbackId(null);
-      return;
-    }
+  const handleFeedbackCreated = () => {
+    // Refresh feedbacks after creating a new one
+    setShowCreateForm(false);
+    // Refetch feedbacks
+    feedbackService.getFeedbacksByHackathonId(hackathonId).then((response) => {
+      if (response.data) {
+        setFeedbacks(response.data);
 
-    setExpandedFeedbackId(feedbackId);
+        // Update hackathon feedbacks
+        const hackathonFeedbacks = response.data.filter(
+          (feedback) => !feedback.mentorId && !feedback.teamId
+        );
+        setHackathonFeedbacks(hackathonFeedbacks);
 
-    // Check if we already have the details cached
-    if (!feedbackDetails[feedbackId]) {
-      try {
-        const response =
-          await feedbackDetailService.getFeedbackDetailsByFeedbackId(
-            feedbackId
-          );
-        if (response.data) {
-          setFeedbackDetails((prev) => ({
-            ...prev,
-            [feedbackId]: response.data,
-          }));
-        } else {
-          showModal({
-            title: "Error",
-            message: "Failed to load feedback details",
-            type: "error",
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching feedback details:", error);
-        showModal({
-          title: "Error",
-          message: "An error occurred while fetching feedback details",
-          type: "error",
+        // Update mentor feedbacks
+        const mentorFeedbacksMap: Record<string, FeedbackType[]> = {};
+        response.data.forEach((feedback) => {
+          if (feedback.mentorId && !feedback.teamId) {
+            if (!mentorFeedbacksMap[feedback.mentorId]) {
+              mentorFeedbacksMap[feedback.mentorId] = [];
+            }
+            mentorFeedbacksMap[feedback.mentorId].push(feedback);
+          }
         });
+        setMentorFeedbacks(mentorFeedbacksMap);
       }
-    }
+    });
   };
 
   if (isLoading) {
@@ -103,79 +115,98 @@ export default function Feedback({ hackathonId }: FeedbackProps) {
     );
   }
 
+  // Generate tabs for each mentor feedback category
+  const tabCategories = [
+    { name: "Hackathon Feedback", type: "hackathon" },
+    ...Object.keys(mentorFeedbacks).map((mentorId) => ({
+      name: `Mentor: ${
+        mentorFeedbacks[mentorId][0]?.mentor?.username || mentorId
+      }`,
+      type: "mentor",
+      mentorId,
+    })),
+  ];
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Hackathon Feedback</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold">Hackathon Feedback</h2>
+        {!showCreateForm && (
+          <Button onClick={() => setShowCreateForm(true)}>
+            Create Feedback Form
+          </Button>
+        )}
+      </div>
 
-      {feedbacks.length === 0 ? (
+      {showCreateForm ? (
+        <CreateFeedbackForm
+          hackathonId={hackathonId}
+          onFeedbackCreated={handleFeedbackCreated}
+          onCancel={() => setShowCreateForm(false)}
+        />
+      ) : feedbacks.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
-          No feedback available for this hackathon.
+          No feedback available for this hackathon. Create your first feedback
+          form!
         </div>
       ) : (
-        <div className="space-y-4">
-          {feedbacks.map((feedback) => (
-            <div
-              key={feedback.id}
-              className="border rounded-lg overflow-hidden"
-            >
-              <div
-                className="bg-gray-50 p-4 cursor-pointer flex justify-between items-center"
-                onClick={() => handleExpandFeedback(feedback.id)}
+        <Tab.Group>
+          <Tab.List className="flex space-x-1 border-b">
+            {tabCategories.map((category) => (
+              <Tab
+                key={
+                  category.type === "mentor"
+                    ? `mentor-${category.mentorId}`
+                    : "hackathon"
+                }
+                className={({ selected }) =>
+                  `py-2 px-4 text-sm font-medium leading-5 text-gray-700 border-b-2 ${
+                    selected
+                      ? "border-blue-500 text-blue-600"
+                      : "border-transparent hover:text-gray-900 hover:border-gray-300"
+                  }`
+                }
               >
-                <div>
-                  <h3 className="font-medium">
-                    {feedback.title || "Untitled Feedback"}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {new Date(feedback.createdAt).toLocaleDateString()}
-                  </p>
+                {category.name}
+              </Tab>
+            ))}
+          </Tab.List>
+          <Tab.Panels className="mt-4">
+            {/* Hackathon Feedback Panel */}
+            <Tab.Panel>
+              {hackathonFeedbacks.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  No hackathon feedback available.
                 </div>
-                <div className="text-blue-600">
-                  {expandedFeedbackId === feedback.id
-                    ? "Hide Details"
-                    : "View Details"}
-                </div>
-              </div>
-
-              {expandedFeedbackId === feedback.id && (
-                <div className="p-4 border-t">
-                  <p className="mb-4 text-gray-700">{feedback.description}</p>
-
-                  <h4 className="font-medium mb-2">Feedback Details:</h4>
-                  {!feedbackDetails[feedback.id] ? (
-                    <div className="flex justify-center py-4">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                    </div>
-                  ) : feedbackDetails[feedback.id].length === 0 ? (
-                    <p className="text-gray-500 italic">
-                      No detailed feedback available
-                    </p>
-                  ) : (
-                    <div className="space-y-3">
-                      {feedbackDetails[feedback.id].map((detail) => (
-                        <div key={detail.id} className="bg-gray-50 p-3 rounded">
-                          <div className="flex justify-between">
-                            <span className="font-medium">
-                              {detail.question}
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              {detail.rating && `Rating: ${detail.rating}/5`}
-                            </span>
-                          </div>
-                          {detail.answer && (
-                            <p className="mt-1 text-gray-700">
-                              {detail.answer}
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+              ) : (
+                <div className="space-y-6">
+                  {hackathonFeedbacks.map((feedback) => (
+                    <FeedbackDetails
+                      key={feedback.id}
+                      feedback={feedback}
+                      currentUser={user}
+                    />
+                  ))}
                 </div>
               )}
-            </div>
-          ))}
-        </div>
+            </Tab.Panel>
+
+            {/* Mentor Feedback Panels */}
+            {Object.keys(mentorFeedbacks).map((mentorId) => (
+              <Tab.Panel key={`mentor-panel-${mentorId}`}>
+                <div className="space-y-6">
+                  {mentorFeedbacks[mentorId].map((feedback) => (
+                    <FeedbackDetails
+                      key={feedback.id}
+                      feedback={feedback}
+                      currentUser={user}
+                    />
+                  ))}
+                </div>
+              </Tab.Panel>
+            ))}
+          </Tab.Panels>
+        </Tab.Group>
       )}
     </div>
   );
