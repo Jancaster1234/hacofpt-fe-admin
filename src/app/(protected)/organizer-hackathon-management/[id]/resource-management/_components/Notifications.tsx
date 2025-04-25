@@ -7,6 +7,7 @@ import { NotificationMethod } from "@/types/entities/notificationDelivery";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { notificationService } from "@/services/notification.service";
+import { useWebSocket } from '@/contexts/WebSocketContext';
 
 enum RoleType {
   ADMIN = "ADMIN",
@@ -79,6 +80,7 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
   const [recipientType, setRecipientType] = useState<"users" | "role">("users");
   const [selectedRole, setSelectedRole] = useState<RoleType>(RoleType.ADMIN);
   const { user } = useAuth();
+  const { client, isConnected } = useWebSocket();
 
   useEffect(() => {
     const loadData = async () => {
@@ -167,6 +169,33 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
       if (data) {
         setNotifications([data, ...notifications]);
 
+        // Send WebSocket notification to each recipient
+        if (recipientType === "users") {
+          selectedRecipients.forEach(recipient => {
+
+            // Gửi qua WebSocket thay vì gọi API trực tiếp
+            if (client && isConnected) {
+              const notificationBody = {
+                id: data.id,
+                content: newNotification.content,
+                type: newNotification.type,
+                metadata: newNotification.metadata || "{}",
+                isRead: false
+              };
+
+              console.log('Sending notification via WebSocket:', notificationBody);
+
+              client.publish({
+                destination: `/app/notifications/${recipient.id}`,
+                body: JSON.stringify(notificationBody)
+              });
+            } else {
+              console.error('WebSocket not connected');
+              toast.error('Failed to send notification: WebSocket not connected');
+            }
+          });
+        }
+
         // Reset form
         setNewNotification({
           recipientEmail: "",
@@ -229,8 +258,8 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (

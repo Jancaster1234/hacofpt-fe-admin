@@ -1,6 +1,9 @@
 // src/app/(protected)/grading-submission/_components/Filters.tsx
 "use client";
 
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+
 const categories = [
   "Coding Hackathons",
   "External Hackathons",
@@ -55,62 +58,85 @@ export default function Filters({
   };
 
   return (
-    <div className="p-4 border rounded-lg bg-white shadow">
-      <h3 className="font-bold mb-2">Filter</h3>
+    <div className="p-6 border rounded-xl bg-white shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Filters</h3>
 
-      {/* Category Filter */}
-      <div>
-        <h4 className="font-semibold">Category</h4>
-        {categories.map((cat) => (
-          <label key={cat} className="block">
-            <input
-              type="checkbox"
-              checked={selectedCategories.includes(cat)}
-              onChange={() =>
-                toggleSelection(cat, selectedCategories, "categories")
-              }
-            />
-            {cat}
-          </label>
-        ))}
-      </div>
+      <div className="space-y-6">
+        {/* Category Filter */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Category</h4>
+          <div className="space-y-2">
+            {categories.map((cat) => (
+              <div key={cat} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`category-${cat}`}
+                  checked={selectedCategories.includes(cat)}
+                  onCheckedChange={() =>
+                    toggleSelection(cat, selectedCategories, "categories")
+                  }
+                />
+                <Label
+                  htmlFor={`category-${cat}`}
+                  className="text-sm font-normal text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+                >
+                  {cat}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      {/* Enrollment Status Filter */}
-      <div className="mt-4">
-        <h4 className="font-semibold">Enrollment Status</h4>
-        {enrollmentStatusOptions.map((statusValue) => (
-          <label key={statusValue} className="block">
-            <input
-              type="checkbox"
-              checked={enrollmentStatus.includes(statusValue)}
-              onChange={() =>
-                toggleSelection(
-                  statusValue,
-                  enrollmentStatus,
-                  "enrollmentStatus"
-                )
-              }
-            />
-            {statusValue.charAt(0).toUpperCase() + statusValue.slice(1)}
-          </label>
-        ))}
-      </div>
+        {/* Enrollment Status Filter */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Enrollment Status</h4>
+          <div className="space-y-2">
+            {enrollmentStatusOptions.map((statusValue) => (
+              <div key={statusValue} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`status-${statusValue}`}
+                  checked={enrollmentStatus.includes(statusValue)}
+                  onCheckedChange={() =>
+                    toggleSelection(
+                      statusValue,
+                      enrollmentStatus,
+                      "enrollmentStatus"
+                    )
+                  }
+                />
+                <Label
+                  htmlFor={`status-${statusValue}`}
+                  className="text-sm font-normal text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+                >
+                  {statusValue.charAt(0).toUpperCase() + statusValue.slice(1)}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
 
-      {/* Organization Filter */}
-      <div className="mt-4">
-        <h4 className="font-semibold">Organization</h4>
-        {organizations.map((org) => (
-          <label key={org} className="block">
-            <input
-              type="checkbox"
-              checked={selectedOrganizations.includes(org)}
-              onChange={() =>
-                toggleSelection(org, selectedOrganizations, "organizations")
-              }
-            />
-            {org}
-          </label>
-        ))}
+        {/* Organization Filter */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Organization</h4>
+          <div className="space-y-2">
+            {organizations.map((org) => (
+              <div key={org} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`org-${org}`}
+                  checked={selectedOrganizations.includes(org)}
+                  onCheckedChange={() =>
+                    toggleSelection(org, selectedOrganizations, "organizations")
+                  }
+                />
+                <Label
+                  htmlFor={`org-${org}`}
+                  className="text-sm font-normal text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+                >
+                  {org}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
