@@ -1,7 +1,7 @@
 // src/app/(protected)/blog-management/_components/BlogPostForm.tsx
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BlogPost, BlogPostStatus } from "@/types/entities/blogPost";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -23,8 +22,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import * as z from "zod";
+import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
 
 // Form validation schema
 const formSchema = z.object({
@@ -47,6 +47,7 @@ interface BlogPostFormProps {
 
 const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const editorRef = useRef<TiptapEditorRef>(null);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -91,6 +92,13 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
   const handleImageUrlChange = (url: string) => {
     form.setValue("bannerImageUrl", url);
     setPreviewImage(url);
+  };
+
+  // Get word count from editor
+  const getWordCount = () => {
+    return (
+      editorRef.current?.getInstance()?.storage.characterCount.words() ?? 0
+    );
   };
 
   return (
@@ -165,13 +173,32 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Blog post content"
-                      className="min-h-[200px]"
-                    />
+                    <div className="min-h-[300px] border border-input rounded-md">
+                      <Controller
+                        name="content"
+                        control={form.control}
+                        render={({ field }) => (
+                          <TiptapEditor
+                            ref={editorRef}
+                            ssr={true}
+                            output="html"
+                            placeholder={{
+                              paragraph: "Write your blog post content here...",
+                              imageCaption: "Type caption for image (optional)",
+                            }}
+                            contentMinHeight={280}
+                            contentMaxHeight={600}
+                            onContentChange={field.onChange}
+                            initialContent={field.value}
+                          />
+                        )}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
+                  <div className="text-sm text-gray-500 mt-2">
+                    Word count: {getWordCount()}
+                  </div>
                 </FormItem>
               )}
             />

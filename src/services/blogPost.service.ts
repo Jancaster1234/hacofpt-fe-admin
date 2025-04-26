@@ -105,6 +105,7 @@ class BlogPostService {
   async createBlogPost(data: {
     title: string;
     content: string;
+    wordCount?: number;
     bannerImageUrl: string;
     slug?: string;
     status?: BlogPostStatus;
@@ -142,6 +143,7 @@ class BlogPostService {
     id: string;
     title?: string;
     content?: string;
+    wordCount?: number;
     bannerImageUrl?: string;
     slug?: string;
     status?: BlogPostStatus;

@@ -48,7 +48,13 @@ export default function BlogManagement() {
     status?: BlogPostStatus;
   }) => {
     try {
-      await blogPostService.createBlogPost(data);
+      // Calculate word count from HTML content
+      const wordCount = calculateWordCount(data.content);
+
+      await blogPostService.createBlogPost({
+        ...data,
+        wordCount,
+      });
       fetchBlogPosts();
       setCurrentView("list");
     } catch (err) {
@@ -60,12 +66,19 @@ export default function BlogManagement() {
     id: string;
     title?: string;
     content?: string;
+    wordCount?: number;
     bannerImageUrl?: string;
     slug?: string;
     status?: BlogPostStatus;
   }) => {
     try {
-      await blogPostService.updateBlogPost(data);
+      // Calculate word count if content is updated
+      const updatedData = { ...data };
+      if (data.content) {
+        updatedData.wordCount = calculateWordCount(data.content);
+      }
+
+      await blogPostService.updateBlogPost(updatedData);
       if (selectedPost) {
         const response = await blogPostService.getBlogPostById(data.id);
         setSelectedPost(response.data);
@@ -74,6 +87,17 @@ export default function BlogManagement() {
     } catch (err) {
       console.error("Error updating blog post:", err);
     }
+  };
+
+  // Helper function to calculate word count from HTML content
+  const calculateWordCount = (htmlContent: string): number => {
+    // Remove HTML tags and count words
+    const text = htmlContent.replace(/<[^>]*>/g, " ");
+    const words = text
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
+    return words.length;
   };
 
   const handleDeleteBlogPost = async (id: string) => {

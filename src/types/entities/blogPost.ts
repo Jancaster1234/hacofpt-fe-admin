@@ -15,6 +15,7 @@ export type BlogPost = {
   slug: string;
   bannerImageUrl?: string;
   content: string;
+  wordCount?: number;
   status: BlogPostStatus;
   reviewedBy?: User;
   reviewedById?: string;

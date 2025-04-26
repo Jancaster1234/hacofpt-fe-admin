@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/utils/dateFormatter";
 import BlogPostForm from "./BlogPostForm";
+import TiptapRenderer from "@/components/TiptapRenderer/ClientRenderer";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -210,11 +211,7 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
               </div>
             )}
             <CardContent className="prose max-w-none pt-6">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: blogPost.content.replace(/\n/g, "<br />"),
-                }}
-              />
+              <TiptapRenderer>{blogPost.content}</TiptapRenderer>
             </CardContent>
           </Card>
 
