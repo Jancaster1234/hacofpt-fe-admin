@@ -120,12 +120,12 @@ const navItems: NavItem[] = [
     allowedRoles: ["ADMIN"],
     path: "/send-notification",
   },
-  // {
-  //   icon: <CalenderIcon />,
-  //   name: "Blog",
-  //   allowedRoles: ["ADMIN"],
-  //   path: "/blog-management",
-  // },
+  {
+    icon: <CalenderIcon />,
+    name: "Blog",
+    allowedRoles: ["ADMIN"],
+    path: "/blog-management",
+  },
 ];
 
 const othersItems: NavItem[] = [];
