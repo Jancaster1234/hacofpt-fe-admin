@@ -98,7 +98,7 @@ class BlogPostService {
   }): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.put<BlogPost>(
-        `/analytics-service/api/v1/blog-posts`,
+        `/analytics-service/api/v1/blog-posts/${data.id}`,
         { data: data }
       );
 
