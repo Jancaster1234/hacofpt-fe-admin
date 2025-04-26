@@ -27,6 +27,31 @@ class BlogPostService {
     }
   }
 
+  async getBlogPostBySlug(
+    slug: string
+  ): Promise<{ data: BlogPost; message?: string }> {
+    try {
+      const response = await apiService.auth.get<BlogPost>(
+        `/analytics-service/api/v1/blog-posts/slug/${slug}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve blog post by slug");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<BlogPost>(
+        error,
+        {} as BlogPost,
+        `[BlogPost Service] Error getting blog post by slug (${slug}):`
+      );
+    }
+  }
+
   async getBlogPostById(
     id: string
   ): Promise<{ data: BlogPost; message?: string }> {
