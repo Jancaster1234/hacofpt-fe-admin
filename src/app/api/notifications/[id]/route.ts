@@ -1,4 +1,3 @@
-// src/app/api/notifications/[id]/route.ts
 import { NextResponse } from "next/server";
 
 // Define notification types

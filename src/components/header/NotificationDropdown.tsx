@@ -7,6 +7,8 @@ import { useAuth } from "@/hooks/useAuth_v0";
 import { toast } from "sonner";
 import Image from "next/image";
 import { notificationService } from "@/services/notification.service";
+import { useWebSocket } from '@/contexts/WebSocketContext';
+import { Message, StompSubscription } from '@stomp/stompjs';
 
 interface Notification {
   id: string;
@@ -18,6 +20,7 @@ interface Notification {
     name: string;
     avatarUrl: string;
   };
+  isRead?: boolean;
 }
 
 export default function NotificationDropdown() {
@@ -25,12 +28,55 @@ export default function NotificationDropdown() {
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useAuth();
+  const { client, isConnected } = useWebSocket();
 
   useEffect(() => {
     if (user?.id) {
       fetchNotifications();
     }
   }, [user?.id]);
+
+  useEffect(() => {
+    let subscription: StompSubscription | null = null;
+
+    const setupSubscription = async () => {
+      if (!isConnected || !client || !user?.id) return;
+
+      try {
+        // Wait a short moment to ensure connection is fully established
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        if (client.connected) {
+          // Subscribe to the topic that matches the backend's destination
+          // The backend uses: messagingTemplate.convertAndSend("/topic/notifications/" + userId, notificationResponse);
+          const topic = `/topic/notifications/${user.id}`;
+          console.log(`Subscribing to topic: ${topic}`);
+
+          subscription = client.subscribe(topic, (message: Message) => {
+            try {
+              const newNotification = JSON.parse(message.body);
+              console.log("Received WebSocket notification:", newNotification);
+              setNotifications(prev => [newNotification, ...prev]);
+              toast.info(newNotification.content);
+            } catch (error) {
+              console.error("Error parsing notification message:", error);
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error setting up WebSocket subscription:', error);
+        toast.error('Failed to connect to notification service');
+      }
+    };
+
+    setupSubscription();
+
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
+  }, [isConnected, client, user?.id]);
 
   const fetchNotifications = async () => {
     try {
@@ -39,14 +85,24 @@ export default function NotificationDropdown() {
         return;
       }
 
-      setLoading(true);
-      // Using the notification service instead of direct fetch
-      const response = await notificationService.getAllNotifications();
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        toast.error("No access token found");
+        return;
+      }
 
-      if (response && response.data) {
-        setNotifications(response.data || []);
+      setLoading(true);
+      const response = await fetch(`/api/notifications/user/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+
+      if (response.ok && data) {
+        setNotifications(data.data || []);
       } else {
-        toast.error("Failed to fetch notifications");
+        toast.error(data.error?.message || "Failed to fetch notifications");
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -139,16 +195,16 @@ export default function NotificationDropdown() {
                           className="rounded-full object-cover"
                         />
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start mb-2">
                           <p className="text-sm font-medium text-gray-900">
                             {notification.sender.name}
                           </p>
-                          <span className="text-xs text-gray-500 ml-2">
+                          <span className="text-xs text-gray-500 flex-shrink-0">
                             {new Date(notification.createdAt).toLocaleString()}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-800">
+                        <p className="text-sm text-gray-800 break-words">
                           {notification.content}
                         </p>
                       </div>
