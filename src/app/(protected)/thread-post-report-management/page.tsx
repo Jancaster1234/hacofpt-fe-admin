@@ -37,14 +37,10 @@ export default function ThreadPostReportManagement() {
     report: ThreadPostReport,
     newStatus: ThreadPostReportStatus
   ) => {
-    if (!report.id || !report.threadPostId) return;
-
+    if (!report.id || !report.threadPost?.id) return;
     try {
       setUpdating((prev) => ({ ...prev, [report.id]: true }));
-
-      await threadPostReportService.updateThreadPostReport(report.id, {
-        threadPostId: report.threadPostId,
-        reason: report.reason,
+      await threadPostReportService.reviewThreadPostReport(report.id, {
         status: newStatus,
       });
 

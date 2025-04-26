@@ -93,7 +93,7 @@ class TeamService {
     try {
       const response = await apiService.auth.post<Team[]>(
         `/hackathon-service/api/v1/teams/bulk`,
-        teams
+        { data: teams }
       );
 
       if (!response || !response.data) {
