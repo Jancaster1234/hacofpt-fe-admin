@@ -7,7 +7,7 @@ class BlogPostService {
   async getAllBlogPosts(): Promise<{ data: BlogPost[]; message?: string }> {
     try {
       const response = await apiService.auth.get<BlogPost[]>(
-        "/hackathon-service/api/v1/blog-posts"
+        "/analytics-service/api/v1/blog-posts"
       );
 
       if (!response || !response.data) {
@@ -32,7 +32,7 @@ class BlogPostService {
   ): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.get<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts/${id}`
+        `/analytics-service/api/v1/blog-posts/${id}`
       );
 
       if (!response || !response.data) {
@@ -67,7 +67,7 @@ class BlogPostService {
       };
 
       const response = await apiService.auth.post<BlogPost>(
-        "/hackathon-service/api/v1/blog-posts",
+        "/analytics-service/api/v1/blog-posts",
         { data: blogPostData }
       );
 
@@ -98,7 +98,7 @@ class BlogPostService {
   }): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.put<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts`,
+        `/analytics-service/api/v1/blog-posts`,
         { data: data }
       );
 
@@ -122,7 +122,7 @@ class BlogPostService {
   async deleteBlogPost(id: string): Promise<{ message?: string }> {
     try {
       const response = await apiService.auth.delete(
-        `/hackathon-service/api/v1/blog-posts/${id}`
+        `/analytics-service/api/v1/blog-posts/${id}`
       );
 
       return {
@@ -142,7 +142,7 @@ class BlogPostService {
   ): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.put<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts/${id}/publish`,
+        `/analytics-service/api/v1/blog-posts/${id}/publish`,
         {}
       );
 
@@ -168,7 +168,7 @@ class BlogPostService {
   ): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.put<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts/${id}/unpublish`,
+        `/analytics-service/api/v1/blog-posts/${id}/unpublish`,
         {}
       );
 
@@ -194,7 +194,7 @@ class BlogPostService {
   ): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.put<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts/${id}/approve`,
+        `/analytics-service/api/v1/blog-posts/${id}/approve`,
         { data: { reviewedById } }
       );
 
@@ -221,7 +221,7 @@ class BlogPostService {
   ): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.put<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts/${id}/reject`,
+        `/analytics-service/api/v1/blog-posts/${id}/reject`,
         { data: { reviewedById } }
       );
 
