@@ -1,4 +1,4 @@
-// app/chat/page.tsx
+// src/app/(protected)/chat/page.tsx
 import { Metadata } from 'next';
 import ChatClient from './_components/ChatClient';
 

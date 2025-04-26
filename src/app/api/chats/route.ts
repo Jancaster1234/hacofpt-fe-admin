@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// src/app/api/chats/route.ts
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {

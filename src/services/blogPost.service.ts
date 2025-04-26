@@ -7,7 +7,7 @@ class BlogPostService {
   async getAllBlogPosts(): Promise<{ data: BlogPost[]; message?: string }> {
     try {
       const response = await apiService.auth.get<BlogPost[]>(
-        "/hackathon-service/api/v1/blog-posts"
+        "/analytics-service/api/v1/blog-posts"
       );
 
       if (!response || !response.data) {
@@ -27,12 +27,37 @@ class BlogPostService {
     }
   }
 
+  async getBlogPostBySlug(
+    slug: string
+  ): Promise<{ data: BlogPost; message?: string }> {
+    try {
+      const response = await apiService.auth.get<BlogPost>(
+        `/analytics-service/api/v1/blog-posts/slug/${slug}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve blog post by slug");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<BlogPost>(
+        error,
+        {} as BlogPost,
+        `[BlogPost Service] Error getting blog post by slug (${slug}):`
+      );
+    }
+  }
+
   async getBlogPostById(
     id: string
   ): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.get<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts/${id}`
+        `/analytics-service/api/v1/blog-posts/${id}`
       );
 
       if (!response || !response.data) {
@@ -52,9 +77,35 @@ class BlogPostService {
     }
   }
 
+  async getBlogPostsByStatus(
+    status: BlogPostStatus
+  ): Promise<{ data: BlogPost[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<BlogPost[]>(
+        `/analytics-service/api/v1/blog-posts?status=${status}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve blog posts by status");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<BlogPost[]>(
+        error,
+        [],
+        `[BlogPost Service] Error getting blog posts by status (${status}):`
+      );
+    }
+  }
+
   async createBlogPost(data: {
     title: string;
     content: string;
+    wordCount?: number;
     bannerImageUrl: string;
     slug?: string;
     status?: BlogPostStatus;
@@ -67,7 +118,7 @@ class BlogPostService {
       };
 
       const response = await apiService.auth.post<BlogPost>(
-        "/hackathon-service/api/v1/blog-posts",
+        "/analytics-service/api/v1/blog-posts",
         { data: blogPostData }
       );
 
@@ -92,13 +143,14 @@ class BlogPostService {
     id: string;
     title?: string;
     content?: string;
+    wordCount?: number;
     bannerImageUrl?: string;
     slug?: string;
     status?: BlogPostStatus;
   }): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.put<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts`,
+        `/analytics-service/api/v1/blog-posts/${data.id}`,
         { data: data }
       );
 
@@ -122,7 +174,7 @@ class BlogPostService {
   async deleteBlogPost(id: string): Promise<{ message?: string }> {
     try {
       const response = await apiService.auth.delete(
-        `/hackathon-service/api/v1/blog-posts/${id}`
+        `/analytics-service/api/v1/blog-posts/${id}`
       );
 
       return {
@@ -142,7 +194,7 @@ class BlogPostService {
   ): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.put<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts/${id}/publish`,
+        `/analytics-service/api/v1/blog-posts/${id}/publish`,
         {}
       );
 
@@ -168,7 +220,7 @@ class BlogPostService {
   ): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.put<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts/${id}/unpublish`,
+        `/analytics-service/api/v1/blog-posts/${id}/unpublish`,
         {}
       );
 
@@ -194,7 +246,7 @@ class BlogPostService {
   ): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.put<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts/${id}/approve`,
+        `/analytics-service/api/v1/blog-posts/${id}/approve`,
         { data: { reviewedById } }
       );
 
@@ -221,7 +273,7 @@ class BlogPostService {
   ): Promise<{ data: BlogPost; message?: string }> {
     try {
       const response = await apiService.auth.put<BlogPost>(
-        `/hackathon-service/api/v1/blog-posts/${id}/reject`,
+        `/analytics-service/api/v1/blog-posts/${id}/reject`,
         { data: { reviewedById } }
       );
 

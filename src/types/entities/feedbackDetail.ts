@@ -1,5 +1,5 @@
 // src/types/entities/feedbackDetail.ts
-import { AuditBase } from "./auditBase";
+import { AuditCreatedBase } from "./auditCreatedBase";
 import { Feedback } from "./feedback";
 
 export type FeedbackDetail = {
@@ -8,6 +8,6 @@ export type FeedbackDetail = {
   feedbackId?: string;
   content: string;
   maxRating: number;
-  rate: number;
+  rate?: number;
   note?: string;
-} & AuditBase;
+} & AuditCreatedBase;

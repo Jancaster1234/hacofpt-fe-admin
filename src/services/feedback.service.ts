@@ -27,6 +27,32 @@ class FeedbackService {
     }
   }
 
+  async getFeedbackByMentorIdAndHackathonId(
+    mentorId: string,
+    hackathonId: string
+  ): Promise<{ data: Feedback; message?: string }> {
+    try {
+      const response = await apiService.auth.get<Feedback[]>(
+        `/analytics-service/api/v1/feedbacks/hackathon/${hackathonId}/mentor/${mentorId}`
+      );
+
+      if (!response || !response.data || response.data.length === 0) {
+        throw new Error("No feedbacks found for given mentor and hackathon");
+      }
+
+      return {
+        data: response.data[0], // first feedback object
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<Feedback>(
+        error,
+        {} as Feedback,
+        "[Feedback Service] Error getting feedback by mentor and hackathon ID:"
+      );
+    }
+  }
+
   async getFeedbackById(
     id: string
   ): Promise<{ data: Feedback; message?: string }> {

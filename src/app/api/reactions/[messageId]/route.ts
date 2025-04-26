@@ -1,3 +1,4 @@
+// src/app/api/reactions/[messageId]/route.ts
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request, { params }: { params: { messageId: string } }

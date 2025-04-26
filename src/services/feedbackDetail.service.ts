@@ -30,6 +30,36 @@ class FeedbackDetailService {
     }
   }
 
+  async getFeedbackDetailsByFeedbackIdAndCreator(
+    feedbackId: string,
+    createdByUserName: string
+  ): Promise<{ data: FeedbackDetail[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<FeedbackDetail[]>(
+        `/analytics-service/api/v1/feedback-details/by-feedback/${feedbackId}/user/${encodeURIComponent(
+          createdByUserName
+        )}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error(
+          "Failed to retrieve feedback details by feedback ID and creator username"
+        );
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<FeedbackDetail[]>(
+        error,
+        [],
+        "[FeedbackDetail Service] Error getting feedback details by feedback ID and creator username:"
+      );
+    }
+  }
+
   async getFeedbackDetailById(
     id: string
   ): Promise<{ data: FeedbackDetail; message?: string }> {
