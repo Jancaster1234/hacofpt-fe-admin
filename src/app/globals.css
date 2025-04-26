@@ -705,3 +705,30 @@ layer(base);
     @apply bg-background text-foreground;
   }
 }
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2aabee;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2aabee;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0) 48%,
+    rgba(174, 195, 249, 0.25) 0,
+    rgba(174, 195, 249, 0.25) 52%,
+    rgba(0, 0, 0, 0) 0,
+    rgba(0, 0, 0, 0)
+  );
+  border-radius: 0;
+}
