@@ -52,6 +52,31 @@ class BlogPostService {
     }
   }
 
+  async getBlogPostsByStatus(
+    status: BlogPostStatus
+  ): Promise<{ data: BlogPost[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<BlogPost[]>(
+        `/analytics-service/api/v1/blog-posts?status=${status}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve blog posts by status");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<BlogPost[]>(
+        error,
+        [],
+        `[BlogPost Service] Error getting blog posts by status (${status}):`
+      );
+    }
+  }
+
   async createBlogPost(data: {
     title: string;
     content: string;
