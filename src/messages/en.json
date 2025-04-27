@@ -1,0 +1,188 @@
+{
+  "_comment": "This is the English translation file. Path: src/messages/en.json",
+  "common": {
+    "languages": {
+      "english": "English",
+      "vietnamese": "Vietnamese"
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "home": {
+    "title": "Welcome to our website",
+    "description": "This is a multi-language website."
+  },
+  "hero": {
+    "exploreHackathon": "Explore Hackathon",
+    "title": "Discover Breakthrough Ideas at FPTU Hackathon",
+    "subtitle": "Join FPTU students on a journey of creativity and innovation.",
+    "getStarted": "Get Started",
+    "worldBackgroundAlt": "World Background",
+    "hackathon1Alt": "Hackathon 1",
+    "hackathon2Alt": "Hackathon 2",
+    "hackathon3Alt": "Hackathon 3"
+  },
+  "services": {
+    "sectionTitle": "SERVICES",
+    "sectionDescription": "A platform for managing hackathon competitions exclusively for FPTU students.",
+    "service1": {
+      "title": "Manage Registrations",
+      "subtitle": "Easy registration and progress tracking"
+    },
+    "service2": {
+      "title": "Efficient Organization",
+      "subtitle": "Tools for scheduling and notifications"
+    },
+    "service3": {
+      "title": "Team Collaboration",
+      "subtitle": "Seamless communication for teams"
+    },
+    "service4": {
+      "title": "Real-time Insights",
+      "subtitle": "Track hackathon progress with analytics"
+    }
+  },
+  "hackathon": {
+    "hackathonPageTitle": "Explore hackathons",
+    "searchPlaceholder": "Search hackathons by title...",
+    "searchHackathons": "Search hackathons",
+    "sortBy": "Sort by",
+    "sortBySuggestion": "Suggestion",
+    "sortByLatest": "Latest",
+    "noHackathonsFound": "No hackathons found. Try adjusting your filters.",
+    "failedToLoad": "Failed to load hackathons. Please try again later.",
+    "errorFetchingHackathons": "Error fetching hackathons. Please try again.",
+    "resultsCount": "Found {count} hackathons",
+    "filters": "Filters",
+    "filterBy": "Filter by",
+    "status": "Status",
+    "statusOpen": "Open",
+    "statusOngoing": "Ongoing",
+    "statusClosed": "Closed",
+    "categories": "Categories",
+    "categoryAI": "AI",
+    "categoryWebDevelopment": "Web Development",
+    "categoryMobile": "Mobile",
+    "categoryBlockchain": "Blockchain",
+    "categoryIoT": "IoT",
+    "organizations": "Organizations",
+    "organizationFPT": "FPT",
+    "organizationMicrosoft": "Microsoft",
+    "organizationGoogle": "Google",
+    "organizationAmazon": "Amazon",
+    "organizationMeta": "Meta",
+    "categoryCodingHackathons": "Coding Hackathons",
+    "categoryExternalHackathons": "External Hackathons",
+    "categoryInternalHackathons": "Internal Hackathons",
+    "categoryDesignHackathons": "Design Hackathons",
+    "categoryOthers": "Others",
+    "organizationFPTU": "FPTU",
+    "organizationNASA": "NASA",
+    "organizationIAIHACKATHON": "IAI HACKATHON",
+    "organizationCEHackathon": "CE Hackathon",
+    "organizationOthers": "Others",
+    "statusUpcoming": "Upcoming",
+    "viewingHackathon": "Viewing hackathon",
+    "bannerAlt": "Hackathon banner image",
+    "loading": "Loading...",
+    "updating": "Updating...",
+    "enroll": "Enroll",
+    "viewTeamEnrollment": "View team enrollment",
+    "viewTeamRequest": "View team request",
+    "viewIndividualEnrollment": "View individual enrollment",
+    "requestMentorship": "Request mentorship",
+    "viewMentorship": "View mentorship",
+    "viewMentorshipRequest": "View mentorship request",
+    "goToBoard": "Go to board",
+    "feedback": "Feedback",
+    "teamMemberOnly": "Only team members can enroll in hackathons",
+    "onePersonRegistered": "1 person has registered to participate",
+    "multiplePersonsRegistered": "{count} people have registered to participate",
+    "loadingData": "Loading hackathon data...",
+    "dataLoadedSuccess": "Hackathon data loaded successfully",
+    "dataLoadError": "Failed to load hackathon data. Please try again later.",
+    "dataLoadErrorTitle": "Data loading error",
+    "updatingData": "Updating mentorship data...",
+    "dataUpdateSuccess": "Mentorship data has been successfully updated",
+    "dataUpdatedTitle": "Data updated",
+    "dataUpdateError": "Failed to update mentorship data. Please try again later.",
+    "updateErrorTitle": "Update error",
+    "refreshingEnrollmentData": "Refreshing enrollment data...",
+    "enrollmentDataRefreshed": "Enrollment data refreshed successfully",
+    "enrollmentDataRefreshError": "Failed to refresh enrollment data"
+  },
+  "pagination": {
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "pageInfo": "{current} / {total}"
+  },
+  "loadingSpinner": {
+    "loading": "Loading..."
+  },
+
+  "hackathonCard": {
+    "enroll": "Enrollment period",
+    "viewDetails": "View details"
+  },
+
+  "hackathonDetail": {
+    "pageTitle": "Hackathon Details",
+    "loading": "Loading hackathon details...",
+    "errorLoading": "Error loading hackathon details",
+    "loadedSuccessfully": "Hackathon details loaded successfully",
+    "failedToLoad": "Failed to load hackathon details",
+    "noHackathonFound": "No hackathon found with this ID"
+  },
+
+  "hackathonTabs": {
+    "tabs": {
+      "information": "Information",
+      "description": "Description",
+      "participant": "Participants",
+      "documentation": "Documentation",
+      "contact": "Contact"
+    },
+    "subtabs": {
+      "teams": "Teams",
+      "individuals": "Individuals"
+    }
+  },
+  "enrollment": {
+    "overviewTitle": "Enrollment overview",
+    "myTeams": "My teams",
+    "teamRequests": "Team requests",
+    "individualRegistrations": "Individual registrations",
+    "close": "Close"
+  },
+  "individualRegistration": {
+    "yourRegistrations": "Your individual registrations",
+    "registerAsIndividual": "Register as individual",
+    "processing": "Processing...",
+    "noRegistrationsFound": "No individual enrollments found.",
+    "clickToRegister": "Click the button above to register as an individual.",
+    "registrationFor": "Registration for {title}",
+    "status": "Status",
+    "submitted": "Submitted",
+    "reviewedBy": "Reviewed by",
+    "deleteRegistration": "Delete registration",
+    "statusPENDING": "Pending",
+    "statusAPPROVED": "Approved",
+    "statusREJECTED": "Rejected",
+    "statusUNDER_REVIEW": "Under review",
+    "warningExistingRegistration": "You already have an individual registration with status: {status}",
+    "warningExistingTeamRequest": "You already have a team request with status: {status}",
+    "errorAlreadyRegisteredIndividual": "You already have an individual registration for this hackathon with status: {status}.",
+    "errorAlreadyTeamRequest": "You already have a team request for this hackathon with status: {status}. Please cancel it first to register as an individual.",
+    "registrationSuccess": "Your individual registration has been submitted successfully.",
+    "registrationError": "Failed to create individual registration. Please try again.",
+    "registrationErrorUnexpected": "An unexpected error occurred while creating your registration.",
+    "deletionErrorNonPending": "You can only delete registrations with PENDING status. Current status: {status}",
+    "registrationDeleted": "Your individual registration has been deleted successfully.",
+    "deletionError": "Failed to delete individual registration. Please try again.",
+    "submittingRegistration": "Submitting your registration...",
+    "deletingRegistration": "Deleting your registration..."
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "_comment": "This is the Vietnamese translation file. Path: src/messages/vi.json",
+  "common": {
+    "languages": {
+      "english": "Tiếng Anh",
+      "vietnamese": "Tiếng Việt"
+    }
+  },
+  "navigation": {
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ"
+  },
+  "home": {
+    "title": "Chào mừng đến với trang web của chúng tôi",
+    "description": "Đây là một trang web đa ngôn ngữ."
+  },
+  "hero": {
+    "exploreHackathon": "Khám phá hackathon",
+    "title": "Khám phá Ý tưởng Đột phá tại FPTU Hackathon",
+    "subtitle": "Tham gia cùng sinh viên FPTU trong hành trình sáng tạo và đổi mới.",
+    "getStarted": "Bắt đầu",
+    "worldBackgroundAlt": "Bản đồ thế giới",
+    "hackathon1Alt": "Hackathon 1",
+    "hackathon2Alt": "Hackathon 2",
+    "hackathon3Alt": "Hackathon 3"
+  },
+  "services": {
+    "sectionTitle": "DỊCH VỤ",
+    "sectionDescription": "Nền tảng quản lý các cuộc thi hackathon dành riêng cho sinh viên FPTU.",
+    "service1": {
+      "title": "Quản lý Đăng ký",
+      "subtitle": "Đăng ký dễ dàng và theo dõi tiến trình"
+    },
+    "service2": {
+      "title": "Tổ chức Hiệu quả",
+      "subtitle": "Công cụ lập lịch và thông báo"
+    },
+    "service3": {
+      "title": "Hợp tác Nhóm",
+      "subtitle": "Giao tiếp liền mạch cho các đội"
+    },
+    "service4": {
+      "title": "Thông tin Thời gian thực",
+      "subtitle": "Theo dõi tiến trình hackathon với phân tích"
+    }
+  },
+  "hackathon": {
+    "hackathonPageTitle": "Khám phá hackathon",
+    "searchPlaceholder": "Tìm kiếm hackathon theo tiêu đề...",
+    "searchHackathons": "Tìm kiếm hackathon",
+    "sortBy": "Sắp xếp theo",
+    "sortBySuggestion": "Đề xuất",
+    "sortByLatest": "Mới nhất",
+    "noHackathonsFound": "Không tìm thấy hackathon nào. Hãy thử điều chỉnh bộ lọc.",
+    "failedToLoad": "Không thể tải hackathon. Vui lòng thử lại sau.",
+    "errorFetchingHackathons": "Lỗi khi tải hackathon. Vui lòng thử lại.",
+    "resultsCount": "Tìm thấy {count} hackathon",
+    "filters": "Bộ lọc",
+    "filterBy": "Lọc theo",
+    "status": "Trạng thái",
+    "statusOpen": "Mở",
+    "statusOngoing": "Đang diễn ra",
+    "statusClosed": "Đã đóng",
+    "categories": "Danh mục",
+    "categoryAI": "AI",
+    "categoryWebDevelopment": "Phát triển Web",
+    "categoryMobile": "Di động",
+    "categoryBlockchain": "Blockchain",
+    "categoryIoT": "IoT",
+    "organizations": "Tổ chức",
+    "organizationFPT": "FPT",
+    "organizationMicrosoft": "Microsoft",
+    "organizationGoogle": "Google",
+    "organizationAmazon": "Amazon",
+    "organizationMeta": "Meta",
+    "categoryCodingHackathons": "Hackathon Lập Trình",
+    "categoryExternalHackathons": "Hackathon Bên Ngoài",
+    "categoryInternalHackathons": "Hackathon Nội Bộ",
+    "categoryDesignHackathons": "Hackathon Thiết Kế",
+    "categoryOthers": "Khác",
+    "organizationFPTU": "FPTU",
+    "organizationNASA": "NASA",
+    "organizationIAIHACKATHON": "IAI HACKATHON",
+    "organizationCEHackathon": "CE Hackathon",
+    "organizationOthers": "Khác",
+    "statusUpcoming": "Sắp Diễn Ra",
+    "viewingHackathon": "Đang xem hackathon",
+    "bannerAlt": "Hình ảnh banner hackathon",
+    "loading": "Đang tải...",
+    "updating": "Đang cập nhật...",
+    "enroll": "Đăng ký",
+    "viewTeamEnrollment": "Xem đăng ký nhóm",
+    "viewTeamRequest": "Xem yêu cầu nhóm",
+    "viewIndividualEnrollment": "Xem đăng ký cá nhân",
+    "requestMentorship": "Yêu cầu cố vấn",
+    "viewMentorship": "Xem cố vấn",
+    "viewMentorshipRequest": "Xem yêu cầu cố vấn",
+    "goToBoard": "Đến bảng",
+    "feedback": "Phản hồi",
+    "teamMemberOnly": "Chỉ thành viên đội mới có thể đăng ký hackathon",
+    "onePersonRegistered": "1 người đã đăng ký tham gia",
+    "multiplePersonsRegistered": "{count} người đã đăng ký tham gia",
+    "loadingData": "Đang tải dữ liệu hackathon...",
+    "dataLoadedSuccess": "Đã tải dữ liệu hackathon thành công",
+    "dataLoadError": "Không thể tải dữ liệu hackathon. Vui lòng thử lại sau.",
+    "dataLoadErrorTitle": "Lỗi tải dữ liệu",
+    "updatingData": "Đang cập nhật dữ liệu cố vấn...",
+    "dataUpdateSuccess": "Dữ liệu cố vấn đã được cập nhật thành công",
+    "dataUpdatedTitle": "Dữ liệu đã cập nhật",
+    "dataUpdateError": "Không thể cập nhật dữ liệu cố vấn. Vui lòng thử lại sau.",
+    "updateErrorTitle": "Lỗi cập nhật",
+    "refreshingEnrollmentData": "Đang làm mới dữ liệu đăng ký...",
+    "enrollmentDataRefreshed": "Dữ liệu đăng ký đã được làm mới thành công",
+    "enrollmentDataRefreshError": "Không thể làm mới dữ liệu đăng ký"
+  },
+  "pagination": {
+    "previousPage": "Trang trước",
+    "nextPage": "Trang sau",
+    "pageInfo": "{current} / {total}"
+  },
+  "loadingSpinner": {
+    "loading": "Đang tải..."
+  },
+
+  "hackathonCard": {
+    "enroll": "Thời gian đăng ký",
+    "viewDetails": "Xem chi tiết"
+  },
+
+  "hackathonDetail": {
+    "pageTitle": "Chi tiết Hackathon",
+    "loading": "Đang tải thông tin hackathon...",
+    "errorLoading": "Lỗi khi tải thông tin hackathon",
+    "loadedSuccessfully": "Tải thông tin hackathon thành công",
+    "failedToLoad": "Không thể tải thông tin hackathon",
+    "noHackathonFound": "Không tìm thấy hackathon với ID này"
+  },
+
+  "hackathonTabs": {
+    "tabs": {
+      "information": "Thông tin",
+      "description": "Mô tả",
+      "participant": "Người tham gia",
+      "documentation": "Tài liệu",
+      "contact": "Liên hệ"
+    },
+    "subtabs": {
+      "teams": "Đội",
+      "individuals": "Cá nhân"
+    }
+  },
+  "enrollment": {
+    "overviewTitle": "Tổng quan đăng ký",
+    "myTeams": "Đội của tôi",
+    "teamRequests": "Yêu cầu đội",
+    "individualRegistrations": "Đăng ký cá nhân",
+    "close": "Đóng"
+  },
+  "individualRegistration": {
+    "yourRegistrations": "Đăng ký cá nhân của bạn",
+    "registerAsIndividual": "Đăng ký cá nhân",
+    "processing": "Đang xử lý...",
+    "noRegistrationsFound": "Không tìm thấy đăng ký cá nhân nào.",
+    "clickToRegister": "Nhấn nút ở trên để đăng ký với tư cách cá nhân.",
+    "registrationFor": "Đăng ký cho {title}",
+    "status": "Trạng thái",
+    "submitted": "Đã gửi",
+    "reviewedBy": "Được xem xét bởi",
+    "deleteRegistration": "Xóa đăng ký",
+    "statusPENDING": "Đang chờ",
+    "statusAPPROVED": "Đã duyệt",
+    "statusREJECTED": "Bị từ chối",
+    "statusUNDER_REVIEW": "Đang xem xét",
+    "warningExistingRegistration": "Bạn đã có đăng ký cá nhân với trạng thái: {status}",
+    "warningExistingTeamRequest": "Bạn đã có yêu cầu đội với trạng thái: {status}",
+    "errorAlreadyRegisteredIndividual": "Bạn đã có đăng ký cá nhân cho hackathon này với trạng thái: {status}.",
+    "errorAlreadyTeamRequest": "Bạn đã có yêu cầu đội cho hackathon này với trạng thái: {status}. Vui lòng hủy yêu cầu trước khi đăng ký cá nhân.",
+    "registrationSuccess": "Đăng ký cá nhân của bạn đã được gửi thành công.",
+    "registrationError": "Không thể tạo đăng ký cá nhân. Vui lòng thử lại.",
+    "registrationErrorUnexpected": "Đã xảy ra lỗi không mong muốn khi tạo đăng ký của bạn.",
+    "deletionErrorNonPending": "Bạn chỉ có thể xóa đăng ký có trạng thái ĐANG CHỜ. Trạng thái hiện tại: {status}",
+    "registrationDeleted": "Đăng ký cá nhân của bạn đã được xóa thành công.",
+    "deletionError": "Không thể xóa đăng ký cá nhân. Vui lòng thử lại.",
+    "submittingRegistration": "Đang gửi đăng ký của bạn...",
+    "deletingRegistration": "Đang xóa đăng ký của bạn..."
+  }
+}

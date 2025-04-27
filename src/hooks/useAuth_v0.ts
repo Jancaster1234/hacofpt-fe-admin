@@ -62,9 +62,8 @@ export function useAuth() {
     try {
       const accessToken = localStorage.getItem("accessToken");
       if (accessToken) {
-        const { message: apiMessage } = await authService_v0.logout(
-          accessToken
-        );
+        const { message: apiMessage } =
+          await authService_v0.logout(accessToken);
         console.log("🔹 Logout message:", apiMessage);
         setMessage(apiMessage || "Successfully logged out", "success");
         return { success: true, message: apiMessage };
