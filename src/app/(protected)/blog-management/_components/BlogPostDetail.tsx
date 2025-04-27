@@ -4,7 +4,8 @@
 import React, { useState, useMemo } from "react";
 import { BlogPost } from "@/types/entities/blogPost";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { formatDate } from "@/utils/dateFormatter";
+import BlogPostForm from "./BlogPostForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Eye,
@@ -16,13 +17,7 @@ import {
   AlertTriangle,
   Trash2,
   Share2,
-  Clock,
-  User,
-  Calendar,
 } from "lucide-react";
-import { formatDate } from "@/utils/dateFormatter";
-import BlogPostForm from "./BlogPostForm";
-import TiptapRenderer from "@/components/TiptapRenderer/ClientRenderer";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,115 +29,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
-// New components based on post-csr/page.tsx
-const PostReadingProgress: React.FC = () => {
-  const [progress, setProgress] = useState(0);
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const docHeight =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercentage = (scrollTop / docHeight) * 100;
-      setProgress(scrollPercentage);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  return (
-    <div className="fixed top-0 left-0 w-full h-1 z-50">
-      <div
-        className="h-full bg-primary transition-all duration-200 ease-out"
-        style={{ width: `${progress}%` }}
-      />
-    </div>
-  );
-};
-
-const PostHeader: React.FC<{
-  title: string;
-  author?: string;
-  createdAt?: string;
-  readingTime: number;
-  bannerImageUrl?: string;
-}> = ({ title, author, createdAt, readingTime, bannerImageUrl }) => {
-  return (
-    <header className="w-full max-w-4xl mb-8">
-      <h1 className="text-4xl font-bold mb-4">{title}</h1>
-      <div className="flex flex-wrap items-center gap-4 text-gray-600 mb-6">
-        {author && (
-          <div className="flex items-center">
-            <User className="h-4 w-4 mr-1" />
-            <span>{author}</span>
-          </div>
-        )}
-        {createdAt && (
-          <div className="flex items-center">
-            <Calendar className="h-4 w-4 mr-1" />
-            <span>{formatDate(createdAt)}</span>
-          </div>
-        )}
-        <div className="flex items-center">
-          <Clock className="h-4 w-4 mr-1" />
-          <span>{readingTime} min read</span>
-        </div>
-      </div>
-      {bannerImageUrl && (
-        <div className="w-full h-64 md:h-96 overflow-hidden rounded-lg mb-8">
-          <img
-            src={bannerImageUrl}
-            alt={title}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = "none";
-            }}
-          />
-        </div>
-      )}
-    </header>
-  );
-};
-
-const PostToc: React.FC = () => {
-  // Placeholder for table of contents
-  // In a real implementation, you would extract headings from the content
-  return (
-    <aside className="hidden lg:block sticky top-24 self-start">
-      <div className="p-4 border rounded-lg">
-        <h3 className="font-semibold mb-2">Table of Contents</h3>
-        <ul className="space-y-2 text-sm">
-          <li className="text-gray-600 hover:text-primary transition-colors">
-            Introduction
-          </li>
-          <li className="text-gray-600 hover:text-primary transition-colors">
-            Main Content
-          </li>
-          <li className="text-gray-600 hover:text-primary transition-colors">
-            Conclusion
-          </li>
-        </ul>
-      </div>
-    </aside>
-  );
-};
-
-const PostSharing: React.FC<{ title?: string }> = ({ title }) => {
-  return (
-    <aside className="hidden lg:flex sticky top-24 self-start flex-col items-center space-y-4">
-      <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
-        <Share2 className="h-5 w-5" />
-      </button>
-      <div className="text-xs text-gray-500">Share</div>
-    </aside>
-  );
-};
-
-const PostContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <div className="prose prose-lg max-w-none">{children}</div>;
-};
+import TiptapRenderer from "@/components/TiptapRenderer/ClientRenderer";
+import PostHeader from "@/components/shared/PostHeader";
+import PostToc from "@/components/shared/PostToc";
+import PostContent from "@/components/shared/PostContent";
+import PostSharing from "@/components/shared/PostSharing";
+import PostReadingProgress from "@/components/shared/PostReadingProgress";
+import Image from "next/image";
 
 interface BlogPostDetailProps {
   blogPost: BlogPost;
@@ -166,14 +59,16 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
   const [activeTab, setActiveTab] = useState("view");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Calculate reading time
+  // Create placeholder values for missing fields from post-csr
+  const author = {
+    name: blogPost.createdByUserName || "Unknown Author",
+    avatar: "/placeholder-avatar.png", // Default avatar
+  };
+
   const readingTime = useMemo(() => {
     const wpm = 150;
-    return Math.ceil((blogPost.wordCount || 0) / wpm) || 3; // Default to 3 minutes if wordCount is missing
+    return Math.ceil((blogPost.wordCount || 500) / wpm);
   }, [blogPost.wordCount]);
-
-  // Get author name from createdByUserName or placeholder
-  const authorName = blogPost.createdByUserName || "Unknown Author";
 
   const handleUpdate = (data: any) => {
     onUpdate({ id: blogPost.id, ...data });
@@ -211,150 +106,156 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
     );
   };
 
-  return (
-    <div>
-      {/* Admin Controls - Visible in both tabs */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          {renderStatusBadge(blogPost.status)}
-        </div>
+  const renderActionButtons = () => (
+    <div className="flex space-x-2">
+      {blogPost.status === "APPROVED" && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPublish(blogPost.id)}
+          className="flex items-center space-x-1"
+        >
+          <ArrowUpCircle className="mr-1 h-4 w-4" />
+          Publish
+        </Button>
+      )}
 
-        <div className="flex space-x-2">
-          {/* Status-specific action buttons */}
-          {blogPost.status === "APPROVED" && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPublish(blogPost.id)}
-              className="flex items-center space-x-1"
-            >
-              <ArrowUpCircle className="mr-1 h-4 w-4" />
-              Publish
-            </Button>
-          )}
+      {blogPost.status === "PUBLISHED" && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onUnpublish(blogPost.id)}
+          className="flex items-center space-x-1"
+        >
+          <ArrowDownCircle className="mr-1 h-4 w-4" />
+          Unpublish
+        </Button>
+      )}
 
-          {blogPost.status === "PUBLISHED" && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onUnpublish(blogPost.id)}
-              className="flex items-center space-x-1"
-            >
-              <ArrowDownCircle className="mr-1 h-4 w-4" />
-              Unpublish
-            </Button>
-          )}
-
-          {blogPost.status === "PENDING_REVIEW" && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onApprove(blogPost.id)}
-                className="flex items-center text-green-600"
-              >
-                <CheckCircle className="mr-1 h-4 w-4" />
-                Approve
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onReject(blogPost.id)}
-                className="flex items-center text-red-600"
-              >
-                <XCircle className="mr-1 h-4 w-4" />
-                Reject
-              </Button>
-            </>
-          )}
-
-          <AlertDialog
-            open={showDeleteConfirm}
-            onOpenChange={setShowDeleteConfirm}
+      {blogPost.status === "PENDING_REVIEW" && (
+        <>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onApprove(blogPost.id)}
+            className="flex items-center text-green-600"
           >
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm">
-                <Trash2 className="mr-1 h-4 w-4" />
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the
-                  blog post and remove all associated data.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => onDelete(blogPost.id)}
-                  className="bg-red-600 hover:bg-red-700"
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            <CheckCircle className="mr-1 h-4 w-4" />
+            Approve
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onReject(blogPost.id)}
+            className="flex items-center text-red-600"
+          >
+            <XCircle className="mr-1 h-4 w-4" />
+            Reject
+          </Button>
+        </>
+      )}
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogTrigger asChild>
+          <Button variant="destructive" size="sm">
+            <Trash2 className="mr-1 h-4 w-4" />
+            Delete
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              blog post and remove all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => onDelete(blogPost.id)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+
+  return (
+    <div className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <div className="flex items-center justify-between mb-4">
+          <TabsList className="grid w-64 grid-cols-2">
+            <TabsTrigger value="view" className="flex items-center">
+              <Eye className="mr-2 h-4 w-4" />
+              View
+            </TabsTrigger>
+            <TabsTrigger value="edit" className="flex items-center">
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit
+            </TabsTrigger>
+          </TabsList>
+          {renderActionButtons()}
         </div>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6 grid w-full grid-cols-2">
-          <TabsTrigger value="view" className="flex items-center">
-            <Eye className="mr-2 h-4 w-4" />
-            View
-          </TabsTrigger>
-          <TabsTrigger value="edit" className="flex items-center">
-            <Pencil className="mr-2 h-4 w-4" />
-            Edit
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="view">
-          {/* Reading Progress Bar */}
-          <PostReadingProgress />
-
-          <article className="py-6 px-4 flex flex-col items-center">
-            {/* Post Header with metadata */}
-            <PostHeader
-              title={blogPost.title}
-              author={authorName}
-              createdAt={blogPost.createdAt}
-              readingTime={readingTime}
-              bannerImageUrl={blogPost.bannerImageUrl}
-            />
-
-            <div className="grid grid-cols-1 w-full lg:w-auto lg:grid-cols-[minmax(auto,64px)_minmax(720px,1fr)_minmax(auto,224px)] gap-6 lg:gap-8">
-              {/* Sharing sidebar */}
-              <PostSharing title={blogPost.title} />
-
-              {/* Main content */}
-              <PostContent>
-                <TiptapRenderer>{blogPost.content}</TiptapRenderer>
-              </PostContent>
-
-              {/* Table of contents */}
-              <PostToc />
-            </div>
-          </article>
-
-          {blogPost.reviewedById && (
-            <div className="mt-4 rounded-md bg-blue-50 p-4 text-blue-800">
-              <div className="flex items-center">
-                <AlertTriangle className="mr-2 h-4 w-4" />
-                <p className="text-sm">
-                  This post was reviewed by {blogPost.reviewedBy?.firstName}{" "}
-                  {blogPost.reviewedBy?.lastName}
-                </p>
-              </div>
-            </div>
-          )}
-        </TabsContent>
 
         <TabsContent value="edit">
           <BlogPostForm blogPost={blogPost} onSubmit={handleUpdate} />
+        </TabsContent>
+
+        <TabsContent value="view" className="w-full">
+          <article className="py-6 flex flex-col items-center w-full">
+            <PostReadingProgress />
+
+            {/* <div className="w-full max-w-3xl mb-6 flex items-center justify-between">
+              <h1 className="text-3xl font-bold">{blogPost.title}</h1>
+              <div>{renderStatusBadge(blogPost.status)}</div>
+            </div> */}
+
+            <PostHeader
+              title={blogPost.title}
+              author={blogPost.createdByUserName || "Unknown Author"}
+              createdAt={blogPost.createdAt || ""}
+              readingTime={readingTime}
+              cover={blogPost.bannerImageUrl}
+            />
+
+            <div className="grid grid-cols-1 w-full lg:grid-cols-[minmax(auto,256px)_minmax(720px,1fr)_minmax(auto,256px)] gap-6 lg:gap-8">
+              {/* Left sidebar with sharing links */}
+              <PostSharing />
+
+              {/* Main content area */}
+              <PostContent>
+                {blogPost.content.startsWith("{") ? (
+                  <TiptapRenderer>{blogPost.content}</TiptapRenderer>
+                ) : (
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: blogPost.content.replace(/\n/g, "<br />"),
+                    }}
+                  />
+                )}
+              </PostContent>
+
+              {/* Right sidebar - use PostToc directly */}
+              <PostToc />
+            </div>
+
+            {/* Placeholder footer image */}
+            <Image
+              src="/doraemon.png"
+              width={350}
+              height={350}
+              alt=""
+              className="mx-auto mt-10"
+              onError={(e) => {
+                // Fallback if image doesn't exist
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+          </article>
         </TabsContent>
       </Tabs>
     </div>
