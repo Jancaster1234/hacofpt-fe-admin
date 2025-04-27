@@ -1,7 +1,8 @@
 // src/services/auth.service_v0.ts
 import { apiService } from "@/services/apiService_v0";
-import { ApiResponse } from "@/services/apiService_v0"; // Import the updated interface
+import { ApiResponse } from "@/services/apiService_v0";
 import { User } from "@/types/entities/user";
+import { handleApiError } from "@/utils/errorHandler";
 
 interface AuthResponseData {
   token: string;
@@ -28,15 +29,11 @@ class AuthService_v0 {
         message: response.message,
       };
     } catch (error: any) {
-      console.error("[Auth Service] Error getting user info:", error.message);
-      // If the error is due to component unmount, don't rethrow
-      if (
-        error.name === "AbortError" &&
-        error.message?.includes("component unmounted")
-      ) {
-        return { data: {} as User, message: "Request aborted" };
-      }
-      throw error;
+      return handleApiError<User>(
+        error,
+        {} as User,
+        "[Auth Service] Error getting user info:"
+      );
     }
   }
 
@@ -56,10 +53,7 @@ class AuthService_v0 {
     try {
       const response = await apiService.public.post<AuthResponseData>(
         "/identity-service/api/v1/auth/token",
-        {
-          username,
-          password,
-        }
+        { username, password }
       );
 
       if (!response || !response.data) {
@@ -71,23 +65,11 @@ class AuthService_v0 {
         message: response.message,
       };
     } catch (error: any) {
-      console.error("[Auth Service] Login error:", error.message);
-
-      // Extract error message if available
-      let errorMessage = "Login failed";
-      if (error.message && error.message.includes("Response:")) {
-        try {
-          const jsonMatch = error.message.match(/Response:(.+)/);
-          if (jsonMatch) {
-            const errorJson = JSON.parse(jsonMatch[1].trim());
-            errorMessage = errorJson.message || errorMessage;
-          }
-        } catch (e) {
-          // If parsing fails, use the original error message
-        }
-      }
-
-      throw new Error(errorMessage);
+      return handleApiError<{ token: string; authenticated: boolean }>(
+        error,
+        { token: "", authenticated: false },
+        "[Auth Service] Login error:"
+      );
     }
   }
 
@@ -102,8 +84,8 @@ class AuthService_v0 {
         "/identity-service/api/v1/auth/logout",
         { token },
         undefined,
-        5000, // Use shorter timeout for logout
-        false // Don't abort previous requests
+        5000, // shorter timeout
+        false // don't abort previous requests
       );
 
       // Clear all in-flight requests when logging out
@@ -113,7 +95,6 @@ class AuthService_v0 {
       return { message: response.message || "Successfully logged out" };
     } catch (error: any) {
       console.error("[Auth Service] Logout error:", error.message);
-      // Even if logout fails, we consider the user logged out on the client side
       console.log(
         "[Auth Service] Continuing with client-side logout despite API error"
       );
@@ -126,9 +107,9 @@ class AuthService_v0 {
    * @returns boolean indicating authentication status
    */
   isAuthenticated(): boolean {
-    // This is a placeholder - you'd need to implement actual token validation logic
+    // Placeholder: Add real validation later
     const token = localStorage.getItem("accessToken");
-    return !!token; // Simple check if token exists
+    return !!token;
   }
 }
 

@@ -108,11 +108,26 @@ export function useAuth() {
       return { success: true, message: apiMessage };
     } catch (error: any) {
       console.error("❌ Failed to fetch user:", error);
-      localStorage.removeItem("accessToken");
+
+      // Only remove accessToken for authentication errors (401 Unauthorized, 403 Forbidden)
+      // Don't remove for network errors or other temporary issues
+      if (
+        error.status === 401 ||
+        error.status === 403 ||
+        error.message?.includes("unauthorized") ||
+        error.message?.includes("forbidden") ||
+        error.message?.includes("invalid token")
+      ) {
+        console.warn("🔹 Authentication error detected, removing token");
+        localStorage.removeItem("accessToken");
+      } else {
+        console.warn("🔹 Non-authentication error, preserving token for retry");
+      }
+
       setAuth({ user: null, loading: false });
 
       // Only set error message on actual errors, not on session expiration
-      if (!error.message.includes("component unmounted")) {
+      if (!error.message?.includes("component unmounted")) {
         setMessage(
           error.message || "Failed to retrieve user information",
           "error"
