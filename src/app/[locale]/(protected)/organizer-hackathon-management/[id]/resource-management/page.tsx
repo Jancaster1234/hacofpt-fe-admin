@@ -1,6 +1,5 @@
-// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/page.tsx
 "use client";
-import React, { useState, use } from "react";
+import React, { useState, use, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import Tabs from "./_components/Tabs";
 import AssignJudgeToRound from "./_components/AssignJudgeToRound";
@@ -20,6 +19,9 @@ import DeviceManagement from "./_components/DeviceManagement";
 import Sponsorship from "./_components/Sponsorship";
 import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
+import { useTranslations } from "@/hooks/useTranslations";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ResourceManagementPage({
   params,
@@ -28,6 +30,9 @@ export default function ResourceManagementPage({
 }) {
   const { user } = useAuth();
   const { id: hackathonId } = use(params);
+  const [isLoading, setIsLoading] = useState(false);
+  const t = useTranslations("resourceManagement");
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState<
     | "round"
     | "location"
@@ -48,43 +53,61 @@ export default function ResourceManagementPage({
   const { modalState, hideModal } = useApiModal();
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">
-        Hackathon Resource Management
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-3 sm:p-4 md:p-6 transition-colors duration-200">
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4 md:mb-6 transition-colors duration-200">
+        {t("title")}
       </h1>
+
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {activeTab === "round" && <Rounds hackathonId={hackathonId} />}
-      {activeTab === "location" && <Locations />}
-      {activeTab === "roundMarkCriteria" && (
-        <RoundMarkCriteria hackathonId={hackathonId} />
-      )}
-      {activeTab === "teamRequest" && (
-        <TeamRequests hackathonId={hackathonId} />
-      )}
-      {activeTab === "individualRequest" && (
-        <IndividualRegistrationRequests hackathonId={hackathonId} />
-      )}
-      {activeTab === "teamFormation" && (
-        <TeamFormation hackathonId={hackathonId} />
-      )}
-      {activeTab === "userManagement" && (
-        <UserManagement hackathonId={hackathonId} />
-      )}
-      {activeTab === "assignJudgeToRound" && (
-        <AssignJudgeToRound hackathonId={hackathonId} />
-      )}
-      {activeTab === "judge" && <JudgeAssign hackathonId={hackathonId} />}
-      {activeTab === "submission" && <Submissions hackathonId={hackathonId} />}
-      {activeTab === "notification" && (
-        <Notifications hackathonId={hackathonId} />
-      )}
-      {activeTab === "hackathonResult" && (
-        <HackathonResults hackathonId={hackathonId} />
-      )}
-      {activeTab === "feedback" && <Feedback hackathonId={hackathonId} />}
-      {activeTab === "device" && <DeviceManagement hackathonId={hackathonId} />}
-      {activeTab === "sponsorship" && <Sponsorship hackathonId={hackathonId} />}
+      <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 transition-colors duration-200">
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <LoadingSpinner size="lg" showText={true} />
+          </div>
+        ) : (
+          <>
+            {activeTab === "round" && <Rounds hackathonId={hackathonId} />}
+            {activeTab === "location" && <Locations />}
+            {activeTab === "roundMarkCriteria" && (
+              <RoundMarkCriteria hackathonId={hackathonId} />
+            )}
+            {activeTab === "teamRequest" && (
+              <TeamRequests hackathonId={hackathonId} />
+            )}
+            {activeTab === "individualRequest" && (
+              <IndividualRegistrationRequests hackathonId={hackathonId} />
+            )}
+            {activeTab === "teamFormation" && (
+              <TeamFormation hackathonId={hackathonId} />
+            )}
+            {activeTab === "userManagement" && (
+              <UserManagement hackathonId={hackathonId} />
+            )}
+            {activeTab === "assignJudgeToRound" && (
+              <AssignJudgeToRound hackathonId={hackathonId} />
+            )}
+            {activeTab === "judge" && <JudgeAssign hackathonId={hackathonId} />}
+            {activeTab === "submission" && (
+              <Submissions hackathonId={hackathonId} />
+            )}
+            {activeTab === "notification" && (
+              <Notifications hackathonId={hackathonId} />
+            )}
+            {activeTab === "hackathonResult" && (
+              <HackathonResults hackathonId={hackathonId} />
+            )}
+            {activeTab === "feedback" && <Feedback hackathonId={hackathonId} />}
+            {activeTab === "device" && (
+              <DeviceManagement hackathonId={hackathonId} />
+            )}
+            {activeTab === "sponsorship" && (
+              <Sponsorship hackathonId={hackathonId} />
+            )}
+          </>
+        )}
+      </div>
+
       <ApiResponseModal
         isOpen={modalState.isOpen}
         onClose={hideModal}

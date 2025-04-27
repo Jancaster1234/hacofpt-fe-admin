@@ -184,5 +184,49 @@
     "deletionError": "Không thể xóa đăng ký cá nhân. Vui lòng thử lại.",
     "submittingRegistration": "Đang gửi đăng ký của bạn...",
     "deletingRegistration": "Đang xóa đăng ký của bạn..."
+  },
+  "resourceManagement": {
+    "title": "Quản lý tài nguyên Hackathon",
+    "loading": "Đang tải...",
+    "tabs": {
+      "round": "Vòng thi",
+      "location": "Địa điểm",
+      "roundMarkCriteria": "Tiêu chí chấm điểm",
+      "teamRequest": "Yêu cầu nhóm",
+      "individualRequest": "Yêu cầu đăng ký cá nhân",
+      "teamFormation": "Thành lập nhóm",
+      "userManagement": "Quản lý người dùng",
+      "assignJudgeToRound": "Phân công giám khảo",
+      "judge": "Phân công giám khảo",
+      "submission": "Bài dự thi",
+      "notification": "Thông báo",
+      "hackathonResult": "Kết quả",
+      "feedback": "Phản hồi",
+      "device": "Quản lý thiết bị",
+      "sponsorship": "Tài trợ",
+      "scrollLeft": "Cuộn sang trái",
+      "scrollRight": "Cuộn sang phải"
+    },
+    "locations": {
+      "title": "Quản lý địa điểm",
+      "createLocation": "Tạo địa điểm",
+      "editLocation": "Chỉnh sửa địa điểm",
+      "deleteLocation": "Xóa địa điểm",
+      "name": "Tên",
+      "address": "Địa chỉ",
+      "latitude": "Vĩ độ",
+      "longitude": "Kinh độ",
+      "actions": "Hành động",
+      "namePlaceholder": "Nhập tên địa điểm",
+      "addressPlaceholder": "Nhập địa chỉ",
+      "latitudePlaceholder": "Nhập vĩ độ",
+      "longitudePlaceholder": "Nhập kinh độ",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "confirmDelete": "Bạn có chắc chắn muốn xóa địa điểm này?",
+      "yes": "Có",
+      "no": "Không",
+      "noLocations": "Không tìm thấy địa điểm nào"
+    }
   }
 }

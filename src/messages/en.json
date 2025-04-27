@@ -184,5 +184,49 @@
     "deletionError": "Failed to delete individual registration. Please try again.",
     "submittingRegistration": "Submitting your registration...",
     "deletingRegistration": "Deleting your registration..."
+  },
+  "resourceManagement": {
+    "title": "Hackathon resource management",
+    "loading": "Loading...",
+    "tabs": {
+      "round": "Rounds",
+      "location": "Locations",
+      "roundMarkCriteria": "Round mark criteria",
+      "teamRequest": "Team requests",
+      "individualRequest": "Individual registration requests",
+      "teamFormation": "Team formation",
+      "userManagement": "User management",
+      "assignJudgeToRound": "Assign judge to round",
+      "judge": "Judge assign",
+      "submission": "Submissions",
+      "notification": "Notifications",
+      "hackathonResult": "Results",
+      "feedback": "Feedback",
+      "device": "Device management",
+      "sponsorship": "Sponsorship",
+      "scrollLeft": "Scroll left",
+      "scrollRight": "Scroll right"
+    },
+    "locations": {
+      "title": "Manage locations",
+      "createLocation": "Create location",
+      "editLocation": "Edit location",
+      "deleteLocation": "Delete location",
+      "name": "Name",
+      "address": "Address",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "actions": "Actions",
+      "namePlaceholder": "Enter location name",
+      "addressPlaceholder": "Enter location address",
+      "latitudePlaceholder": "Enter latitude",
+      "longitudePlaceholder": "Enter longitude",
+      "save": "Save",
+      "cancel": "Cancel",
+      "confirmDelete": "Are you sure you want to delete this location?",
+      "yes": "Yes",
+      "no": "No",
+      "noLocations": "No locations found"
+    }
   }
 }
