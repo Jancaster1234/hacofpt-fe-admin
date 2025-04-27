@@ -227,7 +227,7 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
               <PostSharing />
 
               {/* Main content area */}
-              <PostContent>
+              {/* <PostContent>
                 {blogPost.content.startsWith("{") ? (
                   <TiptapRenderer>{blogPost.content}</TiptapRenderer>
                 ) : (
@@ -237,8 +237,10 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
                     }}
                   />
                 )}
+              </PostContent> */}
+              <PostContent>
+                <TiptapRenderer>{blogPost.content}</TiptapRenderer>
               </PostContent>
-
               {/* Right sidebar - use PostToc directly */}
               <PostToc />
             </div>
