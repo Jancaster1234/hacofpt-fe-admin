@@ -1,0 +1,105 @@
+// src/components/TiptapRenderer/tiptap-content.scss
+
+.tiptap-content {
+  // Import the variables from your style.scss or repeat them here
+  color: var(--rte-fg);
+  background: var(--rte-bg);
+  font-family: var(--rte-editor-font);
+  font-size: var(--rte-editor-font-size);
+  line-height: var(--rte-editor-line-height);
+
+  // Typography
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    color: var(--rte-fg);
+  }
+
+  h1 {
+    font-size: 2em;
+  }
+  h2 {
+    font-size: 1.5em;
+  }
+  h3 {
+    font-size: 1.25em;
+  }
+
+  p {
+    margin-bottom: 1em;
+  }
+
+  // Lists
+  ul,
+  ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1em;
+  }
+
+  // Code blocks
+  pre {
+    background-color: var(--rte-editor-code-bg);
+    border-radius: var(--rte-radius);
+    padding: 1em;
+    margin-bottom: 1em;
+    overflow-x: auto;
+  }
+
+  code {
+    font-family: var(--rte-editor-code-font);
+    background-color: var(--rte-editor-code-bg);
+    border-radius: 3px;
+    padding: 0.2em 0.4em;
+  }
+
+  // Links
+  a {
+    color: var(--rte-primary);
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  // Images
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--rte-radius);
+  }
+
+  // Blockquotes
+  blockquote {
+    border-left: 4px solid var(--rte-border);
+    padding-left: 1rem;
+    font-style: italic;
+    margin-left: 0;
+    margin-right: 0;
+    color: var(--rte-secondary-fg);
+  }
+
+  // Tables
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+  }
+
+  th,
+  td {
+    padding: 0.5rem;
+    border: 1px solid var(--rte-border);
+  }
+
+  th {
+    background-color: var(--rte-muted);
+    font-weight: 600;
+  }
+}

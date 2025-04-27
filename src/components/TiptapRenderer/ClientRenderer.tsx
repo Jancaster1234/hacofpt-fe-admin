@@ -4,6 +4,7 @@
 import { createElement, Fragment, useEffect, useState } from "react";
 import { components } from "./components/custom";
 import { createProcessor } from "./utils/processor";
+import "./tiptap-content.scss"; // Import the styles, but you need to create this file
 
 interface TiptapRendererProps {
   children: string;
@@ -24,7 +25,8 @@ const TiptapRenderer = ({ children }: TiptapRendererProps) => {
     [children]
   );
 
-  return Content;
+  // The key change is here - wrap the content in a div with the tiptap-content class
+  return <div className="tiptap-content">{Content}</div>;
 };
 
 export default TiptapRenderer;

@@ -82,8 +82,64 @@
   --rte-editor-scrollbar: #ffffff40;
 
   //   Box shadow
-  --rte-shadow-1: 0px 0px 0px 1px #3d444d, 0px 6px 12px -3px #01040966, 0px 6px 18px 0px #01040966;
-  --rte-shadow-2: 0px 0px 0px 1px #3d444d, 0px 8px 16px -4px #01040966, 0px 4px 32px -4px #01040966,
-    0px 24px 48px -12px #01040966, 0px 48px 96px -24px #01040966;
+  --rte-shadow-1:
+    0px 0px 0px 1px #3d444d, 0px 6px 12px -3px #01040966,
+    0px 6px 18px 0px #01040966;
+  --rte-shadow-2:
+    0px 0px 0px 1px #3d444d, 0px 8px 16px -4px #01040966,
+    0px 4px 32px -4px #01040966, 0px 24px 48px -12px #01040966,
+    0px 48px 96px -24px #01040966;
   --rte-shadow-3: 0px 0px 0px 1px #3d444d, 0px 24px 48px 0px #010409;
+
+  // Add this to your style.scss
+  .tiptap-content {
+    font-family: var(--rte-editor-font);
+    font-size: var(--rte-editor-font-size);
+    line-height: var(--rte-editor-line-height);
+    color: var(--rte-fg);
+    background: var(--rte-bg);
+
+    // Add padding and other layout styles
+    padding: 1rem;
+    max-width: 100%;
+    width: 100%;
+
+    // Style headings, paragraphs, lists
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin-top: 1.5em;
+      margin-bottom: 0.5em;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+
+    p {
+      margin-bottom: 1em;
+    }
+
+    ul,
+    ol {
+      padding-left: 1.5rem;
+      margin-bottom: 1em;
+    }
+
+    code {
+      font-family: var(--rte-editor-code-font);
+      background-color: var(--rte-editor-code-bg);
+      border-radius: 3px;
+      padding: 0.2em 0.4em;
+    }
+
+    pre {
+      background-color: var(--rte-editor-code-bg);
+      border-radius: var(--rte-radius);
+      padding: 1em;
+      overflow-x: auto;
+      margin-bottom: 1em;
+    }
+  }
 }

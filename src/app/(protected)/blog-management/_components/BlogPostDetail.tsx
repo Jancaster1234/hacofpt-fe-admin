@@ -36,7 +36,7 @@ import PostContent from "@/components/shared/PostContent";
 import PostSharing from "@/components/shared/PostSharing";
 import PostReadingProgress from "@/components/shared/PostReadingProgress";
 import Image from "next/image";
-import styles from "./BlogPostDetail.module.css";
+import "./style.scss";
 interface BlogPostDetailProps {
   blogPost: BlogPost;
   onUpdate: (data: any) => void;
