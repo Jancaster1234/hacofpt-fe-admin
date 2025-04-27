@@ -19,7 +19,9 @@ export default function AuthProvider({
   const isAuthPage =
     pathname === "/signin" ||
     pathname === "/signup" ||
-    pathname === "/forgot-password";
+    pathname === "/forgot-password" ||
+    pathname.includes("/forgot-password") ||
+    pathname.includes("/reset-password");
 
   useEffect(() => {
     console.log("🔹 AuthProvider: Checking user authentication...");
