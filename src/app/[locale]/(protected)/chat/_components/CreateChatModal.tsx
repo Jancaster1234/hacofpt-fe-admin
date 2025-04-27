@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/chat/_components/CreateChatModal.tsx
+/* eslint-disable @next/next/no-img-element */
 // app/_components/CreateChatModal.tsx
 'use client';
 import React, { useState } from 'react';
