@@ -11,6 +11,7 @@ COMMENT_STYLES = {
     ".css": "/* {path} */\n",      # CSS
     ".html": "<!-- {path} -->\n",  # HTML
     ".java": "// {path}\n",        # Java
+    ".scss": "/* {path} */\n",     # CSS (uses JavaScript-style comments)
     ".json": "// {path}\n"         # JSON (uses JavaScript-style comments)
 }
 
