@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/chat/_components/ChatClient.tsx
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/chat/ChatClient.tsx
 "use client";
 import { useState, useEffect } from "react";
@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth_v0";
 import { User as BaseUser } from "@/types/entities/user";
 import { toast } from "sonner";
 import { useWebSocket } from '@/contexts/WebSocketContext';
+import { Chat, ChatListItem } from '@/types/chat';
 
 // Dynamic imports to avoid hydration issues
 const ChatList = dynamic(() => import("./ChatList"), { ssr: false });
@@ -16,48 +17,6 @@ const CreateChatModal = dynamic(() => import("./CreateChatModal"), { ssr: false 
 interface ChatUser extends BaseUser {
   name: string;
   image: string;
-}
-
-interface ConversationUser {
-  id: string;
-  userId: string;
-  firstName: string;
-  lastName: string;
-  username: string;
-  // ... các trường khác
-}
-
-interface Message {
-  id: string;
-  conversationId: string;
-  content: string;
-  fileUrls: string[];
-  reactions: any[]; // Có thể định nghĩa cụ thể hơn
-  createdAt: string;
-  updatedAt: string;
-  createdByUserName: string;
-  deleted: boolean;
-}
-
-interface ChatListItem {
-  id: number;
-  name: string;
-  avatarUrl: string;
-  lastMessage?: string;
-  lastMessageTime?: string;
-  isUnread: boolean;
-}
-
-interface Chat {
-  id: string;
-  type: string;
-  name: string;
-  avatarUrl: string | null;
-  conversationUsers: ConversationUser[];
-  messages: Message[];
-  createdAt: string;
-  updatedAt: string;
-  createdByUserName: string;
 }
 
 export default function ChatClient() {
@@ -96,7 +55,8 @@ export default function ChatClient() {
             avatarUrl: chat.avatarUrl || "https://randomuser.me/api/portraits/men/99.jpg",
             lastMessage: chat.messages[chat.messages.length - 1]?.content,
             lastMessageTime: chat.messages[chat.messages.length - 1]?.createdAt,
-            isUnread: false // Thêm trường isUnread
+            isUnread: false,
+            conversationUsers: chat.conversationUsers
           }));
           setChatListItems(items);
         } else {
@@ -348,7 +308,8 @@ export default function ChatClient() {
             avatarUrl: newChat.avatarUrl || "https://randomuser.me/api/portraits/men/99.jpg",
             lastMessage: newChat.messages?.[newChat.messages.length - 1]?.content,
             lastMessageTime: newChat.messages?.[newChat.messages.length - 1]?.createdAt,
-            isUnread: false
+            isUnread: false,
+            conversationUsers: newChat.conversationUsers
           };
           return [...prevItems, newChatListItem];
         });
@@ -458,7 +419,7 @@ export default function ChatClient() {
   }
 
   return (
-    <div className="flex bg-gray-100 h-[calc(100vh-475px)]" suppressHydrationWarning>
+    <div className="flex bg-gray-100 h-[calc(100vh-130px)]" suppressHydrationWarning>
       {/* Left Side - Chat List */}
       <ChatList
         chats={chatListItems}

@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/chat/_components/ChatDetails.tsx
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
@@ -8,47 +8,12 @@ import { FaPaperclip, FaSmile, FaFile, FaFileWord, FaFilePdf, FaFileExcel, FaFil
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { useAuth } from "@/hooks/useAuth_v0";
 import { toast } from "sonner";
+import { Chat } from '@/types/chat';
 
 interface User {
     id: string;
-    username: string;
-    firstName?: string;
-    lastName?: string;
-    image?: string;
-    name?: string;
-}
-
-interface ConversationUser {
-    id: string;
-    userId: string;
-    firstName: string;
-    lastName: string;
-    username: string;
-    // ... các trường khác
-}
-
-interface Message {
-    id: string;
-    conversationId: string;
-    content: string;
-    fileUrls: string[];
-    reactions: any[]; // Có thể định nghĩa cụ thể hơn
-    createdAt: string;
-    updatedAt: string;
-    createdByUserName: string;
-    deleted: boolean;
-}
-
-interface Chat {
-    id: string;
-    type: string;
     name: string;
-    avatarUrl: string | null;
-    conversationUsers: ConversationUser[];
-    messages: Message[];
-    createdAt: string;
-    updatedAt: string;
-    createdByUserName: string;
+    username: string;
 }
 
 interface ChatDetailsProps {
@@ -234,13 +199,21 @@ const ChatDetails: React.FC<ChatDetailsProps> = ({ chatId, chats, onSendMessage,
         }
     };
 
+    const getOtherUserAvatar = () => {
+        if (!chat?.conversationUsers || !user?.id) {
+            return "https://randomuser.me/api/portraits/men/99.jpg";
+        }
+        const otherUser = chat.conversationUsers.find(u => u.userId !== user.id);
+        return otherUser?.avatarUrl || "https://randomuser.me/api/portraits/men/99.jpg";
+    };
+
     return (
         <div className="w-2/3 flex flex-col bg-white h-full">
             {/* Chat header */}
             <div className="p-4 border-b flex items-center space-x-2">
                 <div className="w-10 h-10 rounded-full bg-gray-300">
                     <img
-                        src={chat.avatarUrl || "https://randomuser.me/api/portraits/men/99.jpg"}
+                        src={getOtherUserAvatar()}
                         alt={chat.name}
                         className="w-full h-full rounded-full object-cover"
                     />

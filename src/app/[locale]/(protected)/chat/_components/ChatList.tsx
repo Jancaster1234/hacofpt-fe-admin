@@ -1,23 +1,17 @@
-// src/app/[locale]/(protected)/chat/_components/ChatList.tsx
+/* eslint-disable @next/next/no-img-element */
 import React, { useState } from 'react';
-
-interface Chat {
-    id: number;
-    name: string;
-    avatarUrl: string;
-    lastMessage?: string;
-    lastMessageTime?: string;
-    isUnread: boolean;
-}
+import { useAuth } from '@/hooks/useAuth_v0';
+import { ChatListItem } from '@/types/chat';
 
 interface ChatListProps {
-    chats: Chat[];
-    onChatSelect: (chatId: number) => void;
-    onCreateNewChat: () => void; // Hàm để tạo cuộc hội thoại mới
+    chats: ChatListItem[];
+    onChatSelect: (chatId: string) => void;
+    onCreateNewChat: () => void;
 }
 
 const ChatList: React.FC<ChatListProps> = ({ chats, onChatSelect, onCreateNewChat }) => {
     const [searchQuery, setSearchQuery] = useState('');
+    const { user } = useAuth();
 
     const formatMessageTime = (dateString?: string) => {
         if (!dateString) return '';
@@ -46,6 +40,26 @@ const ChatList: React.FC<ChatListProps> = ({ chats, onChatSelect, onCreateNewCha
 
         // Otherwise show the date
         return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    };
+
+    const getOtherUserAvatar = (chat: ChatListItem) => {
+        console.log('Current user:', user);
+        console.log('Chat data:', chat);
+        console.log('Conversation users:', chat.conversationUsers);
+
+        if (!chat.conversationUsers || !user?.id) {
+            console.log('No conversation users or user ID, using default avatar');
+            return "https://randomuser.me/api/portraits/men/99.jpg";
+        }
+
+        const otherUser = chat.conversationUsers.find(u => u.userId !== user.id);
+        console.log('Found other user:', otherUser);
+
+        if (!otherUser?.avatarUrl) {
+            console.log('No avatar URL found for other user, using default');
+        }
+
+        return otherUser?.avatarUrl || "https://randomuser.me/api/portraits/men/99.jpg";
     };
 
     // Lọc danh sách chat dựa trên search query
@@ -92,31 +106,37 @@ const ChatList: React.FC<ChatListProps> = ({ chats, onChatSelect, onCreateNewCha
             </div>
 
             {/* Danh sách chat */}
-            <div className="overflow-y-auto" style={{ maxHeight: 'calc(100vh - 150px)' }}>
+            <div className="overflow-y-auto" style={{ height: 'calc(100% - 150px)' }}>
                 {filteredChats.map((chat) => (
                     <div
                         key={chat.id}
-                        className={`p-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer ${chat.isUnread ? 'bg-blue-50 font-semibold' : ''}`}
-                        onClick={() => onChatSelect(chat.id)}
+                        className="p-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+                        onClick={() => onChatSelect(chat.id.toString())}
                     >
                         <div className="flex items-center">
-                            <img src={chat?.avatarUrl || "https://randomuser.me/api/portraits/men/99.jpg"} alt={chat.name} className="w-10 h-10 rounded-full" />
+                            <img
+                                src={getOtherUserAvatar(chat)}
+                                alt={chat.name}
+                                className="w-10 h-10 rounded-full object-cover"
+                            />
                             <div className="ml-3 flex-1 min-w-0">
                                 <div className="flex justify-between items-center">
-                                    <p className={`text-sm ${chat.isUnread ? 'font-semibold' : 'font-medium'} text-gray-900 truncate`}>{chat.name}</p>
+                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                        {chat.name}
+                                    </p>
                                     <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
-                                        {formatMessageTime(chat?.lastMessageTime)}
+                                        {formatMessageTime(chat.lastMessageTime)}
                                     </span>
                                 </div>
-                                <p className={`text-sm ${chat.isUnread ? 'font-medium' : ''} text-gray-500 truncate`}>
-                                    {chat?.lastMessage ? decodeURIComponent(chat.lastMessage) : ''}
+                                <p className="text-sm text-gray-500 truncate">
+                                    {chat.lastMessage ? decodeURIComponent(chat.lastMessage) : 'No messages yet'}
                                 </p>
                             </div>
                         </div>
                     </div>
                 ))}
             </div>
-        </div >
+        </div>
     );
 };
 
