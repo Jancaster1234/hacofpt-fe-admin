@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { threadPostReportService } from "@/services/threadPostReport.service";
+import { threadPostService } from "@/services/threadPost.service"; // Import threadPostService
 import {
   ThreadPostReport,
   ThreadPostReportStatus,
@@ -43,6 +44,19 @@ export default function ThreadPostReportManagement() {
       await threadPostReportService.reviewThreadPostReport(report.id, {
         status: newStatus,
       });
+
+      // If the report is being reviewed (not dismissed), delete the thread post
+      if (newStatus === "REVIEWED" && report.threadPostId) {
+        try {
+          await threadPostService.deleteThreadPost(report.threadPostId);
+          console.log(
+            `Thread post ${report.threadPostId} deleted successfully`
+          );
+        } catch (deleteErr) {
+          console.error(`Failed to delete thread post: ${deleteErr}`);
+          // We'll continue even if deletion fails since the report status was updated
+        }
+      }
 
       // Update local state after successful API call
       setReports((prevReports) =>
