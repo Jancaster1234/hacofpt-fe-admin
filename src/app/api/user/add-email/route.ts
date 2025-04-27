@@ -1,3 +1,4 @@
+// src/app/api/user/add-email/route.ts
 import { NextResponse } from "next/server";
 
 interface AddEmailRequest {

@@ -1,3 +1,4 @@
+// src/components/TiptapEditor/extensions/ImageFigure/ImageFigure.ts
 import { JSONContent } from "@tiptap/core";
 import { NodeSelection, Plugin, TextSelection } from "@tiptap/pm/state";
 import { DOMSerializer } from "@tiptap/pm/model";

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// src/app/(protected)/profile/_components/InformationTab.tsx
 // src/app/profile/_components/InformationTab.tsx
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";

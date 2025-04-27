@@ -1,3 +1,4 @@
+// src/app/api/auth/my-info/route.ts
 import { NextResponse } from "next/server";
 
 interface UpdateUserRequest {

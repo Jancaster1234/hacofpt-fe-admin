@@ -1,4 +1,4 @@
-// src/app/profile/_components/AwardTab.tsx
+// src/app/(protected)/profile/_components/AwardTab.tsx
 import Image from "next/image";
 import { User } from "@/types/entities/user";
 

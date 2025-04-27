@@ -1,4 +1,4 @@
-// src/app/profile/page.tsx
+// src/app/(protected)/profile/page.tsx
 "use client";
 
 import Image from "next/image";
