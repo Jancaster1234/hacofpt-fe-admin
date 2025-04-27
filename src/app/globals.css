@@ -596,6 +596,39 @@ layer(base);
   cursor: grabbing; /* Changes the cursor to indicate dragging */
 }
 
+.article-content {
+  li p {
+    margin: 0 !important;
+  }
+
+  figcaption {
+    text-align: center;
+  }
+
+  blockquote {
+    p:first-of-type::before,
+    p:first-of-type::after {
+      content: unset;
+    }
+  }
+
+  pre {
+    position: relative;
+    background-color: hsl(224, 19%, 97%);
+    padding-block: 1rem;
+    overflow-x: auto;
+
+    code {
+      padding-inline: 1.25rem;
+      display: block;
+      width: fit-content;
+      min-width: 100%;
+      font-size: 90%;
+      line-height: 1.7;
+    }
+  }
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
