@@ -61,12 +61,12 @@ export default function CreateHackathonModal({
   // Controlled form states
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
-  const [enrollmentStartDate, setEnrollmentStartDate] = useState<Date | null>(
-    null
-  );
-  const [enrollmentEndDate, setEnrollmentEndDate] = useState<Date | null>(null);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+
+  const [enrollmentStartDate, setEnrollmentStartDate] = useState<string>("");
+  const [enrollmentEndDate, setEnrollmentEndDate] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+
   const [category, setCategory] = useState<
     "CODING" | "EXTERNAL" | "INTERNAL" | "DESIGN" | "OTHERS"
   >("CODING");
@@ -139,9 +139,8 @@ export default function CreateHackathonModal({
 
     try {
       const fileArray = Array.from(files);
-      const response = await fileUrlService.uploadMultipleFilesCommunication(
-        fileArray
-      );
+      const response =
+        await fileUrlService.uploadMultipleFilesCommunication(fileArray);
 
       if (response.data && response.data.length > 0) {
         // Extract fileUrls from the response
@@ -218,11 +217,11 @@ export default function CreateHackathonModal({
       title,
       subTitle: subtitle,
       bannerImageUrl,
-      enrollStartDate: enrollmentStartDate?.toISOString(),
-      enrollEndDate: enrollmentEndDate?.toISOString(),
+      enrollStartDate: enrollmentStartDate,
+      enrollEndDate: enrollmentEndDate,
       enrollmentCount: 0,
-      startDate: startDate?.toISOString(),
-      endDate: endDate?.toISOString(),
+      startDate: startDate,
+      endDate: endDate,
       information,
       description,
       contact,
@@ -329,45 +328,85 @@ export default function CreateHackathonModal({
                 <label className="block mt-3 font-medium">
                   Enrollment Start Date
                 </label>
-                <DatePicker
-                  selected={enrollmentStartDate}
-                  onChange={(date) => setEnrollmentStartDate(date)}
-                  dateFormat="yyyy-MM-dd"
+                <input
+                  type="datetime-local"
+                  value={enrollmentStartDate}
+                  onChange={(e) => setEnrollmentStartDate(e.target.value)}
                   className="w-full p-2 border rounded-md mt-1"
-                  placeholderText="Select enrollment start date"
+                  placeholder="Select enrollment start date"
                 />
 
                 <label className="block mt-3 font-medium">
                   Enrollment End Date
                 </label>
-                <DatePicker
-                  selected={enrollmentEndDate}
-                  onChange={(date) => setEnrollmentEndDate(date)}
-                  dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border rounded-md mt-1"
-                  placeholderText="Select enrollment end date"
-                  minDate={enrollmentStartDate || undefined}
+                <input
+                  type="datetime-local"
+                  value={enrollmentEndDate}
+                  onChange={(e) => setEnrollmentEndDate(e.target.value)}
+                  className={`w-full p-2 border rounded-md mt-1 ${
+                    enrollmentStartDate &&
+                    enrollmentEndDate &&
+                    new Date(enrollmentStartDate) >= new Date(enrollmentEndDate)
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                  placeholder="Select enrollment end date"
+                  min={enrollmentStartDate}
                 />
+                {enrollmentStartDate &&
+                  enrollmentEndDate &&
+                  new Date(enrollmentStartDate) >=
+                    new Date(enrollmentEndDate) && (
+                    <p className="text-red-500 text-sm mt-1">
+                      End date must be after start date
+                    </p>
+                  )}
 
                 <label className="block mt-3 font-medium">Start Date</label>
-                <DatePicker
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
-                  dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border rounded-md mt-1"
-                  placeholderText="Select start date"
-                  minDate={enrollmentEndDate || undefined}
+                <input
+                  type="datetime-local"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className={`w-full p-2 border rounded-md mt-1 ${
+                    enrollmentEndDate &&
+                    startDate &&
+                    new Date(enrollmentEndDate) >= new Date(startDate)
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                  placeholder="Select start date"
+                  min={enrollmentEndDate}
                 />
+                {enrollmentEndDate &&
+                  startDate &&
+                  new Date(enrollmentEndDate) >= new Date(startDate) && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Start date must be after enrollment end date
+                    </p>
+                  )}
 
                 <label className="block mt-3 font-medium">End Date</label>
-                <DatePicker
-                  selected={endDate}
-                  onChange={(date) => setEndDate(date)}
-                  dateFormat="yyyy-MM-dd"
-                  className="w-full p-2 border rounded-md mt-1"
-                  placeholderText="Select end date"
-                  minDate={startDate || undefined}
+                <input
+                  type="datetime-local"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className={`w-full p-2 border rounded-md mt-1 ${
+                    startDate &&
+                    endDate &&
+                    new Date(startDate) >= new Date(endDate)
+                      ? "border-red-500"
+                      : ""
+                  }`}
+                  placeholder="Select end date"
+                  min={startDate}
                 />
+                {startDate &&
+                  endDate &&
+                  new Date(startDate) >= new Date(endDate) && (
+                    <p className="text-red-500 text-sm mt-1">
+                      End date must be after start date
+                    </p>
+                  )}
 
                 <label className="block mt-3 font-medium">Category</label>
                 <select

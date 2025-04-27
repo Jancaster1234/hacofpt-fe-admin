@@ -46,11 +46,11 @@ export default function ThreadPostReportManagement() {
       });
 
       // If the report is being reviewed (not dismissed), delete the thread post
-      if (newStatus === "REVIEWED" && report.threadPostId) {
+      if (newStatus === "REVIEWED" && report.threadPost?.id) {
         try {
-          await threadPostService.deleteThreadPost(report.threadPostId);
+          await threadPostService.deleteThreadPost(report.threadPost?.id);
           console.log(
-            `Thread post ${report.threadPostId} deleted successfully`
+            `Thread post ${report.threadPost?.id} deleted successfully`
           );
         } catch (deleteErr) {
           console.error(`Failed to delete thread post: ${deleteErr}`);
