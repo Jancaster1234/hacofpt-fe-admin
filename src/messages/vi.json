@@ -228,5 +228,25 @@
       "no": "Không",
       "noLocations": "Không tìm thấy địa điểm nào"
     }
+  },
+  "judgeManagement": {
+    "judgesAssignedTitle": "Giám khảo được phân công cho các vòng",
+    "round": "Vòng",
+    "assignJudges": "Phân công giám khảo",
+    "cancelAction": "Hủy",
+    "noJudgesAssigned": "Chưa có giám khảo nào được phân công.",
+    "availableJudges": "Giám khảo có sẵn",
+    "removeAction": "Xóa",
+    "assignAction": "Phân công",
+    "noJudgesAvailable": "Không có giám khảo nào. Vui lòng thêm giám khảo vào hackathon trước.",
+    "loadingData": "Đang tải dữ liệu giám khảo và vòng thi...",
+    "noRoundsFound": "Chưa có vòng thi nào cho hackathon này.",
+    "noRoundsCreated": "Chưa có vòng thi nào được tạo cho hackathon này.",
+    "judgeRemoved": "Giám khảo đã được xóa khỏi vòng thi thành công.",
+    "judgeRemoveError": "Không thể xóa giám khảo khỏi vòng thi.",
+    "judgeAssigned": "Giám khảo đã được phân công vào vòng thi thành công.",
+    "judgeAssignError": "Không thể phân công giám khảo vào vòng thi.",
+    "dataFetchError": "Không thể tải dữ liệu vòng thi và giám khảo. Vui lòng thử lại sau.",
+    "removeJudge": "Xóa giám khảo"
   }
 }

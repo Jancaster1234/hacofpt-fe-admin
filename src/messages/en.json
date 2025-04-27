@@ -228,5 +228,25 @@
       "no": "No",
       "noLocations": "No locations found"
     }
+  },
+  "judgeManagement": {
+    "judgesAssignedTitle": "Judges assigned to rounds",
+    "round": "Round",
+    "assignJudges": "Assign judges",
+    "cancelAction": "Cancel",
+    "noJudgesAssigned": "No judges assigned yet.",
+    "availableJudges": "Available judges",
+    "removeAction": "Remove",
+    "assignAction": "Assign",
+    "noJudgesAvailable": "No judges available. Please add judges to the hackathon first.",
+    "loadingData": "Loading judges and rounds data...",
+    "noRoundsFound": "No rounds found for this hackathon yet.",
+    "noRoundsCreated": "No rounds have been created for this hackathon.",
+    "judgeRemoved": "Judge has been successfully removed from the round.",
+    "judgeRemoveError": "Failed to remove judge from round.",
+    "judgeAssigned": "Judge has been successfully assigned to the round.",
+    "judgeAssignError": "Failed to assign judge to round.",
+    "dataFetchError": "Failed to load rounds and judges data. Please try again later.",
+    "removeJudge": "Remove judge"
   }
 }
