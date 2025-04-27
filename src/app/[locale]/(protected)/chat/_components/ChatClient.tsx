@@ -1,18 +1,20 @@
+// src/app/[locale]/(protected)/chat/_components/ChatClient.tsx
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// app/chat/ChatClient.tsx
 "use client";
 import { useState, useEffect } from "react";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { User as BaseUser } from "@/types/entities/user";
 import { toast } from "sonner";
-import { useWebSocket } from '@/contexts/WebSocketContext';
-import { Chat, ChatListItem } from '@/types/chat';
+import { useWebSocket } from "@/contexts/WebSocketContext";
+import { Chat, ChatListItem } from "@/types/chat";
 
 // Dynamic imports to avoid hydration issues
 const ChatList = dynamic(() => import("./ChatList"), { ssr: false });
 const ChatDetails = dynamic(() => import("./ChatDetails"), { ssr: false });
-const CreateChatModal = dynamic(() => import("./CreateChatModal"), { ssr: false });
+const CreateChatModal = dynamic(() => import("./CreateChatModal"), {
+  ssr: false,
+});
 
 interface ChatUser extends BaseUser {
   name: string;
@@ -42,7 +44,7 @@ export default function ChatClient() {
         const userId = user?.id;
         const response = await fetch(`/api/chats?userId=${userId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
         if (response.ok) {
@@ -52,11 +54,13 @@ export default function ChatClient() {
           const items: ChatListItem[] = res?.data.map((chat: Chat) => ({
             id: parseInt(chat.id),
             name: chat.name,
-            avatarUrl: chat.avatarUrl || "https://randomuser.me/api/portraits/men/99.jpg",
+            avatarUrl:
+              chat.avatarUrl ||
+              "https://randomuser.me/api/portraits/men/99.jpg",
             lastMessage: chat.messages[chat.messages.length - 1]?.content,
             lastMessageTime: chat.messages[chat.messages.length - 1]?.createdAt,
             isUnread: false,
-            conversationUsers: chat.conversationUsers
+            conversationUsers: chat.conversationUsers,
           }));
           setChatListItems(items);
         } else {
@@ -74,41 +78,48 @@ export default function ChatClient() {
   // Subscribe to chat messages when connected
   useEffect(() => {
     if (!client || !isConnected || !selectedChatId) {
-      console.log('Cannot subscribe:', { client: !!client, isConnected, selectedChatId });
+      console.log("Cannot subscribe:", {
+        client: !!client,
+        isConnected,
+        selectedChatId,
+      });
       return;
     }
 
-    console.log('WebSocket connected, subscribing to topics');
-    console.log('Client:', client);
-    console.log('Is connected:', isConnected);
-    console.log('Selected chat ID:', selectedChatId);
+    console.log("WebSocket connected, subscribing to topics");
+    console.log("Client:", client);
+    console.log("Is connected:", isConnected);
+    console.log("Selected chat ID:", selectedChatId);
 
     const subscriptionTopic = `/topic/conversations/${selectedChatId}`;
-    console.log('Subscribing to conversation topic:', subscriptionTopic);
+    console.log("Subscribing to conversation topic:", subscriptionTopic);
 
     const subscription = client.subscribe(
       subscriptionTopic,
       (message: { body: string }) => {
-        console.log('Received message on conversation topic:', subscriptionTopic);
-        console.log('Raw message:', message);
+        console.log(
+          "Received message on conversation topic:",
+          subscriptionTopic
+        );
+        console.log("Raw message:", message);
         try {
           const messageData = JSON.parse(message.body);
-          console.log('Parsed message data:', messageData);
+          console.log("Parsed message data:", messageData);
 
           // Decode message content
           const decodedMessage = {
             ...messageData,
             content: decodeURIComponent(messageData.content),
-            fileUrls: messageData.fileUrls || []
+            fileUrls: messageData.fileUrls || [],
           };
 
           // Update chats state
-          setChats(prevChats => {
-            return prevChats.map(chat => {
+          setChats((prevChats) => {
+            return prevChats.map((chat) => {
               if (chat.id === selectedChatId) {
                 return {
                   ...chat,
-                  messages: [...chat.messages, decodedMessage]
+                  messages: [...chat.messages, decodedMessage],
                 };
               }
               return chat;
@@ -116,75 +127,90 @@ export default function ChatClient() {
           });
 
           // Update chatListItems state
-          setChatListItems(prevItems => {
-            return prevItems.map(item => {
+          setChatListItems((prevItems) => {
+            return prevItems.map((item) => {
               if (item.id.toString() === selectedChatId) {
                 return {
                   ...item,
-                  lastMessage: decodedMessage.fileUrls?.length > 0
-                    ? "Sent an attachment"
-                    : decodedMessage.content,
+                  lastMessage:
+                    decodedMessage.fileUrls?.length > 0
+                      ? "Sent an attachment"
+                      : decodedMessage.content,
                   lastMessageTime: decodedMessage.createdAt,
-                  isUnread: false
+                  isUnread: false,
                 };
               }
               return item;
             });
           });
         } catch (error) {
-          console.error('Error processing message:', error);
-          toast.error('Error processing message');
+          console.error("Error processing message:", error);
+          toast.error("Error processing message");
         }
       }
     );
 
     // Subscribe to reactions for all messages
     const reactionTopic = `/topic/messages`;
-    console.log('Subscribing to reactions topic:', reactionTopic);
+    console.log("Subscribing to reactions topic:", reactionTopic);
 
     const reactionSubscription = client.subscribe(
       reactionTopic,
       (message: { body: string }) => {
-        console.log('Received reaction message:', message);
+        console.log("Received reaction message:", message);
         try {
           const reactionData = JSON.parse(message.body);
-          console.log('Parsed reaction data:', reactionData);
-          console.log('Reaction data details:', {
+          console.log("Parsed reaction data:", reactionData);
+          console.log("Reaction data details:", {
             id: reactionData.id,
             messageId: reactionData.messageId,
             reactionType: reactionData.reactionType,
-            createdByUserName: reactionData.createdByUserName
+            createdByUserName: reactionData.createdByUserName,
           });
 
           // Update message reactions in chats state
-          setChats(prevChats => {
-            console.log('Previous chats state:', prevChats);
-            const updatedChats = prevChats.map(chat => {
+          setChats((prevChats) => {
+            console.log("Previous chats state:", prevChats);
+            const updatedChats = prevChats.map((chat) => {
               // Check if the message belongs to this chat
-              const messageExists = chat.messages.some(msg => msg.id === reactionData.messageId.toString());
-              console.log('Message exists in chat:', messageExists, 'for message ID:', reactionData.messageId);
+              const messageExists = chat.messages.some(
+                (msg) => msg.id === reactionData.messageId.toString()
+              );
+              console.log(
+                "Message exists in chat:",
+                messageExists,
+                "for message ID:",
+                reactionData.messageId
+              );
               if (messageExists) {
-                const updatedMessages = chat.messages.map(message => {
+                const updatedMessages = chat.messages.map((message) => {
                   if (message.id === reactionData.messageId.toString()) {
-
                     // Kiểm tra xem người dùng đã có reaction cho tin nhắn này chưa
                     const existingReactionIndex = message.reactions?.findIndex(
-                      reaction => reaction.createdByUserName === reactionData.createdByUserName
+                      (reaction) =>
+                        reaction.createdByUserName ===
+                        reactionData.createdByUserName
                     );
 
                     let updatedReactions;
-                    if (existingReactionIndex !== -1 && existingReactionIndex !== undefined) {
+                    if (
+                      existingReactionIndex !== -1 &&
+                      existingReactionIndex !== undefined
+                    ) {
                       // Nếu đã có reaction, thay thế reaction cũ
                       updatedReactions = [...message.reactions];
                       updatedReactions[existingReactionIndex] = reactionData;
                     } else {
                       // Nếu chưa có reaction, thêm mới
-                      updatedReactions = [...(message.reactions || []), reactionData];
+                      updatedReactions = [
+                        ...(message.reactions || []),
+                        reactionData,
+                      ];
                     }
 
                     return {
                       ...message,
-                      reactions: updatedReactions
+                      reactions: updatedReactions,
                     };
                   }
                   return message;
@@ -192,25 +218,25 @@ export default function ChatClient() {
 
                 return {
                   ...chat,
-                  messages: updatedMessages
+                  messages: updatedMessages,
                 };
               }
               return chat;
             });
 
-            console.log('Updated chats state:', updatedChats);
+            console.log("Updated chats state:", updatedChats);
             return updatedChats;
           });
         } catch (error) {
-          console.error('Error processing reaction:', error);
+          console.error("Error processing reaction:", error);
         }
       }
     );
 
-    console.log('Subscriptions completed');
+    console.log("Subscriptions completed");
 
     return () => {
-      console.log('Unsubscribing from:', subscriptionTopic);
+      console.log("Unsubscribing from:", subscriptionTopic);
       subscription.unsubscribe();
       reactionSubscription.unsubscribe();
     };
@@ -218,33 +244,33 @@ export default function ChatClient() {
 
   // Send message through WebSocket
   const sendMessage = async (content: string, fileUrls: any) => {
-    console.log('sendMessage', content, fileUrls);
+    console.log("sendMessage", content, fileUrls);
     if (!client || !isConnected || !selectedChatId || !user?.username) {
-      toast.error('Cannot send message: Missing required information');
+      toast.error("Cannot send message: Missing required information");
       return;
     }
 
     try {
       // 1. Lưu message trước để có messageId và các thông tin đầy đủ
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem("accessToken");
       const response = await fetch(`/api/messages/${selectedChatId}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           content: content,
           fileUrls: fileUrls ? [fileUrls] : [],
-        })
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save message');
+        throw new Error("Failed to save message");
       }
 
       const savedMessage = await response.json();
-      console.log('Message saved successfully:', savedMessage);
+      console.log("Message saved successfully:", savedMessage);
 
       // 2. Gửi qua WebSocket với thông tin đầy đủ từ savedMessage
       const messageBody = {
@@ -254,25 +280,24 @@ export default function ChatClient() {
         conversationId: selectedChatId,
         createdAt: savedMessage.data.createdAt,
         createdByUserName: user.username,
-        reactions: []
+        reactions: [],
       };
 
-      console.log('Before sending - Check connection status:', {
+      console.log("Before sending - Check connection status:", {
         clientExists: !!client,
         isConnected,
         selectedChatId,
-        username: user?.username
+        username: user?.username,
       });
 
       const destination = `/app/chat/${selectedChatId}/${user.username}`;
       client.publish({
         destination: destination,
-        body: JSON.stringify(messageBody)
+        body: JSON.stringify(messageBody),
       });
-
     } catch (error) {
-      console.error('Error sending/saving message:', error);
-      toast.error('Failed to save message');
+      console.error("Error sending/saving message:", error);
+      toast.error("Failed to save message");
     }
   };
 
@@ -288,7 +313,7 @@ export default function ChatClient() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },
         body: JSON.stringify({ data: { userId: selectedUser.id } }),
       });
@@ -298,18 +323,22 @@ export default function ChatClient() {
         const newChat = res.data; // Lấy data từ response
 
         // Cập nhật chats
-        setChats(prevChats => [...prevChats, newChat]);
+        setChats((prevChats) => [...prevChats, newChat]);
 
         // Cập nhật chatListItems
-        setChatListItems(prevItems => {
+        setChatListItems((prevItems) => {
           const newChatListItem: ChatListItem = {
             id: parseInt(newChat.id),
             name: newChat.name,
-            avatarUrl: newChat.avatarUrl || "https://randomuser.me/api/portraits/men/99.jpg",
-            lastMessage: newChat.messages?.[newChat.messages.length - 1]?.content,
-            lastMessageTime: newChat.messages?.[newChat.messages.length - 1]?.createdAt,
+            avatarUrl:
+              newChat.avatarUrl ||
+              "https://randomuser.me/api/portraits/men/99.jpg",
+            lastMessage:
+              newChat.messages?.[newChat.messages.length - 1]?.content,
+            lastMessageTime:
+              newChat.messages?.[newChat.messages.length - 1]?.createdAt,
             isUnread: false,
-            conversationUsers: newChat.conversationUsers
+            conversationUsers: newChat.conversationUsers,
           };
           return [...prevItems, newChatListItem];
         });
@@ -318,12 +347,14 @@ export default function ChatClient() {
         toast.success("Chat created successfully");
       } else {
         const errorData = await response.json();
-        console.error('Chat creation failed:', errorData);
+        console.error("Chat creation failed:", errorData);
         toast.error(errorData.message || "Failed to create chat");
       }
     } catch (error) {
-      console.error('Error creating chat:', error);
-      toast.error("An error occurred while creating the chat. Please try again.");
+      console.error("Error creating chat:", error);
+      toast.error(
+        "An error occurred while creating the chat. Please try again."
+      );
     }
   };
 
@@ -343,7 +374,7 @@ export default function ChatClient() {
       try {
         const response = await fetch("/api/user", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
         if (response.ok) {
@@ -363,32 +394,32 @@ export default function ChatClient() {
 
   const handleReaction = async (messageId: string, reactionType: string) => {
     if (!client || !isConnected || !user?.username) {
-      toast.error('Cannot send reaction: Missing required information');
+      toast.error("Cannot send reaction: Missing required information");
       return;
     }
 
     try {
       // 1. Lưu reaction trước
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem("accessToken");
       const response = await fetch(`/api/reactions/${messageId}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           data: {
-            reactionType: reactionType
-          }
-        })
+            reactionType: reactionType,
+          },
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save reaction');
+        throw new Error("Failed to save reaction");
       }
 
       const savedReaction = await response.json();
-      console.log('Reaction saved successfully:', savedReaction);
+      console.log("Reaction saved successfully:", savedReaction);
 
       // 2. Gửi qua WebSocket với thông tin đầy đủ từ savedReaction
       const reactionBody = {
@@ -397,20 +428,20 @@ export default function ChatClient() {
         reactionType: reactionType,
         createdByUserName: user.username,
         createdAt: savedReaction.data.createdAt,
-        updatedAt: savedReaction.data.updatedAt
+        updatedAt: savedReaction.data.updatedAt,
       };
 
       // Gửi reaction qua WebSocket
       client.publish({
         destination: `/app/reactions/${messageId}/${user.username}`,
-        body: JSON.stringify(reactionBody)
+        body: JSON.stringify(reactionBody),
       });
 
       // Hiển thị thông báo thành công
-      toast.success('Reaction sent');
+      toast.success("Reaction sent");
     } catch (error) {
-      console.error('Error sending/saving reaction:', error);
-      toast.error('Failed to save reaction');
+      console.error("Error sending/saving reaction:", error);
+      toast.error("Failed to save reaction");
     }
   };
 
@@ -419,7 +450,10 @@ export default function ChatClient() {
   }
 
   return (
-    <div className="flex bg-gray-100 h-[calc(100vh-130px)]" suppressHydrationWarning>
+    <div
+      className="flex bg-gray-100 h-[calc(100vh-130px)]"
+      suppressHydrationWarning
+    >
       {/* Left Side - Chat List */}
       <ChatList
         chats={chatListItems}
