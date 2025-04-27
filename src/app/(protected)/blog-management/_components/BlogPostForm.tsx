@@ -49,6 +49,8 @@ interface BlogPostFormProps {
 const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const editorRef = useRef<TiptapEditorRef>(null);
+  const [isFormReady, setIsFormReady] = useState(false);
+  const [initialContent, setInitialContent] = useState("");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -64,6 +66,9 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
   // Populate form when editing an existing blog post
   useEffect(() => {
     if (blogPost) {
+      // Store the content separately for the editor
+      setInitialContent(blogPost.content);
+
       form.reset({
         title: blogPost.title,
         content: blogPost.content,
@@ -76,6 +81,9 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
         setPreviewImage(blogPost.bannerImageUrl);
       }
     }
+
+    // Mark form as ready after initial data is set
+    setIsFormReady(true);
   }, [blogPost, form]);
 
   const handleSubmit = (data: FormValues) => {
@@ -101,6 +109,11 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
       editorRef.current?.getInstance()?.storage.characterCount.words() ?? 0
     );
   };
+
+  // Wait until form is ready before rendering
+  if (!isFormReady) {
+    return <div className="flex justify-center p-8">Loading form...</div>;
+  }
 
   return (
     <Card>
@@ -181,6 +194,7 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
                         render={({ field }) => (
                           <TiptapEditor
                             ref={editorRef}
+                            key={blogPost?.id || "new-post"} // Force re-render when blog post changes
                             ssr={true}
                             output="html"
                             placeholder={{
@@ -189,8 +203,11 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
                             }}
                             contentMinHeight={280}
                             contentMaxHeight={600}
-                            onContentChange={field.onChange}
-                            initialContent={field.value}
+                            onContentChange={(content) => {
+                              // Update form value when content changes
+                              field.onChange(content);
+                            }}
+                            initialContent={initialContent} // Use separate state for initial content
                           />
                         )}
                       />
