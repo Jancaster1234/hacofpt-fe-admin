@@ -261,7 +261,7 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
           </p>
         </div>
       ) : (
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {paginatedRequests.map((request) => (
             <Card
               key={request.id}
