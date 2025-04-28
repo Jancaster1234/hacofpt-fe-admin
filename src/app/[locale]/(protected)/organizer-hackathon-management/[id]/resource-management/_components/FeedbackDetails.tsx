@@ -5,6 +5,9 @@ import { Feedback } from "@/types/entities/feedback";
 import { FeedbackDetail } from "@/types/entities/feedbackDetail";
 import { User } from "@/types/entities/user";
 import { useApiModal } from "@/hooks/useApiModal";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface FeedbackDetailsProps {
   feedback: Feedback;
@@ -15,6 +18,10 @@ export default function FeedbackDetails({
   feedback,
   currentUser,
 }: FeedbackDetailsProps) {
+  const t = useTranslations("feedbackDetails");
+  const toast = useToast();
+  const { showModal } = useApiModal();
+
   const [expanded, setExpanded] = useState(false);
   const [feedbackDetails, setFeedbackDetails] = useState<FeedbackDetail[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +31,6 @@ export default function FeedbackDetails({
   const [otherUserDetails, setOtherUserDetails] = useState<
     Record<string, FeedbackDetail[]>
   >({});
-  const { showModal } = useApiModal();
 
   useEffect(() => {
     // Only fetch details when expanded
@@ -38,6 +44,7 @@ export default function FeedbackDetails({
     try {
       const response =
         await feedbackDetailService.getFeedbackDetailsByFeedbackId(feedback.id);
+
       if (response.data) {
         setFeedbackDetails(response.data);
 
@@ -60,16 +67,17 @@ export default function FeedbackDetails({
         setOtherUserDetails(otherUserDetailsMap);
       } else {
         showModal({
-          title: "Error",
-          message: "Failed to load feedback details",
+          title: t("error"),
+          message: response.message || t("failedToLoadFeedbackDetails"),
           type: "error",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching feedback details:", error);
       showModal({
-        title: "Error",
-        message: "An error occurred while fetching feedback details",
+        title: t("error"),
+        message:
+          error.message || t("errorOccurredWhileFetchingFeedbackDetails"),
         type: "error",
       });
     } finally {
@@ -83,55 +91,75 @@ export default function FeedbackDetails({
 
   const createdAt = new Date(feedback.createdAt || "").toLocaleDateString();
   const feedbackType = feedback.mentorId
-    ? `Mentor Feedback: ${feedback.mentor?.username || feedback.mentorId}`
-    : "Hackathon Feedback";
+    ? `${t("mentorFeedback")}: ${feedback.mentor?.username || feedback.mentorId}`
+    : t("hackathonFeedback");
 
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <div className="border rounded-lg overflow-hidden dark:border-gray-700 transition-colors duration-200">
       <div
-        className="bg-gray-50 p-4 cursor-pointer flex justify-between items-center"
+        className="bg-gray-50 dark:bg-gray-800 p-3 sm:p-4 cursor-pointer flex flex-col sm:flex-row justify-between items-start sm:items-center transition-colors duration-200"
         onClick={toggleExpand}
+        aria-expanded={expanded}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleExpand();
+          }
+        }}
       >
-        <div>
-          <h3 className="font-medium">{feedback.title || feedbackType}</h3>
-          <p className="text-sm text-gray-600">
-            Created by {feedback.createdByUserName} on {createdAt}
+        <div className="mb-2 sm:mb-0">
+          <h3 className="font-medium text-gray-900 dark:text-white">
+            {feedback.title || feedbackType}
+          </h3>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            {t("createdBy")} {feedback.createdByUserName} {t("on")} {createdAt}
           </p>
         </div>
-        <div className="text-blue-600">
-          {expanded ? "Hide Details" : "View Details"}
+        <div className="text-blue-600 dark:text-blue-400 text-sm sm:text-base whitespace-nowrap">
+          {expanded ? t("hideDetails") : t("viewDetails")}
         </div>
       </div>
 
       {expanded && (
-        <div className="p-4 border-t">
+        <div className="p-3 sm:p-4 border-t dark:border-gray-700 transition-colors duration-200">
           {feedback.description && (
-            <p className="mb-4 text-gray-700">{feedback.description}</p>
+            <p className="mb-3 sm:mb-4 text-gray-700 dark:text-gray-300 text-sm sm:text-base transition-colors duration-200">
+              {feedback.description}
+            </p>
           )}
 
           {isLoading ? (
             <div className="flex justify-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+              <LoadingSpinner size="sm" />
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Organizer's feedback template */}
               {organizerDetails.length > 0 && (
-                <div className="border-b pb-4">
-                  <h4 className="font-medium mb-2">Feedback Form Template:</h4>
-                  <div className="space-y-3">
+                <div className="border-b dark:border-gray-700 pb-4 transition-colors duration-200">
+                  <h4 className="font-medium mb-2 text-gray-900 dark:text-white text-sm sm:text-base">
+                    {t("feedbackFormTemplate")}:
+                  </h4>
+                  <div className="space-y-2 sm:space-y-3">
                     {organizerDetails.map((detail) => (
-                      <div key={detail.id} className="bg-gray-50 p-3 rounded">
-                        <div className="flex justify-between">
-                          <span className="font-medium">{detail.content}</span>
+                      <div
+                        key={detail.id}
+                        className="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded text-sm sm:text-base transition-colors duration-200"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:justify-between">
+                          <span className="font-medium text-gray-900 dark:text-white mb-1 sm:mb-0">
+                            {detail.content}
+                          </span>
                           {detail.maxRating > 0 && (
-                            <span className="text-sm text-gray-600">
-                              Max Rating: {detail.maxRating}
+                            <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                              {t("maxRating")}: {detail.maxRating}
                             </span>
                           )}
                         </div>
                         {detail.note && (
-                          <p className="mt-1 text-gray-500 italic">
+                          <p className="mt-1 text-gray-500 dark:text-gray-400 italic text-xs sm:text-sm">
                             {detail.note}
                           </p>
                         )}
@@ -144,31 +172,37 @@ export default function FeedbackDetails({
               {/* Other users' responses */}
               {Object.keys(otherUserDetails).length > 0 && (
                 <div>
-                  <h4 className="font-medium mb-2">Responses:</h4>
+                  <h4 className="font-medium mb-2 text-gray-900 dark:text-white text-sm sm:text-base">
+                    {t("responses")}:
+                  </h4>
                   {Object.entries(otherUserDetails).map(
                     ([username, details]) => (
-                      <div key={username} className="mb-4 border-b pb-4">
-                        <h5 className="text-sm font-semibold mb-2">
-                          Response from {username}:
+                      <div
+                        key={username}
+                        className="mb-3 sm:mb-4 border-b dark:border-gray-700 pb-3 sm:pb-4 transition-colors duration-200"
+                      >
+                        <h5 className="text-xs sm:text-sm font-semibold mb-2 text-gray-800 dark:text-gray-300">
+                          {t("responseFrom")} {username}:
                         </h5>
-                        <div className="space-y-3">
+                        <div className="space-y-2 sm:space-y-3">
                           {details.map((detail) => (
                             <div
                               key={detail.id}
-                              className="bg-gray-50 p-3 rounded"
+                              className="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded text-sm transition-colors duration-200"
                             >
-                              <div className="flex justify-between">
-                                <span className="font-medium">
+                              <div className="flex flex-col sm:flex-row sm:justify-between">
+                                <span className="font-medium text-gray-900 dark:text-white mb-1 sm:mb-0">
                                   {detail.content}
                                 </span>
                                 {detail.rate > 0 && (
-                                  <span className="text-sm text-gray-600">
-                                    Rating: {detail.rate}/{detail.maxRating}
+                                  <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                                    {t("rating")}: {detail.rate}/
+                                    {detail.maxRating}
                                   </span>
                                 )}
                               </div>
                               {detail.note && (
-                                <p className="mt-1 text-gray-700">
+                                <p className="mt-1 text-gray-700 dark:text-gray-300 text-xs sm:text-sm">
                                   {detail.note}
                                 </p>
                               )}
@@ -183,8 +217,8 @@ export default function FeedbackDetails({
 
               {/* No responses message */}
               {Object.keys(otherUserDetails).length === 0 && (
-                <p className="text-gray-500 italic">
-                  No responses submitted yet.
+                <p className="text-gray-500 dark:text-gray-400 italic text-sm">
+                  {t("noResponsesSubmittedYet")}
                 </p>
               )}
             </div>

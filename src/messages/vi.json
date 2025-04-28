@@ -750,5 +750,29 @@
       "lost": "Mất",
       "retired": "Ngừng sử dụng",
       "pending": "Chờ xử lý"
+    },
+    "deviceManagement": "Quản lý thiết bị",
+    "viewOnlyMode": "Bạn đang ở chế độ chỉ xem. Chỉ người tạo hackathon mới có thể tạo, cập nhật hoặc xóa thiết bị.",
+    "failedToFetchHackathon": "Không thể tải thông tin hackathon",
+    "failedToLoadData": "Không thể tải dữ liệu. Vui lòng làm mới và thử lại.",
+    "failedToLoadDevices": "Không thể tải thiết bị cho bộ lọc đã chọn.",
+    "deviceAddedSuccess": "Thêm thiết bị thành công"
+  },
+  "feedbackDetails": {
+    "error": "Lỗi",
+    "failedToLoadFeedbackDetails": "Không thể tải chi tiết phản hồi",
+    "errorOccurredWhileFetchingFeedbackDetails": "Đã xảy ra lỗi khi tải chi tiết phản hồi",
+    "mentorFeedback": "Phản hồi từ mentor",
+    "hackathonFeedback": "Phản hồi về hackathon",
+    "createdBy": "Tạo bởi",
+    "on": "vào ngày",
+    "hideDetails": "Ẩn chi tiết",
+    "viewDetails": "Xem chi tiết",
+    "feedbackFormTemplate": "Mẫu biểu mẫu phản hồi",
+    "maxRating": "Đánh giá tối đa",
+    "responses": "Các phản hồi",
+    "responseFrom": "Phản hồi từ",
+    "rating": "Đánh giá",
+    "noResponsesSubmittedYet": "Chưa có phản hồi nào được gửi."
   }
 }

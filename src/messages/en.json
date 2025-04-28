@@ -751,6 +751,29 @@
       "lost": "Lost",
       "retired": "Retired",
       "pending": "Pending"
-    }
+    },
+    "deviceManagement": "Device management",
+    "viewOnlyMode": "You are in view-only mode. Only the hackathon creator can create, update, or delete devices.",
+    "failedToFetchHackathon": "Failed to fetch hackathon information",
+    "failedToLoadData": "Failed to load data. Please refresh and try again.",
+    "failedToLoadDevices": "Failed to load devices for the selected filters.",
+    "deviceAddedSuccess": "Device added successfully"
+  },
+  "feedbackDetails": {
+    "error": "Error",
+    "failedToLoadFeedbackDetails": "Failed to load feedback details",
+    "errorOccurredWhileFetchingFeedbackDetails": "An error occurred while fetching feedback details",
+    "mentorFeedback": "Mentor feedback",
+    "hackathonFeedback": "Hackathon feedback",
+    "createdBy": "Created by",
+    "on": "on",
+    "hideDetails": "Hide details",
+    "viewDetails": "View details",
+    "feedbackFormTemplate": "Feedback form template",
+    "maxRating": "Max rating",
+    "responses": "Responses",
+    "responseFrom": "Response from",
+    "rating": "Rating",
+    "noResponsesSubmittedYet": "No responses submitted yet."
   }
 }
