@@ -424,7 +424,25 @@
     "hackathonResults": "Hackathon Results",
     "dataLoadingErrorTitle": "Data Loading Error",
     "failedToLoadTeamData": "Failed to load team data for round {roundId}",
-    "failedToLoadSubmissionData": "Failed to load submission data. Please try again later."
+    "failedToLoadSubmissionData": "Failed to load submission data. Please try again later.",
+    "latestSubmissionTitle": "Latest submission",
+    "allSubmissionsTitle": "All submissions",
+    "noSubmissionsYet": "No submissions yet.",
+    "noSubmissionsForRound": "No submissions for this round.",
+    "submitted": "Submitted",
+    "status": "Status",
+    "statusSUBMITTED": "Submitted",
+    "statusDRAFT": "Draft",
+    "statusIN_REVIEW": "In review",
+    "statusAPPROVED": "Approved",
+    "statusREJECTED": "Rejected",
+    "createdBy": "Created by",
+    "finalScore": "Final score",
+    "files": "Files",
+    "judgeEvaluations": "Judge evaluations",
+    "hideJudgements": "Hide judgements",
+    "dataRefreshedSuccess": "Data refreshed successfully",
+    "errorRefreshingData": "Error refreshing data"
   },
   "teamManagement": {
     "status": "Status",
@@ -446,5 +464,44 @@
     "viewScoringDetails": "View scoring details",
     "viewCriterionNote": "View criterion note",
     "viewDetailNote": "View detail note"
+  },
+  "judges": {
+    "judgesTitle": "Judges",
+    "noJudgesAssigned": "No judges assigned yet."
+  },
+  "hackathonResults": {
+    "hackathonResults": "Hackathon Results",
+    "placement": "Placement",
+    "team": "Team",
+    "teamLead": "Team Lead",
+    "members": "Members",
+    "score": "Score",
+    "award": "Award",
+    "noResults": "No results available for this hackathon yet.",
+    "noAdditionalMembers": "No additional members",
+    "loading": "Loading results...",
+    "resultsErrorTitle": "Results Error",
+    "resultsErrorMessage": "Failed to load hackathon results. Please try again later."
+  },
+  "registrationRequests": {
+    "individualRegistrationRequests": "Individual Registration Requests",
+    "user": "User",
+    "status": "Status",
+    "submittedOn": "Submitted On",
+    "reviewedBy": "Reviewed By",
+    "actions": "Actions",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "approve": "Approve",
+    "reject": "Reject",
+    "notReviewedYet": "Not reviewed yet",
+    "noRegistrationRequests": "No registration requests found.",
+    "loading": "Loading registration requests...",
+    "errorTitle": "Error",
+    "failedToLoadRegistrations": "Failed to load individual registration requests",
+    "approvalSuccess": "Registration approved successfully",
+    "rejectionSuccess": "Registration rejected successfully",
+    "updateStatusFailed": "Failed to update registration status"
   }
 }

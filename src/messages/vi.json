@@ -424,7 +424,24 @@
     "hackathonResults": "Kết quả Hackathon",
     "dataLoadingErrorTitle": "Lỗi tải dữ liệu",
     "failedToLoadTeamData": "Không thể tải dữ liệu đội cho vòng {roundId}",
-    "failedToLoadSubmissionData": "Không thể tải dữ liệu bài nộp. Vui lòng thử lại sau."
+    "failedToLoadSubmissionData": "Không thể tải dữ liệu bài nộp. Vui lòng thử lại sau.",
+    "allSubmissionsTitle": "Tất cả bài nộp",
+    "noSubmissionsYet": "Chưa có bài nộp nào.",
+    "noSubmissionsForRound": "Không có bài nộp nào cho vòng này.",
+    "submitted": "Đã nộp",
+    "status": "Trạng thái",
+    "statusSUBMITTED": "Đã nộp",
+    "statusDRAFT": "Bản nháp",
+    "statusIN_REVIEW": "Đang xem xét",
+    "statusAPPROVED": "Đã duyệt",
+    "statusREJECTED": "Bị từ chối",
+    "createdBy": "Tạo bởi",
+    "finalScore": "Điểm cuối cùng",
+    "files": "Tệp",
+    "judgeEvaluations": "Đánh giá của giám khảo",
+    "hideJudgements": "Ẩn đánh giá",
+    "dataRefreshedSuccess": "Dữ liệu đã được cập nhật thành công",
+    "errorRefreshingData": "Lỗi khi cập nhật dữ liệu"
   },
   "teamManagement": {
     "status": "Trạng thái",
@@ -446,5 +463,9 @@
     "viewScoringDetails": "Xem chi tiết chấm điểm",
     "viewCriterionNote": "Xem ghi chú tiêu chí",
     "viewDetailNote": "Xem ghi chú chi tiết"
+  },
+  "judges": {
+    "judgesTitle": "Giám khảo",
+    "noJudgesAssigned": "Chưa có giám khảo nào được phân công."
   }
 }
