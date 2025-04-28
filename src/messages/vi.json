@@ -879,5 +879,32 @@
     "updateError": "Không thể cập nhật giao thiết bị. Vui lòng thử lại.",
     "deleteSuccess": "Xóa giao thiết bị thành công",
     "deleteError": "Không thể xóa giao thiết bị. Vui lòng thử lại."
+  },
+  "filesList": {
+    "download": "Tải xuống tệp",
+    "fileSize": "Kích thước tệp",
+    "uploadDate": "Ngày tải lên"
+  },
+  "trackingHistory": {
+    "title": "Lịch sử theo dõi",
+    "addRecord": "Thêm bản ghi",
+    "errorLoadingHistory": "Không thể tải lịch sử theo dõi",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa bản ghi theo dõi này không?",
+    "recordDeleted": "Đã xóa bản ghi theo dõi thành công",
+    "errorDeleting": "Không thể xóa bản ghi theo dõi",
+    "recordCreated": "Đã tạo bản ghi theo dõi thành công",
+    "errorCreating": "Không thể tạo bản ghi theo dõi",
+    "recordUpdated": "Đã cập nhật bản ghi theo dõi thành công",
+    "errorUpdating": "Không thể cập nhật bản ghi theo dõi",
+    "addNewRecord": "Thêm bản ghi theo dõi mới",
+    "editRecord": "Chỉnh sửa bản ghi theo dõi",
+    "createRecord": "Tạo bản ghi",
+    "updateRecord": "Cập nhật bản ghi",
+    "noHistory": "Không có lịch sử theo dõi",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "loadingFiles": "Đang tải tệp...",
+    "attachedFiles": "Tệp đính kèm",
+    "noFiles": "Không có tệp đính kèm cho bản ghi này"
   }
 }

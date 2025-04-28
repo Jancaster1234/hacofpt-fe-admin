@@ -880,5 +880,32 @@
     "updateError": "Failed to update assignment. Please try again.",
     "deleteSuccess": "Device assignment deleted successfully",
     "deleteError": "Failed to delete device assignment. Please try again."
+  },
+  "filesList": {
+    "download": "Download file",
+    "fileSize": "File size",
+    "uploadDate": "Upload date"
+  },
+  "trackingHistory": {
+    "title": "Tracking history",
+    "addRecord": "Add record",
+    "errorLoadingHistory": "Failed to load tracking history",
+    "confirmDelete": "Are you sure you want to delete this tracking record?",
+    "recordDeleted": "Tracking record deleted successfully",
+    "errorDeleting": "Failed to delete tracking record",
+    "recordCreated": "Tracking record created successfully",
+    "errorCreating": "Failed to create tracking record",
+    "recordUpdated": "Tracking record updated successfully",
+    "errorUpdating": "Failed to update tracking record",
+    "addNewRecord": "Add new tracking record",
+    "editRecord": "Edit tracking record",
+    "createRecord": "Create record",
+    "updateRecord": "Update record",
+    "noHistory": "No tracking history available",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loadingFiles": "Loading files...",
+    "attachedFiles": "Attached files",
+    "noFiles": "No files attached to this record"
   }
 }
