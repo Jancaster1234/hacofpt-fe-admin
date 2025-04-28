@@ -173,7 +173,7 @@ class UserService {
     try {
       const response = await apiService.auth.post<User>(
         "/identity-service/api/v1/users",
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
@@ -204,7 +204,7 @@ class UserService {
     try {
       const response = await apiService.auth.put<User>(
         `/identity-service/api/v1/users/${userId}`,
-        data
+        { data: data }
       );
 
       if (!response || !response.data) {
