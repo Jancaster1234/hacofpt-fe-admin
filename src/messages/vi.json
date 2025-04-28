@@ -653,12 +653,12 @@
     "noName": "Không tên",
     "noTeamLeaderSelected": "Chưa chọn trưởng đội",
     "teamMembers": "Thành viên đội ({{count}})",
-    "makeLeader": "Chọn làm trưởng",
+    "makeLeader": "Chọn làm trưởng đội",
     "remove": "Xóa",
     "unassignedUsers": "Người dùng chưa phân đội ({{count}})",
     "addToTeam": "Thêm vào đội...",
     "members": "thành viên",
-    "allUsersAssigned": "Tất cả người dùng đã được phân đội",
+    "allUsersAssigned": "Tất cả người dùng đã được phân vào các đội",
     "submitTeams": "Xác nhận đội",
     "creatingTeams": "Đang tạo đội...",
     "error": "Lỗi",
@@ -669,8 +669,15 @@
     "minTeamSizeAtLeastTwo": "Số thành viên tối thiểu phải ít nhất là 2.",
     "maxSizeShouldBeGreater": "Số thành viên tối đa phải lớn hơn hoặc bằng số thành viên tối thiểu.",
     "missingTeamLeaders": "Thiếu trưởng đội",
-    "teamsWithoutLeadersMessage": "{{count}} đội không có trưởng đội. Vui lòng chỉ định trưởng đội cho tất cả các đội.",
+    "teamsWithoutLeadersMessage": "{{count}} đội chưa có trưởng đội. Vui lòng chỉ định trưởng đội cho tất cả các đội.",
     "teamsCreated": "Đã tạo đội",
-    "teamsCreatedSuccess": "Đã tạo thành công {{count}} đội."
+    "teamsCreatedSuccess": "Đã tạo thành công {{count}} đội.",
+    "failedToCreateTeams": "Không thể tạo đội. Vui lòng thử lại.",
+    "teamsGeneratedSuccess": "Đã tạo đội thành công.",
+    "userAddedToTeam": "{{name}} đã được thêm vào đội {{team}}.",
+    "userRemovedFromTeam": "{{name}} đã bị xóa khỏi đội {{team}}.",
+    "newTeamLeaderAssigned": "{{name}} đã trở thành trưởng đội của {{team}}.",
+    "newTeamCreated": "Đã tạo đội mới {{team}}.",
+    "teamDeleted": "Đã xóa đội {{team}}."
   }
 }
