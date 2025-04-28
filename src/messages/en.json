@@ -274,5 +274,45 @@
     "dataLoadingError": "Data loading error",
     "failedToLoadHackathon": "Failed to load hackathon data. Please try again later",
     "disqualified_due_to_violation": "Disqualified due to violation"
+  },
+  "rounds": {
+    "rounds": "Rounds",
+    "addRound": "Add round",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "success": "Success",
+    "roundNumber": "Round number",
+    "start": "Start",
+    "end": "End",
+    "maxTeams": "Max teams",
+    "notSpecified": "Not specified",
+    "locations": "Locations",
+    "coordinates": "Coordinates",
+    "noLocationsAssigned": "No locations assigned to this round.",
+    "noRoundsAvailable": "No rounds available.",
+    "roundCreatedSuccessfully": "Round created successfully!",
+    "roundUpdatedSuccessfully": "Round updated successfully!",
+    "roundDeletedSuccessfully": "Round deleted successfully!",
+    "confirmDeleteRound": "Are you sure you want to delete this round?",
+    "dataLoadingError": "Data loading error",
+    "failedToLoadRoundsAndLocations": "Failed to load rounds and locations. Please try again.",
+    "updateFailed": "Update failed",
+    "createFailed": "Create failed",
+    "deleteFailed": "Delete failed",
+    "failedToUpdateRound": "Failed to update round.",
+    "failedToCreateRound": "Failed to create round.",
+    "failedToDeleteRound": "Failed to delete round.",
+    "status": {
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "locationType": {
+      "online": "Online",
+      "offline": "Offline",
+      "hybrid": "Hybrid"
+    }
   }
 }

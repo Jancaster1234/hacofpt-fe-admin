@@ -274,5 +274,45 @@
     "dataLoadingError": "Lỗi tải dữ liệu",
     "failedToLoadHackathon": "Không thể tải dữ liệu hackathon. Vui lòng thử lại sau",
     "disqualified_due_to_violation": "Bị loại do vi phạm quy định"
+  },
+  "rounds": {
+    "rounds": "Vòng thi",
+    "addRound": "Thêm vòng",
+    "cancel": "Hủy",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "success": "Thành công",
+    "roundNumber": "Số vòng",
+    "start": "Bắt đầu",
+    "end": "Kết thúc",
+    "maxTeams": "Số đội tối đa",
+    "notSpecified": "Chưa xác định",
+    "locations": "Địa điểm",
+    "coordinates": "Tọa độ",
+    "noLocationsAssigned": "Không có địa điểm nào được chỉ định cho vòng này.",
+    "noRoundsAvailable": "Không có vòng thi nào.",
+    "roundCreatedSuccessfully": "Tạo vòng thi thành công!",
+    "roundUpdatedSuccessfully": "Cập nhật vòng thi thành công!",
+    "roundDeletedSuccessfully": "Xóa vòng thi thành công!",
+    "confirmDeleteRound": "Bạn có chắc chắn muốn xóa vòng thi này không?",
+    "dataLoadingError": "Lỗi tải dữ liệu",
+    "failedToLoadRoundsAndLocations": "Không thể tải vòng thi và địa điểm. Vui lòng thử lại.",
+    "updateFailed": "Cập nhật thất bại",
+    "createFailed": "Tạo thất bại",
+    "deleteFailed": "Xóa thất bại",
+    "failedToUpdateRound": "Không thể cập nhật vòng thi.",
+    "failedToCreateRound": "Không thể tạo vòng thi.",
+    "failedToDeleteRound": "Không thể xóa vòng thi.",
+    "status": {
+      "upcoming": "Sắp diễn ra",
+      "ongoing": "Đang diễn ra",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy"
+    },
+    "locationType": {
+      "online": "Trực tuyến",
+      "offline": "Trực tiếp",
+      "hybrid": "Kết hợp"
+    }
   }
 }
