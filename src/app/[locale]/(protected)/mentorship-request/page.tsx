@@ -1,13 +1,24 @@
-// src/app/[locale]/(protected)/mentorship-request/page.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { mentorshipRequestService } from "@/services/mentorshipRequest.service";
 import { MentorshipRequest } from "@/types/entities/mentorshipRequest";
-import { ChevronDown, ChevronUp, Check, X, Loader2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Check,
+  X,
+  Loader2,
+  Moon,
+  Sun,
+} from "lucide-react";
 import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import Link from "next/link";
 
 export default function MentorshipRequestsPage() {
   const { user } = useAuth();
@@ -20,6 +31,8 @@ export default function MentorshipRequestsPage() {
   const [loading, setLoading] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
   const { modalState, hideModal, showSuccess, showError } = useApiModal();
+  const t = useTranslations("mentorshipRequests");
+  const toast = useToast();
 
   useEffect(() => {
     const fetchMentorshipRequests = async () => {
@@ -27,7 +40,7 @@ export default function MentorshipRequestsPage() {
 
       setIsLoading(true);
       try {
-        // Assuming the mentor is viewing their own requests
+        // Fetch mentorship requests by mentor ID
         const response =
           await mentorshipRequestService.getMentorshipRequestsByMentorId(
             user.id
@@ -37,16 +50,12 @@ export default function MentorshipRequestsPage() {
           setMentorshipRequests(response.data);
         } else {
           showError(
-            "Request Failed",
-            response.message || "Failed to fetch mentorship requests"
+            t("requestFailed"),
+            response.message || t("failedToFetchRequests")
           );
         }
       } catch (error: any) {
-        showError(
-          "Error",
-          error.message ||
-            "An error occurred while fetching mentorship requests"
-        );
+        showError(t("error"), error.message || t("errorFetchingRequests"));
       } finally {
         setIsLoading(false);
       }
@@ -55,17 +64,20 @@ export default function MentorshipRequestsPage() {
     if (user) {
       fetchMentorshipRequests();
     }
-  }, [user, showError]);
+  }, [user, showError, t]);
 
   // Group mentorship requests by hackathon
-  const groupedByHackathon = mentorshipRequests.reduce((acc, request) => {
-    const hackathonTitle = request.hackathon?.title || "Unknown Hackathon";
-    if (!acc[hackathonTitle]) {
-      acc[hackathonTitle] = [];
-    }
-    acc[hackathonTitle].push(request);
-    return acc;
-  }, {} as Record<string, MentorshipRequest[]>);
+  const groupedByHackathon = mentorshipRequests.reduce(
+    (acc, request) => {
+      const hackathonTitle = request.hackathon?.title || t("unknownHackathon");
+      if (!acc[hackathonTitle]) {
+        acc[hackathonTitle] = [];
+      }
+      acc[hackathonTitle].push(request);
+      return acc;
+    },
+    {} as Record<string, MentorshipRequest[]>
+  );
 
   const toggleHackathon = (title: string) => {
     setExpandedHackathons((prev) => ({
@@ -87,8 +99,11 @@ export default function MentorshipRequestsPage() {
       );
 
       if (!requestToUpdate) {
-        throw new Error("Request not found");
+        throw new Error(t("requestNotFound"));
       }
+
+      // Show loading toast
+      toast.info(t("approvingRequest"));
 
       const response = await mentorshipRequestService.approveMentorshipRequest({
         id: requestId,
@@ -120,22 +135,26 @@ export default function MentorshipRequestsPage() {
           )
         );
 
+        // Show success modal
         showSuccess(
-          "Success",
-          response.message ||
-            "Mentorship request has been approved successfully"
+          t("success"),
+          response.message || t("requestApprovedSuccess")
         );
+
+        // Show success toast
+        toast.success(response.message || t("requestApprovedSuccess"));
       } else {
-        throw new Error(
-          response.message || "Failed to approve mentorship request"
-        );
+        throw new Error(response.message || t("failedToApprove"));
       }
     } catch (error: any) {
+      // Show error modal
       showError(
-        "Approval Failed",
-        error.message ||
-          "An error occurred while approving the mentorship request"
+        t("approvalFailed"),
+        error.message || t("errorApprovingRequest")
       );
+
+      // Show error toast
+      toast.error(error.message || t("errorApprovingRequest"));
     } finally {
       setLoading((prev) => ({ ...prev, [requestId]: false }));
     }
@@ -154,8 +173,11 @@ export default function MentorshipRequestsPage() {
       );
 
       if (!requestToUpdate) {
-        throw new Error("Request not found");
+        throw new Error(t("requestNotFound"));
       }
+
+      // Show loading toast
+      toast.info(t("rejectingRequest"));
 
       const response = await mentorshipRequestService.rejectMentorshipRequest({
         id: requestId,
@@ -187,113 +209,149 @@ export default function MentorshipRequestsPage() {
           )
         );
 
+        // Show success modal
         showSuccess(
-          "Success",
-          response.message ||
-            "Mentorship request has been rejected successfully"
+          t("success"),
+          response.message || t("requestRejectedSuccess")
         );
+
+        // Show success toast
+        toast.success(response.message || t("requestRejectedSuccess"));
       } else {
-        throw new Error(
-          response.message || "Failed to reject mentorship request"
-        );
+        throw new Error(response.message || t("failedToReject"));
       }
     } catch (error: any) {
+      // Show error modal
       showError(
-        "Rejection Failed",
-        error.message ||
-          "An error occurred while rejecting the mentorship request"
+        t("rejectionFailed"),
+        error.message || t("errorRejectingRequest")
       );
+
+      // Show error toast
+      toast.error(error.message || t("errorRejectingRequest"));
     } finally {
       setLoading((prev) => ({ ...prev, [requestId]: false }));
     }
   };
 
   return (
-    <div className="min-h-screen p-6 bg-gray-100">
-      <h1 className="text-3xl font-bold text-gray-900 text-center mb-6">
-        Mentorship Requests
+    <div className="min-h-screen p-4 sm:p-6 bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 text-center mb-4 sm:mb-6 transition-colors duration-300">
+        {t("pageTitle")}
       </h1>
 
+      {/* Language Switcher */}
+      <div className="flex justify-center mb-4 gap-2">
+        <Link
+          href="/en/mentorship-request"
+          className="px-3 py-1 rounded bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors duration-300"
+        >
+          English
+        </Link>
+        <Link
+          href="/vi/mentorship-request"
+          className="px-3 py-1 rounded bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors duration-300"
+        >
+          Tiếng Việt
+        </Link>
+      </div>
+
       {isLoading ? (
-        <div className="flex justify-center items-center h-32">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          <span className="ml-2 text-gray-600">Loading requests...</span>
+        <div className="flex flex-col justify-center items-center h-32">
+          <LoadingSpinner size="lg" showText={true} />
+          <span className="mt-2 text-gray-600 dark:text-gray-400 transition-colors duration-300">
+            {t("loadingRequests")}
+          </span>
         </div>
       ) : Object.keys(groupedByHackathon).length === 0 ? (
-        <p className="text-center text-gray-600">
-          No mentorship requests found.
-        </p>
+        <div className="text-center p-6 rounded-lg bg-white dark:bg-gray-800 shadow-md transition-colors duration-300">
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("noRequestsFound")}
+          </p>
+        </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {Object.entries(groupedByHackathon).map(
             ([hackathonTitle, requests]) => (
               <div
                 key={hackathonTitle}
-                className="bg-white p-4 rounded-lg shadow-md"
+                className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg"
               >
                 {/* Hackathon Title Header */}
                 <div
-                  className="flex justify-between items-center cursor-pointer"
+                  className="flex justify-between items-center cursor-pointer group"
                   onClick={() => toggleHackathon(hackathonTitle)}
                 >
-                  <h2 className="text-xl font-semibold">{hackathonTitle}</h2>
-                  {expandedHackathons[hackathonTitle] ? (
-                    <ChevronUp />
-                  ) : (
-                    <ChevronDown />
-                  )}
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 transition-colors duration-300">
+                    {hackathonTitle}
+                  </h2>
+                  <span className="text-gray-500 dark:text-gray-400 transition-colors duration-300 transform group-hover:scale-110">
+                    {expandedHackathons[hackathonTitle] ? (
+                      <ChevronUp className="w-5 h-5" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5" />
+                    )}
+                  </span>
                 </div>
 
                 {/* Mentorship Requests (Expandable) */}
                 {expandedHackathons[hackathonTitle] && (
-                  <div className="mt-4 space-y-4">
+                  <div className="mt-3 sm:mt-4 space-y-3 sm:space-y-4">
                     {requests.map((request) => (
                       <div
                         key={request.id}
-                        className="border p-3 rounded-md bg-gray-50"
+                        className="border border-gray-200 dark:border-gray-700 p-2 sm:p-3 rounded-md bg-gray-50 dark:bg-gray-850 transition-colors duration-300"
                       >
-                        <p>
-                          <strong>Team:</strong>{" "}
-                          {request.team?.name || "Unknown Team"}
-                        </p>
-                        <p>
-                          <strong>Status:</strong>{" "}
-                          <span
-                            className={`font-semibold ${
-                              request.status === "PENDING"
-                                ? "text-yellow-500"
-                                : request.status === "APPROVED"
-                                ? "text-green-600"
-                                : "text-red-600"
-                            }`}
-                          >
-                            {request.status}
-                          </span>
-                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <p className="text-sm sm:text-base text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                            <span className="font-medium">{t("team")}: </span>
+                            {request.team?.name || t("unknownTeam")}
+                          </p>
+                          <p className="text-sm sm:text-base text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                            <span className="font-medium">{t("status")}: </span>
+                            <span
+                              className={`font-semibold ${
+                                request.status === "PENDING"
+                                  ? "text-yellow-500 dark:text-yellow-400"
+                                  : request.status === "APPROVED"
+                                    ? "text-green-600 dark:text-green-400"
+                                    : "text-red-600 dark:text-red-400"
+                              } transition-colors duration-300`}
+                            >
+                              {t(request.status.toLowerCase())}
+                            </span>
+                          </p>
+                        </div>
+
                         {request.evaluatedBy && (
-                          <p>
-                            <strong>Evaluated By:</strong>{" "}
+                          <p className="text-sm sm:text-base text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                            <span className="font-medium">
+                              {t("evaluatedBy")}:{" "}
+                            </span>
                             {request.evaluatedBy.firstName}{" "}
                             {request.evaluatedBy.lastName}
                           </p>
                         )}
+
                         {request.evaluatedAt && (
-                          <p>
-                            <strong>Evaluated At:</strong>{" "}
+                          <p className="text-sm sm:text-base text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                            <span className="font-medium">
+                              {t("evaluatedAt")}:{" "}
+                            </span>
                             {new Date(request.evaluatedAt).toLocaleString()}
                           </p>
                         )}
 
                         {/* Action Buttons - Only show for PENDING requests */}
                         {request.status === "PENDING" && (
-                          <div className="mt-3 flex space-x-2">
+                          <div className="mt-3 flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleApproveRequest(request.id);
                               }}
                               disabled={loading[request.id]}
-                              className="flex items-center px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 disabled:opacity-50"
+                              className="flex items-center justify-center px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 disabled:opacity-50 transition-colors duration-300"
                             >
                               {loading[request.id] ? (
                                 <Loader2
@@ -303,7 +361,7 @@ export default function MentorshipRequestsPage() {
                               ) : (
                                 <Check size={16} className="mr-1" />
                               )}
-                              Approve
+                              {t("approve")}
                             </button>
                             <button
                               onClick={(e) => {
@@ -311,7 +369,7 @@ export default function MentorshipRequestsPage() {
                                 handleRejectRequest(request.id);
                               }}
                               disabled={loading[request.id]}
-                              className="flex items-center px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
+                              className="flex items-center justify-center px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded hover:bg-red-200 dark:hover:bg-red-800 disabled:opacity-50 transition-colors duration-300"
                             >
                               {loading[request.id] ? (
                                 <Loader2
@@ -321,7 +379,7 @@ export default function MentorshipRequestsPage() {
                               ) : (
                                 <X size={16} className="mr-1" />
                               )}
-                              Reject
+                              {t("reject")}
                             </button>
                           </div>
                         )}
