@@ -5,6 +5,10 @@ import { useApiModal } from "@/hooks/useApiModal";
 import { userService } from "@/services/user.service";
 import { individualRegistrationRequestService } from "@/services/individualRegistrationRequest.service";
 import { teamService } from "@/services/team.service";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import Image from "next/image";
 
 // Types
 interface TeamMember {
@@ -25,6 +29,8 @@ export default function TeamFormation({
 }: {
   hackathonId: string;
 }) {
+  const t = useTranslations("teamFormation");
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [participants, setParticipants] = useState<TeamMember[]>([]);
   const [teams, setTeams] = useState<FormattedTeam[]>([]);
@@ -90,23 +96,23 @@ export default function TeamFormation({
         console.error("Error fetching participants:", error);
         showModal({
           type: "error",
-          title: "Error",
-          message: "Failed to load participants data.",
+          title: t("error"),
+          message: t("failedToLoadParticipants"),
         });
         setLoading(false);
       }
     };
 
     fetchParticipants();
-  }, [hackathonId, showModal]);
+  }, [hackathonId, showModal, t]);
 
   // Function to form teams based on min and max team size
   const formTeams = () => {
     if (participants.length === 0) {
       showModal({
         type: "warning",
-        title: "No Participants",
-        message: "There are no participants to form teams.",
+        title: t("noParticipants"),
+        message: t("noParticipantsToFormTeams"),
       });
       return;
     }
@@ -115,8 +121,8 @@ export default function TeamFormation({
     if (minTeamSize < 2) {
       showModal({
         type: "warning",
-        title: "Invalid Team Size",
-        message: "Minimum team size should be at least 2.",
+        title: t("invalidTeamSize"),
+        message: t("minTeamSizeAtLeastTwo"),
       });
       return;
     }
@@ -124,9 +130,8 @@ export default function TeamFormation({
     if (maxTeamSize < minTeamSize) {
       showModal({
         type: "warning",
-        title: "Invalid Team Size",
-        message:
-          "Maximum team size should be greater than or equal to minimum team size.",
+        title: t("invalidTeamSize"),
+        message: t("maxSizeShouldBeGreater"),
       });
       return;
     }
@@ -174,6 +179,8 @@ export default function TeamFormation({
 
     setTeams(formattedTeams);
     setUnassignedUsers(remainingUsers);
+
+    toast.success(t("teamsGeneratedSuccess"));
   };
 
   // Add user to team
@@ -191,6 +198,7 @@ export default function TeamFormation({
     );
 
     setUnassignedUsers(unassignedUsers.filter((u) => u.id !== user.id));
+    toast.info(t("userAddedToTeam", { name: user.fullName, team: teamId }));
   };
 
   // Remove user from team
@@ -223,6 +231,9 @@ export default function TeamFormation({
     const removedUser = participants.find((p) => p.id === userId);
     if (removedUser) {
       setUnassignedUsers([...unassignedUsers, removedUser]);
+      toast.info(
+        t("userRemovedFromTeam", { name: removedUser.fullName, team: teamId })
+      );
     }
 
     // Filter out empty teams
@@ -242,6 +253,13 @@ export default function TeamFormation({
         return team;
       })
     );
+
+    const newLeader = participants.find((p) => p.id === newLeaderId);
+    if (newLeader) {
+      toast.info(
+        t("newTeamLeaderAssigned", { name: newLeader.fullName, team: teamId })
+      );
+    }
   };
 
   // Create a new team
@@ -255,6 +273,7 @@ export default function TeamFormation({
         teamMembers: [],
       },
     ]);
+    toast.info(t("newTeamCreated", { team: newTeamId }));
   };
 
   // Delete a team
@@ -265,6 +284,7 @@ export default function TeamFormation({
       setUnassignedUsers([...unassignedUsers, ...teamToDelete.teamMembers]);
       // Remove the team
       setTeams(teams.filter((t) => t.id !== teamId));
+      toast.warning(t("teamDeleted", { team: teamId }));
     }
   };
 
@@ -275,8 +295,10 @@ export default function TeamFormation({
     if (teamsWithoutLeaders.length > 0) {
       showModal({
         type: "warning",
-        title: "Missing Team Leaders",
-        message: `${teamsWithoutLeaders.length} team(s) don't have a leader. Please assign leaders to all teams.`,
+        title: t("missingTeamLeaders"),
+        message: t("teamsWithoutLeadersMessage", {
+          count: teamsWithoutLeaders.length,
+        }),
       });
       return;
     }
@@ -298,25 +320,31 @@ export default function TeamFormation({
 
     try {
       setSubmitLoading(true);
+      toast.info(t("creatingTeams"));
 
       // Call the API to create teams
       const response = await teamService.createBulkTeams(formattedTeamsForApi);
 
       if (response.data) {
+        toast.success(
+          response.message ||
+            t("teamsCreatedSuccess", { count: response.data.length })
+        );
         showModal({
           type: "success",
-          title: "Teams Created",
-          message: `Successfully created ${response.data.length} teams.`,
+          title: t("teamsCreated"),
+          message: t("teamsCreatedSuccess", { count: response.data.length }),
         });
       } else {
-        throw new Error("Failed to create teams");
+        throw new Error(response.message || t("failedToCreateTeams"));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting teams:", error);
+      toast.error(error.message || t("failedToCreateTeams"));
       showModal({
         type: "error",
-        title: "Error",
-        message: "Failed to create teams. Please try again.",
+        title: t("error"),
+        message: error.message || t("failedToCreateTeams"),
       });
     } finally {
       setSubmitLoading(false);
@@ -325,35 +353,39 @@ export default function TeamFormation({
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center p-8">
-        Loading participants data...
+      <div className="flex justify-center items-center p-8 h-64 transition-colors duration-300">
+        <LoadingSpinner size="lg" showText={true} />
       </div>
     );
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">Team Formation</h2>
+    <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md transition-colors duration-300">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-100">
+        {t("teamFormation")}
+      </h2>
 
       {/* Team Size Configuration */}
-      <div className="bg-gray-50 p-4 rounded-md mb-6">
-        <h3 className="text-lg font-medium mb-3">Team Size Configuration</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-gray-50 dark:bg-gray-700 p-3 sm:p-4 rounded-md mb-4 sm:mb-6 transition-colors duration-300">
+        <h3 className="text-base sm:text-lg font-medium mb-2 sm:mb-3 text-gray-700 dark:text-gray-200">
+          {t("teamSizeConfiguration")}
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Minimum Team Size
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("minimumTeamSize")}
             </label>
             <input
               type="number"
               min="2"
               value={minTeamSize}
               onChange={(e) => setMinTeamSize(parseInt(e.target.value) || 2)}
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Maximum Team Size
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("maximumTeamSize")}
             </label>
             <input
               type="number"
@@ -362,97 +394,110 @@ export default function TeamFormation({
               onChange={(e) =>
                 setMaxTeamSize(parseInt(e.target.value) || minTeamSize)
               }
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border dark:border-gray-600 rounded-md bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300"
             />
           </div>
         </div>
         <button
           onClick={formTeams}
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+          className="mt-3 sm:mt-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white px-3 sm:px-4 py-1.5 sm:py-2 text-sm rounded-md transition-colors duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
         >
-          Generate Teams
+          {t("generateTeams")}
         </button>
       </div>
 
       {/* Teams Display */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-lg font-medium">Teams ({teams.length})</h3>
+      <div className="mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 sm:mb-3 gap-2 sm:gap-0">
+          <h3 className="text-base sm:text-lg font-medium text-gray-700 dark:text-gray-200">
+            {t("teams", { count: teams.length })}
+          </h3>
           <button
             onClick={createNewTeam}
-            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm"
+            className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white px-2 sm:px-3 py-1 rounded-md text-xs sm:text-sm transition-colors duration-300 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
           >
-            Create New Team
+            {t("createNewTeam")}
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {teams.map((team) => (
-            <div key={team.id} className="border rounded-md p-4">
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="font-medium">{team.id}</h4>
+            <div
+              key={team.id}
+              className="border dark:border-gray-600 rounded-md p-3 sm:p-4 transition-colors duration-300"
+            >
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 sm:mb-3 gap-2 sm:gap-0">
+                <h4 className="font-medium text-gray-800 dark:text-gray-200">
+                  {team.id}
+                </h4>
                 <button
                   onClick={() => deleteTeam(team.id)}
-                  className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-md text-sm"
+                  className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white px-2 py-1 rounded-md text-xs sm:text-sm transition-colors duration-300 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                 >
-                  Delete Team
+                  {t("deleteTeam")}
                 </button>
               </div>
 
-              <div className="mb-3">
-                <p className="text-sm font-medium text-gray-700 mb-1">
-                  Team Leader
+              <div className="mb-2 sm:mb-3">
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t("teamLeader")}
                 </p>
                 {team.teamLeaderId ? (
-                  <div className="bg-blue-50 p-2 rounded-md">
+                  <div className="bg-blue-50 dark:bg-blue-900/30 p-2 rounded-md text-blue-800 dark:text-blue-200 transition-colors duration-300">
                     {team.teamMembers.find((m) => m.id === team.teamLeaderId)
-                      ?.fullName || "No name"}
+                      ?.fullName || t("noName")}
                   </div>
                 ) : (
-                  <div className="bg-yellow-50 p-2 rounded-md text-sm">
-                    No team leader selected
+                  <div className="bg-yellow-50 dark:bg-yellow-900/30 p-2 rounded-md text-xs sm:text-sm text-yellow-800 dark:text-yellow-200 transition-colors duration-300">
+                    {t("noTeamLeaderSelected")}
                   </div>
                 )}
               </div>
 
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-1">
-                  Team Members ({team.teamMembers.length})
+                <p className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t("teamMembers", { count: team.teamMembers.length })}
                 </p>
-                <ul className="space-y-2">
+                <ul className="space-y-1 sm:space-y-2">
                   {team.teamMembers.map((member) => (
                     <li
                       key={member.id}
-                      className="flex justify-between items-center border-b pb-1"
+                      className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b dark:border-gray-600 pb-1 gap-2 sm:gap-0 transition-colors duration-300"
                     >
                       <div className="flex items-center">
-                        <div className="w-8 h-8 rounded-full bg-gray-200 flex justify-center items-center mr-2">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gray-200 dark:bg-gray-600 flex justify-center items-center mr-2 transition-colors duration-300">
                           {member.avatarUrl ? (
-                            <img
+                            <Image
                               src={member.avatarUrl}
                               alt={member.fullName}
-                              className="w-8 h-8 rounded-full"
+                              width={32}
+                              height={32}
+                              className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
                             />
                           ) : (
-                            member.fullName.charAt(0)
+                            <span className="text-gray-600 dark:text-gray-300">
+                              {member.fullName.charAt(0)}
+                            </span>
                           )}
                         </div>
-                        <span>{member.fullName}</span>
+                        <span className="text-sm sm:text-base text-gray-800 dark:text-gray-200">
+                          {member.fullName}
+                        </span>
                       </div>
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-2 sm:space-x-3 ml-8 sm:ml-0">
                         {member.id !== team.teamLeaderId && (
                           <button
                             onClick={() => changeTeamLeader(team.id, member.id)}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs sm:text-sm transition-colors duration-300"
                           >
-                            Make Leader
+                            {t("makeLeader")}
                           </button>
                         )}
                         <button
                           onClick={() => removeUserFromTeam(team.id, member.id)}
-                          className="text-red-600 hover:text-red-800 text-sm"
+                          className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-xs sm:text-sm transition-colors duration-300"
                         >
-                          Remove
+                          {t("remove")}
                         </button>
                       </div>
                     </li>
@@ -465,35 +510,41 @@ export default function TeamFormation({
       </div>
 
       {/* Unassigned Users */}
-      <div className="mb-6">
-        <h3 className="text-lg font-medium mb-3">
-          Unassigned Users ({unassignedUsers.length})
+      <div className="mb-4 sm:mb-6">
+        <h3 className="text-base sm:text-lg font-medium mb-2 sm:mb-3 text-gray-700 dark:text-gray-200">
+          {t("unassignedUsers", { count: unassignedUsers.length })}
         </h3>
         {unassignedUsers.length > 0 ? (
-          <div className="border rounded-md p-4">
-            <ul className="space-y-2">
+          <div className="border dark:border-gray-600 rounded-md p-3 sm:p-4 transition-colors duration-300">
+            <ul className="space-y-1 sm:space-y-2">
               {unassignedUsers.map((user) => (
                 <li
                   key={user.id}
-                  className="flex justify-between items-center border-b pb-1"
+                  className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b dark:border-gray-600 pb-1 gap-2 sm:gap-0 transition-colors duration-300"
                 >
                   <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex justify-center items-center mr-2">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gray-200 dark:bg-gray-600 flex justify-center items-center mr-2 transition-colors duration-300">
                       {user.avatarUrl ? (
-                        <img
+                        <Image
                           src={user.avatarUrl}
                           alt={user.fullName}
-                          className="w-8 h-8 rounded-full"
+                          width={32}
+                          height={32}
+                          className="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
                         />
                       ) : (
-                        user.fullName.charAt(0)
+                        <span className="text-gray-600 dark:text-gray-300">
+                          {user.fullName.charAt(0)}
+                        </span>
                       )}
                     </div>
-                    <span>{user.fullName}</span>
+                    <span className="text-sm sm:text-base text-gray-800 dark:text-gray-200">
+                      {user.fullName}
+                    </span>
                   </div>
-                  <div>
+                  <div className="w-full sm:w-auto mt-1 sm:mt-0">
                     <select
-                      className="border rounded-md p-1"
+                      className="w-full sm:w-auto border dark:border-gray-600 rounded-md p-1 text-sm bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-300"
                       onChange={(e) => {
                         if (e.target.value) {
                           addUserToTeam(e.target.value, user);
@@ -503,11 +554,11 @@ export default function TeamFormation({
                       defaultValue=""
                     >
                       <option value="" disabled>
-                        Add to team...
+                        {t("addToTeam")}
                       </option>
                       {teams.map((team) => (
                         <option key={team.id} value={team.id}>
-                          {team.id} ({team.teamMembers.length} members)
+                          {team.id} ({team.teamMembers.length} {t("members")})
                         </option>
                       ))}
                     </select>
@@ -517,8 +568,8 @@ export default function TeamFormation({
             </ul>
           </div>
         ) : (
-          <div className="text-gray-500 italic">
-            All users have been assigned to teams
+          <div className="text-gray-500 dark:text-gray-400 italic">
+            {t("allUsersAssigned")}
           </div>
         )}
       </div>
@@ -528,13 +579,13 @@ export default function TeamFormation({
         <button
           onClick={submitTeams}
           disabled={teams.length === 0 || submitLoading}
-          className={`px-4 py-2 rounded-md ${
+          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-sm sm:text-base transition-colors duration-300 focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
             teams.length === 0 || submitLoading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700"
-          } text-white`}
+              ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed text-gray-200"
+              : "bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white focus:ring-green-500"
+          }`}
         >
-          {submitLoading ? "Creating Teams..." : "Submit Teams"}
+          {submitLoading ? t("creatingTeams") : t("submitTeams")}
         </button>
       </div>
     </div>
