@@ -7,6 +7,7 @@ import { TeamInfo } from "./TeamInfo";
 import { LatestSubmission } from "./LatestSubmission";
 import { AllSubmissions } from "./AllSubmissions";
 import { JudgesList } from "./JudgesList";
+import { useTranslations } from "@/hooks/useTranslations";
 
 interface TeamCardProps {
   teamRound: TeamRound;
@@ -26,6 +27,7 @@ export function TeamCard({
   const [expandedTeamInfo, setExpandedTeamInfo] = useState(false);
   const [expandedSubmissions, setExpandedSubmissions] = useState(false);
   const [expandedJudges, setExpandedJudges] = useState(false);
+  const t = useTranslations("teamManagement");
 
   const toggleTeamInfoExpand = () => {
     setExpandedTeamInfo(!expandedTeamInfo);
@@ -40,34 +42,40 @@ export function TeamCard({
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md">
-      <div className="flex justify-between items-center">
+    <div className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow-md transition-colors duration-200">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
         <div>
-          <h3 className="text-lg font-medium text-gray-800">
+          <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200">
             {teamRound.team.name}
           </h3>
-          <p className="text-sm text-gray-600">
-            Status: <span className="font-semibold">{teamRound.status}</span>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            {t("status")}:{" "}
+            <span className="font-semibold">{teamRound.status}</span>
           </p>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
           <button
             onClick={toggleTeamInfoExpand}
-            className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+            className="px-2 sm:px-3 py-1 text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 transition-colors duration-200"
+            aria-expanded={expandedTeamInfo}
           >
-            {expandedTeamInfo ? "Hide Info" : "Team Info"}
+            {expandedTeamInfo ? t("hideInfo") : t("teamInfo")}
           </button>
           <button
             onClick={toggleJudgesExpand}
-            className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+            className="px-2 sm:px-3 py-1 text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 transition-colors duration-200"
+            aria-expanded={expandedJudges}
           >
-            {expandedJudges ? "Hide Judges" : `Judges (${judges.length})`}
+            {expandedJudges
+              ? t("hideJudges")
+              : `${t("judges")} (${judges.length})`}
           </button>
           <button
             onClick={toggleSubmissionsExpand}
-            className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300"
+            className="px-2 sm:px-3 py-1 text-xs sm:text-sm bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 transition-colors duration-200"
+            aria-expanded={expandedSubmissions}
           >
-            {expandedSubmissions ? "Hide Submissions" : "All Submissions"}
+            {expandedSubmissions ? t("hideSubmissions") : t("allSubmissions")}
           </button>
         </div>
       </div>

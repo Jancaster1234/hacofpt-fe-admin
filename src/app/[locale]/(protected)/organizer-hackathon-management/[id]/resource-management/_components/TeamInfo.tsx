@@ -1,28 +1,51 @@
 // src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/TeamInfo.tsx
 import { Team } from "@/types/entities/team";
+import { useTranslations } from "@/hooks/useTranslations";
+import Image from "next/image";
 
 interface TeamInfoProps {
   team: Team;
 }
 
 export function TeamInfo({ team }: TeamInfoProps) {
+  const t = useTranslations("teamManagement");
+
   return (
-    <div className="mt-4 p-3 bg-gray-50 rounded-md">
-      <h4 className="font-semibold mb-2">Team Information</h4>
-      <p className="text-sm text-gray-700">
-        <span className="font-medium">Team Leader:</span>{" "}
-        {team.teamLeader.firstName} {team.teamLeader.lastName} (
-        {team.teamLeader.email})
-      </p>
+    <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-md transition-colors duration-200">
+      <h4 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">
+        {t("teamInformation")}
+      </h4>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+        {team.avatar && (
+          <div className="w-16 h-16 relative rounded-full overflow-hidden">
+            <Image
+              src={team.avatar}
+              alt={team.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 64px, 64px"
+            />
+          </div>
+        )}
+        <div>
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            <span className="font-medium">{t("teamLeader")}:</span>{" "}
+            {team.teamLeader.firstName} {team.teamLeader.lastName} (
+            {team.teamLeader.email})
+          </p>
+        </div>
+      </div>
 
       {team.teamMembers && team.teamMembers.length > 0 && (
-        <div className="mt-2">
-          <p className="font-medium text-sm">Team Members:</p>
-          <ul className="pl-5 list-disc text-sm text-gray-700">
+        <div className="mt-3">
+          <p className="font-medium text-sm text-gray-700 dark:text-gray-300">
+            {t("teamMembers")}:
+          </p>
+          <ul className="pl-5 list-disc text-sm text-gray-700 dark:text-gray-300 mt-1">
             {team.teamMembers
               .filter((member) => member.user.id !== team.teamLeader.id)
               .map((member) => (
-                <li key={member.id}>
+                <li key={member.id} className="mb-1">
                   {member.user.firstName} {member.user.lastName} (
                   {member.user.email})
                 </li>

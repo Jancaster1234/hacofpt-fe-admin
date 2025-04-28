@@ -425,5 +425,26 @@
     "dataLoadingErrorTitle": "Data Loading Error",
     "failedToLoadTeamData": "Failed to load team data for round {roundId}",
     "failedToLoadSubmissionData": "Failed to load submission data. Please try again later."
+  },
+  "teamManagement": {
+    "status": "Status",
+    "hideInfo": "Hide info",
+    "teamInfo": "Team info",
+    "hideJudges": "Hide judges",
+    "judges": "Judges",
+    "hideSubmissions": "Hide submissions",
+    "allSubmissions": "All submissions",
+    "teamInformation": "Team information",
+    "teamLeader": "Team leader",
+    "teamMembers": "Team members"
+  },
+  "judging": {
+    "scoringDetails": "Scoring details",
+    "judgeEvaluations": "Judge evaluations",
+    "noJudgeEvaluations": "No judge evaluations yet",
+    "viewJudgeNote": "View judge note",
+    "viewScoringDetails": "View scoring details",
+    "viewCriterionNote": "View criterion note",
+    "viewDetailNote": "View detail note"
   }
 }

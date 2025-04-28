@@ -425,5 +425,26 @@
     "dataLoadingErrorTitle": "Lỗi tải dữ liệu",
     "failedToLoadTeamData": "Không thể tải dữ liệu đội cho vòng {roundId}",
     "failedToLoadSubmissionData": "Không thể tải dữ liệu bài nộp. Vui lòng thử lại sau."
+  },
+  "teamManagement": {
+    "status": "Trạng thái",
+    "hideInfo": "Ẩn thông tin",
+    "teamInfo": "Thông tin đội",
+    "hideJudges": "Ẩn giám khảo",
+    "judges": "Giám khảo",
+    "hideSubmissions": "Ẩn bài nộp",
+    "allSubmissions": "Tất cả bài nộp",
+    "teamInformation": "Thông tin đội",
+    "teamLeader": "Đội trưởng",
+    "teamMembers": "Thành viên đội"
+  },
+  "judging": {
+    "scoringDetails": "Chi tiết chấm điểm",
+    "judgeEvaluations": "Đánh giá của giám khảo",
+    "noJudgeEvaluations": "Chưa có đánh giá nào",
+    "viewJudgeNote": "Xem ghi chú giám khảo",
+    "viewScoringDetails": "Xem chi tiết chấm điểm",
+    "viewCriterionNote": "Xem ghi chú tiêu chí",
+    "viewDetailNote": "Xem ghi chú chi tiết"
   }
 }
