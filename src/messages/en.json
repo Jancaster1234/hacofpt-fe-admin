@@ -276,6 +276,8 @@
     "disqualified_due_to_violation": "Disqualified due to violation"
   },
   "rounds": {
+    "noRounds": "No rounds available",
+    "selectRound": "Select round",
     "rounds": "Rounds",
     "addRound": "Add round",
     "cancel": "Cancel",
@@ -360,5 +362,68 @@
       "updateSuccess": "Round updated successfully",
       "error": "Failed to save round"
     }
+  },
+  "userManagement": {
+    "title": "User management",
+    "addUserButton": "Add user",
+    "addNewUser": "Add new user",
+    "close": "Close",
+    "searchByEmail": "Search user by email",
+    "searchPlaceholder": "Type to search...",
+    "noMatchingUsers": "No matching users found",
+    "selectedUser": "Selected user",
+    "assignRole": "Assign role",
+    "cancel": "Cancel",
+    "addUser": "Add user",
+    "adding": "Adding...",
+    "removeUser": "Remove user",
+    "noUsersFound": "No {role} found.",
+    "roles": {
+      "organizer": "Organizer",
+      "judge": "Judge",
+      "mentor": "Mentor",
+      "organizers": "Organizers",
+      "judges": "Judges",
+      "mentors": "Mentors"
+    },
+    "userAddedSuccess": "{name} has been added as a {role}.",
+    "userRemovedSuccess": "{name} has been removed from this hackathon.",
+    "addUserFailed": "Unable to add the selected user. Please try again later.",
+    "removeUserFailed": "Unable to remove the selected user. Please try again later.",
+    "errorLoadingTitle": "Data loading error",
+    "errorLoadingMessage": "Failed to load user data. Please try again."
+  },
+  "teams": {
+    "noTeamsForRound": "No teams found for this round.",
+    "selectRoundToViewTeams": "Please select a round to view teams."
+  },
+  "popups": {
+    "judgeNote": "Judge Note",
+    "criterionDescription": "Criterion Description",
+    "evaluationNote": "Evaluation Note",
+    "noAdditionalNotes": "No additional notes provided.",
+    "close": "Close"
+  },
+  "hackathonResults": {
+    "creating": "Creating...",
+    "createHackathonResults": "Create Hackathon Results",
+    "note": "Note",
+    "cannotCreateResults": "Cannot create results because the following teams are missing final scores:",
+    "previewTeamRankings": "Preview of Team Rankings",
+    "placement": "Placement",
+    "team": "Team",
+    "totalScore": "Total Score",
+    "resultsCreatedSuccess": "Hackathon results have been successfully created!",
+    "resultsCreationIssue": "The results were processed but no data was returned. Please verify results in the system.",
+    "resultsCreationFailed": "Failed to create hackathon results. Please try again later."
+  },
+  "submissions": {
+    "loadingSubmissionsData": "Loading submissions data...",
+    "rounds": "Rounds",
+    "teams": "Teams",
+    "hackathonResults": "Hackathon Results",
+    "dataLoadingErrorTitle": "Data Loading Error",
+    "failedToLoadTeamData": "Failed to load team data for round {roundId}",
+    "failedToLoadSubmissionData": "Failed to load submission data. Please try again later."
   }
 }

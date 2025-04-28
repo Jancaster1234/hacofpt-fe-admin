@@ -14,6 +14,9 @@ import { TeamRound } from "@/types/entities/teamRound";
 import { Submission } from "@/types/entities/submission";
 import { TeamRoundJudge } from "@/types/entities/teamRoundJudge";
 import { useApiModal } from "@/hooks/useApiModal";
+import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "@/hooks/useTranslations";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function Submissions({ hackathonId }: { hackathonId: string }) {
   const [rounds, setRounds] = useState<Round[]>([]);
@@ -34,6 +37,8 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { showError } = useApiModal();
+  const toast = useToast();
+  const t = useTranslations("submissions");
 
   const fetchTeamRoundJudges = async (teamRoundId: string) => {
     try {
@@ -77,9 +82,8 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
   const fetchTeamRoundsAndSubmissions = async (roundId: string) => {
     try {
       // Fetch team rounds for the round
-      const teamRoundsResponse = await teamRoundService.getTeamRoundsByRoundId(
-        roundId
-      );
+      const teamRoundsResponse =
+        await teamRoundService.getTeamRoundsByRoundId(roundId);
       setTeamRounds((prev) => ({
         ...prev,
         [roundId]: teamRoundsResponse.data,
@@ -96,8 +100,8 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
     } catch (error) {
       console.error(`Error fetching team rounds for round ${roundId}:`, error);
       showError(
-        "Data Loading Error",
-        `Failed to load team data for round ${roundId}`
+        t("dataLoadingErrorTitle"),
+        t("failedToLoadTeamData", { roundId })
       );
     }
   };
@@ -106,9 +110,8 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
     setIsLoading(true);
     try {
       // Fetch rounds
-      const roundsResponse = await roundService.getRoundsByHackathonId(
-        hackathonId
-      );
+      const roundsResponse =
+        await roundService.getRoundsByHackathonId(hackathonId);
 
       if (!roundsResponse.data.length) {
         setIsLoading(false);
@@ -139,14 +142,11 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
       }
     } catch (error) {
       console.error("Error fetching submissions data:", error);
-      showError(
-        "Data Loading Error",
-        "Failed to load submission data. Please try again later."
-      );
+      showError(t("dataLoadingErrorTitle"), t("failedToLoadSubmissionData"));
     } finally {
       setIsLoading(false);
     }
-  }, [hackathonId, selectedRoundId, showError]);
+  }, [hackathonId, selectedRoundId, showError, t]);
 
   useEffect(() => {
     fetchData();
@@ -157,42 +157,61 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
   };
 
   if (isLoading) {
-    return <div className="py-8 text-center">Loading submissions data...</div>;
+    return (
+      <div className="py-8 flex flex-col items-center justify-center text-center min-h-[200px] transition-colors duration-300">
+        <LoadingSpinner size="lg" className="mb-3" />
+        <p className="text-gray-600 dark:text-gray-300">
+          {t("loadingSubmissionsData")}
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 md:space-y-6 transition-all duration-300">
       {/* Round tabs */}
-      <RoundTabs
-        rounds={rounds}
-        selectedRoundId={selectedRoundId}
-        setSelectedRoundId={setSelectedRoundId}
-      />
+      <section className="bg-white dark:bg-gray-900 rounded-lg shadow-sm p-3 sm:p-4 transition-colors duration-300">
+        <h2 className="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
+          {t("rounds")}
+        </h2>
+        <RoundTabs
+          rounds={rounds}
+          selectedRoundId={selectedRoundId}
+          setSelectedRoundId={setSelectedRoundId}
+        />
+      </section>
 
       {/* Bulk Team Round Update Section */}
       {selectedRoundId && (
-        <BulkTeamRoundUpdate
-          selectedRoundId={selectedRoundId}
-          teamRounds={teamRounds}
-          teamSubmissions={teamSubmissions}
-          refreshData={fetchData}
-        />
+        <section className="bg-white dark:bg-gray-900 rounded-lg shadow-sm p-3 sm:p-4 transition-colors duration-300">
+          <BulkTeamRoundUpdate
+            selectedRoundId={selectedRoundId}
+            teamRounds={teamRounds}
+            teamSubmissions={teamSubmissions}
+            refreshData={fetchData}
+          />
+        </section>
       )}
 
       {/* Team List for Selected Round */}
-      <TeamList
-        selectedRoundId={selectedRoundId}
-        teamRounds={teamRounds}
-        teamSubmissions={teamSubmissions}
-        teamRoundJudges={teamRoundJudges}
-        showPopup={showPopup}
-        refreshData={fetchData}
-      />
+      <section className="bg-white dark:bg-gray-900 rounded-lg shadow-sm p-3 sm:p-4 transition-colors duration-300">
+        <h2 className="text-lg font-medium mb-3 text-gray-800 dark:text-gray-200">
+          {t("teams")}
+        </h2>
+        <TeamList
+          selectedRoundId={selectedRoundId}
+          teamRounds={teamRounds}
+          teamSubmissions={teamSubmissions}
+          teamRoundJudges={teamRoundJudges}
+          showPopup={showPopup}
+          refreshData={fetchData}
+        />
+      </section>
 
       {/* Hackathon Results Button */}
-      <div className="border-t border-gray-200 pt-4 mt-8">
-        <h3 className="text-lg font-medium text-gray-800 mb-2">
-          Hackathon Results
+      <section className="bg-white dark:bg-gray-900 rounded-lg shadow-sm p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700 transition-colors duration-300">
+        <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">
+          {t("hackathonResults")}
         </h3>
         <HackathonResultsButton
           hackathonId={hackathonId}
@@ -200,7 +219,7 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
           teamRounds={teamRounds}
           teamSubmissions={teamSubmissions}
         />
-      </div>
+      </section>
 
       {/* Popup for Notes */}
       {activePopup && (

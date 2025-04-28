@@ -8,17 +8,27 @@ import {
   PlusIcon,
   TrashIcon,
   XIcon,
+  MoonIcon,
+  SunIcon,
+  SearchIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { userService } from "@/services/user.service";
 import { userHackathonService } from "@/services/userHackathon.service";
 import { useApiModal } from "@/hooks/useApiModal";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function UserManagement({
   hackathonId,
 }: {
   hackathonId: string;
 }) {
+  const t = useTranslations("userManagement");
+  const { showSuccess, showError } = useApiModal();
+  const toast = useToast();
+
   const [users, setUsers] = useState<UserHackathon[]>([]);
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +40,7 @@ export default function UserManagement({
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>("MENTOR");
   const [submitLoading, setSubmitLoading] = useState(false);
-  const { showSuccess, showError } = useApiModal();
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,17 +59,14 @@ export default function UserManagement({
         setAvailableUsers(usersResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
-        showError(
-          "Data Loading Error",
-          "Failed to load user data. Please try again."
-        );
+        showError(t("errorLoadingTitle"), t("errorLoadingMessage"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [hackathonId, showError]);
+  }, [hackathonId, showError, t]);
 
   const groupedUsers = {
     ORGANIZER: users.filter((u) => u.role === "ORGANIZER"),
@@ -98,10 +105,9 @@ export default function UserManagement({
     };
 
     try {
-      // Call the actual service instead of simulation
-      const response = await userHackathonService.createUserHackathon(
-        requestBody
-      );
+      // Call the service
+      const response =
+        await userHackathonService.createUserHackathon(requestBody);
 
       // If successful, update the users list
       if (response.data) {
@@ -112,12 +118,13 @@ export default function UserManagement({
           );
         setUsers(userHackathonsResponse.data);
 
-        // Show success message
-        showSuccess(
-          "User Added",
-          `${selectedUser.firstName} ${
-            selectedUser.lastName
-          } has been added as a ${selectedRole.toLowerCase()}.`
+        // Show success toast
+        toast.success(
+          response.message ||
+            t("userAddedSuccess", {
+              name: `${selectedUser.firstName} ${selectedUser.lastName}`,
+              role: t(`roles.${selectedRole.toLowerCase()}`),
+            })
         );
       }
 
@@ -125,61 +132,65 @@ export default function UserManagement({
       setSelectedUser(null);
       setSearchTerm("");
       setIsAddingUser(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to create user hackathon:", error);
-      showError(
-        "Add User Failed",
-        "Unable to add the selected user. Please try again later."
-      );
+      toast.error(error.message || t("addUserFailed"));
     } finally {
       setSubmitLoading(false);
     }
   };
 
   const deleteUserHackathon = async (userHackathon: UserHackathon) => {
+    setDeleteLoading(userHackathon.id);
     try {
-      // We don't have a delete method in the service, so we'd need to implement it
-      // For now, let's assume we have an endpoint that accepts userId and hackathonId
-      // and removes the association
-
-      // This is a placeholder for the actual API call
-      await userHackathonService.deleteUserHackathon(userHackathon.id);
-
-      // Since we don't have the delete method yet, we'll simulate it by filtering locally
-      // setUsers((prev) => prev.filter((u) => u.id !== userHackathon.id));
-
-      showSuccess(
-        "User Removed",
-        `${userHackathon.user?.firstName} ${userHackathon.user?.lastName} has been removed from this hackathon.`
+      const response = await userHackathonService.deleteUserHackathon(
+        userHackathon.id
       );
-    } catch (error) {
+
+      // Update local state after successful deletion
+      setUsers((prev) => prev.filter((u) => u.id !== userHackathon.id));
+
+      // Show success toast
+      toast.success(
+        response.message ||
+          t("userRemovedSuccess", {
+            name: `${userHackathon.user?.firstName} ${userHackathon.user?.lastName}`,
+          })
+      );
+    } catch (error: any) {
       console.error("Failed to delete user hackathon:", error);
-      showError(
-        "Remove User Failed",
-        "Unable to remove the selected user. Please try again later."
-      );
+      toast.error(error.message || t("removeUserFailed"));
+    } finally {
+      setDeleteLoading(null);
     }
   };
 
+  const getRoleTranslation = (role: string) => {
+    return t(`roles.${role.toLowerCase()}`);
+  };
+
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-800">User Management</h2>
+    <div className="transition-colors duration-300 dark:text-gray-200">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+        <h2 className="text-xl font-semibold dark:text-white">{t("title")}</h2>
         <button
           onClick={() => setIsAddingUser(true)}
-          className="bg-blue-500 text-white px-3 py-1 rounded-md flex items-center"
+          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md flex items-center transition-colors duration-200 text-sm sm:text-base w-full sm:w-auto justify-center"
         >
-          <PlusIcon className="w-4 h-4 mr-1" /> Add User
+          <PlusIcon className="w-4 h-4 mr-1" /> {t("addUserButton")}
         </button>
       </div>
 
       {isAddingUser && (
-        <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-6 transition-colors duration-300">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium">Add New User</h3>
+            <h3 className="text-lg font-medium dark:text-white">
+              {t("addNewUser")}
+            </h3>
             <button
               onClick={() => setIsAddingUser(false)}
-              className="text-gray-500"
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+              aria-label={t("close")}
             >
               <XIcon className="w-5 h-5" />
             </button>
@@ -188,30 +199,33 @@ export default function UserManagement({
           <div className="mb-4">
             <label
               htmlFor="search"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
-              Search User by Email
+              {t("searchByEmail")}
             </label>
-            <input
-              type="text"
-              id="search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Type to search..."
-              className="w-full p-2 border border-gray-300 rounded-md"
-            />
+            <div className="relative">
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
+              <input
+                type="text"
+                id="search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder={t("searchPlaceholder")}
+                className="w-full p-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+            </div>
           </div>
 
           {searchTerm && (
-            <div className="max-h-60 overflow-y-auto mb-4 border border-gray-200 rounded-md">
+            <div className="max-h-60 overflow-y-auto mb-4 border border-gray-200 dark:border-gray-700 rounded-md">
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <div
                     key={user.id}
-                    className={`p-2 flex items-center cursor-pointer hover:bg-gray-100 ${
+                    className={`p-2 flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
                       selectedUser?.id === user.id
-                        ? "bg-blue-50 border-l-4 border-blue-500"
-                        : ""
+                        ? "bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500"
+                        : "border-l-4 border-transparent"
                     }`}
                     onClick={() => setSelectedUser(user)}
                   >
@@ -223,25 +237,29 @@ export default function UserManagement({
                       height={32}
                     />
                     <div>
-                      <p className="font-medium">
+                      <p className="font-medium dark:text-white">
                         {user.firstName} {user.lastName}
                       </p>
-                      <p className="text-sm text-gray-600">{user.email}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {user.email}
+                      </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="p-3 text-gray-500">No matching users found</p>
+                <p className="p-3 text-gray-500 dark:text-gray-400">
+                  {t("noMatchingUsers")}
+                </p>
               )}
             </div>
           )}
 
           {selectedUser && (
             <div className="mb-4">
-              <p className="text-sm font-medium text-gray-700 mb-1">
-                Selected User:
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t("selectedUser")}:
               </p>
-              <div className="flex items-center p-2 bg-blue-50 rounded-md">
+              <div className="flex items-center p-2 bg-blue-50 dark:bg-blue-900/30 rounded-md">
                 <Image
                   src={selectedUser.avatarUrl || "/avatars/default.jpg"}
                   alt={`${selectedUser.firstName} ${selectedUser.lastName}`}
@@ -250,10 +268,12 @@ export default function UserManagement({
                   height={32}
                 />
                 <div>
-                  <p className="font-medium">
+                  <p className="font-medium dark:text-white">
                     {selectedUser.firstName} {selectedUser.lastName}
                   </p>
-                  <p className="text-sm text-gray-600">{selectedUser.email}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {selectedUser.email}
+                  </p>
                 </div>
               </div>
             </div>
@@ -262,111 +282,137 @@ export default function UserManagement({
           <div className="mb-4">
             <label
               htmlFor="role"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
-              Assign Role
+              {t("assignRole")}
             </label>
             <select
               id="role"
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             >
-              <option value="ORGANIZER">Organizer</option>
-              <option value="JUDGE">Judge</option>
-              <option value="MENTOR">Mentor</option>
+              <option value="ORGANIZER">{t("roles.organizer")}</option>
+              <option value="JUDGE">{t("roles.judge")}</option>
+              <option value="MENTOR">{t("roles.mentor")}</option>
             </select>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex flex-col sm:flex-row justify-end gap-2">
             <button
               onClick={() => setIsAddingUser(false)}
-              className="mr-2 px-4 py-2 text-gray-700 bg-gray-200 rounded-md"
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors order-2 sm:order-1"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               onClick={createUserHackathon}
               disabled={!selectedUser || submitLoading}
-              className={`px-4 py-2 text-white bg-blue-500 rounded-md ${
+              className={`px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors order-1 sm:order-2 ${
                 !selectedUser || submitLoading
                   ? "opacity-50 cursor-not-allowed"
                   : ""
               }`}
             >
-              {submitLoading ? "Adding..." : "Add User"}
+              {submitLoading ? (
+                <span className="flex items-center justify-center">
+                  <LoadingSpinner size="sm" className="mr-2" /> {t("adding")}
+                </span>
+              ) : (
+                t("addUser")
+              )}
             </button>
           </div>
         </div>
       )}
 
       {loading ? (
-        <p className="text-gray-500">Loading users...</p>
+        <div className="flex justify-center items-center py-8">
+          <LoadingSpinner size="md" showText={true} />
+        </div>
       ) : (
         Object.entries(groupedUsers).map(([role, usersInRole]) => (
           <div key={role} className="mb-6">
             <div
-              className="flex justify-between items-center cursor-pointer p-2 bg-gray-200 rounded-md"
+              className="flex justify-between items-center cursor-pointer p-2 bg-gray-200 dark:bg-gray-700 rounded-md transition-colors"
               onClick={() => toggleRoleVisibility(role)}
+              role="button"
+              aria-expanded={expandedRoles[role]}
+              aria-controls={`role-section-${role}`}
             >
-              <h3 className="text-lg font-medium text-gray-800 capitalize">
-                {role.toLowerCase()}s ({usersInRole.length})
+              <h3 className="text-lg font-medium text-gray-800 dark:text-white">
+                {getRoleTranslation(role)} ({usersInRole.length})
               </h3>
               {expandedRoles[role] ? (
-                <ChevronUpIcon className="w-5 h-5 text-gray-600" />
+                <ChevronUpIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               ) : (
-                <ChevronDownIcon className="w-5 h-5 text-gray-600" />
+                <ChevronDownIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               )}
             </div>
-            {expandedRoles[role] &&
-              (usersInRole.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-                  {usersInRole.map((userHackathon) => (
-                    <div
-                      key={userHackathon.id}
-                      className="bg-white p-4 rounded-lg shadow-md flex items-center space-x-4 relative"
-                    >
-                      <Image
-                        src={
-                          userHackathon.user?.avatarUrl ||
-                          "/avatars/default.jpg"
-                        }
-                        alt={`${userHackathon.user?.firstName} ${userHackathon.user?.lastName}`}
-                        className="w-12 h-12 rounded-full"
-                        width={48}
-                        height={48}
-                      />
-                      <div className="flex-grow">
-                        <p className="text-gray-800 font-medium">
-                          {userHackathon.user?.firstName}{" "}
-                          {userHackathon.user?.lastName}
-                        </p>
-                        <p className="text-gray-600 text-sm">
-                          {userHackathon.user?.email}
-                        </p>
-                        <p className="text-gray-500 text-xs">
-                          {userHackathon.user?.experienceLevel} -{" "}
-                          {userHackathon.user?.skills?.join(", ")}
-                        </p>
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteUserHackathon(userHackathon);
-                        }}
-                        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
-                        title="Remove user"
+            {expandedRoles[role] && (
+              <div id={`role-section-${role}`} className="mt-2">
+                {usersInRole.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {usersInRole.map((userHackathon) => (
+                      <div
+                        key={userHackathon.id}
+                        className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex items-center space-x-4 relative transition-colors hover:shadow-lg"
                       >
-                        <TrashIcon className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 mt-2">
-                  No {role.toLowerCase()}s found.
-                </p>
-              ))}
+                        <Image
+                          src={
+                            userHackathon.user?.avatarUrl ||
+                            "/avatars/default.jpg"
+                          }
+                          alt={`${userHackathon.user?.firstName} ${userHackathon.user?.lastName}`}
+                          className="w-12 h-12 rounded-full"
+                          width={48}
+                          height={48}
+                        />
+                        <div className="flex-grow">
+                          <p className="text-gray-800 dark:text-white font-medium">
+                            {userHackathon.user?.firstName}{" "}
+                            {userHackathon.user?.lastName}
+                          </p>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                            {userHackathon.user?.email}
+                          </p>
+                          <p className="text-gray-500 dark:text-gray-500 text-xs">
+                            {userHackathon.user?.experienceLevel} -{" "}
+                            {userHackathon.user?.skills?.join(", ")}
+                          </p>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteUserHackathon(userHackathon);
+                          }}
+                          disabled={deleteLoading === userHackathon.id}
+                          className={`absolute top-2 right-2 text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors ${
+                            deleteLoading === userHackathon.id
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
+                          title={t("removeUser")}
+                          aria-label={t("removeUser")}
+                        >
+                          {deleteLoading === userHackathon.id ? (
+                            <LoadingSpinner size="sm" />
+                          ) : (
+                            <TrashIcon className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400 mt-2">
+                    {t("noUsersFound", {
+                      role: getRoleTranslation(role).toLowerCase(),
+                    })}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         ))
       )}

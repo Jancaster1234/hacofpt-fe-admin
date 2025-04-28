@@ -1,4 +1,7 @@
 // src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/NotePopup.tsx
+import { useTranslations } from "@/hooks/useTranslations";
+import { useEffect } from "react";
+
 interface NotePopupProps {
   activePopup: {
     type: string;
@@ -9,20 +12,55 @@ interface NotePopupProps {
 }
 
 export function NotePopup({ activePopup, setActivePopup }: NotePopupProps) {
+  const t = useTranslations("popups");
+
+  // Close on ESC key press
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setActivePopup(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscKey);
+    return () => {
+      document.removeEventListener("keydown", handleEscKey);
+    };
+  }, [setActivePopup]);
+
+  // Prevent scrolling of the background
+  useEffect(() => {
+    document.body.classList.add("overflow-hidden");
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-30 dark:bg-opacity-50 flex items-center justify-center z-50 p-4 transition-all duration-300"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) setActivePopup(null);
+      }}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 max-w-lg w-full mx-auto shadow-xl transform transition-all duration-300 dark:shadow-gray-900/50"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
             {activePopup.type === "judgeNote"
-              ? "Judge Note"
+              ? t("judgeNote")
               : activePopup.type === "criterionNote"
-              ? "Criterion Description"
-              : "Evaluation Note"}
+                ? t("criterionDescription")
+                : t("evaluationNote")}
           </h3>
           <button
             onClick={() => setActivePopup(null)}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 rounded"
+            aria-label={t("close")}
           >
             <svg
               className="w-6 h-6"
@@ -40,24 +78,23 @@ export function NotePopup({ activePopup, setActivePopup }: NotePopupProps) {
             </svg>
           </button>
         </div>
-        <div className="bg-gray-50 p-4 rounded-md">
-          <p className="text-gray-800">
-            {activePopup.note || "No additional notes provided."}
+        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+          <p className="text-gray-800 dark:text-gray-200">
+            {activePopup.note || t("noAdditionalNotes")}
           </p>
         </div>
         <div className="mt-4 flex justify-end">
           <button
             onClick={() => setActivePopup(null)}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
           >
-            Close
+            {t("close")}
           </button>
         </div>
       </div>
     </div>
   );
 }
-
 // src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/NotePopup.tsx
 // import { Dialog, Transition } from "@headlessui/react";
 // import { Fragment } from "react";
