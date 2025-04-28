@@ -757,7 +757,19 @@
     "failedToFetchHackathon": "Failed to fetch hackathon information",
     "failedToLoadData": "Failed to load data. Please refresh and try again.",
     "failedToLoadDevices": "Failed to load devices for the selected filters.",
-    "deviceAddedSuccess": "Device added successfully"
+    "deviceAddedSuccess": "Device added successfully",
+    "loadingFiles": "Loading files...",
+    "noFilesAssociated": "No files associated with this device",
+    "associatedFiles": "Associated files",
+    "loadingUserAssignments": "Loading user assignments...",
+    "deviceAssignments": "Device assignments",
+    "addAssignment": "Add assignment",
+    "addNewDeviceAssignment": "Add new device assignment",
+    "createAssignment": "Create assignment",
+    "noUserAssignments": "No user assignments for this device",
+    "unknownUser": "Unknown user",
+    "assignmentCreatedSuccess": "Assignment created successfully",
+    "failedToCreateAssignment": "Failed to create assignment. Please try again."
   },
   "feedbackDetails": {
     "error": "Error",
@@ -810,5 +822,32 @@
     "statusLost": "Lost",
     "statusRetired": "Retired",
     "statusPending": "Pending"
+  },
+  "userDeviceDetails": {
+    "userInformation": "User information",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "unknown": "Unknown",
+    "assignmentDetails": "Assignment details",
+    "status": "Status",
+    "from": "From",
+    "to": "To",
+    "createdBy": "Created by",
+    "assignmentFiles": "Assignment files",
+    "loadingFiles": "Loading files...",
+    "noFiles": "No files attached",
+    "trackingHistory": "Device tracking history",
+    "editAssignment": "Edit device assignment",
+    "updateAssignment": "Update assignment",
+    "updating": "Updating...",
+    "deleteConfirm": "Are you sure you want to delete this device assignment?",
+    "editAssignmentBtn": "Edit assignment",
+    "deleteAssignmentBtn": "Delete assignment",
+    "deleting": "Deleting...",
+    "updateSuccess": "Device assignment updated successfully",
+    "updateError": "Failed to update assignment. Please try again.",
+    "deleteSuccess": "Device assignment deleted successfully",
+    "deleteError": "Failed to delete device assignment. Please try again."
   }
 }

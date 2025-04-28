@@ -756,7 +756,19 @@
     "failedToFetchHackathon": "Không thể tải thông tin hackathon",
     "failedToLoadData": "Không thể tải dữ liệu. Vui lòng làm mới và thử lại.",
     "failedToLoadDevices": "Không thể tải thiết bị cho bộ lọc đã chọn.",
-    "deviceAddedSuccess": "Thêm thiết bị thành công"
+    "deviceAddedSuccess": "Thêm thiết bị thành công",
+    "loadingFiles": "Đang tải tệp...",
+    "noFilesAssociated": "Không có tệp liên kết với thiết bị này",
+    "associatedFiles": "Tệp liên kết",
+    "loadingUserAssignments": "Đang tải phân công người dùng...",
+    "deviceAssignments": "Phân công thiết bị",
+    "addAssignment": "Thêm phân công",
+    "addNewDeviceAssignment": "Thêm phân công thiết bị mới",
+    "createAssignment": "Tạo phân công",
+    "noUserAssignments": "Không có phân công người dùng cho thiết bị này",
+    "unknownUser": "Người dùng không xác định",
+    "assignmentCreatedSuccess": "Đã tạo phân công thành công",
+    "failedToCreateAssignment": "Không thể tạo phân công. Vui lòng thử lại."
   },
   "feedbackDetails": {
     "error": "Lỗi",
@@ -809,5 +821,32 @@
     "statusLost": "Thất lạc",
     "statusRetired": "Ngừng sử dụng",
     "statusPending": "Chờ xử lý"
+  },
+  "userDeviceDetails": {
+    "userInformation": "Thông tin người dùng",
+    "name": "Tên",
+    "email": "Email",
+    "role": "Vai trò",
+    "unknown": "Không xác định",
+    "assignmentDetails": "Chi tiết giao thiết bị",
+    "status": "Trạng thái",
+    "from": "Từ",
+    "to": "Đến",
+    "createdBy": "Tạo bởi",
+    "assignmentFiles": "Tệp đính kèm",
+    "loadingFiles": "Đang tải tệp...",
+    "noFiles": "Không có tệp đính kèm",
+    "trackingHistory": "Lịch sử theo dõi thiết bị",
+    "editAssignment": "Chỉnh sửa giao thiết bị",
+    "updateAssignment": "Cập nhật",
+    "updating": "Đang cập nhật...",
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa giao thiết bị này?",
+    "editAssignmentBtn": "Chỉnh sửa",
+    "deleteAssignmentBtn": "Xóa",
+    "deleting": "Đang xóa...",
+    "updateSuccess": "Cập nhật giao thiết bị thành công",
+    "updateError": "Không thể cập nhật giao thiết bị. Vui lòng thử lại.",
+    "deleteSuccess": "Xóa giao thiết bị thành công",
+    "deleteError": "Không thể xóa giao thiết bị. Vui lòng thử lại."
   }
 }
