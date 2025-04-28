@@ -415,7 +415,17 @@
     "totalScore": "Total Score",
     "resultsCreatedSuccess": "Hackathon results have been successfully created!",
     "resultsCreationIssue": "The results were processed but no data was returned. Please verify results in the system.",
-    "resultsCreationFailed": "Failed to create hackathon results. Please try again later."
+    "resultsCreationFailed": "Failed to create hackathon results. Please try again later.",
+    "hackathonResults": "Hackathon Results",
+    "teamLead": "Team Lead",
+    "members": "Members",
+    "score": "Score",
+    "award": "Award",
+    "noResults": "No results available for this hackathon yet.",
+    "noAdditionalMembers": "No additional members",
+    "loading": "Loading results...",
+    "resultsErrorTitle": "Results Error",
+    "resultsErrorMessage": "Failed to load hackathon results. Please try again later."
   },
   "submissions": {
     "loadingSubmissionsData": "Loading submissions data...",
@@ -468,20 +478,6 @@
   "judges": {
     "judgesTitle": "Judges",
     "noJudgesAssigned": "No judges assigned yet."
-  },
-  "hackathonResults": {
-    "hackathonResults": "Hackathon Results",
-    "placement": "Placement",
-    "team": "Team",
-    "teamLead": "Team Lead",
-    "members": "Members",
-    "score": "Score",
-    "award": "Award",
-    "noResults": "No results available for this hackathon yet.",
-    "noAdditionalMembers": "No additional members",
-    "loading": "Loading results...",
-    "resultsErrorTitle": "Results Error",
-    "resultsErrorMessage": "Failed to load hackathon results. Please try again later."
   },
   "registrationRequests": {
     "individualRegistrationRequests": "Individual Registration Requests",

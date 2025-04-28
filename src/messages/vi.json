@@ -410,12 +410,22 @@
     "note": "Lưu ý",
     "cannotCreateResults": "Không thể tạo kết quả vì các đội sau đây còn thiếu điểm cuối cùng:",
     "previewTeamRankings": "Xem trước xếp hạng đội",
-    "placement": "Vị trí",
-    "team": "Đội",
     "totalScore": "Tổng điểm",
     "resultsCreatedSuccess": "Kết quả Hackathon đã được tạo thành công!",
     "resultsCreationIssue": "Kết quả đã được xử lý nhưng không có dữ liệu được trả về. Vui lòng kiểm tra kết quả trong hệ thống.",
-    "resultsCreationFailed": "Tạo kết quả Hackathon thất bại. Vui lòng thử lại sau."
+    "resultsCreationFailed": "Tạo kết quả Hackathon thất bại. Vui lòng thử lại sau.",
+    "hackathonResults": "Kết quả Hackathon",
+    "placement": "Xếp hạng",
+    "team": "Đội",
+    "teamLead": "Trưởng nhóm",
+    "members": "Thành viên",
+    "score": "Điểm số",
+    "award": "Giải thưởng",
+    "noResults": "Chưa có kết quả nào cho hackathon này.",
+    "noAdditionalMembers": "Không có thành viên bổ sung",
+    "loading": "Đang tải kết quả...",
+    "resultsErrorTitle": "Lỗi kết quả",
+    "resultsErrorMessage": "Không thể tải kết quả hackathon. Vui lòng thử lại sau."
   },
   "submissions": {
     "loadingSubmissionsData": "Đang tải dữ liệu bài nộp...",
@@ -467,5 +477,26 @@
   "judges": {
     "judgesTitle": "Giám khảo",
     "noJudgesAssigned": "Chưa có giám khảo nào được phân công."
+  },
+  "registrationRequests": {
+    "individualRegistrationRequests": "Yêu cầu đăng ký cá nhân",
+    "user": "Người dùng",
+    "status": "Trạng thái",
+    "submittedOn": "Đã nộp vào",
+    "reviewedBy": "Được xét duyệt bởi",
+    "actions": "Hành động",
+    "pending": "Đang chờ",
+    "approved": "Đã duyệt",
+    "rejected": "Đã từ chối",
+    "approve": "Duyệt",
+    "reject": "Từ chối",
+    "notReviewedYet": "Chưa được xét duyệt",
+    "noRegistrationRequests": "Không tìm thấy yêu cầu đăng ký nào.",
+    "loading": "Đang tải yêu cầu đăng ký...",
+    "errorTitle": "Lỗi",
+    "failedToLoadRegistrations": "Không thể tải yêu cầu đăng ký cá nhân",
+    "approvalSuccess": "Đã duyệt đăng ký thành công",
+    "rejectionSuccess": "Đã từ chối đăng ký thành công",
+    "updateStatusFailed": "Không thể cập nhật trạng thái đăng ký"
   }
 }
