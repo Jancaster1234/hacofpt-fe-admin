@@ -601,7 +601,7 @@
     },
     "status": {
       "pending": "Pending",
-      "underreview": "Under review",
+      "underReview": "Under review",
       "approved": "Approved",
       "rejected": "Rejected",
       "canceled": "Canceled",

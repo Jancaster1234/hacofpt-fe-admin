@@ -600,7 +600,7 @@
     },
     "status": {
       "pending": "Đang chờ",
-      "underreview": "Đang xem xét",
+      "underReview": "Đang xem xét",
       "approved": "Đã duyệt",
       "rejected": "Đã từ chối",
       "canceled": "Đã hủy",
