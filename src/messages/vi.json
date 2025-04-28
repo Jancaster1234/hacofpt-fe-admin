@@ -584,5 +584,60 @@
     "feedbackCreated": "Biểu mẫu phản hồi đã được tạo thành công",
     "failedToRefresh": "Không thể làm mới dữ liệu phản hồi",
     "errorRefreshing": "Đã xảy ra lỗi khi làm mới dữ liệu phản hồi"
+  },
+  "teamRequests": {
+    "loading": "Đang tải yêu cầu nhóm...",
+    "noRequestsFound": "Không tìm thấy yêu cầu nhóm nào phù hợp với bộ lọc đã chọn.",
+    "filters": {
+      "status": "Lọc theo trạng thái",
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "pagination": {
+      "pageSize": "Kích thước trang",
+      "previous": "Trước",
+      "next": "Tiếp",
+      "pageInfo": "Trang {current} của {total}"
+    },
+    "status": {
+      "pending": "Đang chờ",
+      "underreview": "Đang xem xét",
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối",
+      "canceled": "Đã hủy",
+      "noresponse": "Chưa phản hồi"
+    },
+    "card": {
+      "title": "Yêu cầu nhóm",
+      "createdBy": "Tạo bởi",
+      "note": "Ghi chú",
+      "noNote": "Không có ghi chú",
+      "teamMembers": "Thành viên nhóm ({count})",
+      "deadline": "Hạn chót"
+    },
+    "actions": {
+      "review": "Xem xét"
+    },
+    "dialog": {
+      "title": "Xem xét yêu cầu nhóm",
+      "description": "Cập nhật trạng thái của yêu cầu nhóm này. Hành động này không thể hoàn tác.",
+      "noteLabel": "Ghi chú (Tùy chọn)",
+      "notePlaceholder": "Thêm ghi chú về quyết định của bạn...",
+      "teamMembers": "Thành viên nhóm",
+      "rejecting": "Đang từ chối...",
+      "reject": "Từ chối",
+      "approving": "Đang duyệt...",
+      "approve": "Duyệt"
+    },
+    "toasts": {
+      "processing": "Đang xử lý yêu cầu của bạn...",
+      "approvedSuccess": "Đã duyệt yêu cầu nhóm thành công",
+      "rejectedSuccess": "Đã từ chối yêu cầu nhóm thành công",
+      "approvedFailed": "Không thể duyệt yêu cầu nhóm",
+      "rejectedFailed": "Không thể từ chối yêu cầu nhóm"
+    },
+    "errors": {
+      "invalidResponseData": "Không thể tải yêu cầu nhóm: Dữ liệu phản hồi không hợp lệ",
+      "failedToLoad": "Không thể tải yêu cầu nhóm. Vui lòng thử lại sau."
+    }
   }
 }

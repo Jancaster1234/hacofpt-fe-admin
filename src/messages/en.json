@@ -585,5 +585,60 @@
     "feedbackCreated": "Feedback form created successfully",
     "failedToRefresh": "Failed to refresh feedback data",
     "errorRefreshing": "An error occurred while refreshing feedback data"
+  },
+  "teamRequests": {
+    "loading": "Loading team requests...",
+    "noRequestsFound": "No team requests found matching the selected filters.",
+    "filters": {
+      "status": "Filter by status",
+      "allStatuses": "All statuses"
+    },
+    "pagination": {
+      "pageSize": "Page size",
+      "previous": "Previous",
+      "next": "Next",
+      "pageInfo": "Page {current} of {total}"
+    },
+    "status": {
+      "pending": "Pending",
+      "underreview": "Under review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "canceled": "Canceled",
+      "noresponse": "No response"
+    },
+    "card": {
+      "title": "Team request",
+      "createdBy": "Created by",
+      "note": "Note",
+      "noNote": "No note provided",
+      "teamMembers": "Team members ({count})",
+      "deadline": "Deadline"
+    },
+    "actions": {
+      "review": "Review"
+    },
+    "dialog": {
+      "title": "Review team request",
+      "description": "Update the status of this team request. This action cannot be undone.",
+      "noteLabel": "Note (Optional)",
+      "notePlaceholder": "Add a note about your decision...",
+      "teamMembers": "Team members",
+      "rejecting": "Rejecting...",
+      "reject": "Reject",
+      "approving": "Approving...",
+      "approve": "Approve"
+    },
+    "toasts": {
+      "processing": "Processing your request...",
+      "approvedSuccess": "Team request approved successfully",
+      "rejectedSuccess": "Team request rejected successfully",
+      "approvedFailed": "Failed to approve team request",
+      "rejectedFailed": "Failed to reject team request"
+    },
+    "errors": {
+      "invalidResponseData": "Failed to load team requests: Invalid response data",
+      "failedToLoad": "Failed to load team requests. Please try again later."
+    }
   }
 }
