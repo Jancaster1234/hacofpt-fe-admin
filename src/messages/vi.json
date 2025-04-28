@@ -495,8 +495,8 @@
     "loading": "Đang tải yêu cầu đăng ký...",
     "errorTitle": "Lỗi",
     "failedToLoadRegistrations": "Không thể tải yêu cầu đăng ký cá nhân",
-    "approvalSuccess": "Đã duyệt đăng ký thành công",
-    "rejectionSuccess": "Đã từ chối đăng ký thành công",
+    "approvalSuccess": "Đã xử lí đăng ký thành công",
+    "rejectionSuccess": "Đã xử lí đăng ký thành công",
     "updateStatusFailed": "Không thể cập nhật trạng thái đăng ký"
   },
   "locations": {

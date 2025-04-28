@@ -496,8 +496,8 @@
     "loading": "Loading registration requests...",
     "errorTitle": "Error",
     "failedToLoadRegistrations": "Failed to load individual registration requests",
-    "approvalSuccess": "Registration approved successfully",
-    "rejectionSuccess": "Registration rejected successfully",
+    "approvalSuccess": "Registration submitted successfully",
+    "rejectionSuccess": "Registration submitted successfully",
     "updateStatusFailed": "Failed to update registration status"
   },
   "locations": {
