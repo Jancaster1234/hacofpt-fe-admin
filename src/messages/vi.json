@@ -529,5 +529,28 @@
     "updateError": "Không thể cập nhật địa điểm",
     "deleteError": "Không thể xóa địa điểm",
     "loadError": "Không thể tải các địa điểm. Vui lòng thử lại."
+  },
+  "roundMarkCriteria": {
+    "title": "Tiêu chí chấm điểm vòng thi",
+    "maxScore": "Điểm tối đa",
+    "noCriteria": "Chưa có tiêu chí chấm điểm nào cho vòng thi này.",
+    "buttons": {
+      "addCriterion": "Thêm tiêu chí",
+      "addFirstCriterion": "Thêm tiêu chí đầu tiên",
+      "edit": "Chỉnh sửa tiêu chí",
+      "delete": "Xóa tiêu chí"
+    },
+    "toasts": {
+      "criterionCreated": "Tạo tiêu chí chấm điểm thành công",
+      "criterionUpdated": "Cập nhật tiêu chí chấm điểm thành công",
+      "criterionDeleted": "Xóa tiêu chí chấm điểm thành công"
+    },
+    "errors": {
+      "failedToLoadRounds": "Không thể tải vòng thi",
+      "failedToLoadCriteria": "Không thể tải tiêu chí chấm điểm",
+      "failedToCreateCriterion": "Không thể tạo tiêu chí chấm điểm",
+      "failedToUpdateCriterion": "Không thể cập nhật tiêu chí chấm điểm",
+      "failedToDeleteCriterion": "Không thể xóa tiêu chí chấm điểm"
+    }
   }
 }

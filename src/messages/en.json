@@ -530,5 +530,28 @@
     "updateError": "Failed to update location",
     "deleteError": "Failed to delete location",
     "loadError": "Failed to load locations. Please try again."
+  },
+  "roundMarkCriteria": {
+    "title": "Round mark criteria",
+    "maxScore": "Max score",
+    "noCriteria": "No mark criteria defined for this round.",
+    "buttons": {
+      "addCriterion": "Add criterion",
+      "addFirstCriterion": "Add first criterion",
+      "edit": "Edit criterion",
+      "delete": "Delete criterion"
+    },
+    "toasts": {
+      "criterionCreated": "Mark criterion created successfully",
+      "criterionUpdated": "Mark criterion updated successfully",
+      "criterionDeleted": "Mark criterion deleted successfully"
+    },
+    "errors": {
+      "failedToLoadRounds": "Failed to load rounds",
+      "failedToLoadCriteria": "Failed to load mark criteria",
+      "failedToCreateCriterion": "Failed to create mark criterion",
+      "failedToUpdateCriterion": "Failed to update mark criterion",
+      "failedToDeleteCriterion": "Failed to delete mark criterion"
+    }
   }
 }
