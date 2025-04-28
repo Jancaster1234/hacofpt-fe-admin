@@ -5,6 +5,9 @@ import { User } from "@/types/entities/user";
 import UserDeviceDetails from "./UserDeviceDetails";
 import UserDeviceForm from "./UserDeviceForm";
 import { userDeviceService } from "@/services/userDevice.service";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface UserDevicesTabsProps {
   userDevices: UserDevice[];
@@ -15,7 +18,7 @@ interface UserDevicesTabsProps {
   hackathonId: string;
   deviceId: string;
   onUserDevicesUpdated: () => void;
-  isHackathonCreator: boolean; // Added this prop
+  isHackathonCreator: boolean;
 }
 
 const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
@@ -27,15 +30,18 @@ const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
   hackathonId,
   deviceId,
   onUserDevicesUpdated,
-  isHackathonCreator, // Added this prop
+  isHackathonCreator,
 }) => {
   const [isAddingUserDevice, setIsAddingUserDevice] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations("deviceManagement");
+  const toast = useToast();
 
   if (isLoading) {
     return (
-      <div className="mt-6 ml-14 text-gray-500">
-        Loading user assignments...
+      <div className="mt-4 sm:mt-6 ml-4 sm:ml-14 text-gray-500 dark:text-gray-400 flex items-center transition-colors duration-200">
+        <LoadingSpinner size="sm" className="mr-2" />
+        <span>{t("loadingUserAssignments")}</span>
       </div>
     );
   }
@@ -54,24 +60,29 @@ const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
   };
 
   const handleCreateUserDevice = async (formData: any) => {
+    setError(null);
+
     try {
       const response = await userDeviceService.createUserDevice({
         userId: formData.userId,
         deviceId: formData.deviceId,
-        timeFrom: formData.timeFrom, // Now properly formatted as ISO string
-        timeTo: formData.timeTo, // Now properly formatted as ISO string
+        timeFrom: formData.timeFrom,
+        timeTo: formData.timeTo,
         status: formData.status,
-        files: formData.files || [], // Add files to create request
+        files: formData.files || [],
       });
 
       if (response.data) {
         setIsAddingUserDevice(false);
         onUserDevicesUpdated();
+        toast.success(response.message || t("assignmentCreatedSuccess"));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating user device:", error);
-      setError("Failed to create assignment. Please try again.");
-      throw error;
+      const errorMessage = error.message || t("failedToCreateAssignment");
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
     }
   };
 
@@ -84,84 +95,107 @@ const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
   };
 
   return (
-    <div className="mt-6 ml-14">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium">Device Assignments</h3>
+    <div className="mt-4 sm:mt-6 ml-4 sm:ml-14 transition-all duration-200">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2 sm:mb-0 transition-colors duration-200">
+          {t("deviceAssignments")}
+        </h3>
         {!isAddingUserDevice && isHackathonCreator && (
           <button
-            className="bg-blue-100 hover:bg-blue-200 text-blue-800 py-1 px-3 rounded text-sm"
+            className="bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 
+                      text-blue-800 dark:text-blue-200 py-1 px-3 rounded text-sm transition-colors duration-200
+                      focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             onClick={handleAddUserDeviceClick}
           >
-            Add Assignment
+            {t("addAssignment")}
           </button>
         )}
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded">
+        <div
+          className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 text-sm rounded transition-colors duration-200"
+          role="alert"
+        >
           {error}
         </div>
       )}
 
       {isAddingUserDevice && isHackathonCreator ? (
-        <div className="mb-6 p-4 border rounded-md bg-gray-50">
-          <h4 className="text-md font-medium mb-4">
-            Add New Device Assignment
+        <div className="mb-6 p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-800/50 transition-colors duration-200">
+          <h4 className="text-md font-medium mb-3 sm:mb-4 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+            {t("addNewDeviceAssignment")}
           </h4>
           <UserDeviceForm
             hackathonId={hackathonId}
             deviceId={deviceId}
             onSubmit={handleCreateUserDevice}
             onCancel={handleCancelAddUserDevice}
-            submitButtonText="Create Assignment"
+            submitButtonText={t("createAssignment")}
           />
         </div>
       ) : null}
 
       {userDevices.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          No user assignments for this device
+        <div className="text-center py-6 sm:py-8 text-gray-500 dark:text-gray-400 transition-colors duration-200">
+          {t("noUserAssignments")}
         </div>
       ) : (
         <>
-          {/* User device tabs */}
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-4">
+          {/* User device tabs - Properly implemented with ARIA roles */}
+          <div className="border-b border-gray-200 dark:border-gray-700 overflow-x-auto transition-colors duration-200">
+            <div
+              role="tablist"
+              className="-mb-px flex space-x-2 sm:space-x-4 pb-1"
+            >
               {userDevices.map((userDevice) => {
                 const user = userDevice.userId
                   ? userInfo[userDevice.userId]
                   : null;
                 const userName = user
                   ? `${user.firstName} ${user.lastName}`
-                  : "Unknown User";
+                  : t("unknownUser");
+                const isActive = activeUserDeviceId === userDevice.id;
 
                 return (
                   <button
                     key={userDevice.id}
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-controls={`panel-${userDevice.id}`}
+                    id={`tab-${userDevice.id}`}
                     onClick={() => onUserDeviceSelect(userDevice.id)}
-                    className={`py-2 px-4 text-sm font-medium ${
-                      activeUserDeviceId === userDevice.id
-                        ? "border-b-2 border-blue-500 text-blue-600"
-                        : "text-gray-500 hover:text-gray-700"
-                    }`}
+                    className={`py-1 sm:py-2 px-2 sm:px-4 text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200
+                      ${
+                        isActive
+                          ? "border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-300"
+                          : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                      }`}
                   >
                     {userName}
                   </button>
                 );
               })}
-            </nav>
+            </div>
           </div>
 
-          {/* Active user device details */}
+          {/* Active user device details - with proper ARIA labelling */}
           {activeUserDevice && (
-            <UserDeviceDetails
-              userDevice={activeUserDevice}
-              userInfo={userInfo}
-              hackathonId={hackathonId}
-              onUserDeviceUpdated={handleUserDeviceUpdated}
-              onUserDeviceDeleted={handleUserDeviceDeleted}
-              isHackathonCreator={isHackathonCreator}
-            />
+            <div
+              id={`panel-${activeUserDevice.id}`}
+              role="tabpanel"
+              aria-labelledby={`tab-${activeUserDevice.id}`}
+              className="mt-4 transition-all duration-200"
+            >
+              <UserDeviceDetails
+                userDevice={activeUserDevice}
+                userInfo={userInfo}
+                hackathonId={hackathonId}
+                onUserDeviceUpdated={handleUserDeviceUpdated}
+                onUserDeviceDeleted={handleUserDeviceDeleted}
+                isHackathonCreator={isHackathonCreator}
+              />
+            </div>
           )}
         </>
       )}
