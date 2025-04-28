@@ -248,5 +248,31 @@
     "judgeAssignError": "Không thể phân công giám khảo vào vòng thi.",
     "dataFetchError": "Không thể tải dữ liệu vòng thi và giám khảo. Vui lòng thử lại sau.",
     "removeJudge": "Xóa giám khảo"
+  },
+  "judgeAssign": {
+    "team": "Đội",
+    "status": "Trạng thái",
+    "pending": "Đang chờ",
+    "passed": "Đã qua vòng",
+    "description": "Mô tả",
+    "descriptionTooltip": "Thông tin bổ sung về việc tham gia của đội này trong vòng thi",
+    "noDescriptionProvided": "Chưa có mô tả",
+    "assignJudges": "Phân công giám khảo",
+    "cancel": "Hủy",
+    "assignedJudges": "Giám khảo đã phân công",
+    "noJudgesAssigned": "Chưa có giám khảo nào được phân công",
+    "availableJudges": "Giám khảo có sẵn",
+    "noJudgesAvailable": "Không có giám khảo nào cho vòng này",
+    "assign": "Phân công",
+    "remove": "Gỡ bỏ",
+    "judgeRemoved": "Giám khảo đã được gỡ bỏ khỏi đội thành công",
+    "judgeAssigned": "Giám khảo đã được phân công cho đội thành công",
+    "failedToRemoveJudge": "Không thể gỡ bỏ giám khảo. Vui lòng thử lại sau",
+    "failedToAssignJudge": "Không thể phân công giám khảo cho đội. Vui lòng thử lại sau",
+    "teamRoundStatus": "Trạng thái đội trong vòng thi",
+    "teamRoundStatusDescription": "Mô tả trạng thái hiện tại của đội trong vòng thi. Các đội bị loại không thể được phân công giám khảo",
+    "dataLoadingError": "Lỗi tải dữ liệu",
+    "failedToLoadHackathon": "Không thể tải dữ liệu hackathon. Vui lòng thử lại sau",
+    "disqualified_due_to_violation": "Bị loại do vi phạm quy định"
   }
 }

@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Tabs.tsx
 import React, { useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations } from "@/hooks/useTranslations";

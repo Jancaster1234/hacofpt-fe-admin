@@ -12,8 +12,12 @@ import { teamRoundService } from "@/services/teamRound.service";
 import { teamRoundJudgeService } from "@/services/teamRoundJudge.service";
 import { judgeRoundService } from "@/services/judgeRound.service";
 import { useApiModal } from "@/hooks/useApiModal";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
+  const t = useTranslations("judgeAssign");
   const [rounds, setRounds] = useState<Round[]>([]);
   const [activeRoundId, setActiveRoundId] = useState<string | null>(null);
   const [teamRounds, setTeamRounds] = useState<{
@@ -29,16 +33,18 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
     null
   );
   const [loading, setLoading] = useState<boolean>(true);
+  const [isAssigningJudge, setIsAssigningJudge] = useState<boolean>(false);
+  const [isRemovingJudge, setIsRemovingJudge] = useState<boolean>(false);
   const { showError, showSuccess } = useApiModal();
+  const toast = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         // Fetch real rounds data
-        const roundsResponse = await roundService.getRoundsByHackathonId(
-          hackathonId
-        );
+        const roundsResponse =
+          await roundService.getRoundsByHackathonId(hackathonId);
         const roundsData = roundsResponse.data;
         setRounds(roundsData);
 
@@ -78,23 +84,22 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
         setAvailableJudges(availableJudgesObj);
       } catch (error) {
         console.error("Error fetching data:", error);
-        showError(
-          "Data Loading Error",
-          "Failed to load hackathon data. Please try again later."
-        );
+        showError(t("dataLoadingError"), t("failedToLoadHackathon"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [hackathonId, showError]);
+    // Deliberately not including toast in dependencies to avoid infinite loops
+  }, [hackathonId, showError, t]);
 
   const handleRemoveJudge = async (
     teamRoundJudgeId: string,
     teamRoundId: string,
     judgeId: string
   ) => {
+    setIsRemovingJudge(true);
     try {
       const response = await teamRoundJudgeService.deleteTeamRoundJudge(
         teamRoundId,
@@ -110,17 +115,14 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
           ),
         }));
 
-        showSuccess(
-          "Judge Removed",
-          "Judge has been successfully removed from the team."
-        );
+        // Show toast notification for user action
+        toast.success(response.message || t("judgeRemoved"));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error removing judge:", error);
-      showError(
-        "Failed to Remove Judge",
-        "Could not remove the judge. Please try again later."
-      );
+      toast.error(error?.message || t("failedToRemoveJudge"));
+    } finally {
+      setIsRemovingJudge(false);
     }
   };
 
@@ -129,6 +131,7 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
     teamRoundId: string,
     roundId: string
   ) => {
+    setIsAssigningJudge(true);
     try {
       const response = await teamRoundJudgeService.createTeamRoundJudge({
         teamRoundId,
@@ -142,17 +145,14 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
           [teamRoundId]: [...(prev[teamRoundId] || []), response.data],
         }));
 
-        showSuccess(
-          "Judge Assigned",
-          "Judge has been successfully assigned to the team."
-        );
+        // Show toast notification for user action
+        toast.success(response.message || t("judgeAssigned"));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error assigning judge:", error);
-      showError(
-        "Failed to Assign Judge",
-        "Could not assign judge to the team. Please try again later."
-      );
+      toast.error(error?.message || t("failedToAssignJudge"));
+    } finally {
+      setIsAssigningJudge(false);
     }
   };
 
@@ -167,19 +167,23 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
   };
 
   if (loading) {
-    return <div className="p-4">Loading...</div>;
+    return (
+      <div className="p-4 flex justify-center items-center min-h-[200px] dark:bg-gray-800 dark:text-gray-200 transition-colors duration-300">
+        <LoadingSpinner size="md" showText={true} />
+      </div>
+    );
   }
 
   return (
-    <div>
-      <div className="flex space-x-2 overflow-x-auto border-b mb-4">
+    <div className="transition-colors duration-300 dark:bg-gray-800">
+      <div className="flex space-x-2 overflow-x-auto border-b mb-4 dark:border-gray-700 py-2 px-1 md:px-2">
         {rounds.map((round) => (
           <button
             key={round.id}
-            className={`p-2 ${
+            className={`p-2 whitespace-nowrap transition-colors duration-200 ${
               activeRoundId === round.id
-                ? "border-b-2 border-green-500 text-green-500"
-                : "text-gray-600"
+                ? "border-b-2 border-green-500 text-green-500 dark:text-green-400"
+                : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
             }`}
             onClick={() => setActiveRoundId(round.id)}
           >
@@ -189,7 +193,7 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
       </div>
 
       {activeRoundId && (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {teamRounds[activeRoundId]?.map((teamRound) => {
             const isDisqualified =
               teamRound.status === "DISQUALIFIED_DUE_TO_VIOLATION";
@@ -197,39 +201,44 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
             return (
               <div
                 key={teamRound.id}
-                className={`bg-white p-4 rounded-lg shadow-md ${
-                  isDisqualified ? "border-l-4 border-red-500" : ""
+                className={`bg-white dark:bg-gray-700 p-3 md:p-4 rounded-lg shadow-md transition-all duration-300 ${
+                  isDisqualified
+                    ? "border-l-4 border-red-500 dark:border-red-400"
+                    : ""
                 }`}
               >
-                <div className="flex justify-between items-start">
-                  <div>
+                <div className="flex flex-col md:flex-row md:justify-between md:items-start">
+                  <div className="flex-1">
                     <div className="flex items-center">
-                      <h3 className="text-lg font-medium text-gray-800">
-                        Team:{" "}
+                      <h3 className="text-md md:text-lg font-medium text-gray-800 dark:text-gray-200">
+                        {t("team")}:{" "}
                         {teamRound.team?.name || `ID: ${teamRound.teamId}`}
                       </h3>
                       <TeamMembersTooltip teamId={teamRound.teamId || ""} />
                     </div>
 
                     <div className="flex items-center mt-1">
-                      <p className="text-gray-600 mr-2">
-                        Status: {teamRound.status || "Pending"}
+                      <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mr-2">
+                        {t("status")}:{" "}
+                        {t(teamRound.status?.toLowerCase() || "pending")}
                       </p>
                       <InfoTooltip
-                        title="Team Round Status"
-                        content="Describes the current state of this team in the round. Disqualified teams cannot be assigned judges."
+                        title={t("teamRoundStatus")}
+                        content={t("teamRoundStatusDescription")}
                       />
                     </div>
 
                     <div className="flex items-center mt-1">
-                      <p className="text-gray-600 mr-2">Description:</p>
+                      <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mr-2">
+                        {t("description")}:
+                      </p>
                       <InfoTooltip
-                        title="Description"
-                        content="Additional information about this team's participation in the round."
+                        title={t("description")}
+                        content={t("descriptionTooltip")}
                       />
                     </div>
-                    <p className="text-gray-600 mt-1">
-                      {teamRound.description || "No description provided."}
+                    <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 mt-1">
+                      {teamRound.description || t("noDescriptionProvided")}
                     </p>
                   </div>
 
@@ -242,23 +251,25 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
                             : teamRound.id
                         );
                       }}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                      className="mt-3 md:mt-0 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200"
                     >
                       {selectedTeamRound === teamRound.id
-                        ? "Cancel"
-                        : "Assign Judges"}
+                        ? t("cancel")
+                        : t("assignJudges")}
                     </button>
                   )}
                 </div>
 
-                <div className="mt-2">
-                  <h4 className="font-semibold">Assigned Judges:</h4>
+                <div className="mt-3 md:mt-4">
+                  <h4 className="font-semibold text-gray-800 dark:text-gray-200">
+                    {t("assignedJudges")}:
+                  </h4>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {teamRoundJudges[teamRound.id]?.length ? (
                       teamRoundJudges[teamRound.id].map((judge) => (
                         <div
                           key={judge.id}
-                          className="flex items-center bg-gray-100 text-gray-800 px-3 py-1 rounded-full shadow-sm"
+                          className="flex items-center bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 md:px-3 py-1 rounded-full shadow-sm transition-colors duration-200"
                         >
                           {judge.judge.avatarUrl ? (
                             <Image
@@ -266,17 +277,17 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
                               alt={judge.judge.firstName}
                               width={24}
                               height={24}
-                              className="w-6 h-6 rounded-full mr-2"
+                              className="w-5 h-5 md:w-6 md:h-6 rounded-full mr-1 md:mr-2"
                             />
                           ) : (
-                            <span className="w-6 h-6 flex items-center justify-center bg-gray-300 text-xs rounded-full mr-2">
+                            <span className="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-gray-300 dark:bg-gray-500 text-xs rounded-full mr-1 md:mr-2">
                               {judge.judge.firstName[0]}
                             </span>
                           )}
-                          <span className="text-sm font-medium">
+                          <span className="text-xs md:text-sm font-medium">
                             {judge.judge.firstName} {judge.judge.lastName}
                           </span>
-                          <span className="text-xs text-gray-500 ml-2">
+                          <span className="text-xs text-gray-500 dark:text-gray-400 ml-1 md:ml-2 hidden sm:inline">
                             {judge.judge.email}
                           </span>
                           {!isDisqualified && (
@@ -288,24 +299,27 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
                                   judge.judgeId
                                 )
                               }
-                              className="ml-2 text-xs text-red-500 hover:text-red-700 font-bold"
+                              disabled={isRemovingJudge}
+                              className="ml-1 md:ml-2 text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-bold disabled:opacity-50 transition-colors duration-200"
                             >
-                              ✕
+                              {isRemovingJudge ? "..." : "✕"}
                             </button>
                           )}
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500">No judges assigned yet.</p>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm">
+                        {t("noJudgesAssigned")}
+                      </p>
                     )}
                   </div>
                 </div>
 
                 {/* Show available judges for this team round */}
                 {selectedTeamRound === teamRound.id && !isDisqualified && (
-                  <div className="mt-4 pt-3 border-t border-gray-200">
-                    <h4 className="text-md font-medium text-gray-700 mb-2">
-                      Available Judges
+                  <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600 transition-colors duration-200">
+                    <h4 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {t("availableJudges")}
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {availableJudges[activeRoundId]?.length > 0 ? (
@@ -318,8 +332,10 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
                             <div
                               key={judgeRound.id}
                               className={`flex items-center ${
-                                isAssigned ? "bg-green-100" : "bg-gray-50"
-                              } text-gray-800 px-3 py-1 rounded-full shadow-sm`}
+                                isAssigned
+                                  ? "bg-green-100 dark:bg-green-800/30"
+                                  : "bg-gray-50 dark:bg-gray-600/50"
+                              } text-gray-800 dark:text-gray-200 px-2 md:px-3 py-1 rounded-full shadow-sm transition-all duration-200`}
                             >
                               {judgeRound.judge.avatarUrl ? (
                                 <Image
@@ -327,14 +343,14 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
                                   alt={judgeRound.judge.firstName}
                                   width={24}
                                   height={24}
-                                  className="w-6 h-6 rounded-full mr-2"
+                                  className="w-5 h-5 md:w-6 md:h-6 rounded-full mr-1 md:mr-2"
                                 />
                               ) : (
-                                <span className="w-6 h-6 flex items-center justify-center bg-gray-300 text-xs rounded-full mr-2">
+                                <span className="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-gray-300 dark:bg-gray-500 text-xs rounded-full mr-1 md:mr-2">
                                   {judgeRound.judge.firstName[0]}
                                 </span>
                               )}
-                              <span className="text-sm font-medium">
+                              <span className="text-xs md:text-sm font-medium">
                                 {judgeRound.judge.firstName}{" "}
                                 {judgeRound.judge.lastName}
                               </span>
@@ -362,20 +378,25 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
                                     );
                                   }
                                 }}
-                                className={`ml-2 text-xs ${
+                                disabled={isAssigningJudge || isRemovingJudge}
+                                className={`ml-1 md:ml-2 text-xs ${
                                   isAssigned
-                                    ? "text-red-500 hover:text-red-700"
-                                    : "text-blue-500 hover:text-blue-700"
-                                } font-medium`}
+                                    ? "text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                    : "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                                } font-medium disabled:opacity-50 transition-colors duration-200`}
                               >
-                                {isAssigned ? "Remove" : "Assign"}
+                                {isAssigningJudge || isRemovingJudge
+                                  ? "..."
+                                  : isAssigned
+                                    ? t("remove")
+                                    : t("assign")}
                               </button>
                             </div>
                           );
                         })
                       ) : (
-                        <p className="text-gray-500">
-                          No judges available for this round.
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                          {t("noJudgesAvailable")}
                         </p>
                       )}
                     </div>

@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/page.tsx
 "use client";
 import React, { useState, use, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";

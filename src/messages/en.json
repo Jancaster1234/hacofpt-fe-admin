@@ -248,5 +248,31 @@
     "judgeAssignError": "Failed to assign judge to round.",
     "dataFetchError": "Failed to load rounds and judges data. Please try again later.",
     "removeJudge": "Remove judge"
+  },
+  "judgeAssign": {
+    "team": "Team",
+    "status": "Status",
+    "pending": "Pending",
+    "passed": "Passed",
+    "description": "Description",
+    "descriptionTooltip": "Additional information about this team's participation in the round",
+    "noDescriptionProvided": "No description provided",
+    "assignJudges": "Assign judges",
+    "cancel": "Cancel",
+    "assignedJudges": "Assigned judges",
+    "noJudgesAssigned": "No judges assigned yet",
+    "availableJudges": "Available judges",
+    "noJudgesAvailable": "No judges available for this round",
+    "assign": "Assign",
+    "remove": "Remove",
+    "judgeRemoved": "Judge has been successfully removed from the team",
+    "judgeAssigned": "Judge has been successfully assigned to the team",
+    "failedToRemoveJudge": "Could not remove the judge. Please try again later",
+    "failedToAssignJudge": "Could not assign judge to the team. Please try again later",
+    "teamRoundStatus": "Team round status",
+    "teamRoundStatusDescription": "Describes the current state of this team in the round. Disqualified teams cannot be assigned judges",
+    "dataLoadingError": "Data loading error",
+    "failedToLoadHackathon": "Failed to load hackathon data. Please try again later",
+    "disqualified_due_to_violation": "Disqualified due to violation"
   }
 }
