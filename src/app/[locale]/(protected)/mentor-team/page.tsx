@@ -1,14 +1,18 @@
 // src/app/[locale]/(protected)/mentor-team/page.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { MentorTeam } from "@/types/entities/mentorTeam";
 import { MentorshipSessionRequest } from "@/types/entities/mentorshipSessionRequest";
-import { ChevronDown, ChevronUp, Users, Info } from "lucide-react";
+import { ChevronDown, ChevronUp, Users, Info, Moon, Sun } from "lucide-react";
 import { useApiModal } from "@/hooks/useApiModal";
 import { mentorTeamService } from "@/services/mentorTeam.service";
 import { mentorshipSessionRequestService } from "@/services/mentorshipSessionRequest.service";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function MentorTeamsPage() {
   const { user } = useAuth();
@@ -23,7 +27,10 @@ export default function MentorTeamsPage() {
     Record<string, boolean>
   >({});
   const [loading, setLoading] = useState<boolean>(true);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const { modalState, hideModal, showSuccess, showError } = useApiModal();
+  const t = useTranslations("mentorTeam");
+  const toast = useToast();
 
   useEffect(() => {
     if (user) {
@@ -54,18 +61,17 @@ export default function MentorTeamsPage() {
             }
           })
         );
+
+        toast.success(response.message || t("teamsLoadedSuccess"));
       } else {
         setMentorTeams([]);
         if (response.message) {
-          showError("Notice", response.message);
+          toast.info(response.message);
         }
       }
     } catch (error) {
       console.error("Error fetching mentor teams:", error);
-      showError(
-        "Error",
-        "Failed to fetch mentor teams. Please try again later."
-      );
+      toast.error(t("fetchTeamsError"));
     } finally {
       setLoading(false);
     }
@@ -97,14 +103,15 @@ export default function MentorTeamsPage() {
         `Error fetching session requests for team ${mentorTeamId}:`,
         error
       );
-      // Don't show an error modal here to avoid multiple error popups
+      // Don't show an error toast here to avoid multiple error popups
     }
   };
 
   // Group mentor teams by hackathon title
   const groupedByHackathon = mentorTeams.reduce(
     (acc, mentorTeam) => {
-      const hackathonTitle = mentorTeam.hackathon?.title || "Unknown Hackathon";
+      const hackathonTitle =
+        mentorTeam.hackathon?.title || t("unknownHackathon");
       if (!acc[hackathonTitle]) {
         acc[hackathonTitle] = [];
       }
@@ -142,6 +149,9 @@ export default function MentorTeamsPage() {
   ) => {
     if (!user) return;
 
+    setIsUpdating(true);
+    toast.info(t("updatingStatus"));
+
     // Find the session to update
     let sessionToUpdate: MentorshipSessionRequest | undefined;
 
@@ -153,7 +163,10 @@ export default function MentorTeamsPage() {
       ) as MentorshipSessionRequest;
     }
 
-    if (!sessionToUpdate) return;
+    if (!sessionToUpdate) {
+      setIsUpdating(false);
+      return;
+    }
 
     // Update local state first for immediate UI feedback
     setMentorTeams((prevTeams) =>
@@ -170,8 +183,8 @@ export default function MentorTeamsPage() {
                     evaluatedById: user.id,
                     evaluatedBy: {
                       id: user.id,
-                      firstName: user.firstName || "Unknown",
-                      lastName: user.lastName || "Unknown",
+                      firstName: user.firstName || t("unknown"),
+                      lastName: user.lastName || t("unknown"),
                     },
                     evaluatedAt: new Date().toISOString(),
                   };
@@ -201,126 +214,140 @@ export default function MentorTeamsPage() {
         });
 
       if (response.data) {
-        showSuccess(
-          "Status Updated",
-          `Session has been successfully ${
-            newStatus === "APPROVED" ? "approved" : "rejected"
-          }.`
+        toast.success(
+          newStatus === "APPROVED" ? t("sessionApproved") : t("sessionRejected")
         );
       } else {
         // If the API call fails, refresh the data
-        showError(
-          "Update Failed",
-          response.message || "Failed to update session status."
-        );
+        toast.error(response.message || t("updateFailed"));
         fetchSessionRequests(mentorTeamId);
       }
     } catch (error: any) {
       console.error("Failed to update session status:", error);
-      showError(
-        "Update Failed",
-        error.message || "Failed to update session status. Please try again."
-      );
+      toast.error(error.message || t("updateFailedRetry"));
       fetchSessionRequests(mentorTeamId);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
   // Function to format date for display
   const formatDate = (dateString?: string) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return t("notAvailable");
     return new Date(dateString).toLocaleString();
   };
 
   // Status label with appropriate color
   const StatusLabel = ({ status }: { status?: string }) => {
-    let color = "text-gray-500";
+    let color = "text-gray-500 dark:text-gray-400";
 
     if (status) {
       const lowerStatus = status.toLowerCase();
-      if (lowerStatus === "pending") color = "text-yellow-500";
-      else if (lowerStatus === "approved") color = "text-green-600";
-      else if (lowerStatus === "rejected") color = "text-red-600";
-      else if (lowerStatus === "completed") color = "text-blue-600";
+      if (lowerStatus === "pending")
+        color = "text-yellow-500 dark:text-yellow-400";
+      else if (lowerStatus === "approved")
+        color = "text-green-600 dark:text-green-400";
+      else if (lowerStatus === "rejected")
+        color = "text-red-600 dark:text-red-400";
+      else if (lowerStatus === "completed")
+        color = "text-blue-600 dark:text-blue-400";
     }
 
     return (
-      <span className={`font-semibold ${color}`}>
-        {status?.toLowerCase() || "unknown"}
+      <span className={`font-semibold ${color} transition-colors duration-300`}>
+        {status?.toLowerCase() === "pending"
+          ? t("pending")
+          : status?.toLowerCase() === "approved"
+            ? t("approved")
+            : status?.toLowerCase() === "rejected"
+              ? t("rejected")
+              : status?.toLowerCase() === "completed"
+                ? t("completed")
+                : t("unknown")}
       </span>
     );
   };
 
   return (
-    <div className="min-h-screen p-6 bg-gray-100">
-      <h1 className="text-3xl font-bold text-gray-900 text-center mb-6">
-        Mentor Teams
-      </h1>
+    <div className="min-h-screen p-3 md:p-6 bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white text-center md:text-left transition-colors duration-300">
+          {t("mentorTeams")}
+        </h1>
+      </div>
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <LoadingSpinner size="lg" showText={true} />
         </div>
       ) : Object.keys(groupedByHackathon).length === 0 ? (
-        <p className="text-center text-gray-600">No mentor teams found.</p>
+        <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md transition-colors duration-300">
+          <p className="text-gray-600 dark:text-gray-300">
+            {t("noTeamsFound")}
+          </p>
+        </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {Object.entries(groupedByHackathon).map(([hackathonTitle, teams]) => (
             <div
               key={hackathonTitle}
-              className="bg-white p-4 rounded-lg shadow-md"
+              className="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-lg shadow-md transition-all duration-300"
             >
               {/* Hackathon Title Header */}
               <div
-                className="flex justify-between items-center cursor-pointer"
+                className="flex justify-between items-center cursor-pointer p-2"
                 onClick={() => toggleHackathon(hackathonTitle)}
               >
-                <h2 className="text-xl font-semibold">{hackathonTitle}</h2>
+                <h2 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white transition-colors duration-300">
+                  {hackathonTitle}
+                </h2>
                 {expandedHackathons[hackathonTitle] ? (
-                  <ChevronUp />
+                  <ChevronUp className="text-gray-700 dark:text-gray-300 transition-colors duration-300" />
                 ) : (
-                  <ChevronDown />
+                  <ChevronDown className="text-gray-700 dark:text-gray-300 transition-colors duration-300" />
                 )}
               </div>
 
               {/* Mentor Teams (Expandable) */}
               {expandedHackathons[hackathonTitle] && (
-                <div className="mt-4 space-y-4">
+                <div className="mt-3 md:mt-4 space-y-3 md:space-y-4">
                   {teams.map((team) => (
                     <div
                       key={team.id}
-                      className="border p-3 rounded-md bg-gray-50"
+                      className="border border-gray-200 dark:border-gray-700 p-2 md:p-3 rounded-md bg-gray-50 dark:bg-gray-850 transition-all duration-300"
                     >
                       {/* Team Header */}
                       <div className="flex justify-between items-center">
                         <div className="flex items-center space-x-2">
-                          <Users className="text-blue-600" />
-                          <p className="text-lg font-medium">
-                            {team.team?.name || "Unknown Team"}
+                          <Users className="text-blue-600 dark:text-blue-400 transition-colors duration-300" />
+                          <p className="text-md md:text-lg font-medium text-gray-900 dark:text-white transition-colors duration-300">
+                            {team.team?.name || t("unknownTeam")}
                           </p>
                         </div>
                         {/* Expand Team Info Icon */}
                         <Info
-                          className="text-gray-600 cursor-pointer hover:text-gray-900"
+                          className="text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-white transition-colors duration-300"
                           onClick={() => toggleTeamInfo(team.id)}
                         />
                       </div>
 
                       {/* Team Info (Expandable) */}
                       {expandedTeamInfo[team.id] && (
-                        <div className="mt-2 p-3 bg-white shadow rounded-md">
-                          <p>
-                            <strong>Team Name:</strong>{" "}
-                            {team.team?.name || "N/A"}
+                        <div className="mt-2 p-2 md:p-3 bg-white dark:bg-gray-800 shadow rounded-md transition-all duration-300">
+                          <p className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                            <strong>{t("teamName")}:</strong>{" "}
+                            {team.team?.name || t("notAvailable")}
                           </p>
-                          <p>
-                            <strong>Team ID:</strong> {team.team?.id || "N/A"}
+                          <p className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                            <strong>{t("teamId")}:</strong>{" "}
+                            {team.team?.id || t("notAvailable")}
                           </p>
-                          <p>
-                            <strong>Hackathon:</strong>{" "}
-                            {team.hackathon?.title || "N/A"}
+                          <p className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                            <strong>{t("hackathon")}:</strong>{" "}
+                            {team.hackathon?.title || t("notAvailable")}
                           </p>
-                          <p>
-                            <strong>Created At:</strong>{" "}
+                          <p className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                            <strong>{t("createdAt")}:</strong>{" "}
                             {formatDate(team.createdAt)}
                           </p>
                         </div>
@@ -331,15 +358,15 @@ export default function MentorTeamsPage() {
                         className="mt-2 cursor-pointer"
                         onClick={() => toggleTeam(team.id)}
                       >
-                        <p className="text-blue-600 font-semibold flex items-center">
+                        <p className="text-blue-600 dark:text-blue-400 font-semibold flex items-center transition-colors duration-300">
                           {expandedTeams[team.id] ? (
                             <>
-                              Hide Sessions{" "}
+                              {t("hideSessions")}{" "}
                               <ChevronUp className="ml-1 h-4 w-4" />
                             </>
                           ) : (
                             <>
-                              View Sessions{" "}
+                              {t("viewSessions")}{" "}
                               <ChevronDown className="ml-1 h-4 w-4" />
                             </>
                           )}
@@ -352,38 +379,37 @@ export default function MentorTeamsPage() {
                             team.mentorshipSessionRequests.map((session) => (
                               <div
                                 key={session.id}
-                                className="border-l-4 border-blue-500 p-3 bg-white shadow-sm rounded-md"
+                                className="border-l-4 border-blue-500 dark:border-blue-400 p-2 md:p-3 bg-white dark:bg-gray-800 shadow-sm rounded-md transition-all duration-300"
                               >
-                                <p>
-                                  <strong>Location:</strong>{" "}
-                                  {session.location || "N/A"}
+                                <p className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                                  <strong>{t("location")}:</strong>{" "}
+                                  {session.location || t("notAvailable")}
                                 </p>
-                                <p>
-                                  <strong>Description:</strong>{" "}
-                                  {session.description ||
-                                    "No description provided"}
+                                <p className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                                  <strong>{t("description")}:</strong>{" "}
+                                  {session.description || t("noDescription")}
                                 </p>
-                                <p>
-                                  <strong>Start Time:</strong>{" "}
+                                <p className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                                  <strong>{t("startTime")}:</strong>{" "}
                                   {formatDate(session.startTime)}
                                 </p>
-                                <p>
-                                  <strong>End Time:</strong>{" "}
+                                <p className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                                  <strong>{t("endTime")}:</strong>{" "}
                                   {formatDate(session.endTime)}
                                 </p>
-                                <p>
-                                  <strong>Status:</strong>{" "}
+                                <p className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                                  <strong>{t("status")}:</strong>{" "}
                                   <StatusLabel status={session.status} />
                                 </p>
                                 {session.evaluatedBy && (
                                   <>
-                                    <p>
-                                      <strong>Evaluated By:</strong>{" "}
+                                    <p className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                                      <strong>{t("evaluatedBy")}:</strong>{" "}
                                       {session.evaluatedBy.firstName}{" "}
                                       {session.evaluatedBy.lastName}
                                     </p>
-                                    <p>
-                                      <strong>Evaluated At:</strong>{" "}
+                                    <p className="text-gray-800 dark:text-gray-200 transition-colors duration-300">
+                                      <strong>{t("evaluatedAt")}:</strong>{" "}
                                       {formatDate(session.evaluatedAt)}
                                     </p>
                                   </>
@@ -392,7 +418,7 @@ export default function MentorTeamsPage() {
                                 {/* Action buttons for pending sessions */}
                                 {session.status?.toLowerCase() ===
                                   "pending" && (
-                                  <div className="mt-3 flex space-x-2">
+                                  <div className="mt-3 flex flex-col xs:flex-row space-y-2 xs:space-y-0 xs:space-x-2">
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -402,9 +428,12 @@ export default function MentorTeamsPage() {
                                           "APPROVED"
                                         );
                                       }}
-                                      className="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600 text-sm"
+                                      disabled={isUpdating}
+                                      className="px-3 py-1 bg-green-500 dark:bg-green-600 text-white rounded-md hover:bg-green-600 dark:hover:bg-green-700 text-sm transition-colors duration-300 disabled:opacity-50"
                                     >
-                                      Approve
+                                      {isUpdating
+                                        ? t("processing")
+                                        : t("approve")}
                                     </button>
                                     <button
                                       onClick={(e) => {
@@ -415,17 +444,20 @@ export default function MentorTeamsPage() {
                                           "REJECTED"
                                         );
                                       }}
-                                      className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm"
+                                      disabled={isUpdating}
+                                      className="px-3 py-1 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-700 text-sm transition-colors duration-300 disabled:opacity-50"
                                     >
-                                      Reject
+                                      {isUpdating
+                                        ? t("processing")
+                                        : t("reject")}
                                     </button>
                                   </div>
                                 )}
                               </div>
                             ))
                           ) : (
-                            <p className="text-gray-600 text-sm p-2">
-                              No mentorship sessions available.
+                            <p className="text-gray-600 dark:text-gray-400 text-sm p-2 transition-colors duration-300">
+                              {t("noSessions")}
                             </p>
                           )}
                         </div>
