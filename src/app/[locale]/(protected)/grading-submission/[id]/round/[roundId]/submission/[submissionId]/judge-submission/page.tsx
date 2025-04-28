@@ -12,8 +12,10 @@ import { teamRoundService } from "@/services/teamRound.service";
 import { teamRoundJudgeService } from "@/services/teamRoundJudge.service";
 import { judgeSubmissionService } from "@/services/judgeSubmission.service";
 import { roundMarkCriterionService } from "@/services/roundMarkCriterion.service";
-import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function JudgeSubmissionPage() {
   const { id, roundId, submissionId } = useParams<{
@@ -23,13 +25,15 @@ export default function JudgeSubmissionPage() {
   }>();
   const router = useRouter();
   const { user } = useAuth();
+  const t = useTranslations("judgeSubmission");
+  const toast = useToast();
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [teamRound, setTeamRound] = useState<TeamRound | null>(null);
   const [teamRoundJudges, setTeamRoundJudges] = useState<TeamRoundJudge[]>([]);
   const [roundMarkCriteria, setRoundMarkCriteria] = useState<
     RoundMarkCriterion[]
   >([]);
-  const [activeJudgeIndex, setActiveJudgeIndex] = useState(-1); // Initialize with -1 to indicate no selection
+  const [activeJudgeIndex, setActiveJudgeIndex] = useState(-1);
   const [criteriaScores, setCriteriaScores] = useState<{
     [key: string]: number;
   }>({});
@@ -38,6 +42,7 @@ export default function JudgeSubmissionPage() {
   }>({});
   const [generalFeedback, setGeneralFeedback] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [judgeSubmissions, setJudgeSubmissions] = useState([]);
   const [existingJudgeSubmissionId, setExistingJudgeSubmissionId] = useState<
     string | null
@@ -52,11 +57,11 @@ export default function JudgeSubmissionPage() {
         setIsLoading(true);
 
         // Step 1: Fetch submission data
-        const submissionResponse = await submissionService.getSubmissionById(
-          submissionId
-        );
+        const submissionResponse =
+          await submissionService.getSubmissionById(submissionId);
 
         if (!submissionResponse.data) {
+          // Don't use toast here since this is part of data initialization
           showError("Error", "Failed to load submission");
           return;
         }
@@ -217,7 +222,7 @@ export default function JudgeSubmissionPage() {
     if (!user || !submission) return;
 
     try {
-      setIsLoading(true);
+      setIsSubmitting(true);
 
       // Calculate total score from criteria scores
       const totalScore = calculateTotalScore();
@@ -250,29 +255,21 @@ export default function JudgeSubmissionPage() {
         );
 
         if (response.data) {
-          showSuccess(
-            "Success",
-            "Your evaluation has been updated successfully"
-          );
+          toast.success(response.message || t("evaluationUpdated"));
         }
       } else {
-        response = await judgeSubmissionService.createJudgeSubmission(
-          submissionData
-        );
+        response =
+          await judgeSubmissionService.createJudgeSubmission(submissionData);
 
         if (response.data) {
           setExistingJudgeSubmissionId(response.data.id);
-          showSuccess(
-            "Success",
-            "Your evaluation has been submitted successfully"
-          );
+          toast.success(response.message || t("evaluationSubmitted"));
         }
       }
 
       // Refresh the submission data to show the updated judge submissions
-      const updatedSubmission = await submissionService.getSubmissionById(
-        submissionId
-      );
+      const updatedSubmission =
+        await submissionService.getSubmissionById(submissionId);
 
       if (updatedSubmission.data) {
         setSubmission(updatedSubmission.data);
@@ -290,9 +287,9 @@ export default function JudgeSubmissionPage() {
       }
     } catch (error) {
       console.error("Error submitting evaluation:", error);
-      showError("Error", "Failed to submit your evaluation");
+      toast.error(error.message || t("failedToSubmit"));
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -311,20 +308,22 @@ export default function JudgeSubmissionPage() {
 
   if (isLoading)
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex justify-center items-center h-64 dark:bg-gray-900 transition-colors duration-300">
+        <LoadingSpinner size="lg" showText={true} />
       </div>
     );
 
   if (!submission)
     return (
-      <div className="text-center text-red-500 p-4">Submission not found</div>
+      <div className="text-center text-red-500 dark:text-red-400 p-4 transition-colors duration-300">
+        {t("submissionNotFound")}
+      </div>
     );
 
   if (!teamRound)
     return (
-      <div className="text-center text-red-500 p-4">
-        Team round information not found
+      <div className="text-center text-red-500 dark:text-red-400 p-4 transition-colors duration-300">
+        {t("teamRoundNotFound")}
       </div>
     );
 
@@ -332,28 +331,36 @@ export default function JudgeSubmissionPage() {
   const activeJudgeSubmission = judgeSubmissions[activeJudgeIndex];
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Judge Submission</h1>
+    <div className="container mx-auto p-4 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <h1 className="text-xl md:text-2xl font-bold mb-4 dark:text-gray-100">
+        {t("pageTitle")}
+      </h1>
 
       {/* Submission Info */}
-      <div className="mb-6 bg-gray-50 p-4 rounded-lg shadow-sm">
-        <h2 className="text-xl font-semibold">Team: {submission.team?.name}</h2>
-        <p className="text-gray-600">Round: {submission.round?.roundTitle}</p>
-        <p className="text-gray-600">Status: {submission.status}</p>
-        <p className="text-gray-600">
-          Submitted: {new Date(submission.submittedAt).toLocaleString()}
+      <div className="mb-6 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-sm transition-colors duration-300">
+        <h2 className="text-lg md:text-xl font-semibold dark:text-gray-100">
+          {t("team")}: {submission.team?.name}
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300">
+          {t("round")}: {submission.round?.roundTitle}
+        </p>
+        <p className="text-gray-600 dark:text-gray-300">
+          {t("status")}: {submission.status}
+        </p>
+        <p className="text-gray-600 dark:text-gray-300">
+          {t("submitted")}: {new Date(submission.submittedAt).toLocaleString()}
         </p>
 
         {/* Display average score if multiple judges have submitted */}
         {judgeSubmissions.length > 0 && (
-          <div className="mt-2 pt-2 border-t border-gray-200">
-            <p className="font-medium">
-              Judges: {judgeSubmissions.length}/{teamRoundJudges.length}{" "}
-              submitted
+          <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700 transition-colors duration-300">
+            <p className="font-medium dark:text-gray-200">
+              {t("judges")}: {judgeSubmissions.length}/{teamRoundJudges.length}{" "}
+              {t("submitted")}
             </p>
             {judgeSubmissions.length > 0 && (
-              <p className="font-medium">
-                Average Score:{" "}
+              <p className="font-medium dark:text-gray-200">
+                {t("averageScore")}:{" "}
                 {(
                   judgeSubmissions.reduce(
                     (sum, js) => sum + (js.score || 0),
@@ -367,8 +374,8 @@ export default function JudgeSubmissionPage() {
         )}
       </div>
 
-      {/* Judge Tabs */}
-      <div className="flex border-b mb-4 overflow-x-auto">
+      {/* Judge Tabs - Horizontal scroll on mobile */}
+      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4 overflow-x-auto transition-colors duration-300">
         {teamRoundJudges.map((trj, index) => {
           // Find corresponding judgeSubmission if it exists
           const judgeSubmission = judgeSubmissions.find(
@@ -394,33 +401,39 @@ export default function JudgeSubmissionPage() {
                   setActiveJudgeIndex(-1);
                 }
               }}
-              className={`px-4 py-2 whitespace-nowrap flex items-center ${
+              className={`px-3 py-2 md:px-4 md:py-2 whitespace-nowrap flex items-center transition-all duration-300 ${
                 (judgeSubmission &&
                   judgeSubmissions.indexOf(judgeSubmission) ===
                     activeJudgeIndex) ||
                 (!judgeSubmission &&
                   trj.judge?.id === user?.id &&
                   activeJudgeIndex === -1)
-                  ? "text-blue-600 font-bold border-b-2 border-blue-600"
-                  : "text-gray-600 hover:text-gray-800"
+                  ? "text-blue-600 dark:text-blue-400 font-bold border-b-2 border-blue-600 dark:border-blue-400"
+                  : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
               }`}
             >
               {trj.judge?.firstName} {trj.judge?.lastName}
               {isCurrentUser && (
-                <span className="ml-1 text-green-500">(You)</span>
+                <span className="ml-1 text-green-500 dark:text-green-400 text-xs md:text-sm">
+                  ({t("you")})
+                </span>
               )}
-              {hasSubmitted && <span className="ml-1 text-blue-500">✓</span>}
+              {hasSubmitted && (
+                <span className="ml-1 text-blue-500 dark:text-blue-400">✓</span>
+              )}
             </button>
           );
         })}
       </div>
 
       {/* Evaluation Form or View */}
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">
+      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 md:p-6 transition-colors duration-300">
+        <h2 className="text-lg md:text-xl font-semibold mb-4 dark:text-gray-100">
           {activeJudgeIndex !== -1 && activeJudgeSubmission
-            ? `Evaluation by ${activeJudgeSubmission.judge?.firstName} ${activeJudgeSubmission.judge?.lastName}`
-            : "Your Evaluation"}
+            ? `${t("evaluationBy")} ${activeJudgeSubmission.judge?.firstName} ${
+                activeJudgeSubmission.judge?.lastName
+              }`
+            : t("yourEvaluation")}
         </h2>
 
         {activeJudgeIndex !== -1 &&
@@ -431,31 +444,33 @@ export default function JudgeSubmissionPage() {
             {activeJudgeSubmission.judgeSubmissionDetails?.map((detail) => (
               <div
                 key={detail.roundMarkCriterion.id}
-                className="mb-4 p-3 bg-gray-50 rounded-lg"
+                className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors duration-300"
               >
-                <div className="flex justify-between items-center mb-2">
-                  <label className="font-medium">
+                <div className="flex flex-col md:flex-row justify-between md:items-center mb-2">
+                  <label className="font-medium dark:text-gray-200 mb-1 md:mb-0">
                     {detail.roundMarkCriterion.name}
-                    <span className="text-sm text-gray-500 ml-2">
-                      (Max: {detail.roundMarkCriterion.maxScore})
+                    <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
+                      ({t("max")}: {detail.roundMarkCriterion.maxScore})
                     </span>
                   </label>
-                  <div className="flex items-center">
+                  <div className="flex items-center mt-1 md:mt-0">
                     <input
                       type="number"
                       value={detail.score}
-                      className="w-20 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-20 p-2 border rounded focus:outline-none dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100 transition-colors duration-300"
                       disabled
                     />
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 mb-2">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                   {detail.roundMarkCriterion.note}
                 </p>
                 {detail.note && (
-                  <div className="border-t pt-2 mt-2">
-                    <p className="text-sm font-medium">Judge's feedback:</p>
-                    <p className="text-sm">{detail.note}</p>
+                  <div className="border-t border-gray-200 dark:border-gray-600 pt-2 mt-2 transition-colors duration-300">
+                    <p className="text-sm font-medium dark:text-gray-200">
+                      {t("judgesFeedback")}:
+                    </p>
+                    <p className="text-sm dark:text-gray-300">{detail.note}</p>
                   </div>
                 )}
               </div>
@@ -463,17 +478,23 @@ export default function JudgeSubmissionPage() {
 
             {/* General Feedback */}
             {activeJudgeSubmission.note && (
-              <div className="mt-4 mb-6 p-3 bg-gray-50 rounded-lg">
-                <p className="font-medium mb-2">General Feedback:</p>
-                <p>{activeJudgeSubmission.note}</p>
+              <div className="mt-4 mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors duration-300">
+                <p className="font-medium mb-2 dark:text-gray-200">
+                  {t("generalFeedback")}:
+                </p>
+                <p className="dark:text-gray-300">
+                  {activeJudgeSubmission.note}
+                </p>
               </div>
             )}
 
             {/* Total Score */}
-            <div className="mt-6 pt-4 border-t">
+            <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 transition-colors duration-300">
               <div className="flex justify-between items-center">
-                <span className="font-bold">Total Score:</span>
-                <span className="text-xl font-bold">
+                <span className="font-bold dark:text-gray-200">
+                  {t("totalScore")}:
+                </span>
+                <span className="text-xl font-bold dark:text-gray-200">
                   {activeJudgeSubmission.score} / {calculateMaxTotalScore()}
                 </span>
               </div>
@@ -487,13 +508,13 @@ export default function JudgeSubmissionPage() {
                 {roundMarkCriteria.map((criterion) => (
                   <div
                     key={criterion.id}
-                    className="mb-4 p-3 bg-gray-50 rounded-lg"
+                    className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors duration-300"
                   >
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="font-medium">
+                    <div className="flex flex-col md:flex-row justify-between md:items-center mb-2">
+                      <label className="font-medium dark:text-gray-200 mb-1 md:mb-0">
                         {criterion.name}
-                        <span className="text-sm text-gray-500 ml-2">
-                          (Max: {criterion.maxScore})
+                        <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
+                          ({t("max")}: {criterion.maxScore})
                         </span>
                       </label>
                       <input
@@ -507,24 +528,24 @@ export default function JudgeSubmissionPage() {
                             Number(e.target.value)
                           )
                         }
-                        className="w-20 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-20 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mt-1 md:mt-0 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100 transition-colors duration-300"
                       />
                     </div>
-                    <p className="text-sm text-gray-500 mb-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                       {criterion.note}
                     </p>
                     <div>
-                      <label className="text-sm font-medium">
-                        Feedback for this criterion:
+                      <label className="text-sm font-medium dark:text-gray-200">
+                        {t("feedbackForCriterion")}:
                       </label>
                       <textarea
                         value={criteriaFeedback[criterion.id] || ""}
                         onChange={(e) =>
                           handleFeedbackChange(criterion.id, e.target.value)
                         }
-                        className="w-full mt-1 p-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full mt-1 p-2 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100 transition-colors duration-300"
                         rows={2}
-                        placeholder="Add specific feedback for this criterion..."
+                        placeholder={t("criterionFeedbackPlaceholder")}
                       />
                     </div>
                   </div>
@@ -532,23 +553,25 @@ export default function JudgeSubmissionPage() {
 
                 {/* General Feedback */}
                 <div className="mb-6">
-                  <label className="block font-medium mb-2">
-                    General Feedback:
+                  <label className="block font-medium mb-2 dark:text-gray-200">
+                    {t("generalFeedback")}:
                   </label>
                   <textarea
                     value={generalFeedback}
                     onChange={(e) => setGeneralFeedback(e.target.value)}
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100 transition-colors duration-300"
                     rows={4}
-                    placeholder="Add your overall feedback about this submission..."
+                    placeholder={t("generalFeedbackPlaceholder")}
                   />
                 </div>
 
                 {/* Total Score */}
-                <div className="mt-6 pt-4 border-t">
+                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 transition-colors duration-300">
                   <div className="flex justify-between items-center">
-                    <span className="font-bold">Total Score:</span>
-                    <span className="text-xl font-bold">
+                    <span className="font-bold dark:text-gray-200">
+                      {t("totalScore")}:
+                    </span>
+                    <span className="text-xl font-bold dark:text-gray-200">
                       {calculateTotalScore()} / {calculateMaxTotalScore()}
                     </span>
                   </div>
@@ -556,29 +579,32 @@ export default function JudgeSubmissionPage() {
 
                 <button
                   onClick={handleSubmit}
-                  disabled={isLoading}
-                  className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-300"
+                  disabled={isSubmitting}
+                  className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-300 dark:bg-blue-700 dark:hover:bg-blue-800 dark:disabled:bg-blue-500 transition-colors duration-300 flex justify-center items-center"
                 >
-                  {isLoading
+                  {isSubmitting && (
+                    <LoadingSpinner size="sm" className="mr-2" />
+                  )}
+                  {isSubmitting
                     ? existingJudgeSubmissionId
-                      ? "Updating..."
-                      : "Submitting..."
+                      ? t("updating")
+                      : t("submitting")
                     : existingJudgeSubmissionId
-                    ? "Update Evaluation"
-                    : "Submit Evaluation"}
+                      ? t("updateEvaluation")
+                      : t("submitEvaluation")}
                 </button>
               </div>
             ) : (
-              <p className="text-red-500">
-                No evaluation criteria available for this round.
+              <p className="text-red-500 dark:text-red-400 transition-colors duration-300">
+                {t("noCriteriaAvailable")}
               </p>
             )}
           </div>
         ) : (
           // Not an assigned judge
-          <div className="p-4 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-red-600">
-              You are not assigned as a judge for this team submission.
+          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md transition-colors duration-300">
+            <p className="text-red-600 dark:text-red-400">
+              {t("notAssignedJudge")}
             </p>
           </div>
         )}
@@ -586,39 +612,36 @@ export default function JudgeSubmissionPage() {
 
       {/* Submission Files */}
       <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-3">Submitted Files</h3>
+        <h3 className="text-lg font-semibold mb-3 dark:text-gray-100">
+          {t("submittedFiles")}
+        </h3>
         {submission.fileUrls && submission.fileUrls.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {submission.fileUrls?.map((file) => (
               <div
                 key={file.id}
-                className="border p-3 rounded flex items-center justify-between hover:bg-gray-50"
+                className="border border-gray-200 dark:border-gray-700 p-3 rounded flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
               >
-                <span className="truncate">{file.fileName}</span>
+                <span className="truncate dark:text-gray-200">
+                  {file.fileName}
+                </span>
                 <a
                   href={file.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline ml-2 flex-shrink-0"
+                  className="text-blue-600 dark:text-blue-400 hover:underline ml-2 flex-shrink-0 transition-colors duration-300"
                 >
-                  Download
+                  {t("download")}
                 </a>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">No files have been submitted.</p>
+          <p className="text-gray-500 dark:text-gray-400 transition-colors duration-300">
+            {t("noFilesSubmitted")}
+          </p>
         )}
       </div>
-
-      {/* API Response Modal */}
-      {/* <ApiResponseModal
-        isOpen={modalState.isOpen}
-        onClose={hideModal}
-        title={modalState.title}
-        message={modalState.message}
-        type={modalState.type}
-      /> */}
     </div>
   );
 }
