@@ -314,5 +314,51 @@
       "offline": "Trực tiếp",
       "hybrid": "Kết hợp"
     }
+  },
+  "roundForm": {
+    "title": {
+      "create": "Tạo vòng mới",
+      "edit": "Chỉnh sửa vòng"
+    },
+    "fields": {
+      "roundTitle": "Tiêu đề vòng",
+      "roundNumber": "Số vòng",
+      "startTime": "Thời gian bắt đầu",
+      "endTime": "Thời gian kết thúc",
+      "status": "Trạng thái",
+      "totalTeam": "Tổng số đội (Số đội tối đa có thể tiến vào vòng sau)"
+    },
+    "status": {
+      "upcoming": "Sắp diễn ra",
+      "ongoing": "Đang diễn ra",
+      "completed": "Đã hoàn thành",
+      "cancelled": "Đã hủy"
+    },
+    "locations": {
+      "addLocations": "Thêm địa điểm",
+      "selectedLocations": "Địa điểm đã chọn",
+      "selectType": "-- Chọn loại --",
+      "remove": "Xóa"
+    },
+    "locationType": {
+      "online": "Trực tuyến",
+      "offline": "Trực tiếp",
+      "hybrid": "Kết hợp"
+    },
+    "buttons": {
+      "cancel": "Hủy",
+      "create": "Tạo vòng",
+      "update": "Cập nhật vòng",
+      "processing": "Đang xử lý..."
+    },
+    "errors": {
+      "endTimeAfterStartTime": "Thời gian kết thúc phải sau thời gian bắt đầu",
+      "negativeTotalTeams": "Tổng số đội không thể là số âm"
+    },
+    "notifications": {
+      "createSuccess": "Tạo vòng thành công",
+      "updateSuccess": "Cập nhật vòng thành công",
+      "error": "Không thể lưu vòng"
+    }
   }
 }

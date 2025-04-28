@@ -6,6 +6,9 @@ import {
   RoundLocation,
   RoundLocationType,
 } from "@/types/entities/roundLocation";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface RoundFormProps {
   isEditing: boolean;
@@ -26,6 +29,9 @@ export default function RoundForm({
   onCancel,
   renderLocationType,
 }: RoundFormProps) {
+  const t = useTranslations("roundForm");
+  const toast = useToast();
+
   // Form state
   const [formData, setFormData] = useState<Partial<Round>>(
     initialData || {
@@ -76,7 +82,7 @@ export default function RoundForm({
     if (startDate && endDate && startDate >= endDate) {
       setFormErrors({
         ...formErrors,
-        endTime: "End time must be after start time",
+        endTime: t("errors.endTimeAfterStartTime"),
       });
     } else if (startDate && endDate) {
       setFormErrors({
@@ -92,7 +98,7 @@ export default function RoundForm({
     if (formData.totalTeam !== undefined && formData.totalTeam < 0) {
       setFormErrors({
         ...formErrors,
-        totalTeam: "Total teams cannot be negative",
+        totalTeam: t("errors.negativeTotalTeams"),
       });
     } else {
       setFormErrors({
@@ -166,7 +172,7 @@ export default function RoundForm({
       if (startDate >= endDate) {
         setFormErrors({
           ...formErrors,
-          endTime: "End time must be after start time",
+          endTime: t("errors.endTimeAfterStartTime"),
         });
         setSubmitting(false);
         return;
@@ -176,7 +182,7 @@ export default function RoundForm({
       if (formData.totalTeam !== undefined && formData.totalTeam < 0) {
         setFormErrors({
           ...formErrors,
-          totalTeam: "Total teams cannot be negative",
+          totalTeam: t("errors.negativeTotalTeams"),
         });
         setSubmitting(false);
         return;
@@ -192,8 +198,19 @@ export default function RoundForm({
         createdAt: formData.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       } as Round;
+
+      // Submit the form and handle the response
       await onSubmit(roundData);
-    } catch (error) {
+
+      // Show success toast after successful submission
+      toast.success(
+        isEditing
+          ? t("notifications.updateSuccess")
+          : t("notifications.createSuccess")
+      );
+    } catch (error: any) {
+      // Show error toast with the error message
+      toast.error(error.message || t("notifications.error"));
       console.error("Form submission error:", error);
     } finally {
       setSubmitting(false);
@@ -201,106 +218,118 @@ export default function RoundForm({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-      <h3 className="text-lg font-medium mb-4">
-        {isEditing ? "Edit Round" : "Create New Round"}
+    <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md mb-6 transition-colors duration-300">
+      <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-gray-100">
+        {isEditing ? t("title.edit") : t("title.create")}
       </h3>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-gray-700 mb-1">Round Title</label>
+            <label className="block text-gray-700 dark:text-gray-300 mb-1">
+              {t("fields.roundTitle")}
+            </label>
             <input
               type="text"
               name="roundTitle"
               value={formData.roundTitle}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors duration-300"
               required
               disabled={submitting}
             />
           </div>
           <div>
-            <label className="block text-gray-700 mb-1">Round Number</label>
+            <label className="block text-gray-700 dark:text-gray-300 mb-1">
+              {t("fields.roundNumber")}
+            </label>
             <input
               type="number"
               name="roundNumber"
               value={formData.roundNumber}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors duration-300"
               min="1"
               required
               disabled={submitting}
             />
           </div>
           <div>
-            <label className="block text-gray-700 mb-1">Start Time</label>
+            <label className="block text-gray-700 dark:text-gray-300 mb-1">
+              {t("fields.startTime")}
+            </label>
             <input
               type="datetime-local"
               name="startTime"
               value={formData.startTime}
               onChange={handleInputChange}
-              className={`w-full p-2 border rounded ${
-                formErrors.startTime ? "border-red-500" : ""
+              className={`w-full p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors duration-300 ${
+                formErrors.startTime ? "border-red-500 dark:border-red-400" : ""
               }`}
               required
               disabled={submitting}
             />
             {formErrors.startTime && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                 {formErrors.startTime}
               </p>
             )}
           </div>
           <div>
-            <label className="block text-gray-700 mb-1">End Time</label>
+            <label className="block text-gray-700 dark:text-gray-300 mb-1">
+              {t("fields.endTime")}
+            </label>
             <input
               type="datetime-local"
               name="endTime"
               value={formData.endTime}
               onChange={handleInputChange}
-              className={`w-full p-2 border rounded ${
-                formErrors.endTime ? "border-red-500" : ""
+              className={`w-full p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors duration-300 ${
+                formErrors.endTime ? "border-red-500 dark:border-red-400" : ""
               }`}
               required
               disabled={submitting}
             />
             {formErrors.endTime && (
-              <p className="text-red-500 text-sm mt-1">{formErrors.endTime}</p>
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+                {formErrors.endTime}
+              </p>
             )}
           </div>
           <div>
-            <label className="block text-gray-700 mb-1">Status</label>
+            <label className="block text-gray-700 dark:text-gray-300 mb-1">
+              {t("fields.status")}
+            </label>
             <select
               name="status"
               value={formData.status}
               onChange={handleInputChange}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors duration-300"
               required
               disabled={submitting}
             >
-              <option value="UPCOMING">Upcoming</option>
-              <option value="ONGOING">Ongoing</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value="UPCOMING">{t("status.upcoming")}</option>
+              <option value="ONGOING">{t("status.ongoing")}</option>
+              <option value="COMPLETED">{t("status.completed")}</option>
+              <option value="CANCELLED">{t("status.cancelled")}</option>
             </select>
           </div>
           <div>
-            <label className="block text-gray-700 mb-1">
-              Total Teams (Max teams that can advance)
+            <label className="block text-gray-700 dark:text-gray-300 mb-1">
+              {t("fields.totalTeam")}
             </label>
             <input
               type="number"
               name="totalTeam"
               value={formData.totalTeam || ""}
               onChange={handleInputChange}
-              className={`w-full p-2 border rounded ${
-                formErrors.totalTeam ? "border-red-500" : ""
+              className={`w-full p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors duration-300 ${
+                formErrors.totalTeam ? "border-red-500 dark:border-red-400" : ""
               }`}
               min="0"
               disabled={submitting}
             />
             {formErrors.totalTeam && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                 {formErrors.totalTeam}
               </p>
             )}
@@ -309,8 +338,8 @@ export default function RoundForm({
 
         {/* Locations Selection */}
         <div className="mb-4">
-          <h4 className="text-md font-medium text-gray-700 mb-2">
-            Add Locations
+          <h4 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {t("locations.addLocations")}
           </h4>
           <div className="space-y-3">
             {locations.map((location) => {
@@ -324,20 +353,22 @@ export default function RoundForm({
               return (
                 <div
                   key={location.id}
-                  className={`p-3 rounded-md border ${
+                  className={`p-3 rounded-md border transition-all duration-300 ${
                     isSelected
-                      ? "border-blue-300 bg-blue-50"
-                      : "border-gray-200 bg-gray-50"
+                      ? "border-blue-300 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                      : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50"
                   }`}
                 >
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <div>
-                      <span className="font-medium">{location.name}</span>
-                      <p className="text-sm text-gray-600">
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {location.name}
+                      </span>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         {location.address}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
                       <select
                         value={selectedType || ""}
                         onChange={(e) =>
@@ -346,21 +377,29 @@ export default function RoundForm({
                             e.target.value as RoundLocationType
                           )
                         }
-                        className="p-1 border rounded text-sm"
+                        className="p-1 border rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 transition-colors duration-300 flex-grow sm:flex-grow-0"
                         disabled={submitting}
+                        aria-label={t("locations.selectType")}
                       >
-                        <option value="">-- Select type --</option>
-                        <option value="ONLINE">Online</option>
-                        <option value="OFFLINE">Offline</option>
-                        <option value="HYBRID">Hybrid</option>
+                        <option value="">{t("locations.selectType")}</option>
+                        <option value="ONLINE">
+                          {t("locationType.online")}
+                        </option>
+                        <option value="OFFLINE">
+                          {t("locationType.offline")}
+                        </option>
+                        <option value="HYBRID">
+                          {t("locationType.hybrid")}
+                        </option>
                       </select>
                       {isSelected && !submitting && (
                         <button
                           type="button"
                           onClick={() => removeLocation(location.id)}
-                          className="text-red-500 hover:text-red-700"
+                          className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-300"
+                          aria-label={t("locations.remove")}
                         >
-                          Remove
+                          {t("locations.remove")}
                         </button>
                       )}
                     </div>
@@ -374,11 +413,11 @@ export default function RoundForm({
         {/* Selected Locations */}
         {formData.roundLocations && formData.roundLocations.length > 0 && (
           <div className="mb-4">
-            <h4 className="text-md font-medium text-gray-700 mb-2">
-              Selected Locations
+            <h4 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t("locations.selectedLocations")}
             </h4>
-            <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
-              <ul className="list-disc pl-5">
+            <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-md border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+              <ul className="list-disc pl-5 text-gray-800 dark:text-gray-200">
                 {formData.roundLocations.map((rl) => (
                   <li key={rl.id} className="mb-1">
                     {rl.location?.name} - {renderLocationType(rl.type)}
@@ -389,18 +428,18 @@ export default function RoundForm({
           </div>
         )}
 
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 mt-6">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100"
+            className="px-4 py-2 border rounded text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-gray-300 dark:border-gray-600 transition-colors duration-300"
             disabled={submitting}
           >
-            Cancel
+            {t("buttons.cancel")}
           </button>
           <button
             type="submit"
-            className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 ${
+            className={`px-4 py-2 bg-blue-500 dark:bg-blue-600 text-white rounded hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors duration-300 ${
               submitting ? "opacity-70 cursor-not-allowed" : ""
             }`}
             disabled={
@@ -410,11 +449,16 @@ export default function RoundForm({
               submitting
             }
           >
-            {submitting
-              ? "Processing..."
-              : isEditing
-              ? "Update Round"
-              : "Create Round"}
+            {submitting ? (
+              <span className="flex items-center justify-center">
+                <LoadingSpinner size="sm" className="mr-2" />
+                {t("buttons.processing")}
+              </span>
+            ) : isEditing ? (
+              t("buttons.update")
+            ) : (
+              t("buttons.create")
+            )}
           </button>
         </div>
       </form>

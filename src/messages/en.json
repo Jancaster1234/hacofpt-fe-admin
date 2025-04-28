@@ -314,5 +314,51 @@
       "offline": "Offline",
       "hybrid": "Hybrid"
     }
+  },
+  "roundForm": {
+    "title": {
+      "create": "Create new round",
+      "edit": "Edit round"
+    },
+    "fields": {
+      "roundTitle": "Round title",
+      "roundNumber": "Round number",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "status": "Status",
+      "totalTeam": "Total teams (Max teams that can advance)"
+    },
+    "status": {
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "locations": {
+      "addLocations": "Add locations",
+      "selectedLocations": "Selected locations",
+      "selectType": "-- Select type --",
+      "remove": "Remove"
+    },
+    "locationType": {
+      "online": "Online",
+      "offline": "Offline",
+      "hybrid": "Hybrid"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create round",
+      "update": "Update round",
+      "processing": "Processing..."
+    },
+    "errors": {
+      "endTimeAfterStartTime": "End time must be after start time",
+      "negativeTotalTeams": "Total teams cannot be negative"
+    },
+    "notifications": {
+      "createSuccess": "Round created successfully",
+      "updateSuccess": "Round updated successfully",
+      "error": "Failed to save round"
+    }
   }
 }
