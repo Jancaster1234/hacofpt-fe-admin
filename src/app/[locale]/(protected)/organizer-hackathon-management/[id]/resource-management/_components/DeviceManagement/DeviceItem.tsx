@@ -11,6 +11,9 @@ import { fileUrlService } from "@/services/fileUrl.service";
 import { userDeviceService } from "@/services/userDevice.service";
 import { userService } from "@/services/user.service";
 import { deviceService } from "@/services/device.service";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface DeviceItemProps {
   device: Device;
@@ -33,6 +36,9 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
   roundTitle,
   locationName,
 }) => {
+  const t = useTranslations("deviceManagement");
+  const toast = useToast();
+
   // Device files state
   const [deviceFiles, setDeviceFiles] = useState<FileUrl[]>([]);
   const [loadingDeviceFiles, setLoadingDeviceFiles] = useState<boolean>(false);
@@ -163,15 +169,19 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
       const response = await deviceService.updateDevice(device.id, deviceData);
 
       if (response.data) {
+        // Show success toast
+        toast.success(response.message || t("deviceUpdatedSuccess"));
+
         // Update the device in the parent component
-        // For now we'll just close the edit form and refresh the page
-        // In a real app, you might want to update the device in the parent's state
         setIsEditing(false);
         window.location.reload();
       }
     } catch (error) {
       console.error(`Error updating device ${device.id}:`, error);
       setUpdateError("Failed to update device. Please try again.");
+
+      // Show error toast
+      toast.error((error as any)?.message || t("deviceUpdateFailed"));
       throw error;
     }
   };
@@ -179,16 +189,19 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
   const handleDeleteDevice = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (window.confirm(`Are you sure you want to delete ${device.name}?`)) {
+    if (window.confirm(t("deleteDeviceConfirm", { deviceName: device.name }))) {
       setIsDeleting(true);
       try {
         const response = await deviceService.deleteDevice(device.id);
         if (response.message) {
+          // Show success toast
+          toast.success(response.message || t("deviceDeletedSuccess"));
           onDeviceDeleted(device.id);
         }
       } catch (error) {
         console.error(`Error deleting device ${device.id}:`, error);
-        alert("Failed to delete device. Please try again.");
+        // Show error toast
+        toast.error((error as any)?.message || t("deviceDeleteFailed"));
       } finally {
         setIsDeleting(false);
       }
@@ -198,7 +211,7 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
   const handleUploadFiles = (e: React.MouseEvent) => {
     e.stopPropagation();
     // Keep the alert for now as requested
-    alert(`Upload files for device ${device.id}`);
+    alert(t("uploadFilesAlert", { deviceId: device.id }));
   };
 
   // Prepare initial data for the form
@@ -215,85 +228,126 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
   // Render status badge
   const renderStatusBadge = (status: string) => {
     const colorMap: { [key: string]: string } = {
-      AVAILABLE: "bg-green-100 text-green-800",
-      IN_USE: "bg-blue-100 text-blue-800",
-      DAMAGED: "bg-red-100 text-red-800",
-      LOST: "bg-orange-100 text-orange-800",
-      RETIRED: "bg-gray-100 text-gray-800",
-      PENDING: "bg-yellow-100 text-yellow-800",
+      AVAILABLE:
+        "bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-100",
+      IN_USE: "bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100",
+      DAMAGED: "bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-100",
+      LOST: "bg-orange-100 dark:bg-orange-800 text-orange-800 dark:text-orange-100",
+      RETIRED: "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100",
+      PENDING:
+        "bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-100",
     };
 
     return (
       <span
         className={`px-2 py-1 rounded-full text-xs ${
-          colorMap[status] || "bg-gray-100 text-gray-800"
-        }`}
+          colorMap[status] ||
+          "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+        } transition-colors duration-200`}
+        aria-label={t(`status.${status.toLowerCase()}`)}
       >
-        {status}
+        {t(`status.${status.toLowerCase()}`)}
       </span>
     );
   };
 
   return (
-    <li className="py-4">
+    <li className="py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0 transition-colors duration-200">
       <div
-        className="flex items-center justify-between cursor-pointer"
+        className="flex flex-col sm:flex-row sm:items-center justify-between cursor-pointer rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 p-2 transition-all duration-200"
         onClick={onToggleExpansion}
+        aria-expanded={isExpanded}
+        role="button"
+        tabIndex={0}
+        onKeyPress={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            onToggleExpansion();
+          }
+        }}
       >
-        <div className="flex items-center">
-          <div className="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center">
-            <span className="text-lg">💻</span>
+        <div className="flex items-center mb-2 sm:mb-0">
+          <div className="flex-shrink-0 h-10 w-10 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center shadow-sm transition-colors duration-200">
+            <span className="text-lg" role="img" aria-label={t("deviceIcon")}>
+              💻
+            </span>
           </div>
           <div className="ml-4">
-            <h4 className="font-medium">{device.name}</h4>
-            <p className="text-sm text-gray-500">{device.description}</p>
+            <h4 className="font-medium text-gray-900 dark:text-white transition-colors duration-200">
+              {device.name}
+            </h4>
+            <p className="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">
+              {device.description}
+            </p>
           </div>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center ml-14 sm:ml-0">
           {renderStatusBadge(device.status)}
-          <span className="ml-2">{isExpanded ? "▼" : "►"}</span>
+          <span
+            className="ml-2 text-gray-500 dark:text-gray-400 transition-transform duration-200"
+            aria-hidden="true"
+          >
+            {isExpanded ? "▼" : "►"}
+          </span>
         </div>
       </div>
 
       {isExpanded && (
-        <>
+        <div className="mt-2 sm:mt-4 ml-4 sm:ml-14 transition-all duration-300 ease-in-out">
           {isEditing && isHackathonCreator ? (
-            <div className="mt-4 ml-14">
-              <h4 className="text-md font-medium mb-4">Edit Device</h4>
+            <div className="mt-4">
+              <h4 className="text-md font-medium mb-4 text-gray-900 dark:text-white transition-colors duration-200">
+                {t("editDevice")}
+              </h4>
               <DeviceForm
                 hackathonId={hackathonId}
                 initialData={initialDeviceData}
                 onSubmit={handleUpdateDevice}
                 onCancel={handleCancelEdit}
-                submitButtonText="Update Device"
+                submitButtonText={t("updateDevice")}
               />
               {updateError && (
-                <div className="mt-2 p-3 bg-red-50 text-red-600 text-sm rounded">
+                <div className="mt-2 p-3 bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-200 text-sm rounded transition-colors duration-200">
                   {updateError}
                 </div>
               )}
             </div>
           ) : (
             <>
-              <div className="mt-4 ml-14 grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-500">Created by</p>
-                  <p>{device.createdByUserName}</p>
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm">
+                <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-md transition-colors duration-200">
+                  <p className="text-gray-500 dark:text-gray-400">
+                    {t("createdBy")}
+                  </p>
+                  <p className="text-gray-900 dark:text-gray-100">
+                    {device.createdByUserName}
+                  </p>
                 </div>
-                <div>
-                  <p className="text-gray-500">Last updated</p>
-                  <p>{new Date(device.updatedAt).toLocaleDateString()}</p>
+                <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-md transition-colors duration-200">
+                  <p className="text-gray-500 dark:text-gray-400">
+                    {t("lastUpdated")}
+                  </p>
+                  <p className="text-gray-900 dark:text-gray-100">
+                    {new Date(device.updatedAt).toLocaleDateString()}
+                  </p>
                 </div>
                 {device.roundId && (
-                  <div>
-                    <p className="text-gray-500">Round</p>
-                    <p>{roundTitle || device.roundId}</p>
+                  <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-md transition-colors duration-200">
+                    <p className="text-gray-500 dark:text-gray-400">
+                      {t("round")}
+                    </p>
+                    <p className="text-gray-900 dark:text-gray-100">
+                      {roundTitle || device.roundId}
+                    </p>
                   </div>
                 )}
                 {device.roundLocationId && (
-                  <div>
-                    <p className="text-gray-500">Location</p>
-                    <p>{locationName || device.roundLocationId}</p>
+                  <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-md transition-colors duration-200">
+                    <p className="text-gray-500 dark:text-gray-400">
+                      {t("location")}
+                    </p>
+                    <p className="text-gray-900 dark:text-gray-100">
+                      {locationName || device.roundLocationId}
+                    </p>
                   </div>
                 )}
               </div>
@@ -316,33 +370,43 @@ const DeviceItem: React.FC<DeviceItemProps> = ({
 
               {/* Only render action buttons if user is hackathon creator */}
               {isHackathonCreator && (
-                <div className="mt-4 ml-14 flex gap-2">
+                <div className="mt-4 flex flex-wrap gap-2">
                   <button
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
+                    className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-1 px-3 rounded text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onClick={handleEditDevice}
                     disabled={isDeleting}
+                    aria-label={t("editDevice")}
                   >
-                    Edit
+                    {t("edit")}
                   </button>
                   <button
-                    className="bg-gray-100 hover:bg-gray-200 text-gray-800 py-1 px-3 rounded text-sm"
+                    className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-1 px-3 rounded text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onClick={handleUploadFiles}
                     disabled={isDeleting || isEditing}
+                    aria-label={t("uploadFiles")}
                   >
-                    Upload Files
+                    {t("uploadFiles")}
                   </button>
                   <button
-                    className="bg-red-100 hover:bg-red-200 text-red-800 py-1 px-3 rounded text-sm"
+                    className="bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800 text-red-800 dark:text-red-100 py-1 px-3 rounded text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500"
                     onClick={handleDeleteDevice}
                     disabled={isDeleting || isEditing}
+                    aria-label={isDeleting ? t("deleting") : t("delete")}
                   >
-                    {isDeleting ? "Deleting..." : "Delete"}
+                    {isDeleting ? (
+                      <span className="flex items-center">
+                        <LoadingSpinner size="sm" className="mr-1" />{" "}
+                        {t("deleting")}
+                      </span>
+                    ) : (
+                      t("delete")
+                    )}
                   </button>
                 </div>
               )}
             </>
           )}
-        </>
+        </div>
       )}
     </li>
   );

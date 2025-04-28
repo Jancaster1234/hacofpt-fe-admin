@@ -726,6 +726,31 @@
     "addNewDevice": "Add new device",
     "deviceCreatedSuccess": "Device created successfully",
     "deviceCreateError": "Failed to create device. Please try again.",
-    "noDevicesFound": "No devices found for this selection."
+    "noDevicesFound": "No devices found for this selection.",
+    "deviceIcon": "Device icon",
+    "editDevice": "Edit device",
+    "updateDevice": "Update device",
+    "deviceUpdatedSuccess": "Device updated successfully",
+    "deviceUpdateFailed": "Failed to update device. Please try again.",
+    "deleteDeviceConfirm": "Are you sure you want to delete {deviceName}?",
+    "deviceDeletedSuccess": "Device deleted successfully",
+    "deviceDeleteFailed": "Failed to delete device. Please try again.",
+    "uploadFilesAlert": "Upload files for device {deviceId}",
+    "createdBy": "Created by",
+    "lastUpdated": "Last updated",
+    "round": "Round",
+    "location": "Location",
+    "edit": "Edit",
+    "uploadFiles": "Upload files",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "status": {
+      "available": "Available",
+      "in_use": "In use",
+      "damaged": "Damaged",
+      "lost": "Lost",
+      "retired": "Retired",
+      "pending": "Pending"
+    }
   }
 }

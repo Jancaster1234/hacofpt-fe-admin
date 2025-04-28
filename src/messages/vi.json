@@ -725,6 +725,30 @@
     "addNewDevice": "Thêm thiết bị mới",
     "deviceCreatedSuccess": "Thiết bị đã được tạo thành công",
     "deviceCreateError": "Không thể tạo thiết bị. Vui lòng thử lại.",
-    "noDevicesFound": "Không tìm thấy thiết bị nào cho lựa chọn này."
+    "noDevicesFound": "Không tìm thấy thiết bị nào cho lựa chọn này.",
+    "deviceIcon": "Biểu tượng thiết bị",
+    "editDevice": "Chỉnh sửa thiết bị",
+    "updateDevice": "Cập nhật thiết bị",
+    "deviceUpdatedSuccess": "Cập nhật thiết bị thành công",
+    "deviceUpdateFailed": "Cập nhật thiết bị thất bại. Vui lòng thử lại.",
+    "deleteDeviceConfirm": "Bạn có chắc chắn muốn xóa {deviceName}?",
+    "deviceDeletedSuccess": "Xóa thiết bị thành công",
+    "deviceDeleteFailed": "Xóa thiết bị thất bại. Vui lòng thử lại.",
+    "uploadFilesAlert": "Tải lên tệp cho thiết bị {deviceId}",
+    "createdBy": "Được tạo bởi",
+    "lastUpdated": "Cập nhật lần cuối",
+    "round": "Vòng",
+    "location": "Địa điểm",
+    "edit": "Sửa",
+    "uploadFiles": "Tải lên tệp",
+    "delete": "Xóa",
+    "deleting": "Đang xóa...",
+    "status": {
+      "available": "Khả dụng",
+      "in_use": "Đang sử dụng",
+      "damaged": "Hư hỏng",
+      "lost": "Mất",
+      "retired": "Ngừng sử dụng",
+      "pending": "Chờ xử lý"
   }
 }
