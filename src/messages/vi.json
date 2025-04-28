@@ -746,10 +746,12 @@
     "status": {
       "available": "Khả dụng",
       "in_use": "Đang sử dụng",
-      "damaged": "Hư hỏng",
-      "lost": "Mất",
       "retired": "Ngừng sử dụng",
-      "pending": "Chờ xử lý"
+      "pending": "Chờ xử lý",
+      "assigned": "Đã giao",
+      "returned": "Đã trả",
+      "lost": "Đã mất",
+      "damaged": "Bị hỏng"
     },
     "deviceManagement": "Quản lý thiết bị",
     "viewOnlyMode": "Bạn đang ở chế độ chỉ xem. Chỉ người tạo hackathon mới có thể tạo, cập nhật hoặc xóa thiết bị.",
@@ -768,7 +770,36 @@
     "noUserAssignments": "Không có phân công người dùng cho thiết bị này",
     "unknownUser": "Người dùng không xác định",
     "assignmentCreatedSuccess": "Đã tạo phân công thành công",
-    "failedToCreateAssignment": "Không thể tạo phân công. Vui lòng thử lại."
+    "failedToCreateAssignment": "Không thể tạo phân công. Vui lòng thử lại.",
+    "form": {
+      "assignedUser": "Người được giao",
+      "selectUser": "Chọn người dùng",
+      "startDateTime": "Ngày & giờ bắt đầu",
+      "startDate": "Ngày bắt đầu",
+      "startTime": "Giờ bắt đầu",
+      "endDateTime": "Ngày & giờ kết thúc",
+      "endDate": "Ngày kết thúc",
+      "endTime": "Giờ kết thúc",
+      "status": "Trạng thái",
+      "uploadFiles": "Tải lên tệp (tùy chọn)",
+      "uploadFilesNote": "Tải lên tệp mới để thêm vào phân công này. Các tệp hiện có sẽ được giữ nguyên.",
+      "loadingUserInfo": "Đang tải thông tin người dùng...",
+      "loadingUsers": "Đang tải danh sách người dùng...",
+      "userAssignmentWarning": "Không thể thay đổi người dùng được phân công sau khi tạo",
+      "cancel": "Hủy",
+      "submitting": "Đang gửi..."
+    },
+    "errors": {
+      "failedToLoadOrganizers": "Không thể tải danh sách người tổ chức. Vui lòng thử lại.",
+      "failedToSubmit": "Không thể gửi biểu mẫu. Vui lòng thử lại.",
+      "userRequired": "Vui lòng chọn người dùng",
+      "datesRequired": "Ngày bắt đầu và kết thúc là bắt buộc",
+      "invalidTimeRange": "Thời gian kết thúc phải sau thời gian bắt đầu"
+    },
+    "toasts": {
+      "deviceAssignmentCreated": "Tạo phân công thiết bị thành công",
+      "deviceAssignmentUpdated": "Cập nhật phân công thiết bị thành công"
+    }
   },
   "feedbackDetails": {
     "error": "Lỗi",

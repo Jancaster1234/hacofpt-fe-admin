@@ -747,10 +747,12 @@
     "status": {
       "available": "Available",
       "in_use": "In use",
-      "damaged": "Damaged",
-      "lost": "Lost",
       "retired": "Retired",
-      "pending": "Pending"
+      "pending": "Pending",
+      "assigned": "Assigned",
+      "returned": "Returned",
+      "lost": "Lost",
+      "damaged": "Damaged"
     },
     "deviceManagement": "Device management",
     "viewOnlyMode": "You are in view-only mode. Only the hackathon creator can create, update, or delete devices.",
@@ -769,7 +771,36 @@
     "noUserAssignments": "No user assignments for this device",
     "unknownUser": "Unknown user",
     "assignmentCreatedSuccess": "Assignment created successfully",
-    "failedToCreateAssignment": "Failed to create assignment. Please try again."
+    "failedToCreateAssignment": "Failed to create assignment. Please try again.",
+    "form": {
+      "assignedUser": "Assigned user",
+      "selectUser": "Select a user",
+      "startDateTime": "Start date & time",
+      "startDate": "Start date",
+      "startTime": "Start time",
+      "endDateTime": "End date & time",
+      "endDate": "End date",
+      "endTime": "End time",
+      "status": "Status",
+      "uploadFiles": "Upload files (optional)",
+      "uploadFilesNote": "Upload new files to add to this assignment. Existing files will be preserved.",
+      "loadingUserInfo": "Loading user information...",
+      "loadingUsers": "Loading users...",
+      "userAssignmentWarning": "User assignments cannot be changed after creation",
+      "cancel": "Cancel",
+      "submitting": "Submitting..."
+    },
+    "errors": {
+      "failedToLoadOrganizers": "Failed to load organizers. Please try again.",
+      "failedToSubmit": "Failed to submit form. Please try again.",
+      "userRequired": "Please select a user",
+      "datesRequired": "Start and end dates are required",
+      "invalidTimeRange": "End time must be after start time"
+    },
+    "toasts": {
+      "deviceAssignmentCreated": "Device assignment created successfully",
+      "deviceAssignmentUpdated": "Device assignment updated successfully"
+    }
   },
   "feedbackDetails": {
     "error": "Error",
