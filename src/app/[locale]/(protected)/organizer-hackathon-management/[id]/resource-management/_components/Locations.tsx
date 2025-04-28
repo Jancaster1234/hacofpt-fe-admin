@@ -5,8 +5,13 @@ import { Location } from "@/types/entities/location";
 import { locationService } from "@/services/location.service";
 import { useApiModal } from "@/hooks/useApiModal";
 import ApiResponseModal from "@/components/common/ApiResponseModal";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function Locations() {
+  const t = useTranslations("locations");
+  const toast = useToast();
   const [locations, setLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -33,10 +38,12 @@ export default function Locations() {
         setLocations(response.data);
       } else {
         showError("Error", "Failed to load locations. Please try again.");
+        toast.error(t("loadError"));
       }
     } catch (error) {
       console.error("Failed to load locations:", error);
       showError("Error", "Failed to load locations. Please try again.");
+      toast.error(t("loadError"));
     } finally {
       setIsLoading(false);
     }
@@ -84,17 +91,17 @@ export default function Locations() {
 
       if (response.data) {
         setLocations([...locations, response.data]);
-        showSuccess(
-          "Success",
-          response.message || "Location created successfully"
-        );
+        showSuccess(t("successTitle"), response.message || t("createSuccess"));
+        toast.success(response.message || t("createSuccess"));
         resetForm();
       } else {
-        showError("Error", "Failed to create location");
+        showError(t("errorTitle"), t("createError"));
+        toast.error(response.message || t("createError"));
       }
     } catch (error: any) {
       console.error("Error creating location:", error);
-      showError("Error", error.message || "Failed to create location");
+      showError(t("errorTitle"), error.message || t("createError"));
+      toast.error(error.message || t("createError"));
     } finally {
       setIsLoading(false);
     }
@@ -124,24 +131,24 @@ export default function Locations() {
         );
 
         setLocations(updatedLocations);
-        showSuccess(
-          "Success",
-          response.message || "Location updated successfully"
-        );
+        showSuccess(t("successTitle"), response.message || t("updateSuccess"));
+        toast.success(response.message || t("updateSuccess"));
         resetForm();
       } else {
-        showError("Error", "Failed to update location");
+        showError(t("errorTitle"), t("updateError"));
+        toast.error(response.message || t("updateError"));
       }
     } catch (error: any) {
       console.error("Error updating location:", error);
-      showError("Error", error.message || "Failed to update location");
+      showError(t("errorTitle"), error.message || t("updateError"));
+      toast.error(error.message || t("updateError"));
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this location?")) return;
+    if (!confirm(t("deleteConfirm"))) return;
 
     setIsLoading(true);
 
@@ -149,13 +156,12 @@ export default function Locations() {
       const response = await locationService.deleteLocation(id);
       // Remove the deleted location from the state
       setLocations(locations.filter((loc) => loc.id !== id));
-      showSuccess(
-        "Success",
-        response.message || "Location deleted successfully"
-      );
+      showSuccess(t("successTitle"), response.message || t("deleteSuccess"));
+      toast.success(response.message || t("deleteSuccess"));
     } catch (error: any) {
       console.error("Error deleting location:", error);
-      showError("Error", error.message || "Failed to delete location");
+      showError(t("errorTitle"), error.message || t("deleteError"));
+      toast.error(error.message || t("deleteError"));
     } finally {
       setIsLoading(false);
     }
@@ -176,90 +182,100 @@ export default function Locations() {
     const isEditing = !!editingLocation;
 
     return (
-      <div className="bg-gray-50 p-4 rounded-md border mb-6">
-        <h3 className="font-semibold text-lg mb-3">
-          {isEditing ? "Update Location" : "Create New Location"}
+      <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700 mb-6 transition-colors duration-200">
+        <h3 className="font-semibold text-lg mb-3 text-gray-800 dark:text-gray-200">
+          {isEditing ? t("updateLocation") : t("createLocation")}
         </h3>
 
-        <form onSubmit={isEditing ? handleUpdateSubmit : handleCreateSubmit}>
-          <div className="space-y-4">
+        <form
+          onSubmit={isEditing ? handleUpdateSubmit : handleCreateSubmit}
+          className="space-y-4"
+        >
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("name")}
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("address")}
+            </label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleInputChange}
+              required
+              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Name
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t("latitude")}
               </label>
               <input
-                type="text"
-                name="name"
-                value={formData.name}
+                type="number"
+                name="latitude"
+                value={formData.latitude}
                 onChange={handleInputChange}
+                step="any"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Address
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t("longitude")}
               </label>
               <input
-                type="text"
-                name="address"
-                value={formData.address}
+                type="number"
+                name="longitude"
+                value={formData.longitude}
                 onChange={handleInputChange}
+                step="any"
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               />
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Latitude
-                </label>
-                <input
-                  type="number"
-                  name="latitude"
-                  value={formData.latitude}
-                  onChange={handleInputChange}
-                  step="any"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
+          <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-4">
+            <button
+              type="button"
+              onClick={resetForm}
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
+            >
+              {t("cancel")}
+            </button>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Longitude
-                </label>
-                <input
-                  type="number"
-                  name="longitude"
-                  value={formData.longitude}
-                  onChange={handleInputChange}
-                  step="any"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={resetForm}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                {isLoading ? "Processing..." : isEditing ? "Update" : "Create"}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-700 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 dark:hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <LoadingSpinner size="sm" className="mr-2" />
+                  {t("processing")}
+                </>
+              ) : isEditing ? (
+                t("update")
+              ) : (
+                t("create")
+              )}
+            </button>
           </div>
         </form>
       </div>
@@ -267,7 +283,7 @@ export default function Locations() {
   };
 
   return (
-    <div className="bg-white shadow-md p-4 rounded-lg">
+    <div className="bg-white dark:bg-gray-900 shadow-md dark:shadow-gray-800 p-4 rounded-lg transition-colors duration-300">
       {/* Modal for API responses */}
       <ApiResponseModal
         isOpen={modalState.isOpen}
@@ -277,15 +293,17 @@ export default function Locations() {
         type={modalState.type}
       />
 
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Available Locations</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          {t("availableLocations")}
+        </h2>
 
         {!showCreateForm && !editingLocation && (
           <button
             onClick={() => setShowCreateForm(true)}
-            className="px-3 py-1 text-sm text-white bg-green-600 rounded-md hover:bg-green-700"
+            className="px-3 py-1 text-sm text-white bg-green-600 dark:bg-green-700 rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors duration-200 shadow-sm"
           >
-            Add Location
+            {t("addLocation")}
           </button>
         )}
       </div>
@@ -293,47 +311,59 @@ export default function Locations() {
       {(showCreateForm || editingLocation) && renderForm()}
 
       {isLoading && !editingLocation && !showCreateForm ? (
-        <p>Loading locations...</p>
+        <div className="flex justify-center py-8">
+          <LoadingSpinner size="lg" showText={true} />
+        </div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-3">
           {locations.length === 0 ? (
-            <p className="text-gray-500">
-              No locations available. Add a new location to get started.
+            <p className="text-gray-500 dark:text-gray-400 py-4 text-center">
+              {t("noLocations")}
             </p>
           ) : (
             locations.map((location) => (
               <li
                 key={location.id}
-                className="border p-3 rounded-md shadow-sm bg-gray-50"
+                className="border dark:border-gray-700 p-3 sm:p-4 rounded-md shadow-sm bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors duration-200"
               >
-                <div className="flex justify-between">
-                  <div>
-                    <h3 className="font-medium text-lg">{location.name}</h3>
-                    <p className="text-gray-600">{location.address}</p>
-                    <p className="text-sm text-gray-500">
-                      Latitude: {location.latitude}, Longitude:{" "}
+                <div className="flex flex-col sm:flex-row justify-between gap-3">
+                  <div className="flex-1">
+                    <h3 className="font-medium text-lg text-gray-900 dark:text-gray-100">
+                      {location.name}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {location.address}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {t("latitude")}: {location.latitude}, {t("longitude")}:{" "}
                       {location.longitude}
                     </p>
-                    <p className="text-xs text-gray-400">
-                      Created: {new Date(location.createdAt).toLocaleString()}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      Updated: {new Date(location.updatedAt).toLocaleString()}
-                    </p>
+                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                      <p>
+                        {t("created")}:{" "}
+                        {new Date(location.createdAt).toLocaleString()}
+                      </p>
+                      <p>
+                        {t("updated")}:{" "}
+                        {new Date(location.updatedAt).toLocaleString()}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2 sm:space-x-3 self-start sm:self-center mt-2 sm:mt-0">
                     <button
                       onClick={() => handleEdit(location)}
-                      className="px-3 py-1 text-xs text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                      className="px-3 py-1 text-xs text-white bg-blue-600 dark:bg-blue-700 rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors duration-200"
+                      aria-label={t("editAriaLabel")}
                     >
-                      Edit
+                      {t("edit")}
                     </button>
                     <button
                       onClick={() => handleDelete(location.id)}
-                      className="px-3 py-1 text-xs text-white bg-red-600 rounded-md hover:bg-red-700"
+                      className="px-3 py-1 text-xs text-white bg-red-600 dark:bg-red-700 rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors duration-200"
+                      aria-label={t("deleteAriaLabel")}
                     >
-                      Delete
+                      {t("delete")}
                     </button>
                   </div>
                 </div>
