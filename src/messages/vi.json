@@ -552,5 +552,37 @@
       "failedToUpdateCriterion": "Không thể cập nhật tiêu chí chấm điểm",
       "failedToDeleteCriterion": "Không thể xóa tiêu chí chấm điểm"
     }
+  },
+  "roundMarkCriterion": {
+    "createCriterion": "Tạo tiêu chí đánh giá",
+    "editCriterion": "Chỉnh sửa tiêu chí đánh giá",
+    "name": "Tên",
+    "maxScore": "Điểm tối đa",
+    "note": "Ghi chú (Tùy chọn)",
+    "namePlaceholder": "ví dụ: Sáng tạo",
+    "notePlaceholder": "Mô tả tiêu chí đánh giá này...",
+    "cancel": "Hủy",
+    "create": "Tạo",
+    "update": "Cập nhật",
+    "processing": "Đang xử lý...",
+    "errors": {
+      "nameRequired": "Tên là bắt buộc",
+      "maxScorePositive": "Điểm tối đa phải lớn hơn 0"
+    }
+  },
+  "feedback": {
+    "hackathonFeedbackTitle": "Phản hồi hackathon",
+    "createFeedbackForm": "Tạo biểu mẫu phản hồi",
+    "noFeedbackAvailable": "Không có phản hồi nào cho hackathon này. Hãy tạo biểu mẫu phản hồi đầu tiên của bạn!",
+    "noHackathonFeedback": "Không có phản hồi hackathon nào.",
+    "hackathonFeedback": "Phản hồi hackathon",
+    "mentor": "Người hướng dẫn",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "failedToLoad": "Không thể tải dữ liệu phản hồi",
+    "errorOccurred": "Đã xảy ra lỗi khi tải dữ liệu phản hồi",
+    "feedbackCreated": "Biểu mẫu phản hồi đã được tạo thành công",
+    "failedToRefresh": "Không thể làm mới dữ liệu phản hồi",
+    "errorRefreshing": "Đã xảy ra lỗi khi làm mới dữ liệu phản hồi"
   }
 }

@@ -553,5 +553,37 @@
       "failedToUpdateCriterion": "Failed to update mark criterion",
       "failedToDeleteCriterion": "Failed to delete mark criterion"
     }
+  },
+  "roundMarkCriterion": {
+    "createCriterion": "Create mark criterion",
+    "editCriterion": "Edit mark criterion",
+    "name": "Name",
+    "maxScore": "Max score",
+    "note": "Note (Optional)",
+    "namePlaceholder": "e.g. Innovation",
+    "notePlaceholder": "Describe what this criterion evaluates...",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update",
+    "processing": "Processing...",
+    "errors": {
+      "nameRequired": "Name is required",
+      "maxScorePositive": "Max score must be greater than 0"
+    }
+  },
+  "feedback": {
+    "hackathonFeedbackTitle": "Hackathon feedback",
+    "createFeedbackForm": "Create feedback form",
+    "noFeedbackAvailable": "No feedback available for this hackathon. Create your first feedback form!",
+    "noHackathonFeedback": "No hackathon feedback available.",
+    "hackathonFeedback": "Hackathon feedback",
+    "mentor": "Mentor",
+    "loading": "Loading...",
+    "error": "Error",
+    "failedToLoad": "Failed to load feedback data",
+    "errorOccurred": "An error occurred while fetching feedback data",
+    "feedbackCreated": "Feedback form created successfully",
+    "failedToRefresh": "Failed to refresh feedback data",
+    "errorRefreshing": "An error occurred while refreshing feedback data"
   }
 }

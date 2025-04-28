@@ -1,4 +1,3 @@
-// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Feedback.tsx
 import React, { useState, useEffect } from "react";
 import { Tab } from "@headlessui/react";
 import { feedbackService } from "@/services/feedback.service";
@@ -8,6 +7,9 @@ import { useAuth } from "@/hooks/useAuth_v0";
 import FeedbackDetails from "./FeedbackDetails";
 import CreateFeedbackForm from "./CreateFeedbackForm";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface FeedbackProps {
   hackathonId: string;
@@ -25,15 +27,16 @@ export default function Feedback({ hackathonId }: FeedbackProps) {
   >({});
   const { showModal } = useApiModal();
   const { user } = useAuth();
+  const t = useTranslations("feedback");
+  const toast = useToast();
 
   // Fetch all feedbacks when component mounts
   useEffect(() => {
     const fetchFeedbacks = async () => {
       setIsLoading(true);
       try {
-        const response = await feedbackService.getFeedbacksByHackathonId(
-          hackathonId
-        );
+        const response =
+          await feedbackService.getFeedbacksByHackathonId(hackathonId);
         if (response.data) {
           setFeedbacks(response.data);
 
@@ -56,16 +59,16 @@ export default function Feedback({ hackathonId }: FeedbackProps) {
           setMentorFeedbacks(mentorFeedbacksMap);
         } else {
           showModal({
-            title: "Error",
-            message: "Failed to load feedback data",
+            title: t("error"),
+            message: t("failedToLoad"),
             type: "error",
           });
         }
       } catch (error) {
         console.error("Error fetching feedbacks:", error);
         showModal({
-          title: "Error",
-          message: "An error occurred while fetching feedback data",
+          title: t("error"),
+          message: t("errorOccurred"),
           type: "error",
         });
       } finally {
@@ -74,13 +77,17 @@ export default function Feedback({ hackathonId }: FeedbackProps) {
     };
 
     fetchFeedbacks();
-  }, [hackathonId, showModal]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hackathonId, showModal]); // Do not include toast in dependency array
 
-  const handleFeedbackCreated = () => {
+  const handleFeedbackCreated = async () => {
     // Refresh feedbacks after creating a new one
     setShowCreateForm(false);
-    // Refetch feedbacks
-    feedbackService.getFeedbacksByHackathonId(hackathonId).then((response) => {
+    setIsLoading(true);
+    try {
+      // Refetch feedbacks
+      const response =
+        await feedbackService.getFeedbacksByHackathonId(hackathonId);
       if (response.data) {
         setFeedbacks(response.data);
 
@@ -101,25 +108,25 @@ export default function Feedback({ hackathonId }: FeedbackProps) {
           }
         });
         setMentorFeedbacks(mentorFeedbacksMap);
-      }
-    });
-  };
 
-  if (isLoading) {
-    return (
-      <div className="bg-white p-6 rounded-lg shadow-sm">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        </div>
-      </div>
-    );
-  }
+        // Show success toast only in response to user action
+        toast.success(response.message || t("feedbackCreated"));
+      } else {
+        toast.error(response.message || t("failedToRefresh"));
+      }
+    } catch (error: any) {
+      console.error("Error refreshing feedbacks:", error);
+      toast.error(error.message || t("errorRefreshing"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Generate tabs for each mentor feedback category
   const tabCategories = [
-    { name: "Hackathon Feedback", type: "hackathon" },
+    { name: t("hackathonFeedback"), type: "hackathon" },
     ...Object.keys(mentorFeedbacks).map((mentorId) => ({
-      name: `Mentor: ${
+      name: `${t("mentor")}: ${
         mentorFeedbacks[mentorId][0]?.mentor?.username || mentorId
       }`,
       type: "mentor",
@@ -128,12 +135,17 @@ export default function Feedback({ hackathonId }: FeedbackProps) {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Hackathon Feedback</h2>
+    <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm transition-colors duration-200">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          {t("hackathonFeedbackTitle")}
+        </h2>
         {!showCreateForm && (
-          <Button onClick={() => setShowCreateForm(true)}>
-            Create Feedback Form
+          <Button
+            onClick={() => setShowCreateForm(true)}
+            className="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white transition-colors"
+          >
+            {t("createFeedbackForm")}
           </Button>
         )}
       </div>
@@ -144,14 +156,17 @@ export default function Feedback({ hackathonId }: FeedbackProps) {
           onFeedbackCreated={handleFeedbackCreated}
           onCancel={() => setShowCreateForm(false)}
         />
+      ) : isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <LoadingSpinner size="lg" showText />
+        </div>
       ) : feedbacks.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          No feedback available for this hackathon. Create your first feedback
-          form!
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          {t("noFeedbackAvailable")}
         </div>
       ) : (
         <Tab.Group>
-          <Tab.List className="flex space-x-1 border-b">
+          <Tab.List className="flex flex-wrap space-x-1 border-b dark:border-gray-700 overflow-x-auto">
             {tabCategories.map((category) => (
               <Tab
                 key={
@@ -160,10 +175,10 @@ export default function Feedback({ hackathonId }: FeedbackProps) {
                     : "hackathon"
                 }
                 className={({ selected }) =>
-                  `py-2 px-4 text-sm font-medium leading-5 text-gray-700 border-b-2 ${
+                  `py-2 px-3 sm:px-4 text-sm font-medium leading-5 text-gray-700 dark:text-gray-300 border-b-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all whitespace-nowrap ${
                     selected
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent hover:text-gray-900 hover:border-gray-300"
+                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                      : "border-transparent hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600"
                   }`
                 }
               >
@@ -175,8 +190,8 @@ export default function Feedback({ hackathonId }: FeedbackProps) {
             {/* Hackathon Feedback Panel */}
             <Tab.Panel>
               {hackathonFeedbacks.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  No hackathon feedback available.
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  {t("noHackathonFeedback")}
                 </div>
               ) : (
                 <div className="space-y-6">
