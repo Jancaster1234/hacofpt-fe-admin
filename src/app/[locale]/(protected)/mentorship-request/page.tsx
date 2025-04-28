@@ -241,22 +241,6 @@ export default function MentorshipRequestsPage() {
         {t("pageTitle")}
       </h1>
 
-      {/* Language Switcher */}
-      <div className="flex justify-center mb-4 gap-2">
-        <Link
-          href="/en/mentorship-request"
-          className="px-3 py-1 rounded bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors duration-300"
-        >
-          English
-        </Link>
-        <Link
-          href="/vi/mentorship-request"
-          className="px-3 py-1 rounded bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors duration-300"
-        >
-          Tiếng Việt
-        </Link>
-      </div>
-
       {isLoading ? (
         <div className="flex flex-col justify-center items-center h-32">
           <LoadingSpinner size="lg" showText={true} />
