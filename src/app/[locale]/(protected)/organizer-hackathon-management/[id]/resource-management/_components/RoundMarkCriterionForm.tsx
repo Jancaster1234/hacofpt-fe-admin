@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/RoundMarkCriterionForm.tsx
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { RoundMarkCriterion } from "@/types/entities/roundMarkCriterion";

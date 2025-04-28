@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/DeviceManagement/DeviceForm.tsx
 import React, { useState, useEffect } from "react";
 import { DeviceStatus } from "@/types/entities/device";
 import { Round } from "@/types/entities/round";

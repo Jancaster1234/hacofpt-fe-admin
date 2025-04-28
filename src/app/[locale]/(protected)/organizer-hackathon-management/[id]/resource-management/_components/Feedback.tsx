@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Feedback.tsx
 import React, { useState, useEffect } from "react";
 import { Tab } from "@headlessui/react";
 import { feedbackService } from "@/services/feedback.service";
