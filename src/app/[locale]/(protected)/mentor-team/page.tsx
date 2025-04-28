@@ -6,7 +6,6 @@ import { useAuth } from "@/hooks/useAuth_v0";
 import { MentorTeam } from "@/types/entities/mentorTeam";
 import { MentorshipSessionRequest } from "@/types/entities/mentorshipSessionRequest";
 import { ChevronDown, ChevronUp, Users, Info } from "lucide-react";
-import ApiResponseModal from "@/components/common/ApiResponseModal";
 import { useApiModal } from "@/hooks/useApiModal";
 import { mentorTeamService } from "@/services/mentorTeam.service";
 import { mentorshipSessionRequestService } from "@/services/mentorshipSessionRequest.service";
@@ -103,14 +102,17 @@ export default function MentorTeamsPage() {
   };
 
   // Group mentor teams by hackathon title
-  const groupedByHackathon = mentorTeams.reduce((acc, mentorTeam) => {
-    const hackathonTitle = mentorTeam.hackathon?.title || "Unknown Hackathon";
-    if (!acc[hackathonTitle]) {
-      acc[hackathonTitle] = [];
-    }
-    acc[hackathonTitle].push(mentorTeam);
-    return acc;
-  }, {} as Record<string, MentorTeam[]>);
+  const groupedByHackathon = mentorTeams.reduce(
+    (acc, mentorTeam) => {
+      const hackathonTitle = mentorTeam.hackathon?.title || "Unknown Hackathon";
+      if (!acc[hackathonTitle]) {
+        acc[hackathonTitle] = [];
+      }
+      acc[hackathonTitle].push(mentorTeam);
+      return acc;
+    },
+    {} as Record<string, MentorTeam[]>
+  );
 
   const toggleHackathon = (title: string) => {
     setExpandedHackathons((prev) => ({
@@ -436,15 +438,6 @@ export default function MentorTeamsPage() {
           ))}
         </div>
       )}
-
-      {/* Include the ApiResponseModal component
-      <ApiResponseModal
-        isOpen={modalState.isOpen}
-        onClose={hideModal}
-        title={modalState.title}
-        message={modalState.message}
-        type={modalState.type}
-      /> */}
     </div>
   );
 }

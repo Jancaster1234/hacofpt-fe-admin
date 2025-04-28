@@ -2,6 +2,9 @@
 import React, { useState } from "react";
 import { UserDevice } from "@/types/entities/userDevice";
 import { FileUploader } from "../../../../../../../../components/common/FileUploader";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface UserDeviceTrackFormProps {
   userDeviceId: string;
@@ -42,6 +45,9 @@ const UserDeviceTrackForm: React.FC<UserDeviceTrackFormProps> = ({
   onCancel,
   submitButtonText,
 }) => {
+  const t = useTranslations("deviceManagement");
+  const toast = useToast();
+
   const [deviceQualityStatus, setDeviceQualityStatus] = useState<
     | "EXCELLENT"
     | "GOOD"
@@ -69,8 +75,11 @@ const UserDeviceTrackForm: React.FC<UserDeviceTrackFormProps> = ({
         note,
         files,
       });
+      toast.success(t("deviceStatusUpdateSuccess"));
     } catch (err: any) {
-      setError(err.message || "Failed to submit form. Please try again.");
+      const errorMessage = err.message || t("deviceStatusUpdateError");
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -81,44 +90,51 @@ const UserDeviceTrackForm: React.FC<UserDeviceTrackFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 transition-colors duration-300"
+    >
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Device Quality Status
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {t("deviceQualityStatus")}
         </label>
         <select
           value={deviceQualityStatus}
           onChange={(e) => setDeviceQualityStatus(e.target.value as any)}
-          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm 
+          focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white
+          transition-colors duration-300"
           required
         >
-          <option value="EXCELLENT">Excellent</option>
-          <option value="GOOD">Good</option>
-          <option value="FAIR">Fair</option>
-          <option value="DAMAGED">Damaged</option>
-          <option value="NEEDS_REPAIR">Needs Repair</option>
-          <option value="REPAIRING">Repairing</option>
-          <option value="REPAIRED">Repaired</option>
-          <option value="LOST">Lost</option>
+          <option value="EXCELLENT">{t("excellent")}</option>
+          <option value="GOOD">{t("good")}</option>
+          <option value="FAIR">{t("fair")}</option>
+          <option value="DAMAGED">{t("damaged")}</option>
+          <option value="NEEDS_REPAIR">{t("needsRepair")}</option>
+          <option value="REPAIRING">{t("repairing")}</option>
+          <option value="REPAIRED">{t("repaired")}</option>
+          <option value="LOST">{t("lost")}</option>
         </select>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Note
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {t("note")}
         </label>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm 
+          focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white
+          transition-colors duration-300"
           rows={3}
-          placeholder="Add any additional notes about the device condition"
+          placeholder={t("addNoteAboutDevice")}
         ></textarea>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Attach Files
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {t("attachFiles")}
         </label>
         <FileUploader
           onFilesChange={handleFileChange}
@@ -129,26 +145,38 @@ const UserDeviceTrackForm: React.FC<UserDeviceTrackFormProps> = ({
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 text-red-600 text-sm rounded">
+        <div className="p-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm rounded transition-colors duration-300">
           {error}
         </div>
       )}
 
-      <div className="flex justify-end space-x-2">
+      <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
         <button
           type="button"
           onClick={onCancel}
-          className="px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+          className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
+          text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 
+          hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
           disabled={isSubmitting}
         >
-          Cancel
+          {t("cancel")}
         </button>
         <button
           type="submit"
-          className="px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium 
+          text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
+          dark:focus:ring-offset-gray-800 transition-colors duration-300"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Submitting..." : submitButtonText}
+          {isSubmitting ? (
+            <div className="flex items-center justify-center">
+              <LoadingSpinner size="sm" className="mr-2" />
+              <span>{t("submitting")}</span>
+            </div>
+          ) : (
+            submitButtonText
+          )}
         </button>
       </div>
     </form>
