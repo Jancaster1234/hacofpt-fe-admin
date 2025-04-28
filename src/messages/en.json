@@ -712,5 +712,20 @@
     "validationErrorQuestions": "All feedback questions must have content",
     "validationErrorMentorSelection": "Please select a mentor for mentor feedback",
     "errorGeneric": "An error occurred while creating feedback"
+  },
+  "deviceManagement": {
+    "allDevices": "All devices",
+    "locations": "Locations",
+    "allLocations": "All locations",
+    "unknownLocation": "Unknown location",
+    "devicesAtLocation": "Devices at {location}",
+    "devicesForRound": "Devices for {round}",
+    "allHackathonDevices": "All hackathon devices",
+    "cancel": "Cancel",
+    "addDevice": "Add device",
+    "addNewDevice": "Add new device",
+    "deviceCreatedSuccess": "Device created successfully",
+    "deviceCreateError": "Failed to create device. Please try again.",
+    "noDevicesFound": "No devices found for this selection."
   }
 }

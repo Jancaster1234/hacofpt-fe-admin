@@ -5,6 +5,9 @@ import { Round } from "@/types/entities/round";
 import DeviceItem from "./DeviceItem";
 import DeviceForm from "./DeviceForm";
 import { deviceService } from "@/services/device.service";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface DeviceListProps {
   devices: Device[];
@@ -25,9 +28,12 @@ const DeviceList: React.FC<DeviceListProps> = ({
   onDeviceDeleted,
   isHackathonCreator,
 }) => {
+  const t = useTranslations("deviceManagement");
+  const toast = useToast();
   const [expandedDeviceIds, setExpandedDeviceIds] = useState<string[]>([]);
   const [isAddingDevice, setIsAddingDevice] = useState<boolean>(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const toggleDeviceExpansion = (deviceId: string) => {
     if (expandedDeviceIds.includes(deviceId)) {
@@ -46,18 +52,18 @@ const DeviceList: React.FC<DeviceListProps> = ({
       (rl) => rl.id === activeLocationId
     );
 
-    return roundLocation?.location?.name || "Unknown Location";
+    return roundLocation?.location?.name || t("unknownLocation");
   };
 
   const getTitle = () => {
     if (activeRound) {
       if (activeLocationId) {
-        return `Devices at ${getLocationName()}`;
+        return t("devicesAtLocation", { location: getLocationName() });
       } else {
-        return `Devices for ${activeRound.roundTitle}`;
+        return t("devicesForRound", { round: activeRound.roundTitle });
       }
     } else {
-      return "All Hackathon Devices";
+      return t("allHackathonDevices");
     }
   };
 
@@ -68,6 +74,9 @@ const DeviceList: React.FC<DeviceListProps> = ({
 
   const handleSubmitDevice = async (formData: any) => {
     try {
+      setIsSubmitting(true);
+      setFormError(null);
+
       const deviceData = {
         hackathonId,
         roundId: formData.roundId || "",
@@ -84,11 +93,15 @@ const DeviceList: React.FC<DeviceListProps> = ({
       if (response.data) {
         onDeviceAdded(response.data);
         toggleAddDeviceForm();
+        toast.success(response.message || t("deviceCreatedSuccess"));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating device:", error);
-      setFormError("Failed to create device. Please try again.");
-      throw error;
+      const errorMessage = error.message || t("deviceCreateError");
+      setFormError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -115,36 +128,47 @@ const DeviceList: React.FC<DeviceListProps> = ({
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium">{getTitle()}</h3>
+    <div className="transition-colors duration-200">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+        <h3 className="text-base sm:text-lg font-medium text-gray-800 dark:text-gray-200">
+          {getTitle()}
+        </h3>
 
         {isHackathonCreator && (
           <button
             className={`${
               isAddingDevice
-                ? "bg-gray-500 hover:bg-gray-600"
-                : "bg-blue-500 hover:bg-blue-600"
-            } text-white py-1 px-4 rounded-md text-sm`}
+                ? "bg-gray-500 dark:bg-gray-600 hover:bg-gray-600 dark:hover:bg-gray-700"
+                : "bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700"
+            } text-white py-1 px-3 sm:px-4 rounded-md text-xs sm:text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-white dark:focus:ring-offset-gray-900`}
             onClick={toggleAddDeviceForm}
+            disabled={isSubmitting}
           >
-            {isAddingDevice ? "Cancel" : "Add Device"}
+            {isAddingDevice ? t("cancel") : t("addDevice")}
           </button>
         )}
       </div>
 
       {isAddingDevice && isHackathonCreator && (
-        <div className="mb-6">
-          <h4 className="text-md font-medium mb-4">Add New Device</h4>
-          <DeviceForm
-            hackathonId={hackathonId}
-            activeRound={activeRound}
-            activeRoundLocationId={activeLocationId} // Pass the roundLocationId
-            onSubmit={handleSubmitDevice}
-            onCancel={toggleAddDeviceForm}
-          />
+        <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm transition-colors duration-200">
+          <h4 className="text-sm sm:text-md font-medium mb-4 text-gray-800 dark:text-gray-200">
+            {t("addNewDevice")}
+          </h4>
+          {isSubmitting ? (
+            <div className="flex justify-center items-center py-8">
+              <LoadingSpinner size="md" showText />
+            </div>
+          ) : (
+            <DeviceForm
+              hackathonId={hackathonId}
+              activeRound={activeRound}
+              activeRoundLocationId={activeLocationId} // Pass the roundLocationId
+              onSubmit={handleSubmitDevice}
+              onCancel={toggleAddDeviceForm}
+            />
+          )}
           {formError && (
-            <div className="mt-2 p-3 bg-red-50 text-red-600 text-sm rounded">
+            <div className="mt-2 p-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs sm:text-sm rounded transition-colors duration-200">
               {formError}
             </div>
           )}
@@ -152,11 +176,13 @@ const DeviceList: React.FC<DeviceListProps> = ({
       )}
 
       {devices.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-500">No devices found for this selection.</p>
+        <div className="text-center py-6 sm:py-8 bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors duration-200">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            {t("noDevicesFound")}
+          </p>
         </div>
       ) : (
-        <ul className="divide-y divide-gray-200">
+        <ul className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-lg shadow-sm transition-colors duration-200">
           {devices.map((device) => {
             const { roundTitle, locationName } = getDeviceInfo(device);
             return (

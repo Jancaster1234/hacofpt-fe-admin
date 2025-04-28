@@ -711,5 +711,20 @@
     "validationErrorQuestions": "Tất cả các câu hỏi phản hồi phải có nội dung",
     "validationErrorMentorSelection": "Vui lòng chọn người hướng dẫn cho phản hồi của mentor",
     "errorGeneric": "Đã xảy ra lỗi khi tạo phản hồi"
+  },
+  "deviceManagement": {
+    "allDevices": "Tất cả thiết bị",
+    "locations": "Địa điểm",
+    "allLocations": "Tất cả địa điểm",
+    "unknownLocation": "Địa điểm không xác định",
+    "devicesAtLocation": "Thiết bị tại {location}",
+    "devicesForRound": "Thiết bị cho {round}",
+    "allHackathonDevices": "Tất cả thiết bị hackathon",
+    "cancel": "Hủy",
+    "addDevice": "Thêm thiết bị",
+    "addNewDevice": "Thêm thiết bị mới",
+    "deviceCreatedSuccess": "Thiết bị đã được tạo thành công",
+    "deviceCreateError": "Không thể tạo thiết bị. Vui lòng thử lại.",
+    "noDevicesFound": "Không tìm thấy thiết bị nào cho lựa chọn này."
   }
 }
