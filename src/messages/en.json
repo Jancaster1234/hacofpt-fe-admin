@@ -594,6 +594,48 @@
       "allocationDeleted": "Allocation deleted successfully"
     }
   },
+  "sponsorshipHackathon": {
+    "editAllocation": "Edit allocation",
+    "addNewAllocation": "Add new allocation",
+    "totalMoney": "Total money ($)",
+    "moneyHelperText": "Enter the amount of money allocated for this sponsorship",
+    "cancel": "Cancel",
+    "update": "Update",
+    "create": "Create",
+    "saveError": "Failed to save sponsorship allocation. Please try again later.",
+    "updateSuccess": "Sponsorship allocation updated successfully",
+    "createSuccess": "Sponsorship allocation created successfully"
+  },
+  "threadPostReport": {
+    "management": "Thread post report management",
+    "welcome": "Welcome, {name}! Manage reported thread posts below.",
+    "noReports": "No thread post reports found.",
+    "tableHeaders": {
+      "id": "ID",
+      "threadPostId": "Thread post ID",
+      "reason": "Reason",
+      "status": "Status",
+      "createdBy": "Created by",
+      "createdAt": "Created at",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "reviewed": "Reviewed",
+      "dismissed": "Dismissed"
+    },
+    "actions": {
+      "markReviewed": "Mark reviewed",
+      "dismiss": "Dismiss",
+      "updating": "Updating...",
+      "processed": "Already processed"
+    },
+    "loading": "Loading thread post reports...",
+    "error": "Failed to fetch thread post reports",
+    "tryAgain": "Try again",
+    "updateSuccess": "Report status updated successfully",
+    "updateError": "Failed to update report status"
+  },
   "locations": {
     "availableLocations": "Available locations",
     "addLocation": "Add location",

@@ -593,6 +593,48 @@
       "allocationDeleted": "Đã xóa phân bổ thành công"
     }
   },
+  "sponsorshipHackathon": {
+    "editAllocation": "Chỉnh sửa phân bổ",
+    "addNewAllocation": "Thêm phân bổ mới",
+    "totalMoney": "Tổng tiền ($)",
+    "moneyHelperText": "Nhập số tiền được phân bổ cho tài trợ này",
+    "cancel": "Hủy",
+    "update": "Cập nhật",
+    "create": "Tạo mới",
+    "saveError": "Không thể lưu phân bổ tài trợ. Vui lòng thử lại sau.",
+    "updateSuccess": "Cập nhật phân bổ tài trợ thành công",
+    "createSuccess": "Tạo mới phân bổ tài trợ thành công"
+  },
+  "threadPostReport": {
+    "management": "Quản lý báo cáo bài đăng",
+    "welcome": "Xin chào, {name}! Quản lý các bài đăng bị báo cáo dưới đây.",
+    "noReports": "Không tìm thấy báo cáo bài đăng nào.",
+    "tableHeaders": {
+      "id": "ID",
+      "threadPostId": "ID bài đăng",
+      "reason": "Lý do",
+      "status": "Trạng thái",
+      "createdBy": "Tạo bởi",
+      "createdAt": "Tạo lúc",
+      "actions": "Hành động"
+    },
+    "status": {
+      "pending": "Đang chờ",
+      "reviewed": "Đã xem xét",
+      "dismissed": "Đã bỏ qua"
+    },
+    "actions": {
+      "markReviewed": "Đánh dấu đã xem",
+      "dismiss": "Bỏ qua",
+      "updating": "Đang cập nhật...",
+      "processed": "Đã xử lý"
+    },
+    "loading": "Đang tải báo cáo bài đăng...",
+    "error": "Không thể tải báo cáo bài đăng",
+    "tryAgain": "Thử lại",
+    "updateSuccess": "Cập nhật trạng thái báo cáo thành công",
+    "updateError": "Không thể cập nhật trạng thái báo cáo"
+  },
   "locations": {
     "availableLocations": "Các địa điểm có sẵn",
     "addLocation": "Thêm địa điểm",
