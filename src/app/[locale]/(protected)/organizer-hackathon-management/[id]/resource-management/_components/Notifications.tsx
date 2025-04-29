@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Notifications.tsx
+// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Notifications.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -170,7 +170,7 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
         setNotifications([data, ...notifications]);
 
         // Send WebSocket notification to each recipient
-        if (recipientType === "users") {
+        if (recipientType === "users" && notificationMethod === "IN_APP") {
           selectedRecipients.forEach(recipient => {
 
             // Gửi qua WebSocket thay vì gọi API trực tiếp
@@ -472,26 +472,71 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
                 </div>
               </div>
 
-              <div className="mb-3">
-                <p className="text-gray-800 font-medium">
+              <div className="mb-3 relative group w-full">
+                <p
+                  className="text-gray-800 font-medium line-clamp-2 w-full break-all cursor-pointer"
+                >
                   {notification.content}
                 </p>
+                <div
+                  className="absolute left-0 z-50 hidden group-hover:block bg-black text-white text-xs rounded px-3 py-2 shadow-lg max-w-xs w-max break-words"
+                  style={{ top: '100%', marginTop: 4 }}
+                >
+                  {notification.content}
+                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm space-y-2 sm:space-y-0">
-                <div className="flex items-center">
-                  <span className="text-gray-600 mr-2">To:</span>
-                  <span className="font-medium text-gray-800">
-                    {[
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    const recipients = [
                       ...new Set(
                         notification.notificationDeliveries.flatMap((d) =>
-                          d.recipients.map(
-                            (r) => `${r.firstName} ${r.lastName}`
-                          )
+                          d.recipients.map((r) => `${r.firstName} ${r.lastName}`)
                         )
                       ),
-                    ].join(", ")}
-                  </span>
+                    ];
+                    const maxTags = 3;
+                    const visibleRecipients = recipients.slice(0, maxTags);
+                    const hiddenRecipients = recipients.slice(maxTags);
+                    const tagColors = [
+                      "bg-blue-100 text-blue-800",
+                      "bg-green-100 text-green-800",
+                      "bg-purple-100 text-purple-800",
+                      "bg-pink-100 text-pink-800",
+                      "bg-yellow-100 text-yellow-800",
+                    ];
+                    return (
+                      <>
+                        {visibleRecipients.map((name, idx) => (
+                          <span
+                            key={idx}
+                            className={`px-2 py-1 rounded text-xs font-medium max-w-[120px] truncate inline-block ${tagColors[idx % tagColors.length]}`}
+                            title={name}
+                          >
+                            {name}
+                          </span>
+                        ))}
+                        {hiddenRecipients.length > 0 && (
+                          <span className="relative group">
+                            <span
+                              className="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700 cursor-pointer"
+                            >
+                              +{hiddenRecipients.length}
+                            </span>
+                            <div
+                              className="absolute left-0 z-50 hidden group-hover:block bg-black text-white text-xs rounded px-3 py-2 shadow-lg max-w-xs w-max break-words"
+                              style={{ top: '100%', marginTop: 4 }}
+                            >
+                              {hiddenRecipients.map((name, idx) => (
+                                <div key={idx}>{name}</div>
+                              ))}
+                            </div>
+                          </span>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
