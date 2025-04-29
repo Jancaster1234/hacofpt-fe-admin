@@ -16,7 +16,7 @@ import { MentorTeamLimit } from "./mentorTeamLimit";
 import { Schedule } from "./schedule";
 import { FileUrl } from "./fileUrl";
 
-export type HackathonStatus = "DRAFT" | "OPEN" | "ONGOING" | "CLOSED"; // Update this enum based on your actual Status enum if different
+export type HackathonStatus = "ACTIVE" | "INACTIVE"; // Update this enum based on your actual Status enum if different
 
 export type Hackathon = {
   id: string;
