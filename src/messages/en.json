@@ -266,7 +266,7 @@
   "blogPost": {
     "title": "Title",
     "titlePlaceholder": "Blog post title",
-    "slug": "Slug (optional)",
+    "slug": "Slug",
     "slugPlaceholder": "blog-post-slug",
     "bannerImage": "Banner Image",
     "bannerImagePlaceholder": "https://example.com/image.jpg",

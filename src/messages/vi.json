@@ -669,7 +669,7 @@
   "blogPost": {
     "title": "Tiêu đề",
     "titlePlaceholder": "Tiêu đề bài viết",
-    "slug": "Đường dẫn (tùy chọn)",
+    "slug": "Đường dẫn",
     "slugPlaceholder": "duong-dan-bai-viet",
     "bannerImage": "Ảnh bìa",
     "bannerImagePlaceholder": "https://example.com/image.jpg",

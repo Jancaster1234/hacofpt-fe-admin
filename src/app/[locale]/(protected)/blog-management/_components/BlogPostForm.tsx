@@ -267,16 +267,18 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
                         {t("preview")}:
                       </p>
                       <div className="w-full overflow-hidden rounded-md">
-                        <Image
-                          src={previewImage}
-                          alt={t("bannerPreviewAlt")}
-                          width={1200}
-                          height={630}
-                          className="w-full h-auto"
-                          style={{ objectFit: "contain" }}
-                          onError={() => setPreviewImage(null)}
-                          unoptimized
-                        />
+                        <div className="w-full sm:w-full md:w-full lg:w-3/4 xl:w-2/3 mx-auto">
+                          <Image
+                            src={previewImage}
+                            alt={t("bannerPreviewAlt")}
+                            width={1200}
+                            height={630}
+                            className="w-full h-auto rounded-md"
+                            style={{ objectFit: "contain" }}
+                            onError={() => setPreviewImage(null)}
+                            unoptimized
+                          />
+                        </div>
                       </div>
                     </div>
                   )}
