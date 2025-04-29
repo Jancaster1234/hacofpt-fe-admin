@@ -65,7 +65,7 @@ export default function CreateHackathonPage() {
       toast.success(result.message || t("successMessage"));
 
       // Redirect to the newly created hackathon detail page
-      router.push(`/hackathon/${result.data.id}`);
+      router.push(`/organizer-hackathon-management/${result.data.id}`);
     } catch (error) {
       console.error("Error creating hackathon:", error);
       // Display error toast with message from API response if available
