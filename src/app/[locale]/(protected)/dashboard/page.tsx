@@ -36,7 +36,7 @@ export default function Dashboard() {
       </div>
 
       {/* Hackathon Team List */}
-      <div className="col-span-12 xl:col-span-6">
+      <div className="col-span-12">
         <HackathonTeamsList />
       </div>
 
