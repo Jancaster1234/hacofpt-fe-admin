@@ -263,6 +263,104 @@
     "noDocumentsUploaded": "No documents uploaded yet",
     "participantDescription": "When enabled, participants will be visible to everyone. If disabled, only organizers can see the participants."
   },
+  "blogManagement": {
+    "unknownAuthor": "Unknown Author",
+    "updateSuccess": "Blog post updated successfully",
+    "updateError": "Failed to update blog post",
+    "deleteSuccess": "Blog post deleted successfully",
+    "deleteError": "Failed to delete blog post",
+    "publishSuccess": "Blog post published successfully",
+    "publishError": "Failed to publish blog post",
+    "unpublishSuccess": "Blog post unpublished successfully",
+    "unpublishError": "Failed to unpublish blog post",
+    "approveSuccess": "Blog post approved successfully",
+    "approveError": "Failed to approve blog post",
+    "rejectSuccess": "Blog post rejected successfully",
+    "rejectError": "Failed to reject blog post",
+    "status": {
+      "draft": "Draft",
+      "pendingreview": "Pending Review",
+      "approved": "Approved",
+      "published": "Published",
+      "rejected": "Rejected"
+    },
+    "deleteConfirm": {
+      "title": "Are you absolutely sure?",
+      "description": "This action cannot be undone. This will permanently delete the blog post and remove all associated data."
+    },
+    "common": {
+      "cancel": "Cancel"
+    },
+    "title": "Blog management",
+    "welcome": "Welcome",
+    "guest": "Guest",
+    "actions": {
+      "createNew": "Create new post",
+      "backToList": "Back to list",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "approve": "Approve",
+      "reject": "Reject",
+      "delete": "Delete"
+    },
+    "tabs": {
+      "all": "All",
+      "draft": "Draft",
+      "pendingReview": "Pending review",
+      "approved": "Approved",
+      "published": "Published",
+      "view": "View",
+      "edit": "Edit"
+    },
+    "createPost": {
+      "title": "Create new blog post"
+    },
+    "success": {
+      "postCreated": "Blog post created successfully",
+      "postUpdated": "Blog post updated successfully",
+      "postDeleted": "Blog post deleted successfully",
+      "postPublished": "Blog post published successfully",
+      "postUnpublished": "Blog post unpublished successfully",
+      "postApproved": "Blog post approved successfully",
+      "postRejected": "Blog post rejected successfully"
+    },
+    "errors": {
+      "fetchFailed": "Failed to fetch blog posts",
+      "createFailed": "Failed to create blog post",
+      "updateFailed": "Failed to update blog post",
+      "deleteFailed": "Failed to delete blog post",
+      "publishFailed": "Failed to publish blog post",
+      "unpublishFailed": "Failed to unpublish blog post",
+      "approveFailed": "Failed to approve blog post",
+      "rejectFailed": "Failed to reject blog post",
+      "fetchDetailFailed": "Failed to fetch blog post details"
+    }
+  },
+  "blogPostList": {
+    "noPosts": "No blog posts found. Create your first blog post!",
+    "headers": {
+      "title": "Title",
+      "status": "Status",
+      "created": "Created",
+      "updated": "Last updated",
+      "actions": "Actions"
+    },
+    "status": {
+      "draft": "Draft",
+      "pendingreview": "Pending review",
+      "approved": "Approved",
+      "published": "Published",
+      "rejected": "Rejected"
+    },
+    "actions": {
+      "view": "View/Edit",
+      "delete": "Delete",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "approve": "Approve",
+      "reject": "Reject"
+    }
+  },
   "blogPost": {
     "title": "Title",
     "titlePlaceholder": "Blog post title",

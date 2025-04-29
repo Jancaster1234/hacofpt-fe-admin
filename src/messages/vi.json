@@ -666,6 +666,104 @@
     "noDocumentsUploaded": "Chưa có tài liệu nào được tải lên",
     "participantDescription": "Khi được bật, người tham gia sẽ hiển thị với tất cả mọi người. Nếu tắt, chỉ người tổ chức mới có thể xem người tham gia."
   },
+  "blogManagement": {
+    "unknownAuthor": "Tác giả không xác định",
+    "updateSuccess": "Cập nhật bài viết thành công",
+    "updateError": "Không thể cập nhật bài viết",
+    "deleteSuccess": "Xóa bài viết thành công",
+    "deleteError": "Không thể xóa bài viết",
+    "publishSuccess": "Xuất bản bài viết thành công",
+    "publishError": "Không thể xuất bản bài viết",
+    "unpublishSuccess": "Hủy xuất bản bài viết thành công",
+    "unpublishError": "Không thể hủy xuất bản bài viết",
+    "approveSuccess": "Duyệt bài viết thành công",
+    "approveError": "Không thể duyệt bài viết",
+    "rejectSuccess": "Từ chối bài viết thành công",
+    "rejectError": "Không thể từ chối bài viết",
+    "status": {
+      "draft": "Bản nháp",
+      "pendingreview": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "published": "Đã xuất bản",
+      "rejected": "Bị từ chối"
+    },
+    "deleteConfirm": {
+      "title": "Bạn có chắc chắn không?",
+      "description": "Hành động này không thể hoàn tác. Điều này sẽ xóa vĩnh viễn bài viết và tất cả dữ liệu liên quan."
+    },
+    "common": {
+      "cancel": "Hủy"
+    },
+    "title": "Quản lý bài viết",
+    "welcome": "Xin chào",
+    "guest": "Khách",
+    "actions": {
+      "createNew": "Tạo bài viết mới",
+      "backToList": "Quay lại danh sách",
+      "publish": "Xuất bản",
+      "unpublish": "Hủy xuất bản",
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "delete": "Xóa"
+    },
+    "tabs": {
+      "all": "Tất cả",
+      "draft": "Bản nháp",
+      "pendingReview": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "published": "Đã xuất bản",
+      "view": "Xem",
+      "edit": "Chỉnh sửa"
+    },
+    "createPost": {
+      "title": "Tạo bài viết mới"
+    },
+    "success": {
+      "postCreated": "Tạo bài viết thành công",
+      "postUpdated": "Cập nhật bài viết thành công",
+      "postDeleted": "Xóa bài viết thành công",
+      "postPublished": "Xuất bản bài viết thành công",
+      "postUnpublished": "Hủy xuất bản bài viết thành công",
+      "postApproved": "Duyệt bài viết thành công",
+      "postRejected": "Từ chối bài viết thành công"
+    },
+    "errors": {
+      "fetchFailed": "Không thể tải danh sách bài viết",
+      "createFailed": "Không thể tạo bài viết",
+      "updateFailed": "Không thể cập nhật bài viết",
+      "deleteFailed": "Không thể xóa bài viết",
+      "publishFailed": "Không thể xuất bản bài viết",
+      "unpublishFailed": "Không thể hủy xuất bản bài viết",
+      "approveFailed": "Không thể duyệt bài viết",
+      "rejectFailed": "Không thể từ chối bài viết",
+      "fetchDetailFailed": "Không thể tải chi tiết bài viết"
+    }
+  },
+  "blogPostList": {
+    "noPosts": "Không tìm thấy bài viết nào. Hãy tạo bài viết đầu tiên của bạn!",
+    "headers": {
+      "title": "Tiêu đề",
+      "status": "Trạng thái",
+      "created": "Ngày tạo",
+      "updated": "Cập nhật lần cuối",
+      "actions": "Thao tác"
+    },
+    "status": {
+      "draft": "Bản nháp",
+      "pendingreview": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "published": "Đã xuất bản",
+      "rejected": "Đã từ chối"
+    },
+    "actions": {
+      "view": "Xem/Sửa",
+      "delete": "Xóa",
+      "publish": "Xuất bản",
+      "unpublish": "Hủy xuất bản",
+      "approve": "Duyệt",
+      "reject": "Từ chối"
+    }
+  },
   "blogPost": {
     "title": "Tiêu đề",
     "titlePlaceholder": "Tiêu đề bài viết",
