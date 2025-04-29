@@ -185,6 +185,84 @@
     "submittingRegistration": "Submitting your registration...",
     "deletingRegistration": "Deleting your registration..."
   },
+  "createHackathon": {
+    "title": "Create new hackathon",
+    "newHackathon": "New hackathon",
+    "enterSubtitle": "Enter a subtitle for your hackathon",
+    "uploadBanner": "Upload banner",
+    "changeBanner": "Change banner",
+    "recommendedSize": "Recommended size: 1200x400px",
+    "hackathonBannerAlt": "Hackathon banner",
+    "imageTypeError": "Only JPEG, JPG and PNG images are allowed",
+    "bannerUploadSuccess": "Banner uploaded successfully",
+    "bannerUploadError": "Failed to upload banner image",
+    "uploadingBanner": "Uploading banner...",
+    "successMessage": "Hackathon created successfully",
+    "errorMessage": "Failed to create hackathon",
+    "submitting": "Creating hackathon...",
+    "tabs": {
+      "basic": "Basic Information",
+      "information": "Information",
+      "description": "Description",
+      "participant": "Participants",
+      "documentation": "Documentation",
+      "contact": "Contact"
+    },
+    "fields": {
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "enrollStartDate": "Enrollment Start Date",
+      "enrollEndDate": "Enrollment End Date",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "category": "Category",
+      "organization": "Organization",
+      "teamSize": "Team Size",
+      "minMembers": "Minimum Team Members",
+      "maxMembers": "Maximum Team Members",
+      "information": "Information",
+      "description": "Description",
+      "showParticipants": "Show Participants",
+      "documentation": "Documentation",
+      "contact": "Contact Information"
+    },
+    "placeholders": {
+      "title": "Enter hackathon title",
+      "subtitle": "Enter a brief subtitle for the hackathon",
+      "information": "Enter detailed information about the hackathon",
+      "description": "Enter a description of the hackathon",
+      "contact": "Enter contact information for participants"
+    },
+    "categories": {
+      "coding": "Coding",
+      "external": "External",
+      "internal": "Internal",
+      "design": "Design",
+      "others": "Others"
+    },
+    "organizations": {
+      "fptu": "FPTU",
+      "nasa": "NASA",
+      "iaiHackathon": "IAI Hackathon",
+      "ceHackathon": "CE Hackathon",
+      "others": "Others"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Hackathon",
+      "deleteDocument": "Delete Document"
+    },
+    "validations": {
+      "enrollEndAfterStart": "Enrollment end date must be after the start date",
+      "startAfterEnrollEnd": "Start date must be after enrollment end date",
+      "endAfterStart": "End date must be after start date"
+    },
+    "documentUploadSuccess": "Documents uploaded successfully",
+    "documentUploadError": "Error uploading documents",
+    "documentDeleted": "Document deleted successfully",
+    "noDocumentsUploaded": "No documents uploaded yet",
+    "participantDescription": "When enabled, participants will be visible to everyone. If disabled, only organizers can see the participants."
+  },
   "resourceManagement": {
     "title": "Hackathon resource management",
     "loading": "Loading...",
@@ -499,6 +577,276 @@
     "approvalSuccess": "Registration submitted successfully",
     "rejectionSuccess": "Registration submitted successfully",
     "updateStatusFailed": "Failed to update registration status"
+  },
+  "sponsorship": {
+    "title": "Sponsorship management",
+    "list": {
+      "title": "All sponsorships",
+      "noSponsorships": "No sponsorships found",
+      "columns": {
+        "name": "Name",
+        "brand": "Brand",
+        "amount": "Amount",
+        "period": "Period",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "actions": {
+      "addNew": "Add new sponsorship",
+      "viewDetails": "View details",
+      "viewDetailsFor": "View details for {name}",
+      "backToList": "Back to list",
+      "edit": "Edit"
+    },
+    "status": {
+      "active": "Active",
+      "completed": "Completed",
+      "pending": "Pending",
+      "cancelled": "Cancelled",
+      "status": "Status"
+    },
+    "errors": {
+      "loadFailed": "Failed to load sponsorships. Please try again later.",
+      "loadDetailsFailed": "Failed to load sponsorship details",
+      "organizerOnly": "Only organizers can perform this action",
+      "creatorOnly": "Only the organizer who created this sponsorship can add or edit sponsorships."
+    },
+    "success": {
+      "formSubmitted": "Sponsorship information saved successfully"
+    },
+    "editSponsorship": "Edit sponsorship",
+    "addNewSponsorship": "Add new sponsorship",
+    "cancel": "Cancel",
+    "sponsorshipName": "Sponsorship name",
+    "brand": "Brand",
+    "amount": "Amount",
+    "pending": "Pending",
+    "active": "Active",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "startDateTime": "Start date & time",
+    "endDateTime": "End date & time",
+    "description": "Description",
+    "saving": "Saving...",
+    "update": "Update",
+    "create": "Create",
+    "sponsorshipSaveSuccess": "Sponsorship saved successfully",
+    "sponsorshipSaveFailed": "Failed to save sponsorship"
+  },
+  "sidebar": {
+    "sidebar": "Sidebar navigation",
+    "mainNavigation": "Main navigation",
+    "menu": "Menu",
+    "homeLogo": "Go to home page",
+    "logoAlt": "Logo",
+    "logoNameAlt": "Logo name",
+    "logoIconAlt": "Logo icon",
+    "dashboard": "Dashboard",
+    "ecommerce": "Ecommerce",
+    "userManagement": "User management",
+    "threadPostReport": "Thread post report",
+    "mentorshipRequest": "Mentorship request",
+    "mentorTeam": "Mentor team",
+    "organizerHackathon": "Organizer hackathon",
+    "userCreation": "User creation",
+    "gradingSubmission": "Grading submission",
+    "calendar": "Calendar",
+    "kanbanBoard": "Kanban board",
+    "chat": "Chat",
+    "sendNotification": "Send notification",
+    "blog": "Blog",
+    "new": "new",
+    "pro": "pro"
+  },
+  "sponsorshipFiles": {
+    "backToDetails": "Back to details",
+    "filesFor": "Files for",
+    "spent": "spent",
+    "relatedFiles": "Related files",
+    "uploadFile": "Upload file",
+    "uploading": "Uploading...",
+    "uploadNewFile": "Upload new file",
+    "noFilesFound": "No files found for this detail.",
+    "uploadedBy": "Uploaded by",
+    "on": "on",
+    "download": "Download",
+    "delete": "Delete",
+    "failedToLoadFiles": "Failed to load files. Please try again later.",
+    "onlyCreatorCanUpload": "Only the creator of this sponsorship can upload files.",
+    "onlyCreatorCanDelete": "Only the creator of this sponsorship can delete files.",
+    "confirmDeleteFile": "Are you sure you want to delete this file?",
+    "filesUploadedSuccessfully": "Files uploaded successfully.",
+    "fileDeletedSuccessfully": "File deleted successfully.",
+    "failedToUploadFiles": "Failed to upload files. Please try again.",
+    "failedToDeleteFile": "Failed to delete file. Please try again later.",
+    "completed": "Completed",
+    "planned": "Planned",
+    "cancelled": "Cancelled"
+  },
+  "dashboard": {
+    "home": {
+      "welcomeTitle": "Dashboard home",
+      "welcomeMessage": "Welcome back, {name}!",
+      "guest": "Guest",
+      "dashboardTip": "Use the sidebar to navigate through different sections of your dashboard.",
+      "userAvatar": "User avatar",
+      "card1Title": "Your progress",
+      "card1Description": "Track your progress and achievements in ongoing projects.",
+      "card2Title": "Recent activity",
+      "card2Description": "Check what's been happening in your team lately.",
+      "card3Title": "Upcoming events",
+      "card3Description": "Stay informed about events and deadlines approaching."
+    }
+  },
+  "sponsorshipManagement": {
+    "backToHackathonAllocations": "Back to hackathon allocations",
+    "sponsorshipAllocationDetails": "Sponsorship allocation details",
+    "addNewDetail": "Add new detail",
+    "editAllocation": "Edit allocation",
+    "deleteAllocation": "Delete allocation",
+    "noSponsorshipDetailsFound": "No sponsorship details found.",
+    "addDetail": "Add detail",
+    "description": "Description",
+    "moneySpent": "Money spent",
+    "period": "Period",
+    "status": "Status",
+    "createdBy": "Created by",
+    "actions": "Actions",
+    "viewFiles": "View files",
+    "edit": "Edit",
+    "delete": "Delete",
+    "unknown": "Unknown",
+    "planned": "Planned",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "inprogress": "In progress",
+    "confirmDeleteDetail": "Are you sure you want to delete this detail?",
+    "detailDeletedSuccessfully": "Detail deleted successfully",
+    "failedToDeleteDetail": "Failed to delete detail. Please try again later.",
+    "failedToLoadDetails": "Failed to load sponsorship details. Please try again later.",
+    "onlyCreatorCanAddDetails": "Only the creator of this sponsorship can add details.",
+    "onlyCreatorCanEditDetails": "Only the creator of this sponsorship can edit details.",
+    "onlyCreatorCanDeleteDetails": "Only the creator of this sponsorship can delete details.",
+    "detailNotFound": "Detail not found",
+    "noPermissionToAddEdit": "You don't have permission to add or edit details.",
+    "backToList": "Back to list"
+  },
+  "sponsorshipDetail": {
+    "editDetail": "Edit detail",
+    "createNewDetail": "Create new detail",
+    "description": "Description",
+    "moneySpent": "Money spent",
+    "status": "Status",
+    "planned": "Planned",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "fromDateTime": "From date & time",
+    "toDateTime": "To date & time",
+    "cancel": "Cancel",
+    "updateDetail": "Update detail",
+    "createDetail": "Create detail",
+    "detailSaveSuccess": "Detail saved successfully",
+    "detailSaveFailed": "Failed to save detail"
+  },
+  "sponsorshipDetails": {
+    "fields": {
+      "brand": "Brand",
+      "totalAmount": "Total amount",
+      "period": "Period",
+      "createdBy": "Created by",
+      "description": "Description"
+    },
+    "status": {
+      "active": "Active",
+      "completed": "Completed",
+      "pending": "Pending",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "backToSponsorships": "Back to sponsorships",
+      "editSponsorship": "Edit sponsorship",
+      "addHackathonAllocation": "Add hackathon allocation",
+      "backToList": "Back to list",
+      "viewDetails": "View details",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "sections": {
+      "hackathonAllocations": "Hackathon allocations"
+    },
+    "table": {
+      "hackathonId": "Hackathon ID",
+      "totalMoney": "Total money",
+      "createdBy": "Created by",
+      "createdAt": "Created at",
+      "actions": "Actions"
+    },
+    "messages": {
+      "noAllocationsFound": "No hackathon allocations found for this sponsorship."
+    },
+    "labels": {
+      "unknown": "Unknown"
+    },
+    "confirmations": {
+      "deleteAllocation": "Are you sure you want to delete this allocation?"
+    },
+    "errors": {
+      "loadAllocationsFailed": "Failed to load sponsorship allocations. Please try again later.",
+      "loadDetailsFailed": "Failed to load allocation details. Please try again later.",
+      "deleteFailed": "Failed to delete allocation. Please try again later.",
+      "loadingDetails": "Error loading details",
+      "sponsorshipNotFound": "Sponsorship not found",
+      "onlyCreatorCanAdd": "Only the organizer who created this sponsorship can add hackathon allocations",
+      "onlyCreatorCanEdit": "Only the organizer who created this sponsorship can edit hackathon allocations",
+      "onlyCreatorCanDelete": "Only the organizer who created this sponsorship can delete hackathon allocations",
+      "onlyOrganizersCanModify": "Only organizers can add or edit hackathon allocations."
+    },
+    "success": {
+      "allocationDeleted": "Allocation deleted successfully"
+    }
+  },
+  "sponsorshipHackathon": {
+    "editAllocation": "Edit allocation",
+    "addNewAllocation": "Add new allocation",
+    "totalMoney": "Total money ($)",
+    "moneyHelperText": "Enter the amount of money allocated for this sponsorship",
+    "cancel": "Cancel",
+    "update": "Update",
+    "create": "Create",
+    "saveError": "Failed to save sponsorship allocation. Please try again later.",
+    "updateSuccess": "Sponsorship allocation updated successfully",
+    "createSuccess": "Sponsorship allocation created successfully"
+  },
+  "threadPostReport": {
+    "management": "Thread post report management",
+    "welcome": "Welcome, {name}! Manage reported thread posts below.",
+    "noReports": "No thread post reports found.",
+    "tableHeaders": {
+      "id": "ID",
+      "threadPostId": "Thread post ID",
+      "reason": "Reason",
+      "status": "Status",
+      "createdBy": "Created by",
+      "createdAt": "Created at",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "reviewed": "Reviewed",
+      "dismissed": "Dismissed"
+    },
+    "actions": {
+      "markReviewed": "Mark reviewed",
+      "dismiss": "Dismiss",
+      "updating": "Updating...",
+      "processed": "Already processed"
+    },
+    "loading": "Loading thread post reports...",
+    "error": "Failed to fetch thread post reports",
+    "tryAgain": "Try again",
+    "updateSuccess": "Report status updated successfully",
+    "updateError": "Failed to update report status"
   },
   "locations": {
     "availableLocations": "Available locations",

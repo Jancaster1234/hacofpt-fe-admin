@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import { UserRole } from "@/types/entities/user";
 import { useAuth } from "@/hooks/useAuth_v0";
+import { useTranslations } from "@/hooks/useTranslations";
 
 import {
   CalenderIcon,
@@ -17,18 +18,33 @@ import {
 
 type NavItem = {
   name: string;
+  translationKey: string;
   icon: React.ReactNode;
   path?: string;
-  allowedRoles?: UserRole[]; // ✅ Restrict based on roles
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  allowedRoles?: UserRole[];
+  subItems?: {
+    name: string;
+    translationKey: string;
+    path: string;
+    pro?: boolean;
+    new?: boolean;
+  }[];
 };
 
 const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
+    translationKey: "dashboard",
     allowedRoles: ["ADMIN"],
-    subItems: [{ name: "Ecommerce", path: "/dashboard", pro: false }],
+    subItems: [
+      {
+        name: "Ecommerce",
+        translationKey: "ecommerce",
+        path: "/dashboard",
+        pro: false,
+      },
+    ],
   },
   // {
   //   icon: <CalenderIcon />,
@@ -45,12 +61,14 @@ const navItems: NavItem[] = [
   {
     icon: <CalenderIcon />,
     name: "User Management",
+    translationKey: "userManagement",
     allowedRoles: ["ADMIN"],
     path: "/user-manage",
   },
   {
     icon: <CalenderIcon />,
     name: "Thread Post Report",
+    translationKey: "threadPostReport",
     allowedRoles: ["ADMIN"],
     path: "/thread-post-report-management",
   },
@@ -63,48 +81,56 @@ const navItems: NavItem[] = [
   {
     icon: <CalenderIcon />,
     name: "Mentorship Request",
+    translationKey: "mentorshipRequest",
     allowedRoles: ["MENTOR"],
     path: "/mentorship-request",
   },
   {
     icon: <CalenderIcon />,
     name: "Mentor Team",
+    translationKey: "mentorTeam",
     allowedRoles: ["MENTOR"],
     path: "/mentor-team",
   },
   {
     icon: <CalenderIcon />,
     name: "Organizer Hackathon",
+    translationKey: "organizerHackathon",
     allowedRoles: ["ORGANIZER"],
     path: "/organizer-hackathon-management",
   },
   {
     icon: <CalenderIcon />,
     name: "User Creation",
+    translationKey: "userCreation",
     allowedRoles: ["ORGANIZER"],
     path: "/user-creation",
   },
   {
     icon: <CalenderIcon />,
     name: "Grading Submission",
+    translationKey: "gradingSubmission",
     allowedRoles: ["JUDGE"],
     path: "/grading-submission",
   },
   {
     icon: <CalenderIcon />,
     name: "Calendar",
+    translationKey: "calendar",
     allowedRoles: ["ADMIN", "ORGANIZER", "MENTOR", "JUDGE"],
     path: "/calendar",
   },
   {
     icon: <CalenderIcon />,
     name: "Kanban board",
+    translationKey: "kanbanBoard",
     allowedRoles: ["ADMIN", "ORGANIZER", "MENTOR", "JUDGE"],
     path: "/kanban-board",
   },
   {
     icon: <CalenderIcon />,
     name: "Chat",
+    translationKey: "chat",
     allowedRoles: ["ADMIN", "ORGANIZER", "MENTOR", "JUDGE"],
     path: "/chat",
   },
@@ -117,12 +143,14 @@ const navItems: NavItem[] = [
   {
     icon: <CalenderIcon />,
     name: "Send Notification",
+    translationKey: "sendNotification",
     allowedRoles: ["ADMIN"],
     path: "/send-notification",
   },
   {
     icon: <CalenderIcon />,
     name: "Blog",
+    translationKey: "blog",
     allowedRoles: ["ADMIN"],
     path: "/blog-management",
   },
@@ -135,6 +163,7 @@ const AppSidebar: React.FC = () => {
   const pathname = usePathname();
   const { user } = useAuth();
   const userRole = user?.userRoles?.[0]?.role?.name || null;
+  const t = useTranslations("sidebar");
 
   const filteredNavItems = navItems.filter(
     (item) =>
@@ -153,13 +182,13 @@ const AppSidebar: React.FC = () => {
     navItems: NavItem[],
     menuType: "main" | "others"
   ) => (
-    <ul className="flex flex-col gap-4">
+    <ul className="flex flex-col gap-2 sm:gap-3 md:gap-4">
       {navItems.map((nav, index) => (
-        <li key={nav.name}>
+        <li key={nav.translationKey}>
           {nav.subItems ? (
             <button
               onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group  ${
+              className={`menu-item group ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
                   ? "menu-item-active"
                   : "menu-item-inactive"
@@ -167,23 +196,27 @@ const AppSidebar: React.FC = () => {
                 !isExpanded && !isHovered
                   ? "lg:justify-center"
                   : "lg:justify-start"
-              }`}
+              } transition-colors duration-200 ease-in-out`}
+              aria-expanded={
+                openSubmenu?.type === menuType && openSubmenu?.index === index
+              }
+              aria-controls={`submenu-${menuType}-${index}`}
             >
               <span
-                className={` ${
+                className={`${
                   openSubmenu?.type === menuType && openSubmenu?.index === index
                     ? "menu-item-icon-active"
                     : "menu-item-icon-inactive"
-                }`}
+                } transition-colors duration-200`}
               >
                 {nav.icon}
               </span>
               {(isExpanded || isHovered || isMobileOpen) && (
-                <span className={`menu-item-text`}>{nav.name}</span>
+                <span className="menu-item-text">{t(nav.translationKey)}</span>
               )}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200  ${
+                  className={`ml-auto w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 ${
                     openSubmenu?.type === menuType &&
                     openSubmenu?.index === index
                       ? "rotate-180 text-brand-500"
@@ -198,29 +231,32 @@ const AppSidebar: React.FC = () => {
                 href={nav.path}
                 className={`menu-item group ${
                   isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
-                }`}
+                } transition-colors duration-200 ease-in-out`}
               >
                 <span
                   className={`${
                     isActive(nav.path)
                       ? "menu-item-icon-active"
                       : "menu-item-icon-inactive"
-                  }`}
+                  } transition-colors duration-200`}
                 >
                   {nav.icon}
                 </span>
                 {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className={`menu-item-text`}>{nav.name}</span>
+                  <span className="menu-item-text">
+                    {t(nav.translationKey)}
+                  </span>
                 )}
               </Link>
             )
           )}
           {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
             <div
+              id={`submenu-${menuType}-${index}`}
               ref={(el) => {
                 subMenuRefs.current[`${menuType}-${index}`] = el;
               }}
-              className="overflow-hidden transition-all duration-300"
+              className="overflow-hidden transition-all duration-300 ease-in-out"
               style={{
                 height:
                   openSubmenu?.type === menuType && openSubmenu?.index === index
@@ -228,18 +264,18 @@ const AppSidebar: React.FC = () => {
                     : "0px",
               }}
             >
-              <ul className="mt-2 space-y-1 ml-9">
+              <ul className="mt-2 space-y-1 ml-6 sm:ml-7 md:ml-9">
                 {nav.subItems.map((subItem) => (
-                  <li key={subItem.name}>
+                  <li key={subItem.translationKey}>
                     <Link
                       href={subItem.path}
                       className={`menu-dropdown-item ${
                         isActive(subItem.path)
                           ? "menu-dropdown-item-active"
                           : "menu-dropdown-item-inactive"
-                      }`}
+                      } transition-colors duration-200 text-xs sm:text-sm`}
                     >
-                      {subItem.name}
+                      {t(subItem.translationKey)}
                       <span className="flex items-center gap-1 ml-auto">
                         {subItem.new && (
                           <span
@@ -247,9 +283,9 @@ const AppSidebar: React.FC = () => {
                               isActive(subItem.path)
                                 ? "menu-dropdown-badge-active"
                                 : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge `}
+                            } menu-dropdown-badge text-xs`}
                           >
-                            new
+                            {t("new")}
                           </span>
                         )}
                         {subItem.pro && (
@@ -258,9 +294,9 @@ const AppSidebar: React.FC = () => {
                               isActive(subItem.path)
                                 ? "menu-dropdown-badge-active"
                                 : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge `}
+                            } menu-dropdown-badge text-xs`}
                           >
-                            pro
+                            {t("pro")}
                           </span>
                         )}
                       </span>
@@ -284,7 +320,6 @@ const AppSidebar: React.FC = () => {
   );
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // const isActive = (path: string) => path === pathname;
   const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
   useEffect(() => {
@@ -341,46 +376,51 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-3 sm:px-4 md:px-5 left-0 
+        bg-white dark:bg-gray-900 dark:border-gray-800 
+        text-gray-900 dark:text-gray-100 
+        h-screen transition-all duration-300 ease-in-out z-50 
+        border-r border-gray-200 dark:border-gray-700
         ${
           isExpanded || isMobileOpen
-            ? "w-[290px]"
+            ? "w-[250px] sm:w-[270px] md:w-[290px]"
             : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
+              ? "w-[250px] sm:w-[270px] md:w-[290px]"
+              : "w-[70px] sm:w-[80px] md:w-[90px]"
         }
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      aria-label={t("sidebar")}
     >
       <div
-        className={`py-8 flex  ${
+        className={`py-6 sm:py-7 md:py-8 flex ${
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link href="/">
+        <Link href="/" aria-label={t("homeLogo")}>
           {isExpanded || isHovered || isMobileOpen ? (
             <>
               <div className="flex items-center gap-2">
                 <Image
-                  className="dark:hidden"
+                  className="dark:hidden w-10 h-10 sm:w-12 sm:h-12 md:w-[60px] md:h-[60px]"
                   src="/images/logo/logoe.svg"
-                  alt="Logo"
+                  alt={t("logoAlt")}
                   width={60}
                   height={60}
                 />
                 <Image
                   src="/images/logo/logo-name.svg"
-                  alt="logo"
+                  alt={t("logoNameAlt")}
                   width={60}
                   height={60}
-                  className="dark:hidden"
+                  className="dark:hidden w-10 h-10 sm:w-12 sm:h-12 md:w-[60px] md:h-[60px]"
                 />
                 <Image
-                  className="hidden dark:block"
+                  className="hidden dark:block w-10 h-10 sm:w-12 sm:h-12 md:w-[60px] md:h-[60px]"
                   src="/images/logo/logoe.svg"
-                  alt="Logo"
+                  alt={t("logoAlt")}
                   width={60}
                   height={60}
                 />
@@ -389,26 +429,27 @@ const AppSidebar: React.FC = () => {
           ) : (
             <Image
               src="/images/logo/logo-icon.svg"
-              alt="Logo"
+              alt={t("logoIconAlt")}
               width={32}
               height={32}
+              className="w-8 h-8 sm:w-8 sm:h-8 md:w-8 md:h-8"
             />
           )}
         </Link>
       </div>
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
-        <nav className="mb-6">
-          <div className="flex flex-col gap-4">
+        <nav className="mb-6" aria-label={t("mainNavigation")}>
+          <div className="flex flex-col gap-3 sm:gap-3 md:gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-3 sm:mb-3 md:mb-4 text-xs uppercase flex leading-[20px] text-gray-400 dark:text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
                 }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
+                  t("menu")
                 ) : (
                   <HorizontaLDots />
                 )}

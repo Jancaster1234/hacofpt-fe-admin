@@ -1,9 +1,8 @@
-// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_mocks/fetchMockSponsorshipHackathons.ts
+// src/app/[locale]/(protected)/dashboard/_mocks/fetchMockSponsorshipHackathons.ts
 
 import { SponsorshipHackathon } from "@/types/entities/sponsorshipHackathon";
 
 export const fetchMockSponsorshipHackathons = ({
-  hackathonId,
   sponsorshipId,
 }: {
   hackathonId?: string;
@@ -19,7 +18,6 @@ export const fetchMockSponsorshipHackathons = ({
           totalMoney: 50000,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          createdByUserName: "organizerAlice",
         },
         {
           id: "sh2",
@@ -28,7 +26,6 @@ export const fetchMockSponsorshipHackathons = ({
           totalMoney: 20000,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          createdByUserName: "organizerBob",
         },
         {
           id: "sh3",
@@ -37,7 +34,6 @@ export const fetchMockSponsorshipHackathons = ({
           totalMoney: 75000,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          createdByUserName: "organizerCharlie",
         },
       ];
       resolve(mockSponsorshipHackathons);

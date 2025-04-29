@@ -9,6 +9,8 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { hasOrganizerRole } from "@/utils/roleUtils";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
 
 interface SponsorshipProps {
   hackathonId: string;
@@ -17,6 +19,8 @@ interface SponsorshipProps {
 type ViewMode = "LIST" | "DETAILS" | "ADD" | "EDIT";
 
 const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
+  const t = useTranslations("sponsorship");
+  const toast = useToast();
   const { user } = useAuth();
   const isOrganizer = hasOrganizerRole(user);
 
@@ -38,9 +42,9 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
       setSponsorships(response.data);
       setError(null);
     } catch (err: any) {
-      setError(
-        err.message || "Failed to load sponsorships. Please try again later."
-      );
+      const errorMessage = err.message || t("errors.loadFailed");
+      setError(errorMessage);
+      toast.error(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);
@@ -49,6 +53,7 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
 
   useEffect(() => {
     loadSponsorships();
+    // Don't include toast in dependencies to avoid infinite loops
   }, []);
 
   useEffect(() => {
@@ -61,7 +66,9 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
           );
           setCurrentSponsorship(response.data);
         } catch (err: any) {
-          setError(err.message || "Failed to load sponsorship details");
+          const errorMessage = err.message || t("errors.loadDetailsFailed");
+          setError(errorMessage);
+          toast.error(errorMessage);
           console.error(err);
         } finally {
           setLoading(false);
@@ -74,6 +81,7 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
     if (viewMode === "DETAILS" || viewMode === "EDIT") {
       loadSponsorshipDetails();
     }
+    // Don't include toast in dependencies to avoid infinite loops
   }, [selectedSponsorshipId, viewMode]);
 
   const handleSelectSponsorship = (id: string) => {
@@ -88,7 +96,9 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
 
   const handleAddNewSponsorship = () => {
     if (!isOrganizer) {
-      setError("Only organizers can add new sponsorships");
+      const errorMessage = t("errors.organizerOnly");
+      setError(errorMessage);
+      toast.error(errorMessage);
       return;
     }
 
@@ -99,7 +109,9 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
 
   const handleEditSponsorship = () => {
     if (!isOrganizer) {
-      setError("Only organizers can edit sponsorships");
+      const errorMessage = t("errors.organizerOnly");
+      setError(errorMessage);
+      toast.error(errorMessage);
       return;
     }
 
@@ -107,6 +119,7 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
   };
 
   const handleFormSuccess = () => {
+    toast.success(t("success.formSubmitted"));
     loadSponsorships();
     setViewMode("LIST");
     setSelectedSponsorshipId(null);
@@ -118,7 +131,7 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
   };
 
   if (loading && viewMode === "LIST") {
-    return <LoadingSpinner />;
+    return <LoadingSpinner size="lg" showText={true} />;
   }
 
   if (error && viewMode === "LIST") {
@@ -126,9 +139,9 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Sponsorship Management
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 transition-colors duration-200">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6">
+        {t("title")}
       </h2>
 
       {viewMode === "LIST" && (
@@ -170,16 +183,13 @@ const Sponsorship: React.FC<SponsorshipProps> = ({ hackathonId }) => {
           (viewMode === "EDIT" &&
             currentSponsorship &&
             !isCreator(currentSponsorship))) && (
-          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
-            <p>
-              Only the organizer who created this sponsorship can add or edit
-              sponsorships.
-            </p>
+          <div className="bg-yellow-100 dark:bg-yellow-900 border-l-4 border-yellow-500 text-yellow-700 dark:text-yellow-300 p-4 mb-4 rounded transition-colors duration-200">
+            <p>{t("errors.creatorOnly")}</p>
             <button
               onClick={handleBackToList}
-              className="mt-2 bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded"
+              className="mt-2 bg-yellow-500 hover:bg-yellow-600 dark:hover:bg-yellow-400 text-white dark:text-gray-900 py-1 px-3 rounded transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50"
             >
-              Back to List
+              {t("actions.backToList")}
             </button>
           </div>
         )}

@@ -1,8 +1,9 @@
 // src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/SponsorshipHackathonDetailForm.tsx
 import React, { useState } from "react";
 import { SponsorshipHackathonDetail } from "@/types/entities/sponsorshipHackathonDetail";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
-import ErrorMessage from "@/components/common/ErrorMessage";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
 import { sponsorshipHackathonDetailService } from "@/services/sponsorshipHackathonDetail.service";
 
 interface SponsorshipHackathonDetailFormProps {
@@ -15,6 +16,9 @@ interface SponsorshipHackathonDetailFormProps {
 const SponsorshipHackathonDetailForm: React.FC<
   SponsorshipHackathonDetailFormProps
 > = ({ sponsorshipHackathonId, detail, onSuccess, onCancel }) => {
+  const t = useTranslations("sponsorshipDetail");
+  const toast = useToast();
+
   const [formData, setFormData] = useState<{
     content: string;
     moneySpent: number;
@@ -54,70 +58,86 @@ const SponsorshipHackathonDetailForm: React.FC<
 
     try {
       setLoading(true);
+      setError(null);
 
       const payload = {
         sponsorshipHackathonId,
         ...formData,
       };
 
+      let response;
       if (detail?.id) {
         // Update existing detail
-        await sponsorshipHackathonDetailService.updateSponsorshipHackathonDetailInformation(
-          detail.id,
-          payload
-        );
+        response =
+          await sponsorshipHackathonDetailService.updateSponsorshipHackathonDetailInformation(
+            detail.id,
+            payload
+          );
       } else {
         // Create new detail
-        await sponsorshipHackathonDetailService.createSponsorshipHackathonDetail(
-          payload
-        );
+        response =
+          await sponsorshipHackathonDetailService.createSponsorshipHackathonDetail(
+            payload
+          );
       }
 
+      // Show success toast with response message
+      toast.success(response.message || t("detailSaveSuccess"));
       onSuccess();
     } catch (err: any) {
-      setError(err.message || "Failed to save detail. Please try again.");
-      console.error(err);
+      const errorMsg = err.message || t("detailSaveFailed");
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="flex justify-center items-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm transition-colors duration-200">
+        <LoadingSpinner size="md" showText={true} />
+      </div>
+    );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 transition-colors duration-200">
       <div className="flex justify-between mb-6">
-        <h3 className="text-lg font-semibold">
-          {detail ? "Edit Detail" : "Create New Detail"}
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          {detail ? t("editDetail") : t("createNewDetail")}
         </h3>
       </div>
 
-      {error && <ErrorMessage message={error} />}
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description*
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            {t("description")}*
           </label>
           <textarea
             name="content"
             value={formData.content}
             onChange={handleChange}
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
             required
+            aria-required="true"
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Money Spent*
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("moneySpent")}*
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">
                 $
               </span>
               <input
@@ -127,71 +147,75 @@ const SponsorshipHackathonDetailForm: React.FC<
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                 required
+                aria-required="true"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status*
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("status.status")}*
             </label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
               required
+              aria-required="true"
             >
-              <option value="PLANNED">Planned</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value="PLANNED">{t("planned")}</option>
+              <option value="COMPLETED">{t("completed")}</option>
+              <option value="CANCELLED">{t("cancelled")}</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              From Date & Time*
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("fromDateTime")}*
             </label>
             <input
               type="datetime-local"
               name="timeFrom"
               value={formData.timeFrom}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
               required
+              aria-required="true"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              To Date & Time*
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("toDateTime")}*
             </label>
             <input
               type="datetime-local"
               name="timeTo"
               value={formData.timeTo}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
               required
+              aria-required="true"
             />
           </div>
         </div>
 
-        <div className="flex justify-end space-x-3 mt-6">
+        <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 transition-colors"
           >
-            Cancel
+            {t("cancel")}
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="w-full sm:w-auto px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
           >
-            {detail ? "Update Detail" : "Create Detail"}
+            {detail ? t("updateDetail") : t("createDetail")}
           </button>
         </div>
       </form>

@@ -499,6 +499,337 @@
     "rejectionSuccess": "Đã xử lí đăng ký thành công",
     "updateStatusFailed": "Không thể cập nhật trạng thái đăng ký"
   },
+  "sponsorship": {
+    "title": "Quản lý tài trợ",
+    "editSponsorship": "Chỉnh sửa tài trợ",
+    "addNewSponsorship": "Thêm tài trợ mới",
+    "cancel": "Hủy",
+    "sponsorshipName": "Tên tài trợ",
+    "brand": "Thương hiệu",
+    "amount": "Số tiền",
+    "pending": "Đang chờ",
+    "active": "Đang hoạt động",
+    "completed": "Hoàn thành",
+    "cancelled": "Đã hủy",
+    "startDateTime": "Ngày giờ bắt đầu",
+    "endDateTime": "Ngày giờ kết thúc",
+    "description": "Mô tả",
+    "saving": "Đang lưu...",
+    "update": "Cập nhật",
+    "create": "Tạo mới",
+    "sponsorshipSaveSuccess": "Lưu tài trợ thành công",
+    "sponsorshipSaveFailed": "Lưu tài trợ thất bại",
+    "list": {
+      "title": "Tất cả nhà tài trợ",
+      "noSponsorships": "Không tìm thấy nhà tài trợ nào",
+      "columns": {
+        "name": "Tên",
+        "brand": "Thương hiệu",
+        "amount": "Số tiền",
+        "period": "Thời gian",
+        "status": "Trạng thái",
+        "actions": "Hành động"
+      }
+    },
+    "actions": {
+      "addNew": "Thêm nhà tài trợ mới",
+      "viewDetails": "Xem chi tiết",
+      "viewDetailsFor": "Xem chi tiết của {name}",
+      "backToList": "Quay lại danh sách",
+      "edit": "Chỉnh sửa"
+    },
+    "status": {
+      "active": "Đang hoạt động",
+      "completed": "Đã hoàn thành",
+      "pending": "Đang chờ",
+      "cancelled": "Đã hủy",
+      "status": "Trạng thái"
+    },
+    "errors": {
+      "loadFailed": "Không thể tải danh sách tài trợ. Vui lòng thử lại sau.",
+      "loadDetailsFailed": "Không thể tải chi tiết tài trợ",
+      "organizerOnly": "Chỉ ban tổ chức mới có thể thực hiện hành động này",
+      "creatorOnly": "Chỉ ban tổ chức đã tạo tài trợ này mới có thể thêm hoặc chỉnh sửa thông tin tài trợ."
+    },
+    "success": {
+      "formSubmitted": "Đã lưu thông tin tài trợ thành công"
+    }
+  },
+  "sponsorshipManagement": {
+    "backToHackathonAllocations": "Quay lại phân bổ hackathon",
+    "sponsorshipAllocationDetails": "Chi tiết phân bổ tài trợ",
+    "addNewDetail": "Thêm chi tiết mới",
+    "editAllocation": "Chỉnh sửa phân bổ",
+    "deleteAllocation": "Xóa phân bổ",
+    "noSponsorshipDetailsFound": "Không tìm thấy chi tiết tài trợ nào.",
+    "addDetail": "Thêm chi tiết",
+    "description": "Mô tả",
+    "moneySpent": "Số tiền đã chi",
+    "period": "Thời gian",
+    "status": "Trạng thái",
+    "createdBy": "Tạo bởi",
+    "actions": "Thao tác",
+    "viewFiles": "Xem tệp tin",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "unknown": "Không xác định",
+    "planned": "Đã lên kế hoạch",
+    "completed": "Đã hoàn thành",
+    "cancelled": "Đã hủy",
+    "inprogress": "Đang thực hiện",
+    "confirmDeleteDetail": "Bạn có chắc chắn muốn xóa chi tiết này không?",
+    "detailDeletedSuccessfully": "Đã xóa chi tiết thành công",
+    "failedToDeleteDetail": "Không thể xóa chi tiết. Vui lòng thử lại sau.",
+    "failedToLoadDetails": "Không thể tải chi tiết tài trợ. Vui lòng thử lại sau.",
+    "onlyCreatorCanAddDetails": "Chỉ người tạo tài trợ này mới có thể thêm chi tiết.",
+    "onlyCreatorCanEditDetails": "Chỉ người tạo tài trợ này mới có thể chỉnh sửa chi tiết.",
+    "onlyCreatorCanDeleteDetails": "Chỉ người tạo tài trợ này mới có thể xóa chi tiết.",
+    "detailNotFound": "Không tìm thấy chi tiết",
+    "noPermissionToAddEdit": "Bạn không có quyền thêm hoặc chỉnh sửa chi tiết.",
+    "backToList": "Quay lại danh sách"
+  },
+  "createHackathon": {
+    "title": "Tạo hackathon mới",
+    "newHackathon": "Hackathon mới",
+    "enterSubtitle": "Nhập phụ đề cho hackathon của bạn",
+    "uploadBanner": "Tải lên banner",
+    "changeBanner": "Thay đổi banner",
+    "recommendedSize": "Kích thước đề xuất: 1200x400px",
+    "hackathonBannerAlt": "Banner hackathon",
+    "imageTypeError": "Chỉ cho phép hình ảnh JPEG, JPG và PNG",
+    "bannerUploadSuccess": "Tải lên banner thành công",
+    "bannerUploadError": "Không thể tải lên hình ảnh banner",
+    "uploadingBanner": "Đang tải lên banner...",
+    "successMessage": "Tạo hackathon thành công",
+    "errorMessage": "Không thể tạo hackathon",
+    "submitting": "Đang tạo hackathon...",
+    "tabs": {
+      "basic": "Thông tin cơ bản",
+      "information": "Thông tin chi tiết",
+      "description": "Mô tả",
+      "participant": "Người tham gia",
+      "documentation": "Tài liệu",
+      "contact": "Liên hệ"
+    },
+    "fields": {
+      "title": "Tiêu đề",
+      "subtitle": "Tiêu đề phụ",
+      "enrollStartDate": "Ngày bắt đầu đăng ký",
+      "enrollEndDate": "Ngày kết thúc đăng ký",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "category": "Danh mục",
+      "organization": "Tổ chức",
+      "teamSize": "Kích thước nhóm",
+      "minMembers": "Số thành viên tối thiểu",
+      "maxMembers": "Số thành viên tối đa",
+      "information": "Thông tin chi tiết",
+      "description": "Mô tả",
+      "showParticipants": "Hiển thị người tham gia",
+      "documentation": "Tài liệu",
+      "contact": "Thông tin liên hệ"
+    },
+    "placeholders": {
+      "title": "Nhập tiêu đề hackathon",
+      "subtitle": "Nhập tiêu đề phụ ngắn cho hackathon",
+      "information": "Nhập thông tin chi tiết về hackathon",
+      "description": "Nhập mô tả về hackathon",
+      "contact": "Nhập thông tin liên hệ cho người tham gia"
+    },
+    "categories": {
+      "coding": "Lập trình",
+      "external": "Bên ngoài",
+      "internal": "Nội bộ",
+      "design": "Thiết kế",
+      "others": "Khác"
+    },
+    "organizations": {
+      "fptu": "FPTU",
+      "nasa": "NASA",
+      "iaiHackathon": "IAI Hackathon",
+      "ceHackathon": "CE Hackathon",
+      "others": "Khác"
+    },
+    "buttons": {
+      "cancel": "Hủy",
+      "create": "Tạo Hackathon",
+      "deleteDocument": "Xóa tài liệu"
+    },
+    "validations": {
+      "enrollEndAfterStart": "Ngày kết thúc đăng ký phải sau ngày bắt đầu đăng ký",
+      "startAfterEnrollEnd": "Ngày bắt đầu phải sau ngày kết thúc đăng ký",
+      "endAfterStart": "Ngày kết thúc phải sau ngày bắt đầu"
+    },
+    "documentUploadSuccess": "Tải tài liệu lên thành công",
+    "documentUploadError": "Lỗi khi tải tài liệu lên",
+    "documentDeleted": "Đã xóa tài liệu thành công",
+    "noDocumentsUploaded": "Chưa có tài liệu nào được tải lên",
+    "participantDescription": "Khi được bật, người tham gia sẽ hiển thị với tất cả mọi người. Nếu tắt, chỉ người tổ chức mới có thể xem người tham gia."
+  },
+  "sidebar": {
+    "sidebar": "Thanh điều hướng",
+    "mainNavigation": "Điều hướng chính",
+    "menu": "Menu",
+    "homeLogo": "Về trang chủ",
+    "logoAlt": "Biểu tượng",
+    "logoNameAlt": "Tên biểu tượng",
+    "logoIconAlt": "Biểu tượng nhỏ",
+    "dashboard": "Bảng điều khiển",
+    "ecommerce": "Thương mại",
+    "userManagement": "Quản lý người dùng",
+    "threadPostReport": "Báo cáo bài đăng",
+    "mentorshipRequest": "Yêu cầu cố vấn",
+    "mentorTeam": "Đội ngũ cố vấn",
+    "organizerHackathon": "Tổ chức hackathon",
+    "userCreation": "Tạo người dùng",
+    "gradingSubmission": "Chấm điểm bài nộp",
+    "calendar": "Lịch",
+    "kanbanBoard": "Bảng kanban",
+    "chat": "Trò chuyện",
+    "sendNotification": "Gửi thông báo",
+    "blog": "Blog",
+    "new": "mới",
+    "pro": "pro"
+  },
+  "sponsorshipFiles": {
+    "backToDetails": "Quay lại chi tiết",
+    "filesFor": "Tệp tin cho",
+    "spent": "chi tiêu",
+    "relatedFiles": "Tệp liên quan",
+    "uploadFile": "Tải lên tệp",
+    "uploading": "Đang tải lên...",
+    "uploadNewFile": "Tải lên tệp mới",
+    "noFilesFound": "Không tìm thấy tệp tin cho chi tiết này.",
+    "uploadedBy": "Được tải lên bởi",
+    "on": "vào",
+    "download": "Tải xuống",
+    "delete": "Xóa",
+    "failedToLoadFiles": "Không thể tải tệp tin. Vui lòng thử lại sau.",
+    "onlyCreatorCanUpload": "Chỉ người tạo tài trợ này mới có thể tải lên tệp tin.",
+    "onlyCreatorCanDelete": "Chỉ người tạo tài trợ này mới có thể xóa tệp tin.",
+    "confirmDeleteFile": "Bạn có chắc chắn muốn xóa tệp tin này không?",
+    "filesUploadedSuccessfully": "Tệp tin đã được tải lên thành công.",
+    "fileDeletedSuccessfully": "Tệp tin đã được xóa thành công.",
+    "failedToUploadFiles": "Không thể tải lên tệp tin. Vui lòng thử lại.",
+    "failedToDeleteFile": "Không thể xóa tệp tin. Vui lòng thử lại sau.",
+    "completed": "Hoàn thành",
+    "planned": "Kế hoạch",
+    "cancelled": "Đã hủy"
+  },
+  "dashboard": {
+    "home": {
+      "welcomeTitle": "Trang chủ bảng điều khiển",
+      "welcomeMessage": "Chào mừng trở lại, {name}!",
+      "guest": "Khách",
+      "dashboardTip": "Sử dụng thanh bên để điều hướng qua các phần khác nhau của bảng điều khiển.",
+      "userAvatar": "Ảnh đại diện",
+      "card1Title": "Tiến độ của bạn",
+      "card1Description": "Theo dõi tiến độ và thành tựu của bạn trong các dự án đang diễn ra.",
+      "card2Title": "Hoạt động gần đây",
+      "card2Description": "Kiểm tra những gì đã xảy ra trong nhóm của bạn gần đây.",
+      "card3Title": "Sự kiện sắp tới",
+      "card3Description": "Luôn cập nhật về các sự kiện và thời hạn sắp đến."
+    }
+  },
+  "sponsorshipDetails": {
+    "fields": {
+      "brand": "Thương hiệu",
+      "totalAmount": "Tổng số tiền",
+      "period": "Thời gian",
+      "createdBy": "Được tạo bởi",
+      "description": "Mô tả"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "completed": "Hoàn thành",
+      "pending": "Đang chờ xử lý",
+      "cancelled": "Đã hủy"
+    },
+    "actions": {
+      "backToSponsorships": "Quay lại danh sách tài trợ",
+      "editSponsorship": "Chỉnh sửa tài trợ",
+      "addHackathonAllocation": "Thêm phân bổ hackathon",
+      "backToList": "Quay lại danh sách",
+      "viewDetails": "Xem chi tiết",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa"
+    },
+    "sections": {
+      "hackathonAllocations": "Phân bổ hackathon"
+    },
+    "table": {
+      "hackathonId": "ID hackathon",
+      "totalMoney": "Tổng tiền",
+      "createdBy": "Được tạo bởi",
+      "createdAt": "Ngày tạo",
+      "actions": "Hành động"
+    },
+    "messages": {
+      "noAllocationsFound": "Không tìm thấy phân bổ hackathon nào cho tài trợ này."
+    },
+    "labels": {
+      "unknown": "Không xác định"
+    },
+    "confirmations": {
+      "deleteAllocation": "Bạn có chắc chắn muốn xóa phân bổ này không?"
+    },
+    "errors": {
+      "loadAllocationsFailed": "Không thể tải phân bổ tài trợ. Vui lòng thử lại sau.",
+      "loadDetailsFailed": "Không thể tải chi tiết phân bổ. Vui lòng thử lại sau.",
+      "deleteFailed": "Không thể xóa phân bổ. Vui lòng thử lại sau.",
+      "loadingDetails": "Lỗi khi tải chi tiết",
+      "sponsorshipNotFound": "Không tìm thấy tài trợ",
+      "onlyCreatorCanAdd": "Chỉ người tổ chức đã tạo tài trợ này mới có thể thêm phân bổ hackathon",
+      "onlyCreatorCanEdit": "Chỉ người tổ chức đã tạo tài trợ này mới có thể chỉnh sửa phân bổ hackathon",
+      "onlyCreatorCanDelete": "Chỉ người tổ chức đã tạo tài trợ này mới có thể xóa phân bổ hackathon",
+      "onlyOrganizersCanModify": "Chỉ người tổ chức mới có thể thêm hoặc chỉnh sửa phân bổ hackathon."
+    },
+    "success": {
+      "allocationDeleted": "Đã xóa phân bổ thành công"
+    }
+  },
+  "sponsorshipHackathon": {
+    "editAllocation": "Chỉnh sửa phân bổ",
+    "addNewAllocation": "Thêm phân bổ mới",
+    "totalMoney": "Tổng tiền ($)",
+    "moneyHelperText": "Nhập số tiền được phân bổ cho tài trợ này",
+    "cancel": "Hủy",
+    "update": "Cập nhật",
+    "create": "Tạo mới",
+    "saveError": "Không thể lưu phân bổ tài trợ. Vui lòng thử lại sau.",
+    "updateSuccess": "Cập nhật phân bổ tài trợ thành công",
+    "createSuccess": "Tạo mới phân bổ tài trợ thành công"
+  },
+  "threadPostReport": {
+    "management": "Quản lý báo cáo bài đăng",
+    "welcome": "Xin chào, {name}! Quản lý các bài đăng bị báo cáo dưới đây.",
+    "noReports": "Không tìm thấy báo cáo bài đăng nào.",
+    "tableHeaders": {
+      "id": "ID",
+      "threadPostId": "ID bài đăng",
+      "reason": "Lý do",
+      "status": "Trạng thái",
+      "createdBy": "Tạo bởi",
+      "createdAt": "Tạo lúc",
+      "actions": "Hành động"
+    },
+    "status": {
+      "pending": "Đang chờ",
+      "reviewed": "Đã xem xét",
+      "dismissed": "Đã bỏ qua"
+    },
+    "actions": {
+      "markReviewed": "Đánh dấu đã xem",
+      "dismiss": "Bỏ qua",
+      "updating": "Đang cập nhật...",
+      "processed": "Đã xử lý"
+    },
+    "loading": "Đang tải báo cáo bài đăng...",
+    "error": "Không thể tải báo cáo bài đăng",
+    "tryAgain": "Thử lại",
+    "updateSuccess": "Cập nhật trạng thái báo cáo thành công",
+    "updateError": "Không thể cập nhật trạng thái báo cáo"
+  },
   "locations": {
     "availableLocations": "Các địa điểm có sẵn",
     "addLocation": "Thêm địa điểm",

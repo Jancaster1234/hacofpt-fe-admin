@@ -17,6 +17,7 @@ export type Role = {
  * - ID: 1 → Name: ORGANIZER  → Manages hackathons and events
  * - ID: 2 → Name: JUDGE      → Evaluates submissions
  * - ID: 3 → Name: ADMIN      → Has full system access
+ * - ID: 4 → Name: TEAM_LEADER → Leads a team and coordinates team activities
  * - ID: 5 → Name: MENTOR     → Provides guidance to participants
  * - ID: 6 → Name: TEAM_MEMBER → Participates in teams
  */

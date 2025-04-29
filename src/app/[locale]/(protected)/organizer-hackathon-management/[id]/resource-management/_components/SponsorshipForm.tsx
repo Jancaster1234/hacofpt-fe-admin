@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { Sponsorship } from "@/types/entities/sponsorship";
 import { sponsorshipService } from "@/services/sponsorship.service";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface SponsorshipFormProps {
   hackathonId: string;
@@ -16,6 +19,8 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
   onSuccess,
   onCancel,
 }) => {
+  const t = useTranslations("sponsorship");
+  const toast = useToast();
   const isEditMode = Boolean(sponsorship?.id);
 
   const [formData, setFormData] = useState({
@@ -94,163 +99,187 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
           : `${formData.timeTo}T00:00:00`,
       };
 
+      let response;
       if (isEditMode) {
-        await sponsorshipService.updateSponsorship({
+        response = await sponsorshipService.updateSponsorship({
           id: sponsorship?.id,
           ...submissionData,
         });
       } else {
-        await sponsorshipService.createSponsorship(submissionData);
+        response = await sponsorshipService.createSponsorship(submissionData);
       }
+
+      // Show success toast
+      toast.success(response.message || t("sponsorshipSaveSuccess"));
       onSuccess();
     } catch (err: any) {
-      setError(err.message || "Failed to save sponsorship");
+      const errorMsg = err.message || t("sponsorshipSaveFailed");
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl font-semibold">
-          {isEditMode ? "Edit Sponsorship" : "Add New Sponsorship"}
+    <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm transition-colors duration-200">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 sm:mb-0">
+          {isEditMode ? t("editSponsorship") : t("addNewSponsorship")}
         </h3>
         <button
           onClick={onCancel}
-          className="text-gray-600 hover:text-gray-800"
+          className="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white transition-colors"
+          aria-label={t("cancel")}
         >
-          Cancel
+          {t("cancel")}
         </button>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>
+        <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded">
+          {error}
+        </div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Sponsorship Name
+      {isSubmitting ? (
+        <div className="flex justify-center py-8">
+          <LoadingSpinner size="md" showText={true} />
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t("sponsorshipName")}*
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                aria-required="true"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t("brand")}*
+              </label>
+              <input
+                type="text"
+                name="brand"
+                value={formData.brand}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                aria-required="true"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t("amount")} ($)*
+              </label>
+              <input
+                type="number"
+                name="money"
+                value={formData.money}
+                onChange={handleChange}
+                required
+                min="0"
+                step="0.01"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                aria-required="true"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t("status")}
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+              >
+                <option value="PENDING">{t("pending")}</option>
+                <option value="ACTIVE">{t("active")}</option>
+                <option value="COMPLETED">{t("completed")}</option>
+                <option value="CANCELLED">{t("cancelled")}</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t("startDateTime")}*
+              </label>
+              <input
+                type="datetime-local"
+                name="timeFrom"
+                value={formData.timeFrom}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                aria-required="true"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t("endDateTime")}*
+              </label>
+              <input
+                type="datetime-local"
+                name="timeTo"
+                value={formData.timeTo}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                aria-required="true"
+              />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t("description")}
             </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
+            <textarea
+              name="content"
+              value={formData.content}
               onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Brand
-            </label>
-            <input
-              type="text"
-              name="brand"
-              value={formData.brand}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Amount ($)
-            </label>
-            <input
-              type="number"
-              name="money"
-              value={formData.money}
-              onChange={handleChange}
-              required
-              min="0"
-              step="0.01"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
-            </label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 transition-colors"
+              disabled={isSubmitting}
             >
-              <option value="PENDING">Pending</option>
-              <option value="ACTIVE">Active</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="CANCELLED">Cancelled</option>
-            </select>
+              {t("cancel")}
+            </button>
+            <button
+              type="submit"
+              className="w-full sm:w-auto px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors"
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? t("saving")
+                : isEditMode
+                  ? t("update")
+                  : t("create")}
+            </button>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Start Date & Time
-            </label>
-            <input
-              type="datetime-local"
-              name="timeFrom"
-              value={formData.timeFrom}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              End Date & Time
-            </label>
-            <input
-              type="datetime-local"
-              name="timeTo"
-              value={formData.timeTo}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description
-          </label>
-          <textarea
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="mr-3 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            disabled={isSubmitting}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Saving..." : isEditMode ? "Update" : "Create"}
-          </button>
-        </div>
-      </form>
+        </form>
+      )}
     </div>
   );
 };
