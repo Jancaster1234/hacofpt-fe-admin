@@ -185,6 +185,22 @@
     "submittingRegistration": "Submitting your registration...",
     "deletingRegistration": "Deleting your registration..."
   },
+  "createHackathon": {
+    "title": "Create new hackathon",
+    "newHackathon": "New hackathon",
+    "enterSubtitle": "Enter a subtitle for your hackathon",
+    "uploadBanner": "Upload banner",
+    "changeBanner": "Change banner",
+    "recommendedSize": "Recommended size: 1200x400px",
+    "hackathonBannerAlt": "Hackathon banner",
+    "imageTypeError": "Only JPEG, JPG and PNG images are allowed",
+    "bannerUploadSuccess": "Banner uploaded successfully",
+    "bannerUploadError": "Failed to upload banner image",
+    "uploadingBanner": "Uploading banner...",
+    "successMessage": "Hackathon created successfully",
+    "errorMessage": "Failed to create hackathon",
+    "submitting": "Creating hackathon..."
+  },
   "resourceManagement": {
     "title": "Hackathon resource management",
     "loading": "Loading...",

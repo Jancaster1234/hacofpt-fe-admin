@@ -588,6 +588,22 @@
     "noPermissionToAddEdit": "Bạn không có quyền thêm hoặc chỉnh sửa chi tiết.",
     "backToList": "Quay lại danh sách"
   },
+  "createHackathon": {
+    "title": "Tạo hackathon mới",
+    "newHackathon": "Hackathon mới",
+    "enterSubtitle": "Nhập phụ đề cho hackathon của bạn",
+    "uploadBanner": "Tải lên banner",
+    "changeBanner": "Thay đổi banner",
+    "recommendedSize": "Kích thước đề xuất: 1200x400px",
+    "hackathonBannerAlt": "Banner hackathon",
+    "imageTypeError": "Chỉ cho phép hình ảnh JPEG, JPG và PNG",
+    "bannerUploadSuccess": "Tải lên banner thành công",
+    "bannerUploadError": "Không thể tải lên hình ảnh banner",
+    "uploadingBanner": "Đang tải lên banner...",
+    "successMessage": "Tạo hackathon thành công",
+    "errorMessage": "Không thể tạo hackathon",
+    "submitting": "Đang tạo hackathon..."
+  },
   "sidebar": {
     "sidebar": "Thanh điều hướng",
     "mainNavigation": "Điều hướng chính",
