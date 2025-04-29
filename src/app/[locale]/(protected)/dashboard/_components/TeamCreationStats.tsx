@@ -13,6 +13,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface TeamStatsByPeriod {
   day: number;
@@ -24,9 +26,6 @@ interface TeamStatsByPeriod {
 const TeamCreationStats = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [timeFrame, setTimeFrame] = useState<"day" | "week" | "month" | "year">(
-    "day"
-  );
   const [stats, setStats] = useState<TeamStatsByPeriod>({
     day: 0,
     week: 0,
@@ -84,97 +83,112 @@ const TeamCreationStats = () => {
     loadTeams();
   }, []);
 
-  const chartData = [
+  const dayData = [{ name: "Today", Teams: stats.day }];
+  const weekData = [{ name: "This Week", Teams: stats.week }];
+  const monthData = [{ name: "This Month", Teams: stats.month }];
+  const yearData = [{ name: "This Year", Teams: stats.year }];
+  const allData = [
     { name: "Day", Teams: stats.day },
     { name: "Week", Teams: stats.week },
     { name: "Month", Teams: stats.month },
     { name: "Year", Teams: stats.year },
   ];
 
-  const getDisplayData = () => {
-    switch (timeFrame) {
-      case "day":
-        return [{ name: "Today", Teams: stats.day }];
-      case "week":
-        return [{ name: "This Week", Teams: stats.week }];
-      case "month":
-        return [{ name: "This Month", Teams: stats.month }];
-      case "year":
-        return [{ name: "This Year", Teams: stats.year }];
-      default:
-        return chartData;
-    }
-  };
+  if (isLoading) {
+    return (
+      <Card className="h-full w-full">
+        <CardHeader>
+          <CardTitle>Teams Created</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center p-6">
+          <p>Loading...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="rounded-lg border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="mb-3 flex items-center justify-between">
-        <h4 className="text-xl font-semibold text-black dark:text-white">
-          Teams Created
-        </h4>
-        <div className="flex space-x-2">
-          <button
-            className={`rounded px-3 py-1 text-sm ${
-              timeFrame === "day"
-                ? "bg-primary text-white"
-                : "bg-gray-100 text-black dark:bg-meta-4 dark:text-white"
-            }`}
-            onClick={() => setTimeFrame("day")}
-          >
-            Day
-          </button>
-          <button
-            className={`rounded px-3 py-1 text-sm ${
-              timeFrame === "week"
-                ? "bg-primary text-white"
-                : "bg-gray-100 text-black dark:bg-meta-4 dark:text-white"
-            }`}
-            onClick={() => setTimeFrame("week")}
-          >
-            Week
-          </button>
-          <button
-            className={`rounded px-3 py-1 text-sm ${
-              timeFrame === "month"
-                ? "bg-primary text-white"
-                : "bg-gray-100 text-black dark:bg-meta-4 dark:text-white"
-            }`}
-            onClick={() => setTimeFrame("month")}
-          >
-            Month
-          </button>
-          <button
-            className={`rounded px-3 py-1 text-sm ${
-              timeFrame === "year"
-                ? "bg-primary text-white"
-                : "bg-gray-100 text-black dark:bg-meta-4 dark:text-white"
-            }`}
-            onClick={() => setTimeFrame("year")}
-          >
-            Year
-          </button>
-        </div>
-      </div>
+    <Card className="h-full w-full">
+      <CardHeader>
+        <CardTitle>Teams Created</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="all">
+          <TabsList className="mb-4">
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="day">Day</TabsTrigger>
+            <TabsTrigger value="week">Week</TabsTrigger>
+            <TabsTrigger value="month">Month</TabsTrigger>
+            <TabsTrigger value="year">Year</TabsTrigger>
+          </TabsList>
 
-      {isLoading ? (
-        <div className="flex h-60 items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
-        </div>
-      ) : (
-        <div className="h-60">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={getDisplayData()}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="name" />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Teams" fill="#3C50E0" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-    </div>
+          <TabsContent value="all">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={allData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Teams" fill="#3C50E0" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </TabsContent>
+
+          <TabsContent value="day">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={dayData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Teams" fill="#3C50E0" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </TabsContent>
+
+          <TabsContent value="week">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={weekData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Teams" fill="#3C50E0" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </TabsContent>
+
+          <TabsContent value="month">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={monthData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Teams" fill="#3C50E0" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </TabsContent>
+
+          <TabsContent value="year">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={yearData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="Teams" fill="#3C50E0" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
 
