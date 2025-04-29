@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/[id]/_mock/fetchMockTeams.ts
+// src/app/[locale]/(protected)/dashboard/_mocks/fetchMockTeams.ts
 import { Team } from "@/types/entities/team";
 
 export const fetchMockTeams = (hackathonId: string): Promise<Team[]> => {
@@ -119,7 +119,7 @@ export const fetchMockTeams = (hackathonId: string): Promise<Team[]> => {
             {
               id: "ut4",
               user: {
-                id: userId,
+                id: "userIdz",
                 firstName: "Your",
                 lastName: "Name",
                 email: "yourname@example.com",
