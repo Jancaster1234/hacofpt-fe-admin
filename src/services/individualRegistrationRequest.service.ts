@@ -179,6 +179,71 @@ class IndividualRegistrationRequestService {
     }
   }
 
+  async createBulkIndividualRegistrationRequests(
+    data: Array<{
+      hackathonId: string;
+      status: "PENDING" | "APPROVED" | "REJECTED";
+      reviewedById?: string;
+    }>
+  ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {
+    try {
+      const response = await apiService.auth.post<
+        IndividualRegistrationRequest[]
+      >("/hackathon-service/api/v1/individuals/bulk", { data });
+
+      if (!response || !response.data) {
+        throw new Error(
+          response?.message || "Failed to create bulk registration requests"
+        );
+      }
+
+      return {
+        data: response.data,
+        message:
+          response.message || "Bulk registration requests created successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<IndividualRegistrationRequest[]>(
+        error,
+        [],
+        "[Individual Registration Service] Error creating bulk registration requests:"
+      );
+    }
+  }
+
+  async updateBulkIndividualRegistrationRequests(
+    data: Array<{
+      id: string;
+      hackathonId: string;
+      status: "PENDING" | "APPROVED" | "REJECTED";
+      reviewedById?: string;
+    }>
+  ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {
+    try {
+      const response = await apiService.auth.put<
+        IndividualRegistrationRequest[]
+      >("/hackathon-service/api/v1/individuals/bulk", { data });
+
+      if (!response || !response.data) {
+        throw new Error(
+          response?.message || "Failed to update bulk registration requests"
+        );
+      }
+
+      return {
+        data: response.data,
+        message:
+          response.message || "Bulk registration requests updated successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<IndividualRegistrationRequest[]>(
+        error,
+        [],
+        "[Individual Registration Service] Error updating bulk registration requests:"
+      );
+    }
+  }
+
   async deleteIndividualRegistration(
     id: string
   ): Promise<{ message?: string }> {
