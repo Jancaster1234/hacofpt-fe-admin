@@ -72,6 +72,7 @@ class RoleService {
   async createRole(data: {
     name: string;
     description?: string;
+    permissions?: string[]; //permission ids
   }): Promise<{ data: Role; message?: string }> {
     try {
       const response = await apiService.auth.post<Role>(
@@ -98,8 +99,8 @@ class RoleService {
 
   async updateRole(data: {
     id: string;
-    name?: string;
     description?: string;
+    permissions?: string[]; //permission ids
   }): Promise<{ data: Role; message?: string }> {
     try {
       const response = await apiService.auth.put<Role>(
