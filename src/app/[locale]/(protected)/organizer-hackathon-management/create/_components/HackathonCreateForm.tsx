@@ -16,7 +16,8 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { fileUrlService } from "@/services/fileUrl.service";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 type TabKey =
   | "basic"
@@ -60,22 +61,24 @@ export default function HackathonCreateForm({
 }: HackathonCreateFormProps) {
   const t = useTranslations("createHackathon");
   const [activeTab, setActiveTab] = useState<TabKey>("basic");
+  const [isUploading, setIsUploading] = useState(false);
+  const toast = useToast();
 
   // Available categories and organizations
   const CATEGORIES = [
-    { value: "CODING", label: "Coding Hackathons" },
-    { value: "EXTERNAL", label: "External Hackathons" },
-    { value: "INTERNAL", label: "Internal Hackathons" },
-    { value: "DESIGN", label: "Design Hackathons" },
-    { value: "OTHERS", label: "Others" },
+    { value: "CODING", label: t("categories.coding") },
+    { value: "EXTERNAL", label: t("categories.external") },
+    { value: "INTERNAL", label: t("categories.internal") },
+    { value: "DESIGN", label: t("categories.design") },
+    { value: "OTHERS", label: t("categories.others") },
   ];
 
   const ORGANIZATIONS = [
-    { value: "FPTU", label: "FPTU" },
-    { value: "NASA", label: "NASA" },
-    { value: "IAI_HACKATHON", label: "IAI HACKATHON" },
-    { value: "CE_HACKATHON", label: "CE Hackathon" },
-    { value: "OTHERS", label: "Others" },
+    { value: "FPTU", label: t("organizations.fptu") },
+    { value: "NASA", label: t("organizations.nasa") },
+    { value: "IAI_HACKATHON", label: t("organizations.iaiHackathon") },
+    { value: "CE_HACKATHON", label: t("organizations.ceHackathon") },
+    { value: "OTHERS", label: t("organizations.others") },
   ];
 
   const tabs: { key: TabKey; label: string }[] = [
@@ -106,6 +109,7 @@ export default function HackathonCreateForm({
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
+    setIsUploading(true);
     try {
       const fileArray = Array.from(files);
       const response =
@@ -118,15 +122,17 @@ export default function HackathonCreateForm({
           ...formData,
           documentation: [...formData.documentation, ...newFileUrls],
         });
-        toast.success(t("documentUploadSuccess"));
+        toast.success(response.message || t("documentUploadSuccess"));
       } else {
-        throw new Error("No file URLs returned from server");
+        throw new Error(response.message || t("documentUploadError"));
       }
     } catch (error) {
       console.error("Error uploading documents:", error);
       toast.error(
         error instanceof Error ? error.message : t("documentUploadError")
       );
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -138,6 +144,7 @@ export default function HackathonCreateForm({
       ...formData,
       documentation: updatedDocs,
     });
+    toast.info(t("documentDeleted"));
   };
 
   // Helper functions for file handling
@@ -156,33 +163,33 @@ export default function HackathonCreateForm({
     switch (extension) {
       case "doc":
       case "docx":
-        return <FaFileWord size={16} />;
+        return <FaFileWord size={16} className="text-blue-600" />;
       case "pdf":
-        return <FaFilePdf size={16} />;
+        return <FaFilePdf size={16} className="text-red-600" />;
       case "xls":
       case "xlsx":
-        return <FaFileExcel size={16} />;
+        return <FaFileExcel size={16} className="text-green-600" />;
       case "jpg":
       case "jpeg":
       case "png":
       case "gif":
-        return <FaFileImage size={16} />;
+        return <FaFileImage size={16} className="text-purple-600" />;
       case "mp3":
       case "wav":
       case "ogg":
-        return <FaFileAudio size={16} />;
+        return <FaFileAudio size={16} className="text-yellow-600" />;
       case "mp4":
       case "avi":
       case "mov":
-        return <FaFileVideo size={16} />;
+        return <FaFileVideo size={16} className="text-pink-600" />;
       case "zip":
       case "rar":
       case "7z":
-        return <FaFileArchive size={16} />;
+        return <FaFileArchive size={16} className="text-orange-600" />;
       case "txt":
-        return <FaFileAlt size={16} />;
+        return <FaFileAlt size={16} className="text-gray-600" />;
       default:
-        return <FaFile size={16} />;
+        return <FaFile size={16} className="text-gray-600" />;
     }
   };
 
@@ -201,34 +208,36 @@ export default function HackathonCreateForm({
 
   return (
     <div className="mt-4 sm:mt-6 transition-all duration-300">
-      {/* Tab Buttons */}
-      <div className="flex overflow-x-auto scrollbar-hide border-b dark:border-gray-700">
+      {/* Tab Buttons - Enhanced with better responsiveness */}
+      <div className="flex overflow-x-auto pb-1 scrollbar-hide border-b dark:border-gray-700">
         {tabs.map(({ key, label }) => (
           <button
             key={key}
             onClick={() => handleTabClick(key)}
-            className={`px-3 py-2 sm:px-4 text-sm sm:text-lg whitespace-nowrap transition-all duration-200 ${
+            className={`px-2 py-2 sm:px-4 text-xs sm:text-base md:text-lg whitespace-nowrap transition-all duration-200 ${
               activeTab === key
                 ? "border-b-2 border-blue-500 dark:border-blue-400 font-semibold text-gray-900 dark:text-gray-100"
                 : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             }`}
+            aria-selected={activeTab === key}
+            role="tab"
           >
             {label}
           </button>
         ))}
       </div>
 
-      {/* Tab Content */}
+      {/* Tab Content - Enhanced with theme support */}
       <div className="mt-4 p-3 sm:p-4 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm transition-colors duration-300">
         {activeTab === "basic" && (
           <div className="space-y-4">
             <div>
-              <label className="block font-medium mb-1">
+              <label className="block font-medium mb-1 text-gray-800 dark:text-gray-200">
                 {t("fields.title")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
                 placeholder={t("placeholders.title")}
                 value={formData.title}
                 onChange={(e) =>
@@ -239,11 +248,11 @@ export default function HackathonCreateForm({
             </div>
 
             <div>
-              <label className="block font-medium mb-1">
+              <label className="block font-medium mb-1 text-gray-800 dark:text-gray-200">
                 {t("fields.subtitle")}
               </label>
               <textarea
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
                 rows={3}
                 placeholder={t("placeholders.subtitle")}
                 value={formData.subTitle}
@@ -255,13 +264,13 @@ export default function HackathonCreateForm({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block font-medium mb-1">
+                <label className="block font-medium mb-1 text-gray-800 dark:text-gray-200">
                   {t("fields.enrollStartDate")}{" "}
                   <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
                   value={formData.enrollStartDate}
                   onChange={(e) =>
                     setFormData({
@@ -274,18 +283,18 @@ export default function HackathonCreateForm({
               </div>
 
               <div>
-                <label className="block font-medium mb-1">
+                <label className="block font-medium mb-1 text-gray-800 dark:text-gray-200">
                   {t("fields.enrollEndDate")}{" "}
                   <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
-                  className={`w-full p-2 border rounded-md ${
+                  className={`w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200 ${
                     formData.enrollStartDate &&
                     formData.enrollEndDate &&
                     new Date(formData.enrollStartDate) >=
                       new Date(formData.enrollEndDate)
-                      ? "border-red-500"
+                      ? "border-red-500 dark:border-red-400"
                       : ""
                   }`}
                   value={formData.enrollEndDate}
@@ -302,25 +311,25 @@ export default function HackathonCreateForm({
                   formData.enrollEndDate &&
                   new Date(formData.enrollStartDate) >=
                     new Date(formData.enrollEndDate) && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                       {t("validations.enrollEndAfterStart")}
                     </p>
                   )}
               </div>
 
               <div>
-                <label className="block font-medium mb-1">
+                <label className="block font-medium mb-1 text-gray-800 dark:text-gray-200">
                   {t("fields.startDate")}{" "}
                   <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
-                  className={`w-full p-2 border rounded-md ${
+                  className={`w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200 ${
                     formData.enrollEndDate &&
                     formData.startDate &&
                     new Date(formData.enrollEndDate) >=
                       new Date(formData.startDate)
-                      ? "border-red-500"
+                      ? "border-red-500 dark:border-red-400"
                       : ""
                   }`}
                   value={formData.startDate}
@@ -337,23 +346,23 @@ export default function HackathonCreateForm({
                   formData.startDate &&
                   new Date(formData.enrollEndDate) >=
                     new Date(formData.startDate) && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                       {t("validations.startAfterEnrollEnd")}
                     </p>
                   )}
               </div>
 
               <div>
-                <label className="block font-medium mb-1">
+                <label className="block font-medium mb-1 text-gray-800 dark:text-gray-200">
                   {t("fields.endDate")} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
-                  className={`w-full p-2 border rounded-md ${
+                  className={`w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200 ${
                     formData.startDate &&
                     formData.endDate &&
                     new Date(formData.startDate) >= new Date(formData.endDate)
-                      ? "border-red-500"
+                      ? "border-red-500 dark:border-red-400"
                       : ""
                   }`}
                   value={formData.endDate}
@@ -370,7 +379,7 @@ export default function HackathonCreateForm({
                   formData.endDate &&
                   new Date(formData.startDate) >=
                     new Date(formData.endDate) && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="text-red-500 dark:text-red-400 text-sm mt-1">
                       {t("validations.endAfterStart")}
                     </p>
                   )}
@@ -379,11 +388,11 @@ export default function HackathonCreateForm({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block font-medium mb-1">
+                <label className="block font-medium mb-1 text-gray-800 dark:text-gray-200">
                   {t("fields.category")}
                 </label>
                 <select
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
                   value={formData.category}
                   onChange={(e) =>
                     setFormData({ ...formData, category: e.target.value })
@@ -398,11 +407,11 @@ export default function HackathonCreateForm({
               </div>
 
               <div>
-                <label className="block font-medium mb-1">
+                <label className="block font-medium mb-1 text-gray-800 dark:text-gray-200">
                   {t("fields.organization")}
                 </label>
                 <select
-                  className="w-full p-2 border rounded-md"
+                  className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
                   value={formData.organization}
                   onChange={(e) =>
                     setFormData({ ...formData, organization: e.target.value })
@@ -418,17 +427,17 @@ export default function HackathonCreateForm({
             </div>
 
             <div>
-              <label className="block font-medium mb-1">
+              <label className="block font-medium mb-1 text-gray-800 dark:text-gray-200">
                 {t("fields.teamSize")}
               </label>
-              <div className="flex gap-4">
-                <div className="w-1/2">
-                  <label className="text-sm text-gray-600">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="w-full sm:w-1/2">
+                  <label className="text-sm text-gray-600 dark:text-gray-400">
                     {t("fields.minMembers")}
                   </label>
                   <input
                     type="number"
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
                     min="1"
                     value={formData.minimumTeamMembers}
                     onChange={(e) =>
@@ -440,13 +449,13 @@ export default function HackathonCreateForm({
                   />
                 </div>
 
-                <div className="w-1/2">
-                  <label className="text-sm text-gray-600">
+                <div className="w-full sm:w-1/2">
+                  <label className="text-sm text-gray-600 dark:text-gray-400">
                     {t("fields.maxMembers")}
                   </label>
                   <input
                     type="number"
-                    className="w-full p-2 border rounded-md"
+                    className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
                     min={formData.minimumTeamMembers}
                     value={formData.maximumTeamMembers}
                     onChange={(e) =>
@@ -464,11 +473,11 @@ export default function HackathonCreateForm({
 
         {activeTab === "information" && (
           <div>
-            <label className="block font-medium mb-2">
+            <label className="block font-medium mb-2 text-gray-800 dark:text-gray-200">
               {t("fields.information")}
             </label>
             <textarea
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
               rows={10}
               placeholder={t("placeholders.information")}
               value={formData.information}
@@ -481,11 +490,11 @@ export default function HackathonCreateForm({
 
         {activeTab === "description" && (
           <div>
-            <label className="block font-medium mb-2">
+            <label className="block font-medium mb-2 text-gray-800 dark:text-gray-200">
               {t("fields.description")}
             </label>
             <textarea
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
               rows={10}
               placeholder={t("placeholders.description")}
               value={formData.description}
@@ -509,9 +518,12 @@ export default function HackathonCreateForm({
                     showParticipants: !formData.showParticipants,
                   })
                 }
-                className="mr-2"
+                className="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-400 dark:bg-gray-700 dark:border-gray-600"
               />
-              <label htmlFor="showParticipants">
+              <label
+                htmlFor="showParticipants"
+                className="text-gray-800 dark:text-gray-200"
+              >
                 {t("fields.showParticipants")}
               </label>
             </div>
@@ -523,38 +535,49 @@ export default function HackathonCreateForm({
 
         {activeTab === "documentation" && (
           <div>
-            <label className="block font-medium mb-2">
+            <label className="block font-medium mb-2 text-gray-800 dark:text-gray-200">
               {t("fields.documentation")}
             </label>
-            <input
-              type="file"
-              multiple
-              onChange={handleDocumentUpload}
-              className="block w-full border p-2 rounded-md mb-4"
-            />
+            <div className="relative">
+              <input
+                type="file"
+                multiple
+                onChange={handleDocumentUpload}
+                className={`block w-full border p-2 rounded-md mb-4 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 dark:file:bg-blue-900 dark:file:text-blue-200 hover:file:bg-blue-100 dark:hover:file:bg-blue-800 transition-colors duration-200 ${
+                  isUploading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isUploading}
+              />
+              {isUploading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 dark:bg-gray-800 dark:bg-opacity-70">
+                  <LoadingSpinner size="sm" showText={true} />
+                </div>
+              )}
+            </div>
 
             {formData.documentation.length > 0 ? (
-              <ul className="border rounded-md divide-y">
+              <ul className="border rounded-md divide-y border-gray-300 dark:border-gray-600 divide-gray-300 dark:divide-gray-600 bg-white dark:bg-gray-700 transition-colors duration-200">
                 {formData.documentation.map((url, index) => (
                   <li
                     key={index}
-                    className="flex justify-between items-center p-2"
+                    className="flex justify-between items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
                   >
-                    <span className="flex items-center gap-2">
+                    <span className="flex items-center gap-2 truncate max-w-[80%]">
                       {getFileIcon(url)}
                       <a
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
+                        className="text-blue-600 dark:text-blue-400 hover:underline truncate"
+                        title={getFileName(url)}
                       >
                         {getFileName(url)}
                       </a>
                     </span>
                     <button
                       onClick={() => handleDeleteDocument(index)}
-                      className="text-red-500 hover:text-red-700"
-                      aria-label="Delete document"
+                      className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+                      aria-label={t("buttons.deleteDocument")}
                     >
                       <FaTimes />
                     </button>
@@ -562,18 +585,20 @@ export default function HackathonCreateForm({
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-500 italic">{t("noDocumentsUploaded")}</p>
+              <p className="text-gray-500 dark:text-gray-400 italic p-4 border border-dashed rounded-md border-gray-300 dark:border-gray-600 text-center">
+                {t("noDocumentsUploaded")}
+              </p>
             )}
           </div>
         )}
 
         {activeTab === "contact" && (
           <div>
-            <label className="block font-medium mb-2">
+            <label className="block font-medium mb-2 text-gray-800 dark:text-gray-200">
               {t("fields.contact")}
             </label>
             <textarea
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
               rows={5}
               placeholder={t("placeholders.contact")}
               value={formData.contact}
@@ -586,20 +611,20 @@ export default function HackathonCreateForm({
       </div>
 
       {/* Action Buttons */}
-      <div className="mt-6 flex justify-end gap-3">
+      <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3">
         <button
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-800 transition-colors"
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md text-gray-800 dark:text-gray-200 transition-colors duration-200 order-2 sm:order-1"
         >
           {t("buttons.cancel")}
         </button>
         <button
           onClick={onSubmit}
           disabled={!isFormValid()}
-          className={`px-4 py-2 rounded-md text-white transition-colors ${
+          className={`px-4 py-2 rounded-md text-white transition-colors duration-200 order-1 sm:order-2 ${
             isFormValid()
-              ? "bg-blue-600 hover:bg-blue-700"
-              : "bg-blue-300 cursor-not-allowed"
+              ? "bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+              : "bg-blue-300 dark:bg-blue-400 cursor-not-allowed opacity-70"
           }`}
         >
           {t("buttons.create")}

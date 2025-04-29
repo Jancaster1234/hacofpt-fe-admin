@@ -199,7 +199,69 @@
     "uploadingBanner": "Uploading banner...",
     "successMessage": "Hackathon created successfully",
     "errorMessage": "Failed to create hackathon",
-    "submitting": "Creating hackathon..."
+    "submitting": "Creating hackathon...",
+    "tabs": {
+      "basic": "Basic Information",
+      "information": "Information",
+      "description": "Description",
+      "participant": "Participants",
+      "documentation": "Documentation",
+      "contact": "Contact"
+    },
+    "fields": {
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "enrollStartDate": "Enrollment Start Date",
+      "enrollEndDate": "Enrollment End Date",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "category": "Category",
+      "organization": "Organization",
+      "teamSize": "Team Size",
+      "minMembers": "Minimum Team Members",
+      "maxMembers": "Maximum Team Members",
+      "information": "Information",
+      "description": "Description",
+      "showParticipants": "Show Participants",
+      "documentation": "Documentation",
+      "contact": "Contact Information"
+    },
+    "placeholders": {
+      "title": "Enter hackathon title",
+      "subtitle": "Enter a brief subtitle for the hackathon",
+      "information": "Enter detailed information about the hackathon",
+      "description": "Enter a description of the hackathon",
+      "contact": "Enter contact information for participants"
+    },
+    "categories": {
+      "coding": "Coding",
+      "external": "External",
+      "internal": "Internal",
+      "design": "Design",
+      "others": "Others"
+    },
+    "organizations": {
+      "fptu": "FPTU",
+      "nasa": "NASA",
+      "iaiHackathon": "IAI Hackathon",
+      "ceHackathon": "CE Hackathon",
+      "others": "Others"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Hackathon",
+      "deleteDocument": "Delete Document"
+    },
+    "validations": {
+      "enrollEndAfterStart": "Enrollment end date must be after the start date",
+      "startAfterEnrollEnd": "Start date must be after enrollment end date",
+      "endAfterStart": "End date must be after start date"
+    },
+    "documentUploadSuccess": "Documents uploaded successfully",
+    "documentUploadError": "Error uploading documents",
+    "documentDeleted": "Document deleted successfully",
+    "noDocumentsUploaded": "No documents uploaded yet",
+    "participantDescription": "When enabled, participants will be visible to everyone. If disabled, only organizers can see the participants."
   },
   "resourceManagement": {
     "title": "Hackathon resource management",

@@ -602,7 +602,69 @@
     "uploadingBanner": "Đang tải lên banner...",
     "successMessage": "Tạo hackathon thành công",
     "errorMessage": "Không thể tạo hackathon",
-    "submitting": "Đang tạo hackathon..."
+    "submitting": "Đang tạo hackathon...",
+    "tabs": {
+      "basic": "Thông tin cơ bản",
+      "information": "Thông tin chi tiết",
+      "description": "Mô tả",
+      "participant": "Người tham gia",
+      "documentation": "Tài liệu",
+      "contact": "Liên hệ"
+    },
+    "fields": {
+      "title": "Tiêu đề",
+      "subtitle": "Tiêu đề phụ",
+      "enrollStartDate": "Ngày bắt đầu đăng ký",
+      "enrollEndDate": "Ngày kết thúc đăng ký",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "category": "Danh mục",
+      "organization": "Tổ chức",
+      "teamSize": "Kích thước nhóm",
+      "minMembers": "Số thành viên tối thiểu",
+      "maxMembers": "Số thành viên tối đa",
+      "information": "Thông tin chi tiết",
+      "description": "Mô tả",
+      "showParticipants": "Hiển thị người tham gia",
+      "documentation": "Tài liệu",
+      "contact": "Thông tin liên hệ"
+    },
+    "placeholders": {
+      "title": "Nhập tiêu đề hackathon",
+      "subtitle": "Nhập tiêu đề phụ ngắn cho hackathon",
+      "information": "Nhập thông tin chi tiết về hackathon",
+      "description": "Nhập mô tả về hackathon",
+      "contact": "Nhập thông tin liên hệ cho người tham gia"
+    },
+    "categories": {
+      "coding": "Lập trình",
+      "external": "Bên ngoài",
+      "internal": "Nội bộ",
+      "design": "Thiết kế",
+      "others": "Khác"
+    },
+    "organizations": {
+      "fptu": "FPTU",
+      "nasa": "NASA",
+      "iaiHackathon": "IAI Hackathon",
+      "ceHackathon": "CE Hackathon",
+      "others": "Khác"
+    },
+    "buttons": {
+      "cancel": "Hủy",
+      "create": "Tạo Hackathon",
+      "deleteDocument": "Xóa tài liệu"
+    },
+    "validations": {
+      "enrollEndAfterStart": "Ngày kết thúc đăng ký phải sau ngày bắt đầu đăng ký",
+      "startAfterEnrollEnd": "Ngày bắt đầu phải sau ngày kết thúc đăng ký",
+      "endAfterStart": "Ngày kết thúc phải sau ngày bắt đầu"
+    },
+    "documentUploadSuccess": "Tải tài liệu lên thành công",
+    "documentUploadError": "Lỗi khi tải tài liệu lên",
+    "documentDeleted": "Đã xóa tài liệu thành công",
+    "noDocumentsUploaded": "Chưa có tài liệu nào được tải lên",
+    "participantDescription": "Khi được bật, người tham gia sẽ hiển thị với tất cả mọi người. Nếu tắt, chỉ người tổ chức mới có thể xem người tham gia."
   },
   "sidebar": {
     "sidebar": "Thanh điều hướng",
