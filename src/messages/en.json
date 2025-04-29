@@ -525,7 +525,8 @@
       "active": "Active",
       "completed": "Completed",
       "pending": "Pending",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "status": "Status"
     },
     "errors": {
       "loadFailed": "Failed to load sponsorships. Please try again later.",
@@ -535,7 +536,42 @@
     },
     "success": {
       "formSubmitted": "Sponsorship information saved successfully"
-    }
+    },
+    "editSponsorship": "Edit sponsorship",
+    "addNewSponsorship": "Add new sponsorship",
+    "cancel": "Cancel",
+    "sponsorshipName": "Sponsorship name",
+    "brand": "Brand",
+    "amount": "Amount",
+    "pending": "Pending",
+    "active": "Active",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "startDateTime": "Start date & time",
+    "endDateTime": "End date & time",
+    "description": "Description",
+    "saving": "Saving...",
+    "update": "Update",
+    "create": "Create",
+    "sponsorshipSaveSuccess": "Sponsorship saved successfully",
+    "sponsorshipSaveFailed": "Failed to save sponsorship"
+  },
+  "sponsorshipDetail": {
+    "editDetail": "Edit detail",
+    "createNewDetail": "Create new detail",
+    "description": "Description",
+    "moneySpent": "Money spent",
+    "status": "Status",
+    "planned": "Planned",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "fromDateTime": "From date & time",
+    "toDateTime": "To date & time",
+    "cancel": "Cancel",
+    "updateDetail": "Update detail",
+    "createDetail": "Create detail",
+    "detailSaveSuccess": "Detail saved successfully",
+    "detailSaveFailed": "Failed to save detail"
   },
   "sponsorshipDetails": {
     "fields": {

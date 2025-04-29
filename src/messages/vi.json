@@ -501,6 +501,24 @@
   },
   "sponsorship": {
     "title": "Quản lý tài trợ",
+    "editSponsorship": "Chỉnh sửa tài trợ",
+    "addNewSponsorship": "Thêm tài trợ mới",
+    "cancel": "Hủy",
+    "sponsorshipName": "Tên tài trợ",
+    "brand": "Thương hiệu",
+    "amount": "Số tiền",
+    "pending": "Đang chờ",
+    "active": "Đang hoạt động",
+    "completed": "Hoàn thành",
+    "cancelled": "Đã hủy",
+    "startDateTime": "Ngày giờ bắt đầu",
+    "endDateTime": "Ngày giờ kết thúc",
+    "description": "Mô tả",
+    "saving": "Đang lưu...",
+    "update": "Cập nhật",
+    "create": "Tạo mới",
+    "sponsorshipSaveSuccess": "Lưu tài trợ thành công",
+    "sponsorshipSaveFailed": "Lưu tài trợ thất bại",
     "list": {
       "title": "Tất cả nhà tài trợ",
       "noSponsorships": "Không tìm thấy nhà tài trợ nào",
@@ -524,7 +542,8 @@
       "active": "Đang hoạt động",
       "completed": "Đã hoàn thành",
       "pending": "Đang chờ",
-      "cancelled": "Đã hủy"
+      "cancelled": "Đã hủy",
+      "status": "Trạng thái"
     },
     "errors": {
       "loadFailed": "Không thể tải danh sách tài trợ. Vui lòng thử lại sau.",
