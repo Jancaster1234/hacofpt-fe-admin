@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// src/app/[locale]/(auth)/reset-password/page.tsx
 "use client";
 
 import { useState } from "react";

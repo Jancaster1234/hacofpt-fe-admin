@@ -1,3 +1,4 @@
+// src/app/[locale]/(auth)/forgot-password/page.tsx
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

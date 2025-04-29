@@ -1,4 +1,4 @@
-// src/app/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Notifications.tsx
+// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Notifications.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
