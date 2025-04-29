@@ -3,7 +3,6 @@
 import { SponsorshipHackathon } from "@/types/entities/sponsorshipHackathon";
 
 export const fetchMockSponsorshipHackathons = ({
-  hackathonId,
   sponsorshipId,
 }: {
   hackathonId?: string;
