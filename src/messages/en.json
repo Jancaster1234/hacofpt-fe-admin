@@ -556,6 +556,31 @@
     "sponsorshipSaveSuccess": "Sponsorship saved successfully",
     "sponsorshipSaveFailed": "Failed to save sponsorship"
   },
+  "sponsorshipFiles": {
+    "backToDetails": "Back to details",
+    "filesFor": "Files for",
+    "spent": "spent",
+    "relatedFiles": "Related files",
+    "uploadFile": "Upload file",
+    "uploading": "Uploading...",
+    "uploadNewFile": "Upload new file",
+    "noFilesFound": "No files found for this detail.",
+    "uploadedBy": "Uploaded by",
+    "on": "on",
+    "download": "Download",
+    "delete": "Delete",
+    "failedToLoadFiles": "Failed to load files. Please try again later.",
+    "onlyCreatorCanUpload": "Only the creator of this sponsorship can upload files.",
+    "onlyCreatorCanDelete": "Only the creator of this sponsorship can delete files.",
+    "confirmDeleteFile": "Are you sure you want to delete this file?",
+    "filesUploadedSuccessfully": "Files uploaded successfully.",
+    "fileDeletedSuccessfully": "File deleted successfully.",
+    "failedToUploadFiles": "Failed to upload files. Please try again.",
+    "failedToDeleteFile": "Failed to delete file. Please try again later.",
+    "completed": "Completed",
+    "planned": "Planned",
+    "cancelled": "Cancelled"
+  },
   "dashboard": {
     "home": {
       "welcomeTitle": "Dashboard home",

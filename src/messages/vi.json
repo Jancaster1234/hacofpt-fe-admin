@@ -588,6 +588,31 @@
     "noPermissionToAddEdit": "Bạn không có quyền thêm hoặc chỉnh sửa chi tiết.",
     "backToList": "Quay lại danh sách"
   },
+  "sponsorshipFiles": {
+    "backToDetails": "Quay lại chi tiết",
+    "filesFor": "Tệp tin cho",
+    "spent": "chi tiêu",
+    "relatedFiles": "Tệp liên quan",
+    "uploadFile": "Tải lên tệp",
+    "uploading": "Đang tải lên...",
+    "uploadNewFile": "Tải lên tệp mới",
+    "noFilesFound": "Không tìm thấy tệp tin cho chi tiết này.",
+    "uploadedBy": "Được tải lên bởi",
+    "on": "vào",
+    "download": "Tải xuống",
+    "delete": "Xóa",
+    "failedToLoadFiles": "Không thể tải tệp tin. Vui lòng thử lại sau.",
+    "onlyCreatorCanUpload": "Chỉ người tạo tài trợ này mới có thể tải lên tệp tin.",
+    "onlyCreatorCanDelete": "Chỉ người tạo tài trợ này mới có thể xóa tệp tin.",
+    "confirmDeleteFile": "Bạn có chắc chắn muốn xóa tệp tin này không?",
+    "filesUploadedSuccessfully": "Tệp tin đã được tải lên thành công.",
+    "fileDeletedSuccessfully": "Tệp tin đã được xóa thành công.",
+    "failedToUploadFiles": "Không thể tải lên tệp tin. Vui lòng thử lại.",
+    "failedToDeleteFile": "Không thể xóa tệp tin. Vui lòng thử lại sau.",
+    "completed": "Hoàn thành",
+    "planned": "Kế hoạch",
+    "cancelled": "Đã hủy"
+  },
   "dashboard": {
     "home": {
       "welcomeTitle": "Trang chủ bảng điều khiển",
