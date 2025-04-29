@@ -536,6 +536,63 @@
       "formSubmitted": "Đã lưu thông tin tài trợ thành công"
     }
   },
+  "sponsorshipDetails": {
+    "fields": {
+      "brand": "Thương hiệu",
+      "totalAmount": "Tổng số tiền",
+      "period": "Thời gian",
+      "createdBy": "Được tạo bởi",
+      "description": "Mô tả"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "completed": "Hoàn thành",
+      "pending": "Đang chờ xử lý",
+      "cancelled": "Đã hủy"
+    },
+    "actions": {
+      "backToSponsorships": "Quay lại danh sách tài trợ",
+      "editSponsorship": "Chỉnh sửa tài trợ",
+      "addHackathonAllocation": "Thêm phân bổ hackathon",
+      "backToList": "Quay lại danh sách",
+      "viewDetails": "Xem chi tiết",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa"
+    },
+    "sections": {
+      "hackathonAllocations": "Phân bổ hackathon"
+    },
+    "table": {
+      "hackathonId": "ID hackathon",
+      "totalMoney": "Tổng tiền",
+      "createdBy": "Được tạo bởi",
+      "createdAt": "Ngày tạo",
+      "actions": "Hành động"
+    },
+    "messages": {
+      "noAllocationsFound": "Không tìm thấy phân bổ hackathon nào cho tài trợ này."
+    },
+    "labels": {
+      "unknown": "Không xác định"
+    },
+    "confirmations": {
+      "deleteAllocation": "Bạn có chắc chắn muốn xóa phân bổ này không?"
+    },
+    "errors": {
+      "loadAllocationsFailed": "Không thể tải phân bổ tài trợ. Vui lòng thử lại sau.",
+      "loadDetailsFailed": "Không thể tải chi tiết phân bổ. Vui lòng thử lại sau.",
+      "deleteFailed": "Không thể xóa phân bổ. Vui lòng thử lại sau.",
+      "loadingDetails": "Lỗi khi tải chi tiết",
+      "sponsorshipNotFound": "Không tìm thấy tài trợ",
+      "onlyCreatorCanAdd": "Chỉ người tổ chức đã tạo tài trợ này mới có thể thêm phân bổ hackathon",
+      "onlyCreatorCanEdit": "Chỉ người tổ chức đã tạo tài trợ này mới có thể chỉnh sửa phân bổ hackathon",
+      "onlyCreatorCanDelete": "Chỉ người tổ chức đã tạo tài trợ này mới có thể xóa phân bổ hackathon",
+      "onlyOrganizersCanModify": "Chỉ người tổ chức mới có thể thêm hoặc chỉnh sửa phân bổ hackathon."
+    },
+    "success": {
+      "allocationDeleted": "Đã xóa phân bổ thành công"
+    }
+  },
   "locations": {
     "availableLocations": "Các địa điểm có sẵn",
     "addLocation": "Thêm địa điểm",
