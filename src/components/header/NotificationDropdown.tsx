@@ -6,9 +6,9 @@ import { Bell } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { toast } from "sonner";
 import Image from "next/image";
-import { notificationService } from "@/services/notification.service";
 import { useWebSocket } from '@/contexts/WebSocketContext';
 import { Message, StompSubscription } from '@stomp/stompjs';
+import NotificationDetailModal from "./NotificationDetailModal";
 
 interface Notification {
   id: string;
@@ -20,15 +20,22 @@ interface Notification {
     name: string;
     avatarUrl: string;
   };
-  isRead?: boolean;
+  isRead: boolean;
 }
 
 export default function NotificationDropdown() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuth();
   const { client, isConnected } = useWebSocket();
+
+  const truncateContent = (content: string, maxLength: number = 50) => {
+    if (content.length <= maxLength) return content;
+    return content.slice(0, maxLength) + "...";
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -112,35 +119,38 @@ export default function NotificationDropdown() {
     }
   };
 
-  // Mark notifications as read when dropdown is opened
-  useEffect(() => {
-    if (isOpen && notifications.length > 0) {
-      markNotificationsAsRead();
-    }
-  }, [isOpen]);
+  const handleNotificationClick = async (notification: Notification) => {
+    setSelectedNotification(notification);
+    setIsModalOpen(true);
 
-  const markNotificationsAsRead = async () => {
-    try {
-      const unreadNotifications = notifications
-        .filter((notification) => !notification.isRead)
-        .map((notification) => notification.id);
-
-      if (unreadNotifications.length > 0) {
-        await notificationService.updateReadStatusBulk({
-          notificationIds: unreadNotifications,
-          read: true,
+    if (!notification.isRead) {
+      try {
+        const response = await fetch("/api/notifications/read-status", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          body: JSON.stringify({
+            notificationIds: [notification.id],
+            isRead: true,
+          }),
         });
 
-        // Update local state to reflect read status
+        if (!response.ok) {
+          throw new Error("Failed to mark notification as read");
+        }
+
+        // Update local state
         setNotifications((prevNotifications) =>
-          prevNotifications.map((notification) => ({
-            ...notification,
-            isRead: true,
-          }))
+          prevNotifications.map((n) =>
+            n.id === notification.id ? { ...n, isRead: true } : n
+          )
         );
+      } catch (error) {
+        console.error("Error marking notification as read:", error);
+        toast.error("Failed to mark notification as read");
       }
-    } catch (error) {
-      console.error("Error marking notifications as read:", error);
     }
   };
 
@@ -180,7 +190,11 @@ export default function NotificationDropdown() {
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    onClick={() => handleNotificationClick(notification)}
+                    className={`p-3 rounded-lg transition-colors cursor-pointer ${notification.isRead
+                      ? "bg-gray-50 hover:bg-gray-100"
+                      : "bg-blue-50 hover:bg-blue-100 border-l-4 border-blue-500"
+                      }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex-shrink-0">
@@ -189,7 +203,7 @@ export default function NotificationDropdown() {
                             notification.sender.avatarUrl ||
                             "https://randomuser.me/api/portraits/men/99.jpg"
                           }
-                          alt={notification.sender.name}
+                          alt={`${notification.sender.name}'s avatar`}
                           width={40}
                           height={40}
                           className="rounded-full object-cover"
@@ -197,15 +211,21 @@ export default function NotificationDropdown() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start mb-2">
-                          <p className="text-sm font-medium text-gray-900">
+                          <p
+                            className={`text-sm font-medium ${notification.isRead ? "text-gray-900" : "text-blue-900"
+                              }`}
+                          >
                             {notification.sender.name}
                           </p>
                           <span className="text-xs text-gray-500 flex-shrink-0">
                             {new Date(notification.createdAt).toLocaleString()}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-800 break-words">
-                          {notification.content}
+                        <p
+                          className={`text-sm break-words ${notification.isRead ? "text-gray-800" : "text-blue-800"
+                            }`}
+                        >
+                          {truncateContent(notification.content)}
                         </p>
                       </div>
                     </div>
@@ -227,6 +247,15 @@ export default function NotificationDropdown() {
           )}
         </div>
       )}
+
+      <NotificationDetailModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedNotification(null);
+        }}
+        notification={selectedNotification}
+      />
     </div>
   );
 }
