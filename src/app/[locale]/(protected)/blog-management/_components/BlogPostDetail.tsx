@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/blog-management/_components/BlogPostDetail.tsx
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
