@@ -499,6 +499,43 @@
     "rejectionSuccess": "Đã xử lí đăng ký thành công",
     "updateStatusFailed": "Không thể cập nhật trạng thái đăng ký"
   },
+  "sponsorship": {
+    "title": "Quản lý tài trợ",
+    "list": {
+      "title": "Tất cả nhà tài trợ",
+      "noSponsorships": "Không tìm thấy nhà tài trợ nào",
+      "columns": {
+        "name": "Tên",
+        "brand": "Thương hiệu",
+        "amount": "Số tiền",
+        "period": "Thời gian",
+        "status": "Trạng thái",
+        "actions": "Hành động"
+      }
+    },
+    "actions": {
+      "addNew": "Thêm nhà tài trợ mới",
+      "viewDetails": "Xem chi tiết",
+      "viewDetailsFor": "Xem chi tiết của {name}",
+      "backToList": "Quay lại danh sách",
+      "edit": "Chỉnh sửa"
+    },
+    "status": {
+      "active": "Đang hoạt động",
+      "completed": "Đã hoàn thành",
+      "pending": "Đang chờ",
+      "cancelled": "Đã hủy"
+    },
+    "errors": {
+      "loadFailed": "Không thể tải danh sách tài trợ. Vui lòng thử lại sau.",
+      "loadDetailsFailed": "Không thể tải chi tiết tài trợ",
+      "organizerOnly": "Chỉ ban tổ chức mới có thể thực hiện hành động này",
+      "creatorOnly": "Chỉ ban tổ chức đã tạo tài trợ này mới có thể thêm hoặc chỉnh sửa thông tin tài trợ."
+    },
+    "success": {
+      "formSubmitted": "Đã lưu thông tin tài trợ thành công"
+    }
+  },
   "locations": {
     "availableLocations": "Các địa điểm có sẵn",
     "addLocation": "Thêm địa điểm",

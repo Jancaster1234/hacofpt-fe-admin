@@ -500,6 +500,43 @@
     "rejectionSuccess": "Registration submitted successfully",
     "updateStatusFailed": "Failed to update registration status"
   },
+  "sponsorship": {
+    "title": "Sponsorship management",
+    "list": {
+      "title": "All sponsorships",
+      "noSponsorships": "No sponsorships found",
+      "columns": {
+        "name": "Name",
+        "brand": "Brand",
+        "amount": "Amount",
+        "period": "Period",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "actions": {
+      "addNew": "Add new sponsorship",
+      "viewDetails": "View details",
+      "viewDetailsFor": "View details for {name}",
+      "backToList": "Back to list",
+      "edit": "Edit"
+    },
+    "status": {
+      "active": "Active",
+      "completed": "Completed",
+      "pending": "Pending",
+      "cancelled": "Cancelled"
+    },
+    "errors": {
+      "loadFailed": "Failed to load sponsorships. Please try again later.",
+      "loadDetailsFailed": "Failed to load sponsorship details",
+      "organizerOnly": "Only organizers can perform this action",
+      "creatorOnly": "Only the organizer who created this sponsorship can add or edit sponsorships."
+    },
+    "success": {
+      "formSubmitted": "Sponsorship information saved successfully"
+    }
+  },
   "locations": {
     "availableLocations": "Available locations",
     "addLocation": "Add location",
