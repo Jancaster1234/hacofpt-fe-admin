@@ -588,6 +588,21 @@
     "noPermissionToAddEdit": "Bạn không có quyền thêm hoặc chỉnh sửa chi tiết.",
     "backToList": "Quay lại danh sách"
   },
+  "dashboard": {
+    "home": {
+      "welcomeTitle": "Trang chủ bảng điều khiển",
+      "welcomeMessage": "Chào mừng trở lại, {name}!",
+      "guest": "Khách",
+      "dashboardTip": "Sử dụng thanh bên để điều hướng qua các phần khác nhau của bảng điều khiển.",
+      "userAvatar": "Ảnh đại diện",
+      "card1Title": "Tiến độ của bạn",
+      "card1Description": "Theo dõi tiến độ và thành tựu của bạn trong các dự án đang diễn ra.",
+      "card2Title": "Hoạt động gần đây",
+      "card2Description": "Kiểm tra những gì đã xảy ra trong nhóm của bạn gần đây.",
+      "card3Title": "Sự kiện sắp tới",
+      "card3Description": "Luôn cập nhật về các sự kiện và thời hạn sắp đến."
+    }
+  },
   "sponsorshipDetails": {
     "fields": {
       "brand": "Thương hiệu",

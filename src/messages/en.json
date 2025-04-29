@@ -556,6 +556,21 @@
     "sponsorshipSaveSuccess": "Sponsorship saved successfully",
     "sponsorshipSaveFailed": "Failed to save sponsorship"
   },
+  "dashboard": {
+    "home": {
+      "welcomeTitle": "Dashboard home",
+      "welcomeMessage": "Welcome back, {name}!",
+      "guest": "Guest",
+      "dashboardTip": "Use the sidebar to navigate through different sections of your dashboard.",
+      "userAvatar": "User avatar",
+      "card1Title": "Your progress",
+      "card1Description": "Track your progress and achievements in ongoing projects.",
+      "card2Title": "Recent activity",
+      "card2Description": "Check what's been happening in your team lately.",
+      "card3Title": "Upcoming events",
+      "card3Description": "Stay informed about events and deadlines approaching."
+    }
+  },
   "sponsorshipManagement": {
     "backToHackathonAllocations": "Back to hackathon allocations",
     "sponsorshipAllocationDetails": "Sponsorship allocation details",
