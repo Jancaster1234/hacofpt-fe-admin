@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/_mock/fetchMockHackathons.ts
+// src/app/[locale]/(protected)/dashboard/_mocks/fetchMockHackathons.ts
 import { Hackathon } from "@/types/entities/hackathon";
 
 export const fetchMockHackathons = (): Promise<Hackathon[]> => {

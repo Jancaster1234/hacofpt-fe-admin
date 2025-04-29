@@ -30,12 +30,7 @@ import { Team } from "./team";
 import { MentorTeam } from "./mentorTeam";
 import { MentorTeamLimit } from "./mentorTeamLimit";
 import { UserRole } from "./userRole";
-export type UserStatus =
-  | "Active"
-  | "Inactive"
-  | "Banned"
-  | "Pending"
-  | "Archived";
+export type UserStatus = "ACTIVE" | "INACTIVE" | "BANNED" | "PENDING";
 
 export type User = {
   id: string;
