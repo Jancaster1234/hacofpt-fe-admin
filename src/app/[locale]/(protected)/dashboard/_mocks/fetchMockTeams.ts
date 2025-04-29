@@ -129,7 +129,7 @@ export const fetchMockTeams = (hackathonId: string): Promise<Team[]> => {
                 userRoles: [
                   {
                     id: "ur4",
-                    user: { id: userId },
+                    user: { id: "userIdz" },
                     role: { id: "2", name: "TEAM_MEMBER" },
                   },
                 ],

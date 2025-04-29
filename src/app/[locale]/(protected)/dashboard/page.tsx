@@ -5,6 +5,8 @@ import HackathonMetrics from "./_components/HackathonMetrics";
 import AccountsCreatedChart from "./_components/AccountsCreatedChart";
 import SponsorshipsStats from "./_components/SponsorshipsStats";
 import MoneySpentStats from "./_components/MoneySpentStats";
+import TeamCreationStats from "./_components/TeamCreationStats";
+import HackathonTeamsList from "./_components/HackathonTeamsList";
 
 export const metadata: Metadata = {
   title: "Hackathon Platform Dashboard",
@@ -26,6 +28,16 @@ export default function Dashboard() {
       {/* Account Creation Metrics */}
       <div className="col-span-12 xl:col-span-6">
         <AccountsCreatedChart />
+      </div>
+
+      {/* Team Creation Metrics */}
+      <div className="col-span-12 xl:col-span-6">
+        <TeamCreationStats />
+      </div>
+
+      {/* Hackathon Team List */}
+      <div className="col-span-12 xl:col-span-6">
+        <HackathonTeamsList />
       </div>
 
       {/* Sponsorships Stats */}
