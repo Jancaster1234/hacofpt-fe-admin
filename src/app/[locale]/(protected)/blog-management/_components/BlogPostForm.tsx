@@ -122,11 +122,12 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
 
       const result = await onSubmit(submissionData);
 
-      if (result.success) {
-        success(result.message || t("submitSuccess"));
-      } else {
-        error(result.message || t("submitError"));
-      }
+      // Check if result exists and has a message property
+      // if (result && result.message) {
+      //   success(result.message);
+      // } else {
+      //   success(t("submitSuccess"));
+      // }
     } catch (err: any) {
       error(err.message || t("submitError"));
     } finally {

@@ -84,11 +84,11 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
       setIsLoading(true);
       setOperationType("update");
       const result = await onUpdate({ id: blogPost.id, ...data });
-      if (result?.message) {
-        success(result.message);
-      } else {
-        success(t("updateSuccess"));
-      }
+      // if (result?.message) {
+      //   success(result.message);
+      // } else {
+      //   success(t("updateSuccess"));
+      // }
       setActiveTab("view");
     } catch (err: any) {
       error(err.message || t("updateError"));
