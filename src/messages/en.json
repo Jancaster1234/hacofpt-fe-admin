@@ -454,6 +454,15 @@
       "reject": "Reject"
     }
   },
+  "participants": {
+    "approved": "Approved",
+    "completed": "Completed",
+    "registeredOn": "Registered on",
+    "unknownUser": "Unknown user",
+    "noParticipantsRegistered": "No individual participants have registered for this hackathon yet.",
+    "noRegistrationsFound": "No {status} registrations found.",
+    "failedToLoadParticipants": "Failed to load individual participants. Please try again later."
+  },
   "blogPost": {
     "title": "Title",
     "titlePlaceholder": "Blog post title",
@@ -690,7 +699,35 @@
   },
   "teams": {
     "noTeamsForRound": "No teams found for this round.",
-    "selectRoundToViewTeams": "Please select a round to view teams."
+    "selectRoundToViewTeams": "Please select a round to view teams.",
+    "yourTeams": "Your teams",
+    "noTeams": "You are not part of any teams for this hackathon.",
+    "joinOrCreateTeam": "Join a team or create a team request to participate with others.",
+    "membersCount": "{count} team members",
+    "teamMembers": "Team members",
+    "leader": "Leader",
+    "teamDetails": "Team details",
+    "created": "Created",
+    "hackathon": "Hackathon",
+    "project": "Project",
+    "projectName": "Name",
+    "description": "Description",
+    "goToBoard": "Go to board",
+    "navigationError": "Navigation error occurred. Please try again.",
+    "hackathonInfoError": "Could not find hackathon information for this team.",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "completed": "Completed"
+    },
+    "registeredTeams": "Registered teams",
+    "noTeamsRegistered": "No teams have registered for this hackathon yet.",
+    "members": "members",
+    "teamLeader": "Team leader",
+    "failedToLoadTeams": "Failed to load teams. Please try again later."
   },
   "popups": {
     "judgeNote": "Judge Note",

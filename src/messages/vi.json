@@ -159,6 +159,15 @@
     "hideToc": "Ẩn mục lục",
     "noDocuments": "Không có tài liệu nào"
   },
+  "participants": {
+    "approved": "Đã duyệt",
+    "completed": "Đã hoàn thành",
+    "registeredOn": "Đăng ký vào",
+    "unknownUser": "Người dùng không xác định",
+    "noParticipantsRegistered": "Chưa có cá nhân nào đăng ký hackathon này.",
+    "noRegistrationsFound": "Không tìm thấy đăng ký {status}.",
+    "failedToLoadParticipants": "Không thể tải thông tin người tham gia. Vui lòng thử lại sau."
+  },
   "enrollment": {
     "overviewTitle": "Tổng quan đăng ký",
     "myTeams": "Đội của tôi",
@@ -404,7 +413,35 @@
   },
   "teams": {
     "noTeamsForRound": "Không tìm thấy đội nào cho vòng này.",
-    "selectRoundToViewTeams": "Vui lòng chọn một vòng để xem các đội."
+    "selectRoundToViewTeams": "Vui lòng chọn một vòng để xem các đội.",
+    "yourTeams": "Các đội của bạn",
+    "noTeams": "Bạn không tham gia đội nào trong hackathon này.",
+    "joinOrCreateTeam": "Tham gia một đội hoặc tạo yêu cầu thành lập đội để tham gia cùng người khác.",
+    "membersCount": "{count} thành viên",
+    "teamMembers": "Thành viên đội",
+    "leader": "Trưởng nhóm",
+    "teamDetails": "Chi tiết đội",
+    "created": "Ngày tạo",
+    "hackathon": "Hackathon",
+    "project": "Dự án",
+    "projectName": "Tên",
+    "description": "Mô tả",
+    "goToBoard": "Đến bảng",
+    "navigationError": "Đã xảy ra lỗi chuyển hướng. Vui lòng thử lại.",
+    "hackathonInfoError": "Không tìm thấy thông tin hackathon cho đội này.",
+    "status": {
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động",
+      "pending": "Đang chờ",
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối",
+      "completed": "Hoàn thành"
+    },
+    "registeredTeams": "Các đội đã đăng ký",
+    "noTeamsRegistered": "Chưa có đội nào đăng ký hackathon này.",
+    "members": "thành viên",
+    "teamLeader": "Đội trưởng",
+    "failedToLoadTeams": "Không thể tải thông tin đội. Vui lòng thử lại sau."
   },
   "popups": {
     "judgeNote": "Ghi chú của giám khảo",

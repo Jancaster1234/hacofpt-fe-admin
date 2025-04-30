@@ -1,21 +1,34 @@
-// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/_components/IndividualParticipantsTab.tsx
+// src/app/[locale]/hackathon/[id]/_components/IndividualParticipantsTab.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import { individualRegistrationRequestService } from "@/services/individualRegistrationRequest.service";
+import { userService } from "@/services/user.service";
 import { IndividualRegistrationRequest } from "@/types/entities/individualRegistrationRequest";
+import { User } from "@/types/entities/user";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Image from "next/image";
+
+// Define a type that extends IndividualRegistrationRequest with user details
+interface EnhancedRegistration extends IndividualRegistrationRequest {
+  userDetails?: User;
+}
 
 export function IndividualParticipantsTab({
   hackathonId,
 }: {
   hackathonId: string;
 }) {
+  const t = useTranslations("participants");
+  const { error: showError } = useToast(); // Correctly destructure the error function
+
   const [approvedRegistrations, setApprovedRegistrations] = useState<
-    IndividualRegistrationRequest[]
+    EnhancedRegistration[]
   >([]);
   const [completedRegistrations, setCompletedRegistrations] = useState<
-    IndividualRegistrationRequest[]
+    EnhancedRegistration[]
   >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,10 +36,41 @@ export function IndividualParticipantsTab({
     "APPROVED"
   );
 
+  // Function to fetch user details for a registration
+  const fetchUserDetails = async (
+    registration: IndividualRegistrationRequest
+  ): Promise<EnhancedRegistration> => {
+    if (!registration.createdByUserName) {
+      return registration;
+    }
+
+    try {
+      const userResponse = await userService.getUserByUsername(
+        registration.createdByUserName
+      );
+      if (userResponse && userResponse.data) {
+        return {
+          ...registration,
+          userDetails: userResponse.data,
+        };
+      }
+    } catch (err) {
+      console.error(
+        `Failed to fetch user details for ${registration.createdByUserName}:`,
+        err
+      );
+    }
+
+    return registration;
+  };
+
   useEffect(() => {
+    let isCancelled = false;
+
     const fetchIndividualRegistrations = async () => {
       try {
         setIsLoading(true);
+        setError(null);
 
         // Fetch both APPROVED and COMPLETED registrations in parallel
         const [approvedRes, completedRes] = await Promise.all([
@@ -38,29 +82,56 @@ export function IndividualParticipantsTab({
           ),
         ]);
 
-        setApprovedRegistrations(approvedRes.data);
-        setCompletedRegistrations(completedRes.data);
+        if (isCancelled) return;
+
+        // Fetch user details for all registrations
+        const approvedWithUsers = await Promise.all(
+          (approvedRes.data || []).map(fetchUserDetails)
+        );
+
+        const completedWithUsers = await Promise.all(
+          (completedRes.data || []).map(fetchUserDetails)
+        );
+
+        if (!isCancelled) {
+          setApprovedRegistrations(approvedWithUsers);
+          setCompletedRegistrations(completedWithUsers);
+        }
       } catch (err) {
         console.error("Error fetching individual registrations:", err);
-        setError(
-          "Failed to load individual participants. Please try again later."
-        );
+        if (!isCancelled) {
+          const errorMessage = t("failedToLoadParticipants");
+          setError(errorMessage);
+          showError(errorMessage); // Use the destructured error function
+        }
       } finally {
-        setIsLoading(false);
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchIndividualRegistrations();
-  }, [hackathonId]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [hackathonId, t, showError]); // Add showError to dependencies
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-8">Loading participants...</div>
+      <div className="flex justify-center items-center py-8 transition-colors duration-300">
+        <LoadingSpinner size="md" showText={true} />
+      </div>
     );
   }
 
   if (error) {
-    return <div className="text-red-500 py-4">{error}</div>;
+    return (
+      <div className="text-red-500 dark:text-red-400 py-4 transition-colors duration-300">
+        {error}
+      </div>
+    );
   }
 
   const currentRegistrations =
@@ -73,77 +144,106 @@ export function IndividualParticipantsTab({
     completedRegistrations.length === 0
   ) {
     return (
-      <div className="py-4">
-        No individual participants have registered for this hackathon yet.
+      <div className="py-4 text-gray-700 dark:text-gray-300 transition-colors duration-300">
+        {t("noParticipantsRegistered")}
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="flex mb-4">
+    <div className="transition-colors duration-300">
+      <div className="flex mb-4 border-b dark:border-gray-700">
         <button
           onClick={() => setActiveStatus("APPROVED")}
-          className={`px-4 py-2 ${
+          className={`px-3 sm:px-4 py-2 transition-colors duration-200 ${
             activeStatus === "APPROVED"
-              ? "bg-blue-100 text-blue-800 rounded-t-lg font-medium"
-              : "text-gray-600"
+              ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-t-lg font-medium"
+              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
           }`}
         >
-          Approved ({approvedRegistrations.length})
+          {t("approved")} ({approvedRegistrations.length})
         </button>
         <button
           onClick={() => setActiveStatus("COMPLETED")}
-          className={`px-4 py-2 ${
+          className={`px-3 sm:px-4 py-2 transition-colors duration-200 ${
             activeStatus === "COMPLETED"
-              ? "bg-green-100 text-green-800 rounded-t-lg font-medium"
-              : "text-gray-600"
+              ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-t-lg font-medium"
+              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
           }`}
         >
-          Completed ({completedRegistrations.length})
+          {t("completed")} ({completedRegistrations.length})
         </button>
       </div>
 
-      <div className="bg-white">
+      <div className="bg-white dark:bg-gray-800 transition-colors duration-300">
         {currentRegistrations.length === 0 ? (
-          <div className="py-6 text-center text-gray-500">
-            No {activeStatus.toLowerCase()} registrations found.
+          <div className="py-6 text-center text-gray-500 dark:text-gray-400">
+            {t("noRegistrationsFound", { status: activeStatus.toLowerCase() })}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {currentRegistrations.map((registration) => {
-              // If we have proper user data structure, use it
-              // This section might need adjustment based on actual data structure
-              const userName = registration.createdByUserName || "Unknown User";
+              const userName =
+                registration.createdByUserName || t("unknownUser");
+              const userDetails = registration.userDetails;
+              const email = userDetails?.email || "";
+              const avatarUrl = userDetails?.avatarUrl;
+              const formattedDate = new Date(
+                registration.createdAt || ""
+              ).toLocaleDateString();
 
               return (
                 <div
                   key={registration.id}
-                  className="border rounded-lg p-4 shadow-sm flex items-center gap-3"
+                  className="border dark:border-gray-700 rounded-lg p-3 sm:p-4 shadow-sm 
+                           bg-white dark:bg-gray-800 flex items-center gap-3 
+                           hover:shadow-md transition-all duration-300"
                 >
-                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-sm font-medium text-gray-600">
-                      {userName.charAt(0)}
-                    </span>
-                  </div>
+                  {avatarUrl ? (
+                    <div className="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden relative">
+                      <Image
+                        src={avatarUrl}
+                        alt={userName}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 
+                                flex items-center justify-center flex-shrink-0
+                                transition-colors duration-300"
+                    >
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        {userName.charAt(0)}
+                      </span>
+                    </div>
+                  )}
 
-                  <div>
-                    <div className="font-medium">{userName}</div>
+                  <div className="min-w-0">
+                    <div className="font-medium text-gray-900 dark:text-gray-100 truncate">
+                      {userName}
+                    </div>
 
-                    <div className="text-sm text-gray-500">
-                      Registered on{" "}
-                      {new Date(registration.createdAt).toLocaleDateString()}
+                    {email && (
+                      <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
+                        {email}
+                      </div>
+                    )}
+
+                    <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                      {t("registeredOn")} {formattedDate}
                     </div>
 
                     <div className="mt-1">
                       <span
-                        className={`text-xs px-2 py-0.5 rounded ${
+                        className={`text-xs px-2 py-0.5 rounded transition-colors duration-300 ${
                           registration.status === "APPROVED"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-green-100 text-green-800"
+                            ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                            : "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                         }`}
                       >
-                        {registration.status}
+                        {t(registration.status.toLowerCase())}
                       </span>
                     </div>
                   </div>

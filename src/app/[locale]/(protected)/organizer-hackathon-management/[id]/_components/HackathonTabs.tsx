@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/_components/HackathonTabs.tsx
+// src/app/[locale]/hackathon/[id]/_components/HackathonTabs.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -14,12 +14,13 @@ import {
   FileImage,
   FileSpreadsheet,
   FileCode,
-  FilePpt,
+  File,
   FileArchive,
   FileVideo,
   FileAudio,
-  FilePdf,
-  File,
+  // Replace missing icon imports with the correct ones
+  Presentation, // Instead of FilePpt
+  FileType, // Instead of FilePdf
 } from "lucide-react";
 
 type TabKey =
@@ -90,7 +91,7 @@ export default function HackathonTabs({
   const getFileIcon = (extension: string) => {
     switch (extension) {
       case "pdf":
-        return <FilePdf className="text-red-500" size={20} />;
+        return <FileType className="text-red-500" size={20} />;
       case "doc":
       case "docx":
         return <FileText className="text-blue-500" size={20} />;
@@ -100,7 +101,7 @@ export default function HackathonTabs({
         return <FileSpreadsheet className="text-green-500" size={20} />;
       case "ppt":
       case "pptx":
-        return <FilePpt className="text-orange-500" size={20} />;
+        return <Presentation className="text-orange-500" size={20} />;
       case "jpg":
       case "jpeg":
       case "png":
