@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/dashboard/_components/SponsorshipsStats.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";

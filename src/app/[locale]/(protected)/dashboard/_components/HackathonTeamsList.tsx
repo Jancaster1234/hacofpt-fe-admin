@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/dashboard/_components/HackathonTeamsList.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import { Hackathon } from "@/types/entities/hackathon";
