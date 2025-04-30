@@ -27,7 +27,9 @@ const ImageButton = () => {
     height?: number
   ) => {
     // Create a compact HTML string with no extra whitespace
-    const imageHtml = `<img src="${src}" alt="${alt}" ${width ? `data-width="${width}"` : ""} ${height ? `data-height="${height}"` : ""}>`;
+    const imageHtml = `
+        <img src="${src}" alt="${alt}" ${width ? `data-width="${width}"` : ""} ${height ? `data-height="${height}"` : ""}>
+    `;
 
     // Insert the HTML directly
     editor.chain().focus().insertContent(imageHtml).run();
