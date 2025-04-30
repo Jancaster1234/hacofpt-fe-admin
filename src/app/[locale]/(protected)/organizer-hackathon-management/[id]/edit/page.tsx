@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/edit/page.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";

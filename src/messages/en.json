@@ -112,7 +112,13 @@
     "updateErrorTitle": "Update error",
     "refreshingEnrollmentData": "Refreshing enrollment data...",
     "enrollmentDataRefreshed": "Enrollment data refreshed successfully",
-    "enrollmentDataRefreshError": "Failed to refresh enrollment data"
+    "enrollmentDataRefreshError": "Failed to refresh enrollment data",
+    "enrollmentNotStarted": "Enrollment has not started yet.",
+    "enrollmentClosed": "Enrollment is closed.",
+    "hackathonStartDate": "Start Date",
+    "hackathonEndDate": "End Date",
+    "enrollmentStartDate": "Enrollment Opens",
+    "enrollmentEndDate": "Enrollment Closes"
   },
   "pagination": {
     "previousPage": "Previous page",
@@ -148,7 +154,10 @@
     "subtabs": {
       "teams": "Teams",
       "individuals": "Individuals"
-    }
+    },
+    "showToc": "Show Table of Contents",
+    "hideToc": "Hide Table of Contents",
+    "noDocuments": "No documents available"
   },
   "enrollment": {
     "overviewTitle": "Enrollment overview",
