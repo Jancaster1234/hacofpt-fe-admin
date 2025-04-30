@@ -1,4 +1,3 @@
-// src/app/[locale]/(protected)/dashboard/_components/SponsorshipsStats.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -21,9 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { fetchMockSponsorships } from "../_mocks/fetchMockSponsorships";
 import { Sponsorship } from "@/types/entities/sponsorship";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { sponsorshipService } from "@/services/sponsorship.service";
 
 const SponsorshipsStats = () => {
   const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
@@ -32,8 +31,8 @@ const SponsorshipsStats = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await fetchMockSponsorships();
-        setSponsorships(data);
+        const response = await sponsorshipService.getAllSponsorships();
+        setSponsorships(response.data);
       } catch (error) {
         console.error("Error fetching sponsorship data:", error);
       } finally {
@@ -72,7 +71,7 @@ const SponsorshipsStats = () => {
     return Object.entries(adminMap).map(([name, value]) => ({ name, value }));
   };
 
-  // Process data for time-based metrics
+  // Process data for time-based metrics using actual data
   const processDataByTimeframe = (
     timeframe: "day" | "week" | "month" | "year"
   ) => {
@@ -126,9 +125,70 @@ const SponsorshipsStats = () => {
       }
     }
 
-    // For the demo, just randomly distribute sponsorships
-    Object.keys(counts).forEach((key) => {
-      counts[key] = Math.floor(Math.random() * 5); // Random number between 0-4
+    // Process actual sponsorship data
+    sponsorships.forEach((sponsorship) => {
+      // Use creation date for the timeframe statistics
+      const creationDate = new Date(sponsorship.createdAt);
+
+      if (timeframe === "day") {
+        // Check if creation date is within the last 7 days
+        if (now.getTime() - creationDate.getTime() <= 7 * 24 * 60 * 60 * 1000) {
+          const key = creationDate.toISOString().split("T")[0];
+          if (counts.hasOwnProperty(key)) {
+            counts[key]++;
+          }
+        }
+      } else if (timeframe === "week") {
+        // Check if creation date is within the last 4 weeks
+        if (
+          now.getTime() - creationDate.getTime() <=
+          4 * 7 * 24 * 60 * 60 * 1000
+        ) {
+          const weeksSince = Math.floor(
+            (now.getTime() - creationDate.getTime()) / (7 * 24 * 60 * 60 * 1000)
+          );
+          const weekKey = `Week ${weeksSince + 1}`;
+          if (counts.hasOwnProperty(weekKey)) {
+            counts[weekKey]++;
+          }
+        }
+      } else if (timeframe === "month") {
+        // Check if creation date is within the last 6 months
+        if (
+          now.getTime() - creationDate.getTime() <=
+          6 * 30 * 24 * 60 * 60 * 1000
+        ) {
+          const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const monthKey = monthNames[creationDate.getMonth()];
+          if (counts.hasOwnProperty(monthKey)) {
+            counts[monthKey]++;
+          }
+        }
+      } else if (timeframe === "year") {
+        // Check if creation date is within the last 3 years
+        if (
+          now.getTime() - creationDate.getTime() <=
+          3 * 365 * 24 * 60 * 60 * 1000
+        ) {
+          const yearKey = creationDate.getFullYear().toString();
+          if (counts.hasOwnProperty(yearKey)) {
+            counts[yearKey]++;
+          }
+        }
+      }
     });
 
     return Object.entries(counts).map(([name, value]) => ({ name, value }));

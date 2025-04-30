@@ -11,9 +11,9 @@ import {
   Legend,
   Tooltip,
 } from "recharts";
-import { fetchMockUsers } from "../_mocks/fetchMockUsers";
 import { User } from "@/types/entities/user";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { userService } from "@/services/user.service";
 
 const AccountsCreatedChart = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -22,8 +22,8 @@ const AccountsCreatedChart = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await fetchMockUsers();
-        setUsers(data);
+        const response = await userService.getAllUsers();
+        setUsers(response.data);
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -36,17 +36,25 @@ const AccountsCreatedChart = () => {
 
   // Process data for charts by role type
   const processDataByRole = () => {
-    // For demo purposes, let's simulate role distribution
-    const roleDistribution = [
-      { name: "ORGANIZER", value: 12 },
-      { name: "JUDGE", value: 18 },
-      { name: "ADMIN", value: 5 },
-      { name: "TEAM_LEADER", value: 25 },
-      { name: "MENTOR", value: 15 },
-      { name: "TEAM_MEMBER", value: 45 },
-    ];
+    // Count users by role
+    const roleCounts: Record<string, number> = {};
 
-    return roleDistribution;
+    users.forEach((user) => {
+      if (user.userRoles && user.userRoles.length > 0) {
+        user.userRoles.forEach((userRole) => {
+          if (userRole.role?.name) {
+            const roleName = userRole.role.name;
+            roleCounts[roleName] = (roleCounts[roleName] || 0) + 1;
+          }
+        });
+      }
+    });
+
+    // Convert to array format for chart
+    return Object.entries(roleCounts).map(([name, value]) => ({
+      name,
+      value,
+    }));
   };
 
   // Process data for time-based charts
@@ -55,14 +63,18 @@ const AccountsCreatedChart = () => {
   ) => {
     const now = new Date();
     const counts: Record<string, Record<string, number>> = {};
-    const roleNames = [
-      "ORGANIZER",
-      "JUDGE",
-      "ADMIN",
-      "TEAM_LEADER",
-      "MENTOR",
-      "TEAM_MEMBER",
-    ];
+    const roleNames = new Set<string>();
+
+    // Collect all role names first
+    users.forEach((user) => {
+      if (user.userRoles && user.userRoles.length > 0) {
+        user.userRoles.forEach((userRole) => {
+          if (userRole.role?.name) {
+            roleNames.add(userRole.role.name);
+          }
+        });
+      }
+    });
 
     // Set up initial counts based on timeframe
     if (timeframe === "day") {
@@ -123,14 +135,77 @@ const AccountsCreatedChart = () => {
       }
     }
 
-    // For the demo, just randomly distribute users
-    Object.keys(counts).forEach((timeKey) => {
-      roleNames.forEach((role) => {
-        counts[timeKey][role] = Math.floor(Math.random() * 10) + 1; // Random number between 1-10
-      });
+    // Process actual user data
+    users.forEach((user) => {
+      if (!user.createdAt) return;
+
+      const createdDate = new Date(user.createdAt);
+      let timeKey: string | null = null;
+
+      if (timeframe === "day") {
+        // Check if within last 7 days
+        const dayDiff = Math.floor(
+          (now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        if (dayDiff < 7) {
+          timeKey = createdDate.toISOString().split("T")[0];
+        }
+      } else if (timeframe === "week") {
+        // Check if within last 4 weeks
+        const weekDiff = Math.floor(
+          (now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24 * 7)
+        );
+        if (weekDiff < 4) {
+          timeKey = `Week ${4 - weekDiff}`;
+        }
+      } else if (timeframe === "month") {
+        // Check if within last 6 months
+        const monthDiff =
+          (now.getFullYear() - createdDate.getFullYear()) * 12 +
+          now.getMonth() -
+          createdDate.getMonth();
+        if (monthDiff < 6) {
+          const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          timeKey = monthNames[createdDate.getMonth()];
+        }
+      } else if (timeframe === "year") {
+        // Check if within last 3 years
+        const yearDiff = now.getFullYear() - createdDate.getFullYear();
+        if (yearDiff < 3) {
+          timeKey = createdDate.getFullYear().toString();
+        }
+      }
+
+      // If we found a valid timeKey, increment the counts
+      if (timeKey && counts[timeKey]) {
+        if (user.userRoles && user.userRoles.length > 0) {
+          user.userRoles.forEach((userRole) => {
+            if (
+              userRole.role?.name &&
+              counts[timeKey] &&
+              counts[timeKey][userRole.role.name] !== undefined
+            ) {
+              counts[timeKey][userRole.role.name]++;
+            }
+          });
+        }
+      }
     });
 
-    // Format data for stacked bar chart
+    // Format data for chart
     return Object.entries(counts).map(([name, roleData]) => {
       return {
         name,
@@ -213,8 +288,6 @@ const AccountsCreatedChart = () => {
             </div>
           </TabsContent>
 
-          {/* For time-based tabs, we would normally show stacked bar charts */}
-          {/* For simplicity, I'm showing summary numbers for now */}
           <TabsContent value="day">
             <div className="grid grid-cols-3 gap-4">
               {dayData.map((day, index) => (

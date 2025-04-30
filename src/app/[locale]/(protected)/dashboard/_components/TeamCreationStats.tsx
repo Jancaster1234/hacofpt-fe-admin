@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { fetchMockAllTeams } from "../_mocks/fetchMockAllTeams";
 import { Team } from "@/types/entities/team";
 import {
   BarChart,
@@ -16,6 +15,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { teamService } from "@/services/team.service";
 
 const TeamCreationStats = () => {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -24,8 +24,8 @@ const TeamCreationStats = () => {
   useEffect(() => {
     const loadTeams = async () => {
       try {
-        const teamsData = await fetchMockAllTeams();
-        setTeams(teamsData);
+        const response = await teamService.getAllTeams();
+        setTeams(response.data || []);
       } catch (error) {
         console.error("Failed to load teams data:", error);
       } finally {
@@ -96,10 +96,59 @@ const TeamCreationStats = () => {
       }
     }
 
-    // For the demo, just randomly distribute the teams
-    // In a real implementation, you would count actual team creation dates
-    Object.keys(counts).forEach((key) => {
-      counts[key] = Math.floor(Math.random() * 5) + 1; // Random number between 1-5
+    // Count teams based on their creation date
+    teams.forEach((team) => {
+      if (!team.createdAt) return;
+
+      const createdDate = new Date(team.createdAt);
+
+      if (timeframe === "day") {
+        // Daily view - last 7 days
+        const dateKey = createdDate.toISOString().split("T")[0];
+        if (counts.hasOwnProperty(dateKey)) {
+          counts[dateKey]++;
+        }
+      } else if (timeframe === "week") {
+        // Weekly view - last 4 weeks
+        const weeksDiff = Math.floor(
+          (now.getTime() - createdDate.getTime()) / (7 * 24 * 60 * 60 * 1000)
+        );
+        if (weeksDiff < 4) {
+          const weekKey = `Week ${4 - weeksDiff}`;
+          counts[weekKey]++;
+        }
+      } else if (timeframe === "month") {
+        // Monthly view - last 6 months
+        const monthsDiff =
+          (now.getFullYear() - createdDate.getFullYear()) * 12 +
+          now.getMonth() -
+          createdDate.getMonth();
+        if (monthsDiff < 6) {
+          const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const monthKey = monthNames[createdDate.getMonth()];
+          counts[monthKey]++;
+        }
+      } else if (timeframe === "year") {
+        // Yearly view - last 3 years
+        const yearsDiff = now.getFullYear() - createdDate.getFullYear();
+        if (yearsDiff < 3) {
+          const yearKey = createdDate.getFullYear().toString();
+          counts[yearKey]++;
+        }
+      }
     });
 
     return Object.entries(counts).map(([name, value]) => ({ name, value }));

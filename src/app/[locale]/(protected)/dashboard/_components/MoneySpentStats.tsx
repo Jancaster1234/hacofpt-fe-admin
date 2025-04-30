@@ -1,4 +1,3 @@
-// src/app/[locale]/(protected)/dashboard/_components/MoneySpentStats.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -23,13 +22,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { fetchMockSponsorshipHackathons } from "../_mocks/fetchMockSponsorshipHackathons";
-import { fetchMockSponsorshipHackathonDetails } from "../_mocks/fetchMockSponsorshipHackathonDetails";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SponsorshipHackathon } from "@/types/entities/sponsorshipHackathon";
 import { SponsorshipHackathonDetail } from "@/types/entities/sponsorshipHackathonDetail";
-import { fetchMockSponsorships } from "../_mocks/fetchMockSponsorships";
 import { Sponsorship } from "@/types/entities/sponsorship";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { sponsorshipService } from "@/services/sponsorship.service";
+import { sponsorshipHackathonService } from "@/services/sponsorshipHackathon.service";
+import { sponsorshipHackathonDetailService } from "@/services/sponsorshipHackathonDetail.service";
+
+interface TimeframeDataPoint {
+  name: string;
+  value: number;
+}
 
 const MoneySpentStats = () => {
   const [sponsorshipHackathons, setSponsorshipHackathons] = useState<
@@ -40,17 +44,54 @@ const MoneySpentStats = () => {
   >([]);
   const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [dayData, setDayData] = useState<TimeframeDataPoint[]>([]);
+  const [weekData, setWeekData] = useState<TimeframeDataPoint[]>([]);
+  const [monthData, setMonthData] = useState<TimeframeDataPoint[]>([]);
+  const [yearData, setYearData] = useState<TimeframeDataPoint[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const hackathonsData = await fetchMockSponsorshipHackathons({});
-        const detailsData = await fetchMockSponsorshipHackathonDetails({});
-        const sponsorshipsData = await fetchMockSponsorships();
+        // Fetch real data from API services
+        const sponsorshipsResponse =
+          await sponsorshipService.getAllSponsorships();
+        const fetchedSponsorships = sponsorshipsResponse.data;
+        setSponsorships(fetchedSponsorships);
 
-        setSponsorshipHackathons(hackathonsData);
-        setSponsorshipDetails(detailsData);
-        setSponsorships(sponsorshipsData);
+        // Fetch all sponsorship hackathons for each sponsorship
+        const allSponsorshipHackathons: SponsorshipHackathon[] = [];
+        const allSponsorshipDetails: SponsorshipHackathonDetail[] = [];
+
+        for (const sponsorship of fetchedSponsorships) {
+          const hackathonsResponse =
+            await sponsorshipHackathonService.getSponsorshipHackathonsBySponsorshipId(
+              sponsorship.id
+            );
+          const fetchedHackathons = hackathonsResponse.data;
+          allSponsorshipHackathons.push(...fetchedHackathons);
+
+          // Fetch all details for each sponsorship hackathon
+          for (const hackathon of fetchedHackathons) {
+            const detailsResponse =
+              await sponsorshipHackathonDetailService.getSponsorshipHackathonDetailsBySponsorshipHackathonId(
+                hackathon.id
+              );
+            const fetchedDetails = detailsResponse.data;
+            allSponsorshipDetails.push(...fetchedDetails);
+          }
+        }
+
+        setSponsorshipHackathons(allSponsorshipHackathons);
+        setSponsorshipDetails(allSponsorshipDetails);
+
+        // Process data for time-based charts
+        const timeframeData = processSpendingByTimeframes(
+          allSponsorshipDetails
+        );
+        setDayData(timeframeData.dayData);
+        setWeekData(timeframeData.weekData);
+        setMonthData(timeframeData.monthData);
+        setYearData(timeframeData.yearData);
       } catch (error) {
         console.error("Error fetching money spent data:", error);
       } finally {
@@ -61,74 +102,208 @@ const MoneySpentStats = () => {
     loadData();
   }, []);
 
-  // Process data for time-based spending metrics
-  const processSpendingByTimeframe = (
-    timeframe: "day" | "week" | "month" | "year"
+  const processSpendingByTimeframes = (
+    details: SponsorshipHackathonDetail[]
   ) => {
     const now = new Date();
-    const spending: Record<string, number> = {};
 
-    // Set up initial spending based on timeframe
-    if (timeframe === "day") {
-      // Last 7 days
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date(now);
-        date.setDate(date.getDate() - i);
-        const key = date.toISOString().split("T")[0];
-        spending[key] = 0;
-      }
-    } else if (timeframe === "week") {
-      // Last 4 weeks
-      for (let i = 3; i >= 0; i--) {
-        const weekKey = `Week ${4 - i}`;
-        spending[weekKey] = 0;
-      }
-    } else if (timeframe === "month") {
-      // Last 6 months
-      for (let i = 5; i >= 0; i--) {
-        const date = new Date(now);
-        date.setMonth(date.getMonth() - i);
-        const monthNames = [
-          "Jan",
-          "Feb",
-          "Mar",
-          "Apr",
-          "May",
-          "Jun",
-          "Jul",
-          "Aug",
-          "Sep",
-          "Oct",
-          "Nov",
-          "Dec",
-        ];
-        const monthKey = monthNames[date.getMonth()];
-        spending[monthKey] = 0;
-      }
-    } else if (timeframe === "year") {
-      // Last 3 years
-      for (let i = 2; i >= 0; i--) {
-        const date = new Date(now);
-        date.setFullYear(date.getFullYear() - i);
-        const yearKey = date.getFullYear().toString();
-        spending[yearKey] = 0;
-      }
+    // Initialize time periods
+    const daySpending: Record<string, number> = {};
+    const weekSpending: Record<string, number> = {};
+    const monthSpending: Record<string, number> = {};
+    const yearSpending: Record<string, number> = {};
+
+    // Initialize day data (last 7 days)
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const key = date.toISOString().split("T")[0];
+      daySpending[key] = 0;
     }
 
-    // For the demo, just randomly distribute spending
-    Object.keys(spending).forEach((key) => {
-      const baseMoney = Math.floor(Math.random() * 15000) + 5000; // Random amount between $5,000-$20,000
-      spending[key] = baseMoney;
+    // Initialize week data (last 4 weeks)
+    for (let i = 3; i >= 0; i--) {
+      const weekKey = `Week ${4 - i}`;
+      weekSpending[weekKey] = 0;
+    }
+
+    // Initialize month data (last 6 months)
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now);
+      date.setMonth(date.getMonth() - i);
+      const monthKey = monthNames[date.getMonth()];
+      monthSpending[monthKey] = 0;
+    }
+
+    // Initialize year data (last 3 years)
+    for (let i = 2; i >= 0; i--) {
+      const date = new Date(now);
+      date.setFullYear(date.getFullYear() - i);
+      const yearKey = date.getFullYear().toString();
+      yearSpending[yearKey] = 0;
+    }
+
+    // Process each detail to populate spending data
+    details.forEach((detail) => {
+      if (detail.status === "COMPLETED") {
+        const timeFrom = new Date(detail.timeFrom);
+        const timeTo = new Date(detail.timeTo);
+        const moneySpent = detail.moneySpent;
+
+        // Daily data
+        Object.keys(daySpending).forEach((dayKey) => {
+          const day = new Date(dayKey);
+          if (timeFrom <= day && day <= timeTo) {
+            daySpending[dayKey] +=
+              moneySpent /
+              Math.max(
+                1,
+                (timeTo.getTime() - timeFrom.getTime()) / (1000 * 60 * 60 * 24)
+              );
+          }
+        });
+
+        // Weekly data
+        const fourWeeksAgo = new Date(now);
+        fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+
+        if (timeFrom <= now && timeTo >= fourWeeksAgo) {
+          // Distribute money across weeks
+          Object.keys(weekSpending).forEach((weekKey, index) => {
+            const weekStart = new Date(now);
+            weekStart.setDate(weekStart.getDate() - (28 - index * 7));
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+
+            if (timeFrom <= weekEnd && timeTo >= weekStart) {
+              const overlapStart = new Date(
+                Math.max(timeFrom.getTime(), weekStart.getTime())
+              );
+              const overlapEnd = new Date(
+                Math.min(timeTo.getTime(), weekEnd.getTime())
+              );
+              const overlapDays = Math.max(
+                0,
+                (overlapEnd.getTime() - overlapStart.getTime()) /
+                  (1000 * 60 * 60 * 24)
+              );
+              const totalDetailDays = Math.max(
+                1,
+                (timeTo.getTime() - timeFrom.getTime()) / (1000 * 60 * 60 * 24)
+              );
+
+              weekSpending[weekKey] +=
+                (overlapDays / totalDetailDays) * moneySpent;
+            }
+          });
+        }
+
+        // Monthly data
+        const sixMonthsAgo = new Date(now);
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+
+        if (timeFrom <= now && timeTo >= sixMonthsAgo) {
+          Object.keys(monthSpending).forEach((monthKey, index) => {
+            const monthIndex = monthNames.indexOf(monthKey);
+            const monthDate = new Date(now);
+            monthDate.setMonth(now.getMonth() - 5 + index);
+            monthDate.setDate(1);
+
+            const nextMonth = new Date(monthDate);
+            nextMonth.setMonth(monthDate.getMonth() + 1);
+
+            if (timeFrom < nextMonth && timeTo >= monthDate) {
+              const overlapStart = new Date(
+                Math.max(timeFrom.getTime(), monthDate.getTime())
+              );
+              const overlapEnd = new Date(
+                Math.min(timeTo.getTime(), nextMonth.getTime() - 1)
+              );
+              const overlapDays = Math.max(
+                0,
+                (overlapEnd.getTime() - overlapStart.getTime()) /
+                  (1000 * 60 * 60 * 24)
+              );
+              const totalDetailDays = Math.max(
+                1,
+                (timeTo.getTime() - timeFrom.getTime()) / (1000 * 60 * 60 * 24)
+              );
+
+              monthSpending[monthKey] +=
+                (overlapDays / totalDetailDays) * moneySpent;
+            }
+          });
+        }
+
+        // Yearly data
+        const threeYearsAgo = new Date(now);
+        threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 2);
+
+        if (timeFrom <= now && timeTo >= threeYearsAgo) {
+          Object.keys(yearSpending).forEach((yearKey) => {
+            const year = parseInt(yearKey);
+            const yearStart = new Date(year, 0, 1);
+            const yearEnd = new Date(year, 11, 31, 23, 59, 59);
+
+            if (timeFrom <= yearEnd && timeTo >= yearStart) {
+              const overlapStart = new Date(
+                Math.max(timeFrom.getTime(), yearStart.getTime())
+              );
+              const overlapEnd = new Date(
+                Math.min(timeTo.getTime(), yearEnd.getTime())
+              );
+              const overlapDays = Math.max(
+                0,
+                (overlapEnd.getTime() - overlapStart.getTime()) /
+                  (1000 * 60 * 60 * 24)
+              );
+              const totalDetailDays = Math.max(
+                1,
+                (timeTo.getTime() - timeFrom.getTime()) / (1000 * 60 * 60 * 24)
+              );
+
+              yearSpending[yearKey] +=
+                (overlapDays / totalDetailDays) * moneySpent;
+            }
+          });
+        }
+      }
     });
 
-    return Object.entries(spending).map(([name, value]) => ({ name, value }));
+    // Convert to chart data format
+    return {
+      dayData: Object.entries(daySpending).map(([name, value]) => ({
+        name,
+        value: Math.round(value),
+      })),
+      weekData: Object.entries(weekSpending).map(([name, value]) => ({
+        name,
+        value: Math.round(value),
+      })),
+      monthData: Object.entries(monthSpending).map(([name, value]) => ({
+        name,
+        value: Math.round(value),
+      })),
+      yearData: Object.entries(yearSpending).map(([name, value]) => ({
+        name,
+        value: Math.round(value),
+      })),
+    };
   };
-
-  // Generate data for the charts
-  const dayData = processSpendingByTimeframe("day");
-  const weekData = processSpendingByTimeframe("week");
-  const monthData = processSpendingByTimeframe("month");
-  const yearData = processSpendingByTimeframe("year");
 
   // Enhanced spending data for the detailed table
   const getDetailedSpendingData = () => {

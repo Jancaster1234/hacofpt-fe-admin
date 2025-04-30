@@ -1,10 +1,8 @@
-// src/app/[locale]/(protected)/dashboard/_components/HackathonTeamsList.tsx
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchMockHackathons } from "../_mocks/fetchMockHackathons";
-import { fetchMockTeams } from "../_mocks/fetchMockTeams";
 import { Hackathon } from "@/types/entities/hackathon";
-import { Team } from "@/types/entities/team";
+import { hackathonService } from "@/services/hackathon.service";
+import { teamService } from "@/services/team.service";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,15 +22,20 @@ const HackathonTeamsList = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const hackathonsData = await fetchMockHackathons();
+        // Replace mock function with real service
+        const hackathonsResponse = await hackathonService.getAllHackathons();
+        const hackathonsData = hackathonsResponse.data;
         setHackathons(hackathonsData);
 
         // For each hackathon, fetch its teams and count them
         const teamsCountMap: Record<string, number> = {};
 
         for (const hackathon of hackathonsData) {
-          const teams = await fetchMockTeams(hackathon.id);
-          teamsCountMap[hackathon.id] = teams.length;
+          // Replace mock function with real service
+          const teamsResponse = await teamService.getTeamsByHackathonId(
+            hackathon.id
+          );
+          teamsCountMap[hackathon.id] = teamsResponse.data.length;
         }
 
         setHackathonTeamsCount(teamsCountMap);

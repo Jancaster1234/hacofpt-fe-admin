@@ -13,9 +13,9 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { fetchMockHackathons } from "../_mocks/fetchMockHackathons";
 import { Hackathon } from "@/types/entities/hackathon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { hackathonService } from "@/services/hackathon.service";
 
 const HackathonMetrics = () => {
   const [hackathons, setHackathons] = useState<Hackathon[]>([]);
@@ -24,8 +24,8 @@ const HackathonMetrics = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await fetchMockHackathons();
-        setHackathons(data);
+        const response = await hackathonService.getAllHackathons();
+        setHackathons(response.data || []);
       } catch (error) {
         console.error("Error fetching hackathon data:", error);
       } finally {
@@ -96,9 +96,59 @@ const HackathonMetrics = () => {
       }
     }
 
-    // For the demo, just randomly distribute the hackathons
-    Object.keys(counts).forEach((key) => {
-      counts[key] = Math.floor(Math.random() * 5) + 1; // Random number between 1-5
+    // Count hackathons based on their creation date
+    hackathons.forEach((hackathon) => {
+      if (!hackathon.createdAt) return;
+
+      const createdDate = new Date(hackathon.createdAt);
+
+      if (timeframe === "day") {
+        // Daily view - last 7 days
+        const dateKey = createdDate.toISOString().split("T")[0];
+        if (counts.hasOwnProperty(dateKey)) {
+          counts[dateKey]++;
+        }
+      } else if (timeframe === "week") {
+        // Weekly view - last 4 weeks
+        const weeksDiff = Math.floor(
+          (now.getTime() - createdDate.getTime()) / (7 * 24 * 60 * 60 * 1000)
+        );
+        if (weeksDiff < 4) {
+          const weekKey = `Week ${4 - weeksDiff}`;
+          counts[weekKey]++;
+        }
+      } else if (timeframe === "month") {
+        // Monthly view - last 6 months
+        const monthsDiff =
+          (now.getFullYear() - createdDate.getFullYear()) * 12 +
+          now.getMonth() -
+          createdDate.getMonth();
+        if (monthsDiff < 6) {
+          const monthNames = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const monthKey = monthNames[createdDate.getMonth()];
+          counts[monthKey]++;
+        }
+      } else if (timeframe === "year") {
+        // Yearly view - last 3 years
+        const yearsDiff = now.getFullYear() - createdDate.getFullYear();
+        if (yearsDiff < 3) {
+          const yearKey = createdDate.getFullYear().toString();
+          counts[yearKey]++;
+        }
+      }
     });
 
     return Object.entries(counts).map(([name, value]) => ({ name, value }));
