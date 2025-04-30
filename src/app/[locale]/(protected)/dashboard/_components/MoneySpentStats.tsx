@@ -27,7 +27,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SponsorshipHackathon } from "@/types/entities/sponsorshipHackathon";
 import { SponsorshipHackathonDetail } from "@/types/entities/sponsorshipHackathonDetail";
 import { Sponsorship } from "@/types/entities/sponsorship";
-import { sponsorshipService } from "@/services/sponsorship.service";
 import { sponsorshipHackathonService } from "@/services/sponsorshipHackathon.service";
 import { sponsorshipHackathonDetailService } from "@/services/sponsorshipHackathonDetail.service";
 
@@ -36,28 +35,37 @@ interface TimeframeDataPoint {
   value: number;
 }
 
-const MoneySpentStats = () => {
+interface MoneySpentStatsProps {
+  sponsorshipsData: Sponsorship[];
+  isLoading: boolean;
+}
+
+const MoneySpentStats: React.FC<MoneySpentStatsProps> = ({
+  sponsorshipsData,
+  isLoading,
+}) => {
   const [sponsorshipHackathons, setSponsorshipHackathons] = useState<
     SponsorshipHackathon[]
   >([]);
   const [sponsorshipDetails, setSponsorshipDetails] = useState<
     SponsorshipHackathonDetail[]
   >([]);
-  const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [dayData, setDayData] = useState<TimeframeDataPoint[]>([]);
   const [weekData, setWeekData] = useState<TimeframeDataPoint[]>([]);
   const [monthData, setMonthData] = useState<TimeframeDataPoint[]>([]);
   const [yearData, setYearData] = useState<TimeframeDataPoint[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
+      // Only proceed if sponsorshipsData is available and not loading
+      if (isLoading || !sponsorshipsData.length) {
+        return;
+      }
+
       try {
-        // Fetch real data from API services
-        const sponsorshipsResponse =
-          await sponsorshipService.getAllSponsorships();
-        const fetchedSponsorships = sponsorshipsResponse.data;
-        setSponsorships(fetchedSponsorships);
+        // Use the sponsorshipsData passed from Dashboard
+        const fetchedSponsorships = sponsorshipsData;
 
         // Fetch all sponsorship hackathons for each sponsorship
         const allSponsorshipHackathons: SponsorshipHackathon[] = [];
@@ -96,12 +104,12 @@ const MoneySpentStats = () => {
       } catch (error) {
         console.error("Error fetching money spent data:", error);
       } finally {
-        setIsLoading(false);
+        setIsDataLoading(false);
       }
     };
 
     loadData();
-  }, []);
+  }, [sponsorshipsData, isLoading]);
 
   const processSpendingByTimeframes = (
     details: SponsorshipHackathonDetail[]
@@ -320,7 +328,7 @@ const MoneySpentStats = () => {
       if (!sponsorshipHackathon) continue;
 
       // Find related sponsorship
-      const sponsorship = sponsorships.find(
+      const sponsorship = sponsorshipsData.find(
         (s) => s.id === sponsorshipHackathon.sponsorshipId
       );
 
@@ -350,7 +358,8 @@ const MoneySpentStats = () => {
     0
   );
 
-  if (isLoading) {
+  // Show loading state if either parent is loading or component is loading its own data
+  if (isLoading || isDataLoading) {
     return (
       <Card className="h-full w-full">
         <CardHeader>

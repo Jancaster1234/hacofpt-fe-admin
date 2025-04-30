@@ -1,7 +1,7 @@
 // src/app/[locale]/(protected)/dashboard/_components/SponsorshipsStats.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BarChart,
@@ -23,32 +23,21 @@ import {
 } from "@/components/ui/table";
 import { Sponsorship } from "@/types/entities/sponsorship";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { sponsorshipService } from "@/services/sponsorship.service";
 
-const SponsorshipsStats = () => {
-  const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+interface SponsorshipsStatsProps {
+  sponsorshipsData: Sponsorship[];
+  isLoading: boolean;
+}
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const response = await sponsorshipService.getAllSponsorships();
-        setSponsorships(response.data);
-      } catch (error) {
-        console.error("Error fetching sponsorship data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
-
+const SponsorshipsStats = ({
+  sponsorshipsData,
+  isLoading,
+}: SponsorshipsStatsProps) => {
   // Process data for charts - categorize by brand
   const processSponsorshipsByBrand = () => {
     const brandMap: Record<string, number> = {};
 
-    sponsorships.forEach((sponsorship) => {
+    sponsorshipsData.forEach((sponsorship) => {
       if (!brandMap[sponsorship.brand]) {
         brandMap[sponsorship.brand] = 0;
       }
@@ -62,7 +51,7 @@ const SponsorshipsStats = () => {
   const processSponsorshipsByAdmin = () => {
     const adminMap: Record<string, number> = {};
 
-    sponsorships.forEach((sponsorship) => {
+    sponsorshipsData.forEach((sponsorship) => {
       if (!adminMap[sponsorship.createdByUserName]) {
         adminMap[sponsorship.createdByUserName] = 0;
       }
@@ -127,7 +116,7 @@ const SponsorshipsStats = () => {
     }
 
     // Process actual sponsorship data
-    sponsorships.forEach((sponsorship) => {
+    sponsorshipsData.forEach((sponsorship) => {
       // Use creation date for the timeframe statistics
       const creationDate = new Date(sponsorship.createdAt);
 
@@ -204,7 +193,7 @@ const SponsorshipsStats = () => {
 
   // Enhanced sponsorship data for the detailed table
   const getDetailedSponsorshipData = () => {
-    return sponsorships.map((s) => ({
+    return sponsorshipsData.map((s) => ({
       id: s.id,
       name: s.name,
       brand: s.brand,
