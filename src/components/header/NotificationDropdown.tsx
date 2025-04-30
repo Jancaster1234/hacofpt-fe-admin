@@ -109,11 +109,12 @@ export default function NotificationDropdown() {
       if (response.ok && data) {
         setNotifications(data.data || []);
       } else {
-        toast.error(data.error?.message || "Failed to fetch notifications");
+        const error = await response.json();
+        toast.error(error instanceof Error ? error.message : "Failed to fetch notifications");
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
-      toast.error("Failed to fetch notifications");
+      toast.error(error instanceof Error ? error.message : "Failed to fetch notifications");
     } finally {
       setLoading(false);
     }
@@ -138,7 +139,8 @@ export default function NotificationDropdown() {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to mark notification as read");
+          const error = await response.json();
+          toast.error(error instanceof Error ? error.message : 'Failed to mark notification as read');
         }
 
         // Update local state
