@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/calendar/_components/HackathonList.tsx
+// src/app/[locale]/(protected)/kanban-board/_components/HackathonList.tsx
 "use client";
 
 import HackathonCard from "./HackathonCard";

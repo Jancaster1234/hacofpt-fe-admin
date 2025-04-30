@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/[id]/team/[teamId]/board/_components/KanbanBoard.tsx
+// src/app/[locale]/(protected)/kanban-board/hackathon/[id]/kanban-board/_components/KanbanBoard.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -14,7 +14,7 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { Board } from "@/types/entities/board";
-import { Team } from "@/types/entities/team";
+import { UserHackathon } from "@/types/entities/userHackathon";
 import KanbanColumn from "./KanbanColumn";
 import BoardHeader from "./BoardHeader";
 import { useAuth } from "@/hooks/useAuth_v0";
@@ -35,13 +35,13 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface KanbanBoardProps {
   board: Board | null;
-  team: Team | null;
+  userHackathons: UserHackathon[];
   isLoading: boolean;
 }
 
 export default function KanbanBoard({
   board,
-  team,
+  userHackathons,
   isLoading,
 }: KanbanBoardProps) {
   const { user } = useAuth();
@@ -66,7 +66,7 @@ export default function KanbanBoard({
 
   // Load board data progressively
   useEffect(() => {
-    if (!board || isLoading || !team) return;
+    if (!board || isLoading || !userHackathons.length) return;
 
     const loadBoardData = async () => {
       setLoading(true);
@@ -75,13 +75,13 @@ export default function KanbanBoard({
       setBoard(board);
 
       try {
-        // Create a user map from team members for quick access
+        // Create a user map from userHackathons for quick access
         const teamUsersMap = {};
 
-        // Add all team members to the map
-        team.teamMembers?.forEach((member) => {
-          if (member.user) {
-            teamUsersMap[member.user.id] = member.user;
+        // Add all users from userHackathons to the map
+        userHackathons.forEach((userHackathon) => {
+          if (userHackathon.user) {
+            teamUsersMap[userHackathon.user.id] = userHackathon.user;
           }
         });
 
@@ -235,7 +235,7 @@ export default function KanbanBoard({
     };
 
     loadBoardData();
-  }, [board, isLoading, team, setBoard, setColumns]);
+  }, [board, isLoading, userHackathons, setBoard, setColumns]);
 
   // Update the handleDragStart function
   const handleDragStart = (event: DragStartEvent) => {
@@ -574,7 +574,7 @@ export default function KanbanBoard({
       {isInviteModalOpen && (
         <BoardUserManagement
           board={useKanbanStore.getState().board || board}
-          team={team}
+          userHackathons={userHackathons} // Pass the userHackathons prop
           isOpen={isInviteModalOpen}
           onClose={() => setInviteModalOpen(false)}
           isOwner={isOwner}

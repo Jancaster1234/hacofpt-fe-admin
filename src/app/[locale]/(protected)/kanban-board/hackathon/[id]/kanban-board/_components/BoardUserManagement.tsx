@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/[id]/team/[teamId]/board/_components/BoardUserManagement.tsx
+// src/app/[locale]/(protected)/kanban-board/hackathon/[id]/kanban-board/_components/BoardUserManagement.tsx
 "use client";
 
 import { Fragment, useState, useEffect } from "react";
@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Board } from "@/types/entities/board";
 import { BoardUser, BoardUserRole } from "@/types/entities/boardUser";
 import { Team } from "@/types/entities/team";
+import { UserHackathon } from "@/types/entities/userHackathon";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { useKanbanStore } from "@/store/kanbanStore";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -15,7 +16,8 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface BoardUserManagementProps {
   board: Board;
-  team: Team | null;
+  team?: Team | null; // Make team optional as we'll use userHackathons
+  userHackathons: UserHackathon[]; // Add the new userHackathons prop
   isOpen: boolean;
   onClose: () => void;
   isOwner: boolean;
@@ -24,6 +26,7 @@ interface BoardUserManagementProps {
 export default function BoardUserManagement({
   board,
   team,
+  userHackathons,
   isOpen,
   onClose,
   isOwner,
@@ -53,13 +56,17 @@ export default function BoardUserManagement({
     setStoreError(null);
   }, [isOpen, setStoreError]);
 
-  // Filter team members who are not already active board users
-  // This correctly filters out team members who are already active in the board
-  const availableTeamMembers =
-    team?.teamMembers?.filter(
-      (tm) =>
-        !boardUsers.some((bu) => !bu.isDeleted && bu.user?.id === tm.user.id)
-    ) || [];
+  // Extract users from userHackathons instead of team.teamMembers
+  const hackathonUsers = userHackathons.map((uh) => uh.user).filter(Boolean);
+
+  // Filter hackathon users who are not already active board users
+  const availableTeamMembers = hackathonUsers.filter(
+    (hackathonUser) =>
+      hackathonUser && // Ensure user exists
+      !boardUsers.some(
+        (bu) => !bu.isDeleted && bu.user?.id === hackathonUser.id
+      )
+  );
 
   const handleAddUser = async () => {
     if (!selectedTeamMember || !isOwner) return;
@@ -293,8 +300,8 @@ export default function BoardUserManagement({
                         >
                           <option value="">{t("selectTeamMember")}</option>
                           {availableTeamMembers.map((member) => (
-                            <option key={member.user.id} value={member.user.id}>
-                              {member.user.firstName} {member.user.lastName}
+                            <option key={member.id} value={member.id}>
+                              {member.firstName} {member.lastName}
                             </option>
                           ))}
                         </select>

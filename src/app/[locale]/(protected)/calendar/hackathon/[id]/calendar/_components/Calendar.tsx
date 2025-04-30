@@ -24,7 +24,7 @@ import { ScheduleEventAttendee } from "@/types/entities/scheduleEventAttendee";
 import { ScheduleEventReminder } from "@/types/entities/scheduleEventReminder";
 import { scheduleService } from "@/services/schedule.service";
 import { scheduleEventService } from "@/services/scheduleEvent.service";
-import { teamService } from "@/services/team.service";
+import { userHackathonService } from "@/services/userHackathon.service";
 import { ScheduleEventLabel } from "@/types/entities/scheduleEvent";
 import Image from "next/image";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -41,19 +41,16 @@ export interface CalendarEvent extends EventInput {
 }
 
 interface CalendarProps {
-  teamId?: string;
   hackathonId?: string;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ teamId, hackathonId }) => {
+const Calendar: React.FC<CalendarProps> = ({ hackathonId }) => {
   // Add translation hook
   const t = useTranslations("calendar");
   // Add toast hook
   const toast = useToast();
 
   const params = useParams();
-  const currentTeamId =
-    teamId || (Array.isArray(params.teamId) ? params.teamId[0] : params.teamId);
   const currentHackathonId =
     hackathonId || (Array.isArray(params.id) ? params.id[0] : params.id);
 
@@ -64,7 +61,7 @@ const Calendar: React.FC<CalendarProps> = ({ teamId, hackathonId }) => {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [activeScheduleId, setActiveScheduleId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [teamMembers, setTeamMembers] = useState<User[]>([]);
+  const [hackathonMembers, setHackathonMembers] = useState<User[]>([]);
   const calendarRef = useRef<FullCalendar>(null);
 
   const {
@@ -83,57 +80,54 @@ const Calendar: React.FC<CalendarProps> = ({ teamId, hackathonId }) => {
     closeModal: closeMembersModal,
   } = useModal();
 
-  // Load team members
+  // Load hackathon members
   useEffect(() => {
-    const loadTeamMembers = async () => {
-      if (!currentTeamId || !currentHackathonId) return;
+    const loadHackathonMembers = async () => {
+      if (!currentHackathonId) return;
 
       try {
         setLoading(true);
-        // Use the real service call instead of mock
-        const { data: team, message } =
-          await teamService.getTeamById(currentTeamId);
+        // Use userHackathonService instead of teamService
+        const { data: userHackathons, message } =
+          await userHackathonService.getUserHackathonsByHackathonId(
+            currentHackathonId
+          );
 
-        if (team && team.teamMembers) {
-          // Extract users from team members
-          const users = team.teamMembers
-            .filter((member) => member.user)
-            .map((member) => member.user);
+        if (userHackathons && userHackathons.length > 0) {
+          // Extract users from userHackathons
+          const users = userHackathons
+            .filter((userHackathon) => userHackathon.user)
+            .map((userHackathon) => userHackathon.user);
 
-          setTeamMembers(users);
+          setHackathonMembers(users);
         }
       } catch (error: any) {
-        console.error("Failed to fetch team members", error);
+        console.error("Failed to fetch hackathon members", error);
         toast.error(error.message || t("errors.failedToFetchMembers"));
       } finally {
         setLoading(false);
       }
     };
 
-    loadTeamMembers();
-  }, [currentTeamId, currentHackathonId]);
+    loadHackathonMembers();
+  }, [currentHackathonId]);
   // Note: toast is deliberately omitted from dependency array to prevent infinite loops
 
-  // Load basic schedule data when component mounts
+  // Load hackathon operating schedule when component mounts
   useEffect(() => {
-    const loadBasicScheduleData = async () => {
-      if (!currentTeamId || !currentHackathonId) return;
+    const loadHackathonOperatingSchedule = async () => {
+      if (!currentHackathonId) return;
 
       setLoading(true);
       try {
-        // Use the real service call instead of mock
-        const { data: fetchedSchedules, message } =
-          await scheduleService.getSchedulesByTeamIdAndHackathonId(
-            currentTeamId,
+        // Use getHackathonOperatingScheduleByHackathonId instead of getSchedulesByTeamIdAndHackathonId
+        const { data: operatingSchedule, message } =
+          await scheduleService.getHackathonOperatingScheduleByHackathonId(
             currentHackathonId
           );
 
-        // Ensure we have an array
-        const schedulesArray = Array.isArray(fetchedSchedules)
-          ? fetchedSchedules
-          : fetchedSchedules
-            ? [fetchedSchedules]
-            : [];
+        // Ensure we have an array, even if only one schedule
+        const schedulesArray = operatingSchedule ? [operatingSchedule] : [];
 
         setSchedules(schedulesArray);
 
@@ -142,15 +136,15 @@ const Calendar: React.FC<CalendarProps> = ({ teamId, hackathonId }) => {
           setActiveScheduleId(schedulesArray[0].id);
         }
       } catch (error: any) {
-        console.error("Failed to fetch basic schedule data", error);
+        console.error("Failed to fetch hackathon operating schedule", error);
         toast.error(error.message || t("errors.failedToFetchSchedules"));
       } finally {
         setLoading(false);
       }
     };
 
-    loadBasicScheduleData();
-  }, [currentTeamId, currentHackathonId, activeScheduleId]);
+    loadHackathonOperatingSchedule();
+  }, [currentHackathonId, activeScheduleId]);
   // Note: toast is deliberately omitted from dependency array to prevent infinite loops
 
   // Load schedule events only when calendar view changes or schedules are loaded
@@ -402,12 +396,14 @@ const Calendar: React.FC<CalendarProps> = ({ teamId, hackathonId }) => {
     <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 dark:text-white transition-colors duration-300">
       <div className="p-3 sm:p-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-          <h2 className="text-xl sm:text-2xl font-bold">{t("teamSchedule")}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold">
+            {t("hackathonSchedule")}
+          </h2>
 
           {/* Members display */}
           <div className="flex items-center mt-2 md:mt-0">
             <div className="flex -space-x-2 mr-2">
-              {teamMembers.slice(0, 3).map((user) => (
+              {hackathonMembers.slice(0, 3).map((user) => (
                 <div key={user.id} className="relative h-7 w-7 sm:h-8 sm:w-8">
                   {user.avatarUrl ? (
                     <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full overflow-hidden border-2 border-white dark:border-gray-800 transition-colors duration-300 relative">
@@ -428,12 +424,12 @@ const Calendar: React.FC<CalendarProps> = ({ teamId, hackathonId }) => {
                   )}
                 </div>
               ))}
-              {teamMembers.length > 3 && (
+              {hackathonMembers.length > 3 && (
                 <div
                   className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-gray-200 dark:bg-gray-600 border-2 border-white dark:border-gray-800 flex items-center justify-center text-xs font-medium cursor-pointer transition-colors duration-300"
                   onClick={openMembersModal}
                 >
-                  +{teamMembers.length - 3}
+                  +{hackathonMembers.length - 3}
                 </div>
               )}
             </div>
@@ -477,11 +473,6 @@ const Calendar: React.FC<CalendarProps> = ({ teamId, hackathonId }) => {
                   <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                     {schedule.description}
                   </p>
-                  {schedule.team && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {t("team")}: {schedule.team.name}
-                    </p>
-                  )}
                 </div>
               ))}
             </div>
@@ -538,13 +529,13 @@ const Calendar: React.FC<CalendarProps> = ({ teamId, hackathonId }) => {
           selectedEvent={selectedEvent}
           onUpdateEvent={handleUpdateEvent}
           onDeleteEvent={handleDeleteEvent}
-          teamMembers={teamMembers}
+          teamMembers={hackathonMembers} // Using hackathonMembers instead of teamMembers
         />
       )}
       <ScheduleMembers
         isOpen={isMembersModalOpen}
         onClose={closeMembersModal}
-        members={teamMembers}
+        members={hackathonMembers} // Using hackathonMembers instead of teamMembers
         scheduleName={activeSchedule?.name || t("schedule")}
       />
     </div>

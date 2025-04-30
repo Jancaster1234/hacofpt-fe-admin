@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/calendar/_components/Pagination.tsx
+// src/app/[locale]/(protected)/kanban-board/_components/Pagination.tsx
 "use client";
 
 import { useTranslations } from "@/hooks/useTranslations";

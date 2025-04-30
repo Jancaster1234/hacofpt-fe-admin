@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/calendar/page.tsx
+// src/app/[locale]/(protected)/kanban-board/page.tsx
 "use client";
 import { useState, useMemo, useEffect, useRef } from "react";
 import HackathonList from "./_components/HackathonList";

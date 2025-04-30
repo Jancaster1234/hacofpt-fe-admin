@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/[id]/team/[teamId]/board/_components/KanbanTask.tsx
+// src/app/[locale]/(protected)/kanban-board/hackathon/[id]/kanban-board/_components/KanbanTask.tsx
 import { useState, useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";

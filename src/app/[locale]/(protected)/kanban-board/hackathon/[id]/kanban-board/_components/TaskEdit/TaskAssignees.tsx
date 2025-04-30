@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/[id]/team/[teamId]/board/_components/TaskEdit/TaskAssignees.tsx
+// src/app/[locale]/(protected)/kanban-board/hackathon/[id]/kanban-board/_components/TaskEdit/TaskAssignees.tsx
 "use client";
 
 import { useState, useEffect, useCallback } from "react";

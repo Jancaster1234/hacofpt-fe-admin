@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/[id]/team/[teamId]/board/_components/BoardHeader.tsx
+// src/app/[locale]/(protected)/kanban-board/hackathon/[id]/kanban-board/_components/BoardHeader.tsx
 "use client";
 
 import { useState, useEffect } from "react";

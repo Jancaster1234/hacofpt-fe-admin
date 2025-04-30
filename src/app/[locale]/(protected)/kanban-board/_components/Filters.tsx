@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/calendar/_components/Filters.tsx
+// src/app/[locale]/(protected)/kanban-board/_components/Filters.tsx
 "use client";
 
 import { useState } from "react";

@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/calendar/_components/HackathonCard.tsx
+// src/app/[locale]/(protected)/kanban-board/_components/HackathonCard.tsx
 import Link from "next/link";
 import Image from "next/image";
 import { Hackathon } from "@/types/entities/hackathon";

@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/calendar/_components/SearchSortBar.tsx
+// src/app/[locale]/(protected)/kanban-board/_components/SearchSortBar.tsx
 "use client";
 
 import { useState, useEffect } from "react";
