@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/[id]/_components/TeamParticipantsTab.tsx
+// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/_components/TeamParticipantsTab.tsx
 "use client";
 
 import { useState, useEffect } from "react";

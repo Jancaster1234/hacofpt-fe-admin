@@ -58,7 +58,7 @@ class TeamService {
   ): Promise<{ data: Team[]; message?: string }> {
     try {
       const response = await apiService.auth.get<Team[]>(
-        `/hackathon-service/api/v1/teams/by-hackathon?hackathonId=${hackathonId}`
+        `/hackathon-service/api/v1/teams/by-hackathon/${hackathonId}`
       );
 
       if (!response || !response.data) {
