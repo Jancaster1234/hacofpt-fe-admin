@@ -741,6 +741,88 @@
       "fetchDetailFailed": "Không thể tải chi tiết bài viết"
     }
   },
+  "editHackathon": {
+    "title": "Chỉnh sửa Hackathon",
+    "editHackathon": "Chỉnh sửa Hackathon",
+    "enterSubtitle": "Chỉnh sửa phụ đề cho hackathon của bạn",
+    "loading": "Đang tải dữ liệu hackathon...",
+    "submitting": "Đang cập nhật hackathon...",
+    "successMessage": "Cập nhật hackathon thành công!",
+    "errorMessage": "Cập nhật hackathon thất bại. Vui lòng thử lại.",
+    "hackathonNotFound": "Không tìm thấy hackathon.",
+    "errorFetchingHackathon": "Lỗi khi lấy thông tin hackathon.",
+    "tabs": {
+      "basic": "Thông tin cơ bản",
+      "information": "Thông tin",
+      "description": "Mô tả",
+      "participant": "Người tham gia",
+      "documentation": "Tài liệu",
+      "contact": "Liên hệ"
+    },
+    "fields": {
+      "title": "Tiêu đề Hackathon",
+      "subtitle": "Phụ đề",
+      "enrollStartDate": "Ngày bắt đầu đăng ký",
+      "enrollEndDate": "Ngày kết thúc đăng ký",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "category": "Danh mục",
+      "organization": "Tổ chức",
+      "teamSize": "Số lượng thành viên",
+      "minMembers": "Số thành viên tối thiểu",
+      "maxMembers": "Số thành viên tối đa",
+      "information": "Thông tin",
+      "description": "Mô tả",
+      "contact": "Thông tin liên hệ",
+      "documentation": "Tài liệu",
+      "showParticipants": "Hiển thị người tham gia"
+    },
+    "placeholders": {
+      "title": "Nhập tiêu đề hackathon",
+      "subtitle": "Nhập phụ đề ngắn cho hackathon của bạn",
+      "information": "Nhập thông tin về hackathon...",
+      "description": "Nhập mô tả chi tiết...",
+      "contact": "Nhập thông tin liên hệ..."
+    },
+    "categories": {
+      "coding": "Lập trình",
+      "external": "Bên ngoài",
+      "internal": "Nội bộ",
+      "design": "Thiết kế",
+      "others": "Khác"
+    },
+    "organizations": {
+      "fptu": "FPTU",
+      "nasa": "NASA",
+      "iaiHackathon": "IAI Hackathon",
+      "ceHackathon": "CE Hackathon",
+      "others": "Khác"
+    },
+    "validations": {
+      "enrollEndAfterStart": "Ngày kết thúc đăng ký phải sau ngày bắt đầu đăng ký",
+      "startAfterEnrollEnd": "Ngày bắt đầu phải sau ngày kết thúc đăng ký",
+      "endAfterStart": "Ngày kết thúc phải sau ngày bắt đầu"
+    },
+    "buttons": {
+      "save": "Lưu thay đổi",
+      "cancel": "Hủy",
+      "deleteDocument": "Xóa tài liệu"
+    },
+    "imageCaptionPlaceholder": "Chú thích hình ảnh",
+    "documentUploadSuccess": "Tải tài liệu lên thành công",
+    "documentUploadError": "Lỗi khi tải tài liệu lên",
+    "documentDeleted": "Tài liệu đã được xóa",
+    "noDocumentsUploaded": "Chưa có tài liệu nào được tải lên",
+    "bannerUploadSuccess": "Tải banner thành công",
+    "bannerUploadError": "Lỗi khi tải banner",
+    "uploadingBanner": "Đang tải banner...",
+    "imageTypeError": "Chỉ chấp nhận định dạng JPEG, JPG và PNG",
+    "hackathonBannerAlt": "Banner Hackathon",
+    "recommendedSize": "Kích thước khuyến nghị: 1920×1080px (16:9)",
+    "uploadBanner": "Tải lên Banner",
+    "changeBanner": "Thay đổi Banner",
+    "participantDescription": "Bật tùy chọn này để hiển thị người tham gia trong trang chi tiết hackathon."
+  },
   "blogPostList": {
     "noPosts": "Không tìm thấy bài viết nào. Hãy tạo bài viết đầu tiên của bạn!",
     "headers": {
