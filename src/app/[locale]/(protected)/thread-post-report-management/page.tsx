@@ -135,10 +135,9 @@ export default function ThreadPostReportManagement() {
           {t("management")}
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          {t("welcome").replace(
-            "{name}",
-            user ? `${user.firstName} ${user.lastName}` : "Guest"
-          )}
+          {t("welcome", {
+            name: user ? `${user.firstName} ${user.lastName}` : "Guest",
+          })}
         </p>
       </div>
 

@@ -124,14 +124,14 @@ const navItems: NavItem[] = [
     icon: <CalenderIcon />,
     name: "Calendar",
     translationKey: "calendar",
-    allowedRoles: ["ADMIN", "ORGANIZER", "MENTOR", "JUDGE"],
+    allowedRoles: ["ORGANIZER", "MENTOR", "JUDGE"],
     path: "/calendar",
   },
   {
     icon: <CalenderIcon />,
     name: "Kanban board",
     translationKey: "kanbanBoard",
-    allowedRoles: ["ADMIN", "ORGANIZER", "MENTOR", "JUDGE"],
+    allowedRoles: ["ORGANIZER", "MENTOR", "JUDGE"],
     path: "/kanban-board",
   },
   {
