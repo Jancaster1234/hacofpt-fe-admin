@@ -144,6 +144,11 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
       return;
     }
 
+    if (newNotification.metadata && newNotification.metadata.length > 256) {
+      toast.error("Data truncation: Data too long for column 'metadata'");
+      return;
+    }
+
     if (recipientType === "users" && selectedRecipients.length === 0) {
       toast.error("Please select at least one recipient");
       return;
@@ -162,7 +167,7 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
         },
       };
 
-      const { data, message } = await notificationService.createNotification(
+      const { data } = await notificationService.createNotification(
         requestBody
       );
 
@@ -206,13 +211,13 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
         setSelectedRecipients([]);
         setSelectedRole(RoleType.ADMIN);
 
-        toast.success(message || "Notification created successfully!");
+        toast.success("Notification created successfully!");
       } else {
-        toast.error(message || "Failed to create notification");
+        const errorData = await data.json();
+        toast.error(errorData.message || "Failed to create notification");
       }
     } catch (error) {
-      console.error("Error creating notification:", error);
-      toast.error("Failed to create notification");
+      toast.error(error instanceof Error ? error.message : 'Failed to create notification');
     }
   };
 
