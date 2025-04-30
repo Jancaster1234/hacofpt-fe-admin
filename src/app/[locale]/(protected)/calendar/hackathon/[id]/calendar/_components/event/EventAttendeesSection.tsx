@@ -291,8 +291,7 @@ const EventAttendeesSection: React.FC<EventAttendeesSectionProps> = ({
       {attendeesWithUsers.length > 0 ? (
         <div className="space-y-2">
           {attendeesWithUsers.map((attendee) => {
-            const canManageAttendee =
-              isOrganizer || isCurrentUserAttendee(attendee.userId);
+            const canManageAttendee = isCurrentUserAttendee(attendee.userId);
             const isRemoveInProgress =
               actionInProgress === `remove-${attendee.id}`;
             const isStatusInProgress =

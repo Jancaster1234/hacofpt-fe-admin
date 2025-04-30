@@ -49,10 +49,8 @@ const Calendar: React.FC<CalendarProps> = ({ hackathonId }) => {
   const t = useTranslations("calendar");
   // Add toast hook
   const toast = useToast();
-
   const params = useParams();
-  const currentHackathonId =
-    hackathonId || (Array.isArray(params.id) ? params.id[0] : params.id);
+  const currentHackathonId = hackathonId;
 
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
     null
@@ -113,7 +111,7 @@ const Calendar: React.FC<CalendarProps> = ({ hackathonId }) => {
   }, [currentHackathonId]);
   // Note: toast is deliberately omitted from dependency array to prevent infinite loops
 
-  // Load hackathon operating schedule when component mounts
+  // Update the useEffect hook that loads the hackathon operating schedule
   useEffect(() => {
     const loadHackathonOperatingSchedule = async () => {
       if (!currentHackathonId) return;
@@ -126,14 +124,16 @@ const Calendar: React.FC<CalendarProps> = ({ hackathonId }) => {
             currentHackathonId
           );
 
-        // Ensure we have an array, even if only one schedule
-        const schedulesArray = operatingSchedule ? [operatingSchedule] : [];
+        // If we have a valid schedule, create a single-item array
+        if (operatingSchedule) {
+          // Replace the entire schedules array with a new one containing just this schedule
+          setSchedules([operatingSchedule]);
 
-        setSchedules(schedulesArray);
-
-        // Set the first schedule as active if we have any
-        if (schedulesArray.length > 0 && !activeScheduleId) {
-          setActiveScheduleId(schedulesArray[0].id);
+          // Set this as the active schedule
+          setActiveScheduleId(operatingSchedule.id);
+        } else {
+          // If no schedule was returned, set an empty array
+          setSchedules([]);
         }
       } catch (error: any) {
         console.error("Failed to fetch hackathon operating schedule", error);
@@ -144,8 +144,8 @@ const Calendar: React.FC<CalendarProps> = ({ hackathonId }) => {
     };
 
     loadHackathonOperatingSchedule();
-  }, [currentHackathonId, activeScheduleId]);
-  // Note: toast is deliberately omitted from dependency array to prevent infinite loops
+  }, [currentHackathonId]);
+  // Note: toast and t are deliberately omitted from dependency array to prevent infinite loops
 
   // Load schedule events only when calendar view changes or schedules are loaded
   const loadScheduleEvents = async () => {
@@ -155,8 +155,16 @@ const Calendar: React.FC<CalendarProps> = ({ hackathonId }) => {
     try {
       const allEvents: CalendarEvent[] = [];
 
-      // For each schedule, fetch its events
+      // For each schedule, fetch its events only if schedule.id exists
       for (const schedule of schedules) {
+        // Ensure schedule.id exists before making the API call
+        if (!schedule.id) {
+          console.warn("Schedule ID is undefined, skipping fetch of events");
+          continue;
+        }
+
+        console.log("Fetching events for schedule ID:", schedule.id);
+
         // Use the real service call instead of mock
         const { data: scheduleEvents, message } =
           await scheduleEventService.getScheduleEventsByScheduleId(schedule.id);
@@ -188,12 +196,17 @@ const Calendar: React.FC<CalendarProps> = ({ hackathonId }) => {
     }
   };
 
-  // Load events when schedules are available
+  // Load events when schedules are available and activeScheduleId is set
   useEffect(() => {
-    if (schedules.length > 0) {
+    // Only call loadScheduleEvents when both schedules exist and activeScheduleId is set
+    if (schedules.length > 0 && activeScheduleId) {
+      console.log(
+        "Loading schedule events with active schedule ID:",
+        activeScheduleId
+      );
       loadScheduleEvents();
     }
-  }, [schedules]);
+  }, [schedules, activeScheduleId]);
   // Note: toast is deliberately omitted from dependency array to prevent infinite loops
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
@@ -391,7 +404,7 @@ const Calendar: React.FC<CalendarProps> = ({ hackathonId }) => {
   const activeSchedule = schedules.find(
     (schedule) => schedule.id === activeScheduleId
   );
-
+  console.log("🔹🔹🔹🔹🔹🔹🔹🔹🔹🔹", schedules);
   return (
     <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 dark:text-white transition-colors duration-300">
       <div className="p-3 sm:p-4">
@@ -459,7 +472,7 @@ const Calendar: React.FC<CalendarProps> = ({ hackathonId }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {schedules.map((schedule) => (
                 <div
-                  key={schedule.id}
+                  key={`schedule-${schedule.id}`} // Ensure unique key with prefix
                   className={`bg-gray-100 dark:bg-gray-800 p-2 sm:p-3 rounded-lg cursor-pointer border-2 transition-all duration-300 hover:shadow-md ${
                     activeScheduleId === schedule.id
                       ? "border-brand-500 dark:border-brand-400"
