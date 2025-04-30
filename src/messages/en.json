@@ -119,8 +119,8 @@
     "hackathonEndDate": "End Date",
     "enrollmentStartDate": "Enrollment Opens",
     "enrollmentEndDate": "Enrollment Closes",
-    "createHackathon": "Tạo hackathon mới",
-    "createHackathonAriaLabel": "Tạo một cuộc thi hackathon mới"
+    "createHackathon": "Create a hackathon",
+    "createHackathonAriaLabel": "Create a new hackathon"
   },
   "hackathonManagement": {
     "edit": "Edit",
