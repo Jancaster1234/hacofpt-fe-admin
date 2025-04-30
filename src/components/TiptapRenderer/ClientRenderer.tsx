@@ -4,7 +4,7 @@
 import { createElement, Fragment, useEffect, useState } from "react";
 import { components } from "./components/custom";
 import { createProcessor } from "./utils/processor";
-import "./tiptap-content.scss"; // Import the styles, but you need to create this file
+import "./tiptap-content.scss";
 
 interface TiptapRendererProps {
   children: string;
