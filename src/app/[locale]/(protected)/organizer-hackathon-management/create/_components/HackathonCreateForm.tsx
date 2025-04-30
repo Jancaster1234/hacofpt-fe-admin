@@ -19,6 +19,7 @@ import { fileUrlService } from "@/services/fileUrl.service";
 import { useToast } from "@/hooks/use-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
+import "./style.scss";
 
 type TabKey =
   | "basic"
