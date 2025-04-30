@@ -384,7 +384,7 @@ export default function HackathonOverview({
               )}
             </div>
           ) : (
-            <div>
+            <div className="flex items-center gap-3 sm:gap-4">
               <button
                 className="bg-gray-400 dark:bg-gray-600 text-white font-bold py-2 px-4 sm:px-6 rounded-full cursor-not-allowed transition-colors duration-300"
                 disabled
@@ -392,7 +392,7 @@ export default function HackathonOverview({
               >
                 {getButtonTitle()}
               </button>
-              <p className="text-sm text-red-500 dark:text-red-400 mt-1">
+              <p className="text-sm text-red-500 dark:text-red-400 self-center">
                 {t("teamMemberOnly")}
               </p>
             </div>
