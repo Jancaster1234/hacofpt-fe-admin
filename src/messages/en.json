@@ -112,7 +112,22 @@
     "updateErrorTitle": "Update error",
     "refreshingEnrollmentData": "Refreshing enrollment data...",
     "enrollmentDataRefreshed": "Enrollment data refreshed successfully",
-    "enrollmentDataRefreshError": "Failed to refresh enrollment data"
+    "enrollmentDataRefreshError": "Failed to refresh enrollment data",
+    "enrollmentNotStarted": "Enrollment has not started yet.",
+    "enrollmentClosed": "Enrollment is closed.",
+    "hackathonStartDate": "Start Date",
+    "hackathonEndDate": "End Date",
+    "enrollmentStartDate": "Enrollment Opens",
+    "enrollmentEndDate": "Enrollment Closes"
+  },
+  "hackathonManagement": {
+    "edit": "Edit",
+    "editHackathon": "Edit hackathon details",
+    "resourceManagement": "Resource Management",
+    "resourceManagementAriaLabel": "Navigate to resource management page",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirmChanges": "Confirm changes"
   },
   "pagination": {
     "previousPage": "Previous page",
@@ -148,7 +163,10 @@
     "subtabs": {
       "teams": "Teams",
       "individuals": "Individuals"
-    }
+    },
+    "showToc": "Show Table of Contents",
+    "hideToc": "Hide Table of Contents",
+    "noDocuments": "No documents available"
   },
   "enrollment": {
     "overviewTitle": "Enrollment overview",
@@ -185,13 +203,95 @@
     "submittingRegistration": "Submitting your registration...",
     "deletingRegistration": "Deleting your registration..."
   },
+  "editHackathon": {
+    "title": "Edit Hackathon",
+    "editHackathon": "Edit Hackathon",
+    "enterSubtitle": "Edit your hackathon subtitle",
+    "loading": "Loading hackathon data...",
+    "submitting": "Updating hackathon...",
+    "successMessage": "Hackathon updated successfully!",
+    "errorMessage": "Failed to update hackathon. Please try again.",
+    "hackathonNotFound": "Hackathon not found.",
+    "errorFetchingHackathon": "Error fetching hackathon details.",
+    "tabs": {
+      "basic": "Basic Info",
+      "information": "Information",
+      "description": "Description",
+      "participant": "Participants",
+      "documentation": "Documentation",
+      "contact": "Contact"
+    },
+    "fields": {
+      "title": "Hackathon Title",
+      "subtitle": "Subtitle",
+      "enrollStartDate": "Enrollment Start Date",
+      "enrollEndDate": "Enrollment End Date",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "category": "Category",
+      "organization": "Organization",
+      "teamSize": "Team Size",
+      "minMembers": "Minimum Members",
+      "maxMembers": "Maximum Members",
+      "information": "Information",
+      "description": "Description",
+      "contact": "Contact Information",
+      "documentation": "Documentation",
+      "showParticipants": "Show Participants"
+    },
+    "placeholders": {
+      "title": "Enter hackathon title",
+      "subtitle": "Enter a brief subtitle for your hackathon",
+      "information": "Enter information about the hackathon...",
+      "description": "Enter detailed description...",
+      "contact": "Enter contact information..."
+    },
+    "categories": {
+      "coding": "Coding",
+      "external": "External",
+      "internal": "Internal",
+      "design": "Design",
+      "others": "Others"
+    },
+    "organizations": {
+      "fptu": "FPTU",
+      "nasa": "NASA",
+      "iaiHackathon": "IAI Hackathon",
+      "ceHackathon": "CE Hackathon",
+      "others": "Others"
+    },
+    "validations": {
+      "enrollEndAfterStart": "Enrollment end date must be after enrollment start date",
+      "startAfterEnrollEnd": "Start date must be after enrollment end date",
+      "endAfterStart": "End date must be after start date"
+    },
+    "buttons": {
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "deleteDocument": "Delete Document"
+    },
+    "imageCaptionPlaceholder": "Image caption",
+    "documentUploadSuccess": "Documents uploaded successfully",
+    "documentUploadError": "Error uploading documents",
+    "documentDeleted": "Document removed",
+    "noDocumentsUploaded": "No documents uploaded yet",
+    "bannerUploadSuccess": "Banner uploaded successfully",
+    "bannerUploadError": "Error uploading banner",
+    "uploadingBanner": "Uploading banner...",
+    "imageTypeError": "Only JPEG, JPG and PNG formats are allowed",
+    "hackathonBannerAlt": "Hackathon Banner",
+    "recommendedSize": "Optimal size: 1920×1080px (16:9)",
+    "uploadBanner": "Upload Banner",
+    "changeBanner": "Change Banner",
+    "participantDescription": "Enable this option to show participants in the hackathon details page."
+  },
   "createHackathon": {
     "title": "Create new hackathon",
     "newHackathon": "New hackathon",
     "enterSubtitle": "Enter a subtitle for your hackathon",
     "uploadBanner": "Upload banner",
     "changeBanner": "Change banner",
-    "recommendedSize": "Recommended size: 1200x400px",
+    "recommendedSize": "Recommended size: 1920x1080px",
     "hackathonBannerAlt": "Hackathon banner",
     "imageTypeError": "Only JPEG, JPG and PNG images are allowed",
     "bannerUploadSuccess": "Banner uploaded successfully",
@@ -249,7 +349,7 @@
     },
     "buttons": {
       "cancel": "Cancel",
-      "create": "Create Hackathon",
+      "create": "Submit Hackathon",
       "deleteDocument": "Delete Document"
     },
     "validations": {
@@ -261,7 +361,142 @@
     "documentUploadError": "Error uploading documents",
     "documentDeleted": "Document deleted successfully",
     "noDocumentsUploaded": "No documents uploaded yet",
-    "participantDescription": "When enabled, participants will be visible to everyone. If disabled, only organizers can see the participants."
+    "participantDescription": "When enabled, participants will be visible to everyone. If disabled, only organizers can see the participants.",
+    "wordCount": "Word count",
+    "imageCaptionPlaceholder": "Image caption"
+  },
+  "blogManagement": {
+    "unknownAuthor": "Unknown Author",
+    "updateSuccess": "Blog post updated successfully",
+    "updateError": "Failed to update blog post",
+    "deleteSuccess": "Blog post deleted successfully",
+    "deleteError": "Failed to delete blog post",
+    "publishSuccess": "Blog post published successfully",
+    "publishError": "Failed to publish blog post",
+    "unpublishSuccess": "Blog post unpublished successfully",
+    "unpublishError": "Failed to unpublish blog post",
+    "approveSuccess": "Blog post approved successfully",
+    "approveError": "Failed to approve blog post",
+    "rejectSuccess": "Blog post rejected successfully",
+    "rejectError": "Failed to reject blog post",
+    "status": {
+      "draft": "Draft",
+      "pendingreview": "Pending Review",
+      "approved": "Approved",
+      "published": "Published",
+      "rejected": "Rejected"
+    },
+    "deleteConfirm": {
+      "title": "Are you absolutely sure?",
+      "description": "This action cannot be undone. This will permanently delete the blog post and remove all associated data."
+    },
+    "common": {
+      "cancel": "Cancel"
+    },
+    "title": "Blog management",
+    "welcome": "Welcome",
+    "guest": "Guest",
+    "actions": {
+      "createNew": "Create new post",
+      "backToList": "Back to list",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "approve": "Approve",
+      "reject": "Reject",
+      "delete": "Delete"
+    },
+    "tabs": {
+      "all": "All",
+      "draft": "Draft",
+      "pendingReview": "Pending review",
+      "approved": "Approved",
+      "published": "Published",
+      "view": "View",
+      "edit": "Edit"
+    },
+    "createPost": {
+      "title": "Create new blog post"
+    },
+    "success": {
+      "postCreated": "Blog post created successfully",
+      "postUpdated": "Blog post updated successfully",
+      "postDeleted": "Blog post deleted successfully",
+      "postPublished": "Blog post published successfully",
+      "postUnpublished": "Blog post unpublished successfully",
+      "postApproved": "Blog post approved successfully",
+      "postRejected": "Blog post rejected successfully"
+    },
+    "errors": {
+      "fetchFailed": "Failed to fetch blog posts",
+      "createFailed": "Failed to create blog post",
+      "updateFailed": "Failed to update blog post",
+      "deleteFailed": "Failed to delete blog post",
+      "publishFailed": "Failed to publish blog post",
+      "unpublishFailed": "Failed to unpublish blog post",
+      "approveFailed": "Failed to approve blog post",
+      "rejectFailed": "Failed to reject blog post",
+      "fetchDetailFailed": "Failed to fetch blog post details"
+    }
+  },
+  "blogPostList": {
+    "noPosts": "No blog posts found. Create your first blog post!",
+    "headers": {
+      "title": "Title",
+      "status": "Status",
+      "created": "Created",
+      "updated": "Last updated",
+      "actions": "Actions"
+    },
+    "status": {
+      "draft": "Draft",
+      "pendingreview": "Pending review",
+      "approved": "Approved",
+      "published": "Published",
+      "rejected": "Rejected"
+    },
+    "actions": {
+      "view": "View/Edit",
+      "delete": "Delete",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "approve": "Approve",
+      "reject": "Reject"
+    }
+  },
+  "participants": {
+    "approved": "Approved",
+    "completed": "Completed",
+    "registeredOn": "Registered on",
+    "unknownUser": "Unknown user",
+    "noParticipantsRegistered": "No individual participants have registered for this hackathon yet.",
+    "noRegistrationsFound": "No {status} registrations found.",
+    "failedToLoadParticipants": "Failed to load individual participants. Please try again later."
+  },
+  "blogPost": {
+    "title": "Title",
+    "titlePlaceholder": "Blog post title",
+    "slug": "Slug",
+    "slugPlaceholder": "blog-post-slug",
+    "bannerImage": "Banner Image",
+    "bannerImagePlaceholder": "https://example.com/image.jpg",
+    "uploadImage": "Upload Image",
+    "preview": "Preview",
+    "bannerPreviewAlt": "Banner preview",
+    "content": "Content",
+    "contentPlaceholder": "Write your blog post content here...",
+    "imageCaptionPlaceholder": "Type caption for image (optional)",
+    "wordCount": "Word count",
+    "status": "Status",
+    "selectStatus": "Select status",
+    "draft": "Draft",
+    "pendingReview": "Submit for Review",
+    "createPost": "Create Post",
+    "updatePost": "Update Post",
+    "loading": "Loading form...",
+    "submitSuccess": "Blog post saved successfully",
+    "submitError": "Failed to save blog post",
+    "imageUploadSuccess": "Image uploaded successfully",
+    "imageUploadError": "Failed to upload image"
   },
   "resourceManagement": {
     "title": "Hackathon resource management",
@@ -473,7 +708,35 @@
   },
   "teams": {
     "noTeamsForRound": "No teams found for this round.",
-    "selectRoundToViewTeams": "Please select a round to view teams."
+    "selectRoundToViewTeams": "Please select a round to view teams.",
+    "yourTeams": "Your teams",
+    "noTeams": "You are not part of any teams for this hackathon.",
+    "joinOrCreateTeam": "Join a team or create a team request to participate with others.",
+    "membersCount": "{count} team members",
+    "teamMembers": "Team members",
+    "leader": "Leader",
+    "teamDetails": "Team details",
+    "created": "Created",
+    "hackathon": "Hackathon",
+    "project": "Project",
+    "projectName": "Name",
+    "description": "Description",
+    "goToBoard": "Go to board",
+    "navigationError": "Navigation error occurred. Please try again.",
+    "hackathonInfoError": "Could not find hackathon information for this team.",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "completed": "Completed"
+    },
+    "registeredTeams": "Registered teams",
+    "noTeamsRegistered": "No teams have registered for this hackathon yet.",
+    "members": "members",
+    "teamLeader": "Team leader",
+    "failedToLoadTeams": "Failed to load teams. Please try again later."
   },
   "popups": {
     "judgeNote": "Judge Note",

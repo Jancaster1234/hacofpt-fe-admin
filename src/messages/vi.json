@@ -112,7 +112,13 @@
     "updateErrorTitle": "Lỗi cập nhật",
     "refreshingEnrollmentData": "Đang làm mới dữ liệu đăng ký...",
     "enrollmentDataRefreshed": "Dữ liệu đăng ký đã được làm mới thành công",
-    "enrollmentDataRefreshError": "Không thể làm mới dữ liệu đăng ký"
+    "enrollmentDataRefreshError": "Không thể làm mới dữ liệu đăng ký",
+    "enrollmentNotStarted": "Thời hạn đăng ký chưa bắt đầu.",
+    "enrollmentClosed": "Thời hạn đăng ký đã kết thúc.",
+    "hackathonStartDate": "Ngày bắt đầu",
+    "hackathonEndDate": "Ngày kết thúc",
+    "enrollmentStartDate": "Bắt đầu đăng ký",
+    "enrollmentEndDate": "Kết thúc đăng ký"
   },
   "pagination": {
     "previousPage": "Trang trước",
@@ -148,7 +154,19 @@
     "subtabs": {
       "teams": "Đội",
       "individuals": "Cá nhân"
-    }
+    },
+    "showToc": "Hiển thị mục lục",
+    "hideToc": "Ẩn mục lục",
+    "noDocuments": "Không có tài liệu nào"
+  },
+  "participants": {
+    "approved": "Đã duyệt",
+    "completed": "Đã hoàn thành",
+    "registeredOn": "Đăng ký vào",
+    "unknownUser": "Người dùng không xác định",
+    "noParticipantsRegistered": "Chưa có cá nhân nào đăng ký hackathon này.",
+    "noRegistrationsFound": "Không tìm thấy đăng ký {status}.",
+    "failedToLoadParticipants": "Không thể tải thông tin người tham gia. Vui lòng thử lại sau."
   },
   "enrollment": {
     "overviewTitle": "Tổng quan đăng ký",
@@ -395,7 +413,44 @@
   },
   "teams": {
     "noTeamsForRound": "Không tìm thấy đội nào cho vòng này.",
-    "selectRoundToViewTeams": "Vui lòng chọn một vòng để xem các đội."
+    "selectRoundToViewTeams": "Vui lòng chọn một vòng để xem các đội.",
+    "yourTeams": "Các đội của bạn",
+    "noTeams": "Bạn không tham gia đội nào trong hackathon này.",
+    "joinOrCreateTeam": "Tham gia một đội hoặc tạo yêu cầu thành lập đội để tham gia cùng người khác.",
+    "membersCount": "{count} thành viên",
+    "teamMembers": "Thành viên đội",
+    "leader": "Trưởng nhóm",
+    "teamDetails": "Chi tiết đội",
+    "created": "Ngày tạo",
+    "hackathon": "Hackathon",
+    "project": "Dự án",
+    "projectName": "Tên",
+    "description": "Mô tả",
+    "goToBoard": "Đến bảng",
+    "navigationError": "Đã xảy ra lỗi chuyển hướng. Vui lòng thử lại.",
+    "hackathonInfoError": "Không tìm thấy thông tin hackathon cho đội này.",
+    "status": {
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động",
+      "pending": "Đang chờ",
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối",
+      "completed": "Hoàn thành"
+    },
+    "registeredTeams": "Các đội đã đăng ký",
+    "noTeamsRegistered": "Chưa có đội nào đăng ký hackathon này.",
+    "members": "thành viên",
+    "teamLeader": "Đội trưởng",
+    "failedToLoadTeams": "Không thể tải thông tin đội. Vui lòng thử lại sau."
+  },
+  "hackathonManagement": {
+    "edit": "Chỉnh sửa",
+    "editHackathon": "Chỉnh sửa thông tin hackathon",
+    "resourceManagement": "Quản lý tài nguyên",
+    "resourceManagementAriaLabel": "Điều hướng đến trang quản lý tài nguyên",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "confirmChanges": "Xác nhận thay đổi"
   },
   "popups": {
     "judgeNote": "Ghi chú của giám khảo",
@@ -594,7 +649,7 @@
     "enterSubtitle": "Nhập phụ đề cho hackathon của bạn",
     "uploadBanner": "Tải lên banner",
     "changeBanner": "Thay đổi banner",
-    "recommendedSize": "Kích thước đề xuất: 1200x400px",
+    "recommendedSize": "Kích thước đề xuất: 1920x1080px",
     "hackathonBannerAlt": "Banner hackathon",
     "imageTypeError": "Chỉ cho phép hình ảnh JPEG, JPG và PNG",
     "bannerUploadSuccess": "Tải lên banner thành công",
@@ -652,7 +707,7 @@
     },
     "buttons": {
       "cancel": "Hủy",
-      "create": "Tạo Hackathon",
+      "create": "Gửi Hackathon",
       "deleteDocument": "Xóa tài liệu"
     },
     "validations": {
@@ -664,7 +719,215 @@
     "documentUploadError": "Lỗi khi tải tài liệu lên",
     "documentDeleted": "Đã xóa tài liệu thành công",
     "noDocumentsUploaded": "Chưa có tài liệu nào được tải lên",
-    "participantDescription": "Khi được bật, người tham gia sẽ hiển thị với tất cả mọi người. Nếu tắt, chỉ người tổ chức mới có thể xem người tham gia."
+    "participantDescription": "Khi được bật, người tham gia sẽ hiển thị với tất cả mọi người. Nếu tắt, chỉ người tổ chức mới có thể xem người tham gia.",
+    "wordCount": "Số từ",
+    "imageCaptionPlaceholder": "Chú thích hình ảnh"
+  },
+  "blogManagement": {
+    "unknownAuthor": "Tác giả không xác định",
+    "updateSuccess": "Cập nhật bài viết thành công",
+    "updateError": "Không thể cập nhật bài viết",
+    "deleteSuccess": "Xóa bài viết thành công",
+    "deleteError": "Không thể xóa bài viết",
+    "publishSuccess": "Xuất bản bài viết thành công",
+    "publishError": "Không thể xuất bản bài viết",
+    "unpublishSuccess": "Hủy xuất bản bài viết thành công",
+    "unpublishError": "Không thể hủy xuất bản bài viết",
+    "approveSuccess": "Duyệt bài viết thành công",
+    "approveError": "Không thể duyệt bài viết",
+    "rejectSuccess": "Từ chối bài viết thành công",
+    "rejectError": "Không thể từ chối bài viết",
+    "status": {
+      "draft": "Bản nháp",
+      "pendingreview": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "published": "Đã xuất bản",
+      "rejected": "Bị từ chối"
+    },
+    "deleteConfirm": {
+      "title": "Bạn có chắc chắn không?",
+      "description": "Hành động này không thể hoàn tác. Điều này sẽ xóa vĩnh viễn bài viết và tất cả dữ liệu liên quan."
+    },
+    "common": {
+      "cancel": "Hủy"
+    },
+    "title": "Quản lý bài viết",
+    "welcome": "Xin chào",
+    "guest": "Khách",
+    "actions": {
+      "createNew": "Tạo bài viết mới",
+      "backToList": "Quay lại danh sách",
+      "publish": "Xuất bản",
+      "unpublish": "Hủy xuất bản",
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "delete": "Xóa"
+    },
+    "tabs": {
+      "all": "Tất cả",
+      "draft": "Bản nháp",
+      "pendingReview": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "published": "Đã xuất bản",
+      "view": "Xem",
+      "edit": "Chỉnh sửa"
+    },
+    "createPost": {
+      "title": "Tạo bài viết mới"
+    },
+    "success": {
+      "postCreated": "Tạo bài viết thành công",
+      "postUpdated": "Cập nhật bài viết thành công",
+      "postDeleted": "Xóa bài viết thành công",
+      "postPublished": "Xuất bản bài viết thành công",
+      "postUnpublished": "Hủy xuất bản bài viết thành công",
+      "postApproved": "Duyệt bài viết thành công",
+      "postRejected": "Từ chối bài viết thành công"
+    },
+    "errors": {
+      "fetchFailed": "Không thể tải danh sách bài viết",
+      "createFailed": "Không thể tạo bài viết",
+      "updateFailed": "Không thể cập nhật bài viết",
+      "deleteFailed": "Không thể xóa bài viết",
+      "publishFailed": "Không thể xuất bản bài viết",
+      "unpublishFailed": "Không thể hủy xuất bản bài viết",
+      "approveFailed": "Không thể duyệt bài viết",
+      "rejectFailed": "Không thể từ chối bài viết",
+      "fetchDetailFailed": "Không thể tải chi tiết bài viết"
+    }
+  },
+  "editHackathon": {
+    "title": "Chỉnh sửa Hackathon",
+    "editHackathon": "Chỉnh sửa Hackathon",
+    "enterSubtitle": "Chỉnh sửa phụ đề cho hackathon của bạn",
+    "loading": "Đang tải dữ liệu hackathon...",
+    "submitting": "Đang cập nhật hackathon...",
+    "successMessage": "Cập nhật hackathon thành công!",
+    "errorMessage": "Cập nhật hackathon thất bại. Vui lòng thử lại.",
+    "hackathonNotFound": "Không tìm thấy hackathon.",
+    "errorFetchingHackathon": "Lỗi khi lấy thông tin hackathon.",
+    "tabs": {
+      "basic": "Thông tin cơ bản",
+      "information": "Thông tin",
+      "description": "Mô tả",
+      "participant": "Người tham gia",
+      "documentation": "Tài liệu",
+      "contact": "Liên hệ"
+    },
+    "fields": {
+      "title": "Tiêu đề Hackathon",
+      "subtitle": "Phụ đề",
+      "enrollStartDate": "Ngày bắt đầu đăng ký",
+      "enrollEndDate": "Ngày kết thúc đăng ký",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "category": "Danh mục",
+      "organization": "Tổ chức",
+      "teamSize": "Số lượng thành viên",
+      "minMembers": "Số thành viên tối thiểu",
+      "maxMembers": "Số thành viên tối đa",
+      "information": "Thông tin",
+      "description": "Mô tả",
+      "contact": "Thông tin liên hệ",
+      "documentation": "Tài liệu",
+      "showParticipants": "Hiển thị người tham gia"
+    },
+    "placeholders": {
+      "title": "Nhập tiêu đề hackathon",
+      "subtitle": "Nhập phụ đề ngắn cho hackathon của bạn",
+      "information": "Nhập thông tin về hackathon...",
+      "description": "Nhập mô tả chi tiết...",
+      "contact": "Nhập thông tin liên hệ..."
+    },
+    "categories": {
+      "coding": "Lập trình",
+      "external": "Bên ngoài",
+      "internal": "Nội bộ",
+      "design": "Thiết kế",
+      "others": "Khác"
+    },
+    "organizations": {
+      "fptu": "FPTU",
+      "nasa": "NASA",
+      "iaiHackathon": "IAI Hackathon",
+      "ceHackathon": "CE Hackathon",
+      "others": "Khác"
+    },
+    "validations": {
+      "enrollEndAfterStart": "Ngày kết thúc đăng ký phải sau ngày bắt đầu đăng ký",
+      "startAfterEnrollEnd": "Ngày bắt đầu phải sau ngày kết thúc đăng ký",
+      "endAfterStart": "Ngày kết thúc phải sau ngày bắt đầu"
+    },
+    "buttons": {
+      "save": "Lưu thay đổi",
+      "cancel": "Hủy",
+      "deleteDocument": "Xóa tài liệu"
+    },
+    "imageCaptionPlaceholder": "Chú thích hình ảnh",
+    "documentUploadSuccess": "Tải tài liệu lên thành công",
+    "documentUploadError": "Lỗi khi tải tài liệu lên",
+    "documentDeleted": "Tài liệu đã được xóa",
+    "noDocumentsUploaded": "Chưa có tài liệu nào được tải lên",
+    "bannerUploadSuccess": "Tải banner thành công",
+    "bannerUploadError": "Lỗi khi tải banner",
+    "uploadingBanner": "Đang tải banner...",
+    "imageTypeError": "Chỉ chấp nhận định dạng JPEG, JPG và PNG",
+    "hackathonBannerAlt": "Banner Hackathon",
+    "recommendedSize": "Kích thước khuyến nghị: 1920×1080px (16:9)",
+    "uploadBanner": "Tải lên Banner",
+    "changeBanner": "Thay đổi Banner",
+    "participantDescription": "Bật tùy chọn này để hiển thị người tham gia trong trang chi tiết hackathon."
+  },
+  "blogPostList": {
+    "noPosts": "Không tìm thấy bài viết nào. Hãy tạo bài viết đầu tiên của bạn!",
+    "headers": {
+      "title": "Tiêu đề",
+      "status": "Trạng thái",
+      "created": "Ngày tạo",
+      "updated": "Cập nhật lần cuối",
+      "actions": "Thao tác"
+    },
+    "status": {
+      "draft": "Bản nháp",
+      "pendingreview": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "published": "Đã xuất bản",
+      "rejected": "Đã từ chối"
+    },
+    "actions": {
+      "view": "Xem/Sửa",
+      "delete": "Xóa",
+      "publish": "Xuất bản",
+      "unpublish": "Hủy xuất bản",
+      "approve": "Duyệt",
+      "reject": "Từ chối"
+    }
+  },
+  "blogPost": {
+    "title": "Tiêu đề",
+    "titlePlaceholder": "Tiêu đề bài viết",
+    "slug": "Đường dẫn",
+    "slugPlaceholder": "duong-dan-bai-viet",
+    "bannerImage": "Ảnh bìa",
+    "bannerImagePlaceholder": "https://example.com/image.jpg",
+    "uploadImage": "Tải ảnh lên",
+    "preview": "Xem trước",
+    "bannerPreviewAlt": "Xem trước ảnh bìa",
+    "content": "Nội dung",
+    "contentPlaceholder": "Viết nội dung bài viết của bạn tại đây...",
+    "imageCaptionPlaceholder": "Nhập chú thích cho ảnh (tùy chọn)",
+    "wordCount": "Số từ",
+    "status": "Trạng thái",
+    "selectStatus": "Chọn trạng thái",
+    "draft": "Bản nháp",
+    "pendingReview": "Gửi để xem xét",
+    "createPost": "Tạo bài viết",
+    "updatePost": "Cập nhật bài viết",
+    "loading": "Đang tải biểu mẫu...",
+    "submitSuccess": "Bài viết đã được lưu thành công",
+    "submitError": "Không thể lưu bài viết",
+    "imageUploadSuccess": "Tải ảnh lên thành công",
+    "imageUploadError": "Không thể tải ảnh lên"
   },
   "sidebar": {
     "sidebar": "Thanh điều hướng",

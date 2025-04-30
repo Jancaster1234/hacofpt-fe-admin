@@ -1,7 +1,7 @@
 // src/app/[locale]/(protected)/organizer-hackathon-management/create/_components/HackathonCreateForm.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "@/hooks/useTranslations";
 import {
   FaFileWord,
@@ -18,6 +18,8 @@ import {
 import { fileUrlService } from "@/services/fileUrl.service";
 import { useToast } from "@/hooks/use-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import TiptapEditor, { type TiptapEditorRef } from "@/components/TiptapEditor";
+import "./style.scss";
 
 type TabKey =
   | "basic"
@@ -63,6 +65,11 @@ export default function HackathonCreateForm({
   const [activeTab, setActiveTab] = useState<TabKey>("basic");
   const [isUploading, setIsUploading] = useState(false);
   const toast = useToast();
+
+  // Editor references for each tab
+  const informationEditorRef = useRef<TiptapEditorRef>(null);
+  const descriptionEditorRef = useRef<TiptapEditorRef>(null);
+  const contactEditorRef = useRef<TiptapEditorRef>(null);
 
   // Available categories and organizations
   const CATEGORIES = [
@@ -476,15 +483,23 @@ export default function HackathonCreateForm({
             <label className="block font-medium mb-2 text-gray-800 dark:text-gray-200">
               {t("fields.information")}
             </label>
-            <textarea
-              className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
-              rows={10}
-              placeholder={t("placeholders.information")}
-              value={formData.information}
-              onChange={(e) =>
-                setFormData({ ...formData, information: e.target.value })
-              }
-            />
+            <div className="min-h-[300px] border border-input rounded-md dark:border-gray-600">
+              <TiptapEditor
+                ref={informationEditorRef}
+                ssr={true}
+                output="html"
+                placeholder={{
+                  paragraph: t("placeholders.information"),
+                  imageCaption: t("imageCaptionPlaceholder"),
+                }}
+                contentMinHeight={280}
+                contentMaxHeight={600}
+                onContentChange={(content) => {
+                  setFormData({ ...formData, information: content });
+                }}
+                initialContent={formData.information}
+              />
+            </div>
           </div>
         )}
 
@@ -493,15 +508,23 @@ export default function HackathonCreateForm({
             <label className="block font-medium mb-2 text-gray-800 dark:text-gray-200">
               {t("fields.description")}
             </label>
-            <textarea
-              className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
-              rows={10}
-              placeholder={t("placeholders.description")}
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-            />
+            <div className="min-h-[300px] border border-input rounded-md dark:border-gray-600">
+              <TiptapEditor
+                ref={descriptionEditorRef}
+                ssr={true}
+                output="html"
+                placeholder={{
+                  paragraph: t("placeholders.description"),
+                  imageCaption: t("imageCaptionPlaceholder"),
+                }}
+                contentMinHeight={280}
+                contentMaxHeight={600}
+                onContentChange={(content) => {
+                  setFormData({ ...formData, description: content });
+                }}
+                initialContent={formData.description}
+              />
+            </div>
           </div>
         )}
 
@@ -597,15 +620,23 @@ export default function HackathonCreateForm({
             <label className="block font-medium mb-2 text-gray-800 dark:text-gray-200">
               {t("fields.contact")}
             </label>
-            <textarea
-              className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
-              rows={5}
-              placeholder={t("placeholders.contact")}
-              value={formData.contact}
-              onChange={(e) =>
-                setFormData({ ...formData, contact: e.target.value })
-              }
-            />
+            <div className="min-h-[200px] border border-input rounded-md dark:border-gray-600">
+              <TiptapEditor
+                ref={contactEditorRef}
+                ssr={true}
+                output="html"
+                placeholder={{
+                  paragraph: t("placeholders.contact"),
+                  imageCaption: t("imageCaptionPlaceholder"),
+                }}
+                contentMinHeight={180}
+                contentMaxHeight={400}
+                onContentChange={(content) => {
+                  setFormData({ ...formData, contact: content });
+                }}
+                initialContent={formData.contact}
+              />
+            </div>
           </div>
         )}
       </div>

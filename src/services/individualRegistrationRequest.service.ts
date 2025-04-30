@@ -179,6 +179,71 @@ class IndividualRegistrationRequestService {
     }
   }
 
+  async createBulkIndividualRegistrationRequests(
+    data: Array<{
+      hackathonId: string;
+      status: "PENDING" | "APPROVED" | "REJECTED";
+      reviewedById?: string;
+    }>
+  ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {
+    try {
+      const response = await apiService.auth.post<
+        IndividualRegistrationRequest[]
+      >("/hackathon-service/api/v1/individuals/bulk", { data });
+
+      if (!response || !response.data) {
+        throw new Error(
+          response?.message || "Failed to create bulk registration requests"
+        );
+      }
+
+      return {
+        data: response.data,
+        message:
+          response.message || "Bulk registration requests created successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<IndividualRegistrationRequest[]>(
+        error,
+        [],
+        "[Individual Registration Service] Error creating bulk registration requests:"
+      );
+    }
+  }
+
+  async updateBulkIndividualRegistrationRequests(
+    data: Array<{
+      id: string;
+      hackathonId: string;
+      status: "PENDING" | "APPROVED" | "REJECTED";
+      reviewedById?: string;
+    }>
+  ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {
+    try {
+      const response = await apiService.auth.put<
+        IndividualRegistrationRequest[]
+      >("/hackathon-service/api/v1/individuals/bulk", { data });
+
+      if (!response || !response.data) {
+        throw new Error(
+          response?.message || "Failed to update bulk registration requests"
+        );
+      }
+
+      return {
+        data: response.data,
+        message:
+          response.message || "Bulk registration requests updated successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<IndividualRegistrationRequest[]>(
+        error,
+        [],
+        "[Individual Registration Service] Error updating bulk registration requests:"
+      );
+    }
+  }
+
   async deleteIndividualRegistration(
     id: string
   ): Promise<{ message?: string }> {
@@ -196,6 +261,60 @@ class IndividualRegistrationRequestService {
         error.message
       );
       throw error;
+    }
+  }
+
+  async getApprovedIndividualRegistrationsByHackathonId(
+    hackathonId: string
+  ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<
+        IndividualRegistrationRequest[]
+      >(
+        `/hackathon-service/api/v1/individuals/filter-by-hackathon-and-status-approved?hackathonId=${hackathonId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve approved registrations");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<IndividualRegistrationRequest[]>(
+        error,
+        [],
+        "[Individual Registration Service] Error fetching approved registrations by hackathon ID:"
+      );
+    }
+  }
+
+  async getCompletedIndividualRegistrationsByHackathonId(
+    hackathonId: string
+  ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<
+        IndividualRegistrationRequest[]
+      >(
+        `/hackathon-service/api/v1/individuals/filter-by-hackathon-and-status-completed?hackathonId=${hackathonId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve completed registrations");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<IndividualRegistrationRequest[]>(
+        error,
+        [],
+        "[Individual Registration Service] Error fetching completed registrations by hackathon ID:"
+      );
     }
   }
 }

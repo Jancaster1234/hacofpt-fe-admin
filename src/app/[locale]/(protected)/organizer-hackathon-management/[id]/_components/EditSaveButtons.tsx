@@ -1,8 +1,7 @@
-// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/_components/EditSaveButtons.tsx
 "use client";
 
-import { useState } from "react";
-import EditHackathonModal from "./EditHackathonModal";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "@/hooks/useTranslations";
 
 interface Hackathon {
   id: string;
@@ -33,61 +32,23 @@ export default function EditSaveButtons({
   hackathonId,
   initialHackathonData,
 }: EditSaveButtonsProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [hackathonData, setHackathonData] = useState(initialHackathonData);
+  const router = useRouter();
+  const t = useTranslations("hackathonManagement");
 
   const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleSave = async () => {
-    try {
-      const response = await fetch(`/api/hackathon/${hackathonId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(hackathonData), // Send updated data
-      });
-
-      if (!response.ok) throw new Error("Failed to update hackathon");
-
-      alert("Hackathon updated successfully!");
-      setIsEditing(false);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to update hackathon.");
-    }
+    // Navigate to the edit page with the hackathon ID
+    router.push(`/organizer-hackathon-management/${hackathonId}/edit`);
   };
 
   return (
-    <>
-      <div className="top-2 left-4 flex space-x-2">
-        {!isEditing ? (
-          <button
-            onClick={handleEdit}
-            className="bg-blue-500 font-bold text-white px-4 py-2 rounded-md"
-          >
-            Edit
-          </button>
-        ) : (
-          <button
-            onClick={handleSave}
-            className="bg-green-500 font-bold text-white px-4 py-2 rounded-md"
-          >
-            Save
-          </button>
-        )}
-      </div>
-
-      {isEditing && (
-        <EditHackathonModal
-          hackathon={hackathonData}
-          onClose={() => setIsEditing(false)}
-          onSuccess={(updatedHackathon) => {
-            setHackathonData(updatedHackathon);
-            setIsEditing(false);
-          }}
-        />
-      )}
-    </>
+    <div className="flex space-x-2 transition-colors duration-300">
+      <button
+        onClick={handleEdit}
+        className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 font-medium text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-800 shadow-sm"
+        aria-label={t("editHackathon")}
+      >
+        {t("edit")}
+      </button>
+    </div>
   );
 }

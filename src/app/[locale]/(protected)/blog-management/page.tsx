@@ -10,18 +10,23 @@ import BlogPostForm from "./_components/BlogPostForm";
 import BlogPostDetail from "./_components/BlogPostDetail";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useTranslations } from "@/hooks/useTranslations";
 
 export default function BlogManagement() {
   const { user } = useAuth();
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [currentView, setCurrentView] = useState<"list" | "create" | "detail">(
     "list"
   );
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+  const toast = useToast();
+  const t = useTranslations("blogManagement");
 
   useEffect(() => {
     fetchBlogPosts();
@@ -32,8 +37,9 @@ export default function BlogManagement() {
     try {
       const response = await blogPostService.getAllBlogPosts();
       setBlogPosts(response.data);
-    } catch (err) {
-      setError("Failed to fetch blog posts");
+      // Don't show toast for initial data loading
+    } catch (err: any) {
+      setError(err.message || t("errors.fetchFailed"));
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -47,18 +53,24 @@ export default function BlogManagement() {
     slug?: string;
     status?: BlogPostStatus;
   }) => {
+    setIsProcessing(true);
     try {
       // Calculate word count from HTML content
       const wordCount = calculateWordCount(data.content);
 
-      await blogPostService.createBlogPost({
+      const response = await blogPostService.createBlogPost({
         ...data,
         wordCount,
       });
+
+      toast.success(response.message || t("success.postCreated"));
       fetchBlogPosts();
       setCurrentView("list");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error creating blog post:", err);
+      toast.error(err.message || t("errors.createFailed"));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -71,6 +83,7 @@ export default function BlogManagement() {
     slug?: string;
     status?: BlogPostStatus;
   }) => {
+    setIsProcessing(true);
     try {
       // Calculate word count if content is updated
       const updatedData = { ...data };
@@ -78,14 +91,19 @@ export default function BlogManagement() {
         updatedData.wordCount = calculateWordCount(data.content);
       }
 
-      await blogPostService.updateBlogPost(updatedData);
+      const response = await blogPostService.updateBlogPost(updatedData);
+      toast.success(response.message || t("success.postUpdated"));
+
       if (selectedPost) {
-        const response = await blogPostService.getBlogPostById(data.id);
-        setSelectedPost(response.data);
+        const detailResponse = await blogPostService.getBlogPostById(data.id);
+        setSelectedPost(detailResponse.data);
       }
       fetchBlogPosts();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error updating blog post:", err);
+      toast.error(err.message || t("errors.updateFailed"));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -101,79 +119,108 @@ export default function BlogManagement() {
   };
 
   const handleDeleteBlogPost = async (id: string) => {
+    setIsProcessing(true);
     try {
-      await blogPostService.deleteBlogPost(id);
+      const response = await blogPostService.deleteBlogPost(id);
+      toast.success(response.message || t("success.postDeleted"));
       fetchBlogPosts();
       if (selectedPost && selectedPost.id === id) {
         setSelectedPost(null);
         setCurrentView("list");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error deleting blog post:", err);
+      toast.error(err.message || t("errors.deleteFailed"));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handlePublishBlogPost = async (id: string) => {
+    setIsProcessing(true);
     try {
-      await blogPostService.publishBlogPost(id);
+      const response = await blogPostService.publishBlogPost(id);
+      toast.success(response.message || t("success.postPublished"));
       fetchBlogPosts();
       if (selectedPost && selectedPost.id === id) {
-        const response = await blogPostService.getBlogPostById(id);
-        setSelectedPost(response.data);
+        const detailResponse = await blogPostService.getBlogPostById(id);
+        setSelectedPost(detailResponse.data);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error publishing blog post:", err);
+      toast.error(err.message || t("errors.publishFailed"));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleUnpublishBlogPost = async (id: string) => {
+    setIsProcessing(true);
     try {
-      await blogPostService.unpublishBlogPost(id);
+      const response = await blogPostService.unpublishBlogPost(id);
+      toast.success(response.message || t("success.postUnpublished"));
       fetchBlogPosts();
       if (selectedPost && selectedPost.id === id) {
-        const response = await blogPostService.getBlogPostById(id);
-        setSelectedPost(response.data);
+        const detailResponse = await blogPostService.getBlogPostById(id);
+        setSelectedPost(detailResponse.data);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error unpublishing blog post:", err);
+      toast.error(err.message || t("errors.unpublishFailed"));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleApproveBlogPost = async (id: string) => {
     if (!user?.id) return;
+    setIsProcessing(true);
     try {
-      await blogPostService.approveBlogPost(id, user.id);
+      const response = await blogPostService.approveBlogPost(id, user.id);
+      toast.success(response.message || t("success.postApproved"));
       fetchBlogPosts();
       if (selectedPost && selectedPost.id === id) {
-        const response = await blogPostService.getBlogPostById(id);
-        setSelectedPost(response.data);
+        const detailResponse = await blogPostService.getBlogPostById(id);
+        setSelectedPost(detailResponse.data);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error approving blog post:", err);
+      toast.error(err.message || t("errors.approveFailed"));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleRejectBlogPost = async (id: string) => {
     if (!user?.id) return;
+    setIsProcessing(true);
     try {
-      await blogPostService.rejectBlogPost(id, user.id);
+      const response = await blogPostService.rejectBlogPost(id, user.id);
+      toast.success(response.message || t("success.postRejected"));
       fetchBlogPosts();
       if (selectedPost && selectedPost.id === id) {
-        const response = await blogPostService.getBlogPostById(id);
-        setSelectedPost(response.data);
+        const detailResponse = await blogPostService.getBlogPostById(id);
+        setSelectedPost(detailResponse.data);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error rejecting blog post:", err);
+      toast.error(err.message || t("errors.rejectFailed"));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const handleViewPost = async (id: string) => {
+    setIsProcessing(true);
     try {
       const response = await blogPostService.getBlogPostById(id);
       setSelectedPost(response.data);
       setCurrentView("detail");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching blog post details:", err);
+      toast.error(err.message || t("errors.fetchDetailFailed"));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -183,58 +230,90 @@ export default function BlogManagement() {
       : blogPosts.filter((post) => post.status === activeTab.toUpperCase());
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-900">Blog Management</h1>
-          <div className="flex space-x-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-3 sm:p-4 md:p-6 transition-colors duration-200">
+      <div className="mx-auto max-w-full lg:max-w-7xl">
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+            {t("title")}
+          </h1>
+          <div className="flex space-x-2 sm:space-x-4">
             {currentView === "list" && (
               <Button
                 onClick={() => {
                   setSelectedPost(null);
                   setCurrentView("create");
                 }}
+                className="w-full sm:w-auto text-sm sm:text-base"
+                disabled={isProcessing}
               >
-                Create New Post
+                {isProcessing ? (
+                  <LoadingSpinner size="sm" className="mr-2" />
+                ) : null}
+                {t("actions.createNew")}
               </Button>
             )}
             {(currentView === "create" || currentView === "detail") && (
-              <Button variant="outline" onClick={() => setCurrentView("list")}>
-                Back to List
+              <Button
+                variant="outline"
+                onClick={() => setCurrentView("list")}
+                className="w-full sm:w-auto text-sm sm:text-base"
+                disabled={isProcessing}
+              >
+                {t("actions.backToList")}
               </Button>
             )}
           </div>
         </div>
 
         <div className="mb-4">
-          <p className="text-gray-700">
-            Welcome, {user ? `${user.firstName} ${user.lastName}` : "Guest"}!
+          <p className="text-gray-700 dark:text-gray-300">
+            {t("welcome")},{" "}
+            {user ? `${user.firstName} ${user.lastName}` : t("guest")}!
           </p>
         </div>
 
         {isLoading ? (
           <div className="flex h-64 items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <LoadingSpinner size="lg" showText={true} />
           </div>
         ) : error ? (
-          <div className="rounded-md bg-red-50 p-4 text-red-800">{error}</div>
+          <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4 text-red-800 dark:text-red-300 transition-colors duration-200">
+            {error}
+          </div>
         ) : (
           <>
             {currentView === "list" && (
-              <div className="rounded-lg bg-white p-6 shadow">
+              <div className="rounded-lg bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-6 shadow transition-colors duration-200">
                 <Tabs
                   value={activeTab}
                   onValueChange={setActiveTab}
                   className="w-full"
                 >
-                  <TabsList className="mb-6 grid w-full grid-cols-5">
-                    <TabsTrigger value="all">All</TabsTrigger>
-                    <TabsTrigger value="draft">Draft</TabsTrigger>
-                    <TabsTrigger value="pending_review">
-                      Pending Review
+                  <TabsList className="mb-4 sm:mb-6 grid w-full grid-cols-2 sm:grid-cols-5 gap-1">
+                    <TabsTrigger value="all" className="text-xs sm:text-sm">
+                      {t("tabs.all")}
                     </TabsTrigger>
-                    <TabsTrigger value="approved">Approved</TabsTrigger>
-                    <TabsTrigger value="published">Published</TabsTrigger>
+                    <TabsTrigger value="draft" className="text-xs sm:text-sm">
+                      {t("tabs.draft")}
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="pending_review"
+                      className="text-xs sm:text-sm"
+                    >
+                      {t("tabs.pendingReview")}
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="approved"
+                      className="text-xs sm:text-sm"
+                    >
+                      {t("tabs.approved")}
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="published"
+                      className="text-xs sm:text-sm"
+                    >
+                      {t("tabs.published")}
+                    </TabsTrigger>
                   </TabsList>
                   <TabsContent value={activeTab}>
                     <BlogPostList
@@ -245,6 +324,7 @@ export default function BlogManagement() {
                       onUnpublishPost={handleUnpublishBlogPost}
                       onApprovePost={handleApproveBlogPost}
                       onRejectPost={handleRejectBlogPost}
+                      isProcessing={isProcessing}
                     />
                   </TabsContent>
                 </Tabs>
@@ -252,16 +332,19 @@ export default function BlogManagement() {
             )}
 
             {currentView === "create" && (
-              <div className="rounded-lg bg-white p-6 shadow">
-                <h2 className="mb-6 text-2xl font-semibold">
-                  Create New Blog Post
+              <div className="rounded-lg bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-6 shadow transition-colors duration-200">
+                <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                  {t("createPost.title")}
                 </h2>
-                <BlogPostForm onSubmit={handleCreateBlogPost} />
+                <BlogPostForm
+                  onSubmit={handleCreateBlogPost}
+                  isProcessing={isProcessing}
+                />
               </div>
             )}
 
             {currentView === "detail" && selectedPost && (
-              <div className="rounded-lg bg-white p-6 shadow">
+              <div className="rounded-lg bg-white dark:bg-gray-800 p-3 sm:p-4 md:p-6 shadow transition-colors duration-200">
                 <BlogPostDetail
                   blogPost={selectedPost}
                   onUpdate={handleUpdateBlogPost}

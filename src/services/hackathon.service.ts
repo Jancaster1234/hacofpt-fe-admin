@@ -2,6 +2,7 @@
 import { apiService } from "@/services/apiService_v0";
 import { Hackathon } from "@/types/entities/hackathon";
 import { handleApiError } from "@/utils/errorHandler";
+
 class HackathonService {
   async getAllHackathons(): Promise<{ data: Hackathon[]; message?: string }> {
     try {
@@ -15,21 +16,14 @@ class HackathonService {
 
       return {
         data: response.data,
-        message: response.message,
+        message: response.message || "Hackathons retrieved successfully",
       };
     } catch (error: any) {
-      console.error(
-        "[Hackathon Service] Error getting all hackathons:",
-        error.message
+      return handleApiError<Hackathon[]>(
+        error,
+        [],
+        "[Hackathon Service] Error getting all hackathons:"
       );
-      // If the error is due to component unmount, don't rethrow
-      if (
-        error.name === "AbortError" &&
-        error.message?.includes("component unmounted")
-      ) {
-        return { data: [] as Hackathon[], message: "Request aborted" };
-      }
-      throw error;
     }
   }
 
@@ -42,7 +36,7 @@ class HackathonService {
       );
 
       if (!response || !response.data) {
-        throw new Error(response?.message || "Failed to retrieve hackathon");
+        throw new Error("Failed to retrieve hackathon");
       }
 
       return {
@@ -59,7 +53,7 @@ class HackathonService {
   }
 
   async createHackathon(
-    data: any
+    data: Partial<Hackathon>
   ): Promise<{ data: Hackathon; message?: string }> {
     try {
       const response = await apiService.auth.post<Hackathon>(
@@ -68,39 +62,24 @@ class HackathonService {
       );
 
       if (!response || !response.data) {
-        throw new Error(response?.message || "Failed to create hackathon");
+        throw new Error("Failed to create hackathon");
       }
 
       return {
         data: response.data,
-        message: response.message,
+        message: response.message || "Hackathon created successfully",
       };
     } catch (error: any) {
-      console.error(
-        "[Hackathon Service] Error creating hackathon:",
-        error.message
+      return handleApiError<Hackathon>(
+        error,
+        {} as Hackathon,
+        "[Hackathon Service] Error creating hackathon:"
       );
-
-      // Extract error message if available
-      let errorMessage = "Failed to create hackathon";
-      if (error.message && error.message.includes("Response:")) {
-        try {
-          const jsonMatch = error.message.match(/Response:(.+)/);
-          if (jsonMatch) {
-            const errorJson = JSON.parse(jsonMatch[1].trim());
-            errorMessage = errorJson.message || errorMessage;
-          }
-        } catch (e) {
-          // If parsing fails, use the original error message
-        }
-      }
-
-      throw new Error(errorMessage);
     }
   }
 
   async updateHackathon(
-    data: any
+    data: Partial<Hackathon>
   ): Promise<{ data: Hackathon; message?: string }> {
     try {
       const response = await apiService.auth.put<Hackathon>(
@@ -109,34 +88,37 @@ class HackathonService {
       );
 
       if (!response || !response.data) {
-        throw new Error(response?.message || "Failed to update hackathon");
+        throw new Error("Failed to update hackathon");
       }
 
       return {
         data: response.data,
-        message: response.message,
+        message: response.message || "Hackathon updated successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<Hackathon>(
+        error,
+        {} as Hackathon,
+        "[Hackathon Service] Error updating hackathon:"
+      );
+    }
+  }
+
+  async deleteHackathon(id: string): Promise<{ message?: string }> {
+    try {
+      const response = await apiService.auth.delete(
+        `/hackathon-service/api/v1/hackathons/${id}`
+      );
+
+      return {
+        message: response.message || "Hackathon deleted successfully",
       };
     } catch (error: any) {
       console.error(
-        "[Hackathon Service] Error updating hackathon:",
+        "[Hackathon Service] Error deleting hackathon:",
         error.message
       );
-
-      // Extract error message if available
-      let errorMessage = "Failed to update hackathon";
-      if (error.message && error.message.includes("Response:")) {
-        try {
-          const jsonMatch = error.message.match(/Response:(.+)/);
-          if (jsonMatch) {
-            const errorJson = JSON.parse(jsonMatch[1].trim());
-            errorMessage = errorJson.message || errorMessage;
-          }
-        } catch (e) {
-          // If parsing fails, use the original error message
-        }
-      }
-
-      throw new Error(errorMessage);
+      throw error;
     }
   }
 }
