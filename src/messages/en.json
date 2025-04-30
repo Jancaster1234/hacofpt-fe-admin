@@ -185,6 +185,88 @@
     "submittingRegistration": "Submitting your registration...",
     "deletingRegistration": "Deleting your registration..."
   },
+  "editHackathon": {
+    "title": "Edit Hackathon",
+    "editHackathon": "Edit Hackathon",
+    "enterSubtitle": "Edit your hackathon subtitle",
+    "loading": "Loading hackathon data...",
+    "submitting": "Updating hackathon...",
+    "successMessage": "Hackathon updated successfully!",
+    "errorMessage": "Failed to update hackathon. Please try again.",
+    "hackathonNotFound": "Hackathon not found.",
+    "errorFetchingHackathon": "Error fetching hackathon details.",
+    "tabs": {
+      "basic": "Basic Info",
+      "information": "Information",
+      "description": "Description",
+      "participant": "Participants",
+      "documentation": "Documentation",
+      "contact": "Contact"
+    },
+    "fields": {
+      "title": "Hackathon Title",
+      "subtitle": "Subtitle",
+      "enrollStartDate": "Enrollment Start Date",
+      "enrollEndDate": "Enrollment End Date",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "category": "Category",
+      "organization": "Organization",
+      "teamSize": "Team Size",
+      "minMembers": "Minimum Members",
+      "maxMembers": "Maximum Members",
+      "information": "Information",
+      "description": "Description",
+      "contact": "Contact Information",
+      "documentation": "Documentation",
+      "showParticipants": "Show Participants"
+    },
+    "placeholders": {
+      "title": "Enter hackathon title",
+      "subtitle": "Enter a brief subtitle for your hackathon",
+      "information": "Enter information about the hackathon...",
+      "description": "Enter detailed description...",
+      "contact": "Enter contact information..."
+    },
+    "categories": {
+      "coding": "Coding",
+      "external": "External",
+      "internal": "Internal",
+      "design": "Design",
+      "others": "Others"
+    },
+    "organizations": {
+      "fptu": "FPTU",
+      "nasa": "NASA",
+      "iaiHackathon": "IAI Hackathon",
+      "ceHackathon": "CE Hackathon",
+      "others": "Others"
+    },
+    "validations": {
+      "enrollEndAfterStart": "Enrollment end date must be after enrollment start date",
+      "startAfterEnrollEnd": "Start date must be after enrollment end date",
+      "endAfterStart": "End date must be after start date"
+    },
+    "buttons": {
+      "save": "Save Changes",
+      "cancel": "Cancel",
+      "deleteDocument": "Delete Document"
+    },
+    "imageCaptionPlaceholder": "Image caption",
+    "documentUploadSuccess": "Documents uploaded successfully",
+    "documentUploadError": "Error uploading documents",
+    "documentDeleted": "Document removed",
+    "noDocumentsUploaded": "No documents uploaded yet",
+    "bannerUploadSuccess": "Banner uploaded successfully",
+    "bannerUploadError": "Error uploading banner",
+    "uploadingBanner": "Uploading banner...",
+    "imageTypeError": "Only JPEG, JPG and PNG formats are allowed",
+    "hackathonBannerAlt": "Hackathon Banner",
+    "recommendedSize": "Optimal size: 1920×1080px (16:9)",
+    "uploadBanner": "Upload Banner",
+    "changeBanner": "Change Banner",
+    "participantDescription": "Enable this option to show participants in the hackathon details page."
+  },
   "createHackathon": {
     "title": "Create new hackathon",
     "newHackathon": "New hackathon",

@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/organizer-hackathon-management/create/_components/HackathonCreateBanner.tsx
 "use client";
 
 import { useState } from "react";
