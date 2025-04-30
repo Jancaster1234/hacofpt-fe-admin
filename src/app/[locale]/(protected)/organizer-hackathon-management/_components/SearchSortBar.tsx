@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/_components/SearchSortBar.tsx
+// src/app/[locale]/(protected)/organizer-hackathon-management/_components/SearchSortBar.tsx
 "use client";
 
 import { useState, useEffect } from "react";

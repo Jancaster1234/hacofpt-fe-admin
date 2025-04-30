@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/_components/HackathonList.tsx
+// src/app/[locale]/(protected)/organizer-hackathon-management/_components/HackathonList.tsx
 "use client";
 
 import HackathonCard from "@/components/HackathonCard";

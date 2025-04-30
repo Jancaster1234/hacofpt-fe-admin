@@ -120,6 +120,15 @@
     "enrollmentStartDate": "Enrollment Opens",
     "enrollmentEndDate": "Enrollment Closes"
   },
+  "hackathonManagement": {
+    "edit": "Edit",
+    "editHackathon": "Edit hackathon details",
+    "resourceManagement": "Resource Management",
+    "resourceManagementAriaLabel": "Navigate to resource management page",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirmChanges": "Confirm changes"
+  },
   "pagination": {
     "previousPage": "Previous page",
     "nextPage": "Next page",

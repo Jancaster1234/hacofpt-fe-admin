@@ -443,6 +443,15 @@
     "teamLeader": "Đội trưởng",
     "failedToLoadTeams": "Không thể tải thông tin đội. Vui lòng thử lại sau."
   },
+  "hackathonManagement": {
+    "edit": "Chỉnh sửa",
+    "editHackathon": "Chỉnh sửa thông tin hackathon",
+    "resourceManagement": "Quản lý tài nguyên",
+    "resourceManagementAriaLabel": "Điều hướng đến trang quản lý tài nguyên",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "confirmChanges": "Xác nhận thay đổi"
+  },
   "popups": {
     "judgeNote": "Ghi chú của giám khảo",
     "criterionDescription": "Mô tả tiêu chí",

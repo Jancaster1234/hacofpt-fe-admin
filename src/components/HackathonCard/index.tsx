@@ -13,7 +13,7 @@ export default function HackathonCard({ hackathon }: HackathonCardProps) {
 
   return (
     <Link
-      href={`/hackathon/${hackathon.id}`}
+      href={`/organizer-hackathon-management/${hackathon.id}`}
       className="block bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 
       rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 
       hover:shadow-lg dark:hover:shadow-gray-600"

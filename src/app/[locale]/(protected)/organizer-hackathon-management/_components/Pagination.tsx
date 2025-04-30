@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/_components/Pagination.tsx
+// src/app/[locale]/(protected)/organizer-hackathon-management/_components/Pagination.tsx
 "use client";
 
 import { useTranslations } from "@/hooks/useTranslations";

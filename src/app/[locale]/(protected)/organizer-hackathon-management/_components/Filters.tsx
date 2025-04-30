@@ -1,4 +1,4 @@
-// src/app/[locale]/hackathon/_components/Filters.tsx
+// src/app/[locale]/(protected)/organizer-hackathon-management/_components/Filters.tsx
 "use client";
 
 import { useState } from "react";

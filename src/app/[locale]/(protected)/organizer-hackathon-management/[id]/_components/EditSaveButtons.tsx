@@ -1,7 +1,7 @@
-// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/_components/EditSaveButtons.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "@/hooks/useTranslations";
 
 interface Hackathon {
   id: string;
@@ -33,6 +33,7 @@ export default function EditSaveButtons({
   initialHackathonData,
 }: EditSaveButtonsProps) {
   const router = useRouter();
+  const t = useTranslations("hackathonManagement");
 
   const handleEdit = () => {
     // Navigate to the edit page with the hackathon ID
@@ -40,12 +41,13 @@ export default function EditSaveButtons({
   };
 
   return (
-    <div className="top-2 left-4 flex space-x-2">
+    <div className="flex space-x-2 transition-colors duration-300">
       <button
         onClick={handleEdit}
-        className="bg-blue-500 hover:bg-blue-600 font-bold text-white px-4 py-2 rounded-md transition-colors duration-300"
+        className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 font-medium text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-md transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-800 shadow-sm"
+        aria-label={t("editHackathon")}
       >
-        Edit
+        {t("edit")}
       </button>
     </div>
   );
