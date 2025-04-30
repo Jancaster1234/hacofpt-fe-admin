@@ -1,10 +1,11 @@
 // src/app/[locale]/(protected)/grading-submission/_components/Filters.tsx
 "use client";
 
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { useTranslations } from "@/hooks/useTranslations";
 
-const categories = [
+// Define the filter options
+const categoryOptions = [
   "Coding Hackathons",
   "External Hackathons",
   "Internal Hackathons",
@@ -12,7 +13,7 @@ const categories = [
   "Others",
 ];
 
-const organizations = [
+const organizationOptions = [
   "FPTU",
   "NASA",
   "IAI HACKATHON",
@@ -39,11 +40,8 @@ export default function Filters({
   selectedFilters,
   onFilterChange,
 }: FiltersProps) {
-  const {
-    enrollmentStatus,
-    categories: selectedCategories,
-    organizations: selectedOrganizations,
-  } = selectedFilters;
+  const t = useTranslations("hackathon");
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   const toggleSelection = (
     value: string,
@@ -57,87 +55,146 @@ export default function Filters({
     onFilterChange({ ...selectedFilters, [key]: newState });
   };
 
-  return (
-    <div className="p-6 border rounded-xl bg-white shadow-sm dark:bg-gray-800 dark:border-gray-700">
-      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Filters</h3>
+  const toggleMobileFilters = () => {
+    setIsMobileFiltersOpen(!isMobileFiltersOpen);
+  };
 
-      <div className="space-y-6">
+  return (
+    <>
+      {/* Mobile filter toggle button */}
+      <div className="lg:hidden mb-4">
+        <button
+          onClick={toggleMobileFilters}
+          className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-300 flex items-center justify-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+            />
+          </svg>
+          {t("filters")}
+        </button>
+      </div>
+
+      {/* Filter sidebar content */}
+      <div
+        className={`
+          lg:block
+          ${isMobileFiltersOpen ? "block" : "hidden"}
+          bg-white dark:bg-gray-900 p-4 md:p-5 rounded-lg shadow-md transition-all duration-300 border dark:border-gray-700
+        `}
+      >
+        <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
+          {t("filterBy")}
+        </h3>
+
         {/* Category Filter */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Category</h4>
+        <div className="mb-6">
+          <h4 className="font-medium mb-3 text-gray-800 dark:text-gray-200">
+            {t("categories")}
+          </h4>
           <div className="space-y-2">
-            {categories.map((cat) => (
-              <div key={cat} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`category-${cat}`}
-                  checked={selectedCategories.includes(cat)}
-                  onCheckedChange={() =>
-                    toggleSelection(cat, selectedCategories, "categories")
+            {categoryOptions.map((category) => (
+              <div key={category} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`category-${category}`}
+                  checked={selectedFilters.categories.includes(category)}
+                  onChange={() =>
+                    toggleSelection(
+                      category,
+                      selectedFilters.categories,
+                      "categories"
+                    )
                   }
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:focus:ring-blue-400"
                 />
-                <Label
-                  htmlFor={`category-${cat}`}
-                  className="text-sm font-normal text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+                <label
+                  htmlFor={`category-${category}`}
+                  className="ml-2 text-sm text-gray-700 dark:text-gray-300"
                 >
-                  {cat}
-                </Label>
+                  {t(`category${category.replace(/\s+/g, "")}`)}
+                </label>
               </div>
             ))}
           </div>
         </div>
 
         {/* Enrollment Status Filter */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Enrollment Status</h4>
+        <div className="mb-6">
+          <h4 className="font-medium mb-3 text-gray-800 dark:text-gray-200">
+            {t("status")}
+          </h4>
           <div className="space-y-2">
-            {enrollmentStatusOptions.map((statusValue) => (
-              <div key={statusValue} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`status-${statusValue}`}
-                  checked={enrollmentStatus.includes(statusValue)}
-                  onCheckedChange={() =>
+            {enrollmentStatusOptions.map((status) => (
+              <div key={status} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`status-${status}`}
+                  checked={selectedFilters.enrollmentStatus.includes(status)}
+                  onChange={() =>
                     toggleSelection(
-                      statusValue,
-                      enrollmentStatus,
+                      status,
+                      selectedFilters.enrollmentStatus,
                       "enrollmentStatus"
                     )
                   }
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:focus:ring-blue-400"
                 />
-                <Label
-                  htmlFor={`status-${statusValue}`}
-                  className="text-sm font-normal text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+                <label
+                  htmlFor={`status-${status}`}
+                  className="ml-2 text-sm text-gray-700 dark:text-gray-300 capitalize"
                 >
-                  {statusValue.charAt(0).toUpperCase() + statusValue.slice(1)}
-                </Label>
+                  {t(
+                    `status${status.charAt(0).toUpperCase() + status.slice(1)}`
+                  )}
+                </label>
               </div>
             ))}
           </div>
         </div>
 
         {/* Organization Filter */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Organization</h4>
+        <div className="mb-4">
+          <h4 className="font-medium mb-3 text-gray-800 dark:text-gray-200">
+            {t("organizations")}
+          </h4>
           <div className="space-y-2">
-            {organizations.map((org) => (
-              <div key={org} className="flex items-center space-x-2">
-                <Checkbox
+            {organizationOptions.map((org) => (
+              <div key={org} className="flex items-center">
+                <input
+                  type="checkbox"
                   id={`org-${org}`}
-                  checked={selectedOrganizations.includes(org)}
-                  onCheckedChange={() =>
-                    toggleSelection(org, selectedOrganizations, "organizations")
+                  checked={selectedFilters.organizations.includes(org)}
+                  onChange={() =>
+                    toggleSelection(
+                      org,
+                      selectedFilters.organizations,
+                      "organizations"
+                    )
                   }
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:focus:ring-blue-400"
                 />
-                <Label
+                <label
                   htmlFor={`org-${org}`}
-                  className="text-sm font-normal text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-gray-200 transition-colors"
+                  className="ml-2 text-sm text-gray-700 dark:text-gray-300"
                 >
-                  {org}
-                </Label>
+                  {t(`organization${org.replace(/\s+/g, "")}`)}
+                </label>
               </div>
             ))}
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
