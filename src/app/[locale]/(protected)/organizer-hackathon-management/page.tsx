@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/organizer-hackathon-management/page.tsx
 "use client";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -26,7 +27,7 @@ export default function HackathonPage() {
   const toast = useToast();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("suggestion");
+  const [sortBy, setSortBy] = useState("latest");
   const [filters, setFilters] = useState<{
     enrollmentStatus: string[];
     categories: string[];
@@ -137,10 +138,18 @@ export default function HackathonPage() {
         (a, b) =>
           new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
       );
+    } else if (sortBy === "oldest") {
+      return [...result].sort(
+        (a, b) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      );
     }
 
-    // Default sorting (suggestion)
-    return result;
+    // Default to latest sorting if no sort option matches
+    return [...result].sort(
+      (a, b) =>
+        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+    );
   }, [hackathonsResponse?.data, filters, searchTerm, sortBy]);
 
   // Pagination: Slice the filtered results
