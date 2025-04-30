@@ -382,9 +382,11 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
              lg:grid-cols-[minmax(auto,256px)_minmax(720px,1fr)_minmax(auto,256px)] 
              gap-4 md:gap-6 lg:gap-8"
             >
-              {/* Left sidebar with sharing links */}
-              <div className="hidden md:block">
-                <PostSharing />
+              {/* Left sidebar with sharing links - reintroduced sticky positioning */}
+              <div className="hidden md:block relative">
+                <div className="sticky top-24">
+                  <PostSharing />
+                </div>
               </div>
 
               {/* Main content area */}
@@ -396,9 +398,11 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
                 </PostContent>
               </div>
 
-              {/* Right sidebar */}
-              <div className="hidden md:block">
-                <PostToc />
+              {/* Right sidebar - reintroduced sticky positioning */}
+              <div className="hidden md:block relative">
+                <div className="sticky top-24">
+                  <PostToc />
+                </div>
               </div>
             </div>
 
