@@ -39,8 +39,8 @@ const navItems: NavItem[] = [
     allowedRoles: ["ADMIN"],
     subItems: [
       {
-        name: "Ecommerce",
-        translationKey: "ecommerce",
+        name: "Analytics",
+        translationKey: "analytics",
         path: "/dashboard",
         pro: false,
       },
@@ -58,6 +58,13 @@ const navItems: NavItem[] = [
   //   allowedRoles: ["ADMIN"],
   //   path: "/user-management",
   // },
+  {
+    icon: <CalenderIcon />,
+    name: "Hackathon",
+    translationKey: "hackathon",
+    allowedRoles: ["ADMIN", "ORGANIZER", "MENTOR", "JUDGE"],
+    path: "/hackathon",
+  },
   {
     icon: <CalenderIcon />,
     name: "User Management",

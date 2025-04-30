@@ -15,9 +15,8 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function HackathonBoardPage() {
   const toast = useToast();
-  const id = useParams();
-  const hackathonId = Array.isArray(id) ? id[0] : id;
-
+  const params = useParams();
+  const hackathonId = Array.isArray(params.id) ? params.id[0] : params.id;
   const [board, setBoard] = useState<Board | null>(null);
   const [userHackathons, setUserHackathons] = useState<UserHackathon[]>([]);
   const [loading, setLoading] = useState(true);

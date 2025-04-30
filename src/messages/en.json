@@ -910,6 +910,8 @@
     "logoIconAlt": "Logo icon",
     "dashboard": "Dashboard",
     "ecommerce": "Ecommerce",
+    "analytics": "Analytics",
+    "hackathon": "Hackathon",
     "userManagement": "User management",
     "threadPostReport": "Thread post report",
     "mentorshipRequest": "Mentorship request",
