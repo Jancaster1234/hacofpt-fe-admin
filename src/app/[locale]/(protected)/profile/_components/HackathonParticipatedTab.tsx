@@ -1,4 +1,4 @@
-// src/app/profile/_components/HackathonParticipatedTab.tsx
+// src/app/[locale]/(protected)/profile/_components/HackathonParticipatedTab.tsx
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { User } from "@/types/entities/user";

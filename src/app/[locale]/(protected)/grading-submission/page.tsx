@@ -1,7 +1,6 @@
 // src/app/[locale]/(protected)/grading-submission/page.tsx
 "use client";
 import { useState, useMemo, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import HackathonList from "./_components/HackathonList";
 import Filters from "./_components/Filters";
 import SearchSortBar from "./_components/SearchSortBar";
@@ -25,7 +24,6 @@ const ITEMS_PER_PAGE = 6; // Limit items per page
 export default function HackathonPage() {
   const t = useTranslations("hackathon");
   const toast = useToast();
-  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("latest");
   const [filters, setFilters] = useState<{
@@ -87,11 +85,6 @@ export default function HackathonPage() {
   // Handle sort change
   const handleSortChange = (value: string) => {
     setSortBy(value);
-  };
-
-  // Handle create hackathon navigation
-  const handleCreateHackathon = () => {
-    router.push("/organizer-hackathon-management/create");
   };
 
   // Apply Filters, Search and Sort & Memoize the Computation
@@ -192,26 +185,6 @@ export default function HackathonPage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-0">
           {t("hackathonPageTitle")}
         </h1>
-
-        <button
-          onClick={handleCreateHackathon}
-          className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-green-300 dark:focus:ring-green-800 shadow-sm flex items-center"
-          aria-label={t("createHackathonAriaLabel")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-2"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-              clipRule="evenodd"
-            />
-          </svg>
-          {t("createHackathon")}
-        </button>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">

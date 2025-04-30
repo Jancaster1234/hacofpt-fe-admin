@@ -1,3 +1,4 @@
+// src/app/api/user/change-password/route.ts
 import { NextResponse } from "next/server";
 
 interface ChangePasswordRequest {
