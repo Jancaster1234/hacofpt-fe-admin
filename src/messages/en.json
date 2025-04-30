@@ -191,7 +191,7 @@
     "enterSubtitle": "Enter a subtitle for your hackathon",
     "uploadBanner": "Upload banner",
     "changeBanner": "Change banner",
-    "recommendedSize": "Recommended size: 1200x400px",
+    "recommendedSize": "Recommended size: 1920x1080px",
     "hackathonBannerAlt": "Hackathon banner",
     "imageTypeError": "Only JPEG, JPG and PNG images are allowed",
     "bannerUploadSuccess": "Banner uploaded successfully",

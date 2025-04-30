@@ -1,4 +1,3 @@
-// src/app/[locale]/(protected)/organizer-hackathon-management/create/_components/HackathonCreateBanner.tsx
 "use client";
 
 import { useState } from "react";
@@ -59,7 +58,7 @@ export default function HackathonCreateBanner({
   };
 
   return (
-    <div className="relative w-full h-36 sm:h-48 md:h-60 lg:h-72 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden mb-4 transition-colors duration-300 shadow-md">
+    <div className="relative w-full aspect-[16/9] bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden mb-4 transition-colors duration-300 shadow-md">
       {bannerImageUrl ? (
         <>
           <div className="relative w-full h-full">
@@ -112,7 +111,9 @@ export default function HackathonCreateBanner({
             aria-label={t("uploadBanner")}
           />
           <p className="text-gray-500 dark:text-gray-400 mt-2 text-xs sm:text-sm text-center px-2">
-            {t("recommendedSize")}
+            {t("recommendedSize", {
+              defaultValue: "Optimal size: 1920×1080px (16:9)",
+            })}
           </p>
         </div>
       )}

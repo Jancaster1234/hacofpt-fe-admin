@@ -594,7 +594,7 @@
     "enterSubtitle": "Nhập phụ đề cho hackathon của bạn",
     "uploadBanner": "Tải lên banner",
     "changeBanner": "Thay đổi banner",
-    "recommendedSize": "Kích thước đề xuất: 1200x400px",
+    "recommendedSize": "Kích thước đề xuất: 1920x1080px",
     "hackathonBannerAlt": "Banner hackathon",
     "imageTypeError": "Chỉ cho phép hình ảnh JPEG, JPG và PNG",
     "bannerUploadSuccess": "Tải lên banner thành công",
