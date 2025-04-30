@@ -1,18 +1,225 @@
-// src/app/[locale]/(protected)/kanban-board/page.tsx
-import { Metadata } from "next";
-import KanbanBoard from "./_components/KanbanBoard";
+// src/app/[locale]/(protected)/calendar/page.tsx
+"use client";
+import { useState, useMemo, useEffect, useRef } from "react";
+import HackathonList from "./_components/HackathonList";
+import Filters from "./_components/Filters";
+import SearchSortBar from "./_components/SearchSortBar";
+import Pagination from "./_components/Pagination";
+import { Hackathon } from "@/types/entities/hackathon";
+import { useQuery } from "@tanstack/react-query";
+import { hackathonService } from "@/services/hackathon.service";
+import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/hooks/use-toast";
 
-export const metadata: Metadata = {
-  title: "Kanban Board Page",
-  description: "This is the Kanban Board Page.",
-};
+async function getHackathons(): Promise<{
+  data: Hackathon[];
+  message?: string;
+}> {
+  const response = await hackathonService.getAllHackathons();
+  return response;
+}
 
-export default function KanbanBoardPage() {
+const ITEMS_PER_PAGE = 6; // Limit items per page
+
+export default function HackathonPage() {
+  const t = useTranslations("hackathon");
+  const toast = useToast();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("latest");
+  const [filters, setFilters] = useState<{
+    enrollmentStatus: string[];
+    categories: string[];
+    organizations: string[];
+  }>({
+    enrollmentStatus: ["open"],
+    categories: [],
+    organizations: [],
+  });
+  const [page, setPage] = useState(1);
+
+  // Use ref to track if we've already shown the toast
+  const shownToastRef = useRef(false);
+
+  const {
+    data: hackathonsResponse,
+    error,
+    isLoading,
+  } = useQuery<{ data: Hackathon[]; message?: string }>({
+    queryKey: ["hackathons"],
+    queryFn: getHackathons,
+    staleTime: 60 * 1000, // 1 minute before refetch
+    refetchOnWindowFocus: false, // Disable automatic refetching when the window regains focus
+  });
+
+  // Only show toast on initial load and prevent re-renders
+  useEffect(() => {
+    if (hackathonsResponse?.message && !shownToastRef.current) {
+      toast.success(hackathonsResponse.message);
+      shownToastRef.current = true;
+    }
+  }, [hackathonsResponse]);
+
+  // Show error toast if API call fails
+  useEffect(() => {
+    if (error && !shownToastRef.current) {
+      toast.error(
+        error instanceof Error ? error.message : t("errorFetchingHackathons")
+      );
+      shownToastRef.current = true;
+    }
+  }, [error, t]);
+
+  // Reset the ref when the query key changes
+  useEffect(() => {
+    return () => {
+      shownToastRef.current = false;
+    };
+  }, []);
+
+  // Handle search input change
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setPage(1); // Reset to first page when search changes
+  };
+
+  // Handle sort change
+  const handleSortChange = (value: string) => {
+    setSortBy(value);
+  };
+
+  // Apply Filters, Search and Sort & Memoize the Computation
+  const filteredHackathons = useMemo(() => {
+    if (!hackathonsResponse?.data) return [];
+
+    // First, apply filters
+    let result = hackathonsResponse.data.filter((hackathon) => {
+      const matchesStatus =
+        filters.enrollmentStatus.length > 0
+          ? filters.enrollmentStatus.some(
+              (status) =>
+                hackathon.enrollmentStatus.toLowerCase() ===
+                status.toLowerCase()
+            )
+          : true;
+      const matchesCategory =
+        filters.categories.length > 0
+          ? filters.categories.some((category) =>
+              hackathon.category.includes(category)
+            )
+          : true;
+      const matchesOrganization =
+        filters.organizations.length > 0
+          ? filters.organizations.some((org) =>
+              hackathon.organization.includes(org)
+            )
+          : true;
+
+      return matchesStatus && matchesCategory && matchesOrganization;
+    });
+
+    // Then, apply search if there's a search term
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase().trim();
+      result = result.filter((hackathon) =>
+        hackathon.title.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Finally, apply sorting
+    if (sortBy === "latest") {
+      return [...result].sort(
+        (a, b) =>
+          new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      );
+    } else if (sortBy === "oldest") {
+      return [...result].sort(
+        (a, b) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      );
+    }
+
+    // Default to latest sorting if no sort option matches
+    return [...result].sort(
+      (a, b) =>
+        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+    );
+  }, [hackathonsResponse?.data, filters, searchTerm, sortBy]);
+
+  // Pagination: Slice the filtered results
+  const paginatedHackathons = useMemo(() => {
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    return filteredHackathons.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredHackathons, page]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [filters, searchTerm, sortBy]);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4 flex justify-center items-center min-h-[50vh]">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-t-blue-500 border-b-blue-700 border-gray-200"></div>
+          <p className="mt-2 text-gray-700 dark:text-gray-300">
+            {t("loading")}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-4 flex justify-center items-center min-h-[50vh]">
+        <div className="text-center text-red-600 dark:text-red-400">
+          <p>{t("failedToLoad")}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Kanban Board</h1>
-      <div className="border rounded-lg bg-white shadow p-4">
-        <KanbanBoard />
+    <div className="container mx-auto px-4 py-6 transition-colors duration-300">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-0">
+          {t("hackathonPageTitle")}
+        </h1>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Sidebar Filters */}
+        <div className="w-full lg:w-1/4">
+          <Filters selectedFilters={filters} onFilterChange={setFilters} />
+        </div>
+
+        {/* Main Content */}
+        <div className="w-full lg:w-3/4">
+          <SearchSortBar
+            searchValue={searchTerm}
+            sortValue={sortBy}
+            onSearchChange={handleSearchChange}
+            onSortChange={handleSortChange}
+          />
+
+          {/* Results summary */}
+          <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            {t("resultsCount", { count: filteredHackathons.length })}
+          </div>
+
+          {/* Hackathon list */}
+          <HackathonList hackathons={paginatedHackathons} />
+
+          {/* Pagination */}
+          {filteredHackathons.length > 0 && (
+            <Pagination
+              page={page}
+              onPageChange={setPage}
+              totalItems={filteredHackathons.length}
+              itemsPerPage={ITEMS_PER_PAGE}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
