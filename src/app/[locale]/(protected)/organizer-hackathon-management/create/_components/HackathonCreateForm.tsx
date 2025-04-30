@@ -108,13 +108,6 @@ export default function HackathonCreateForm({
     window.location.hash = key; // Update URL hash
   };
 
-  // Get word count from editor
-  const getWordCount = (editorRef: React.RefObject<TiptapEditorRef>) => {
-    return (
-      editorRef.current?.getInstance()?.storage.characterCount.words() ?? 0
-    );
-  };
-
   // Handle file upload for documentation
   const handleDocumentUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -506,9 +499,6 @@ export default function HackathonCreateForm({
                 initialContent={formData.information}
               />
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              {t("wordCount")}: {getWordCount(informationEditorRef)}
-            </div>
           </div>
         )}
 
@@ -533,9 +523,6 @@ export default function HackathonCreateForm({
                 }}
                 initialContent={formData.description}
               />
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              {t("wordCount")}: {getWordCount(descriptionEditorRef)}
             </div>
           </div>
         )}
@@ -648,9 +635,6 @@ export default function HackathonCreateForm({
                 }}
                 initialContent={formData.contact}
               />
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              {t("wordCount")}: {getWordCount(contactEditorRef)}
             </div>
           </div>
         )}
