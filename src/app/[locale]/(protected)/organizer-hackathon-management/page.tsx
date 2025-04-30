@@ -1,6 +1,7 @@
 // src/app/[locale]/(protected)/organizer-hackathon-management/page.tsx
 "use client";
 import { useState, useMemo, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import HackathonList from "./_components/HackathonList";
 import Filters from "./_components/Filters";
 import SearchSortBar from "./_components/SearchSortBar";
@@ -24,8 +25,9 @@ const ITEMS_PER_PAGE = 6; // Limit items per page
 export default function HackathonPage() {
   const t = useTranslations("hackathon");
   const toast = useToast();
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("suggestion");
+  const [sortBy, setSortBy] = useState("latest");
   const [filters, setFilters] = useState<{
     enrollmentStatus: string[];
     categories: string[];
@@ -87,6 +89,11 @@ export default function HackathonPage() {
     setSortBy(value);
   };
 
+  // Handle create hackathon navigation
+  const handleCreateHackathon = () => {
+    router.push("/organizer-hackathon-management/create");
+  };
+
   // Apply Filters, Search and Sort & Memoize the Computation
   const filteredHackathons = useMemo(() => {
     if (!hackathonsResponse?.data) return [];
@@ -131,10 +138,18 @@ export default function HackathonPage() {
         (a, b) =>
           new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
       );
+    } else if (sortBy === "oldest") {
+      return [...result].sort(
+        (a, b) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      );
     }
 
-    // Default sorting (suggestion)
-    return result;
+    // Default to latest sorting if no sort option matches
+    return [...result].sort(
+      (a, b) =>
+        new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+    );
   }, [hackathonsResponse?.data, filters, searchTerm, sortBy]);
 
   // Pagination: Slice the filtered results
@@ -173,9 +188,31 @@ export default function HackathonPage() {
 
   return (
     <div className="container mx-auto px-4 py-6 transition-colors duration-300">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-white">
-        {t("hackathonPageTitle")}
-      </h1>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-0">
+          {t("hackathonPageTitle")}
+        </h1>
+
+        <button
+          onClick={handleCreateHackathon}
+          className="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-all duration-300 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-green-300 dark:focus:ring-green-800 shadow-sm flex items-center"
+          aria-label={t("createHackathonAriaLabel")}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-2"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+          {t("createHackathon")}
+        </button>
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar Filters */}

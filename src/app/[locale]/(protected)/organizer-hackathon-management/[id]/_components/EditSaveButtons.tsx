@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/_components/EditSaveButtons.tsx
 "use client";
 
 import { useRouter } from "next/navigation";

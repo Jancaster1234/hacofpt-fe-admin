@@ -71,8 +71,8 @@ export default function SearchSortBar({
           className="border dark:border-gray-700 p-2 rounded-lg w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none shadow-sm transition-colors duration-300"
           aria-label={t("sortBy")}
         >
-          <option value="suggestion">{t("sortBySuggestion")}</option>
           <option value="latest">{t("sortByLatest")}</option>
+          <option value="oldest">{t("sortByOldest")}</option>
         </select>
       </div>
     </div>

@@ -51,7 +51,7 @@
     "searchHackathons": "Search hackathons",
     "sortBy": "Sort by",
     "sortBySuggestion": "Suggestion",
-    "sortByLatest": "Latest",
+    "sortByLatest": "Latest (Event Date)",
     "noHackathonsFound": "No hackathons found. Try adjusting your filters.",
     "failedToLoad": "Failed to load hackathons. Please try again later.",
     "errorFetchingHackathons": "Error fetching hackathons. Please try again.",
@@ -118,7 +118,10 @@
     "hackathonStartDate": "Start Date",
     "hackathonEndDate": "End Date",
     "enrollmentStartDate": "Enrollment Opens",
-    "enrollmentEndDate": "Enrollment Closes"
+    "enrollmentEndDate": "Enrollment Closes",
+    "createHackathon": "Create a hackathon",
+    "createHackathonAriaLabel": "Create a new hackathon",
+    "sortByOldest": "Oldest (Event Date)"
   },
   "hackathonManagement": {
     "edit": "Edit",
