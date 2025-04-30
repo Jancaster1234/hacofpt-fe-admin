@@ -118,7 +118,9 @@
     "hackathonStartDate": "Ngày bắt đầu",
     "hackathonEndDate": "Ngày kết thúc",
     "enrollmentStartDate": "Bắt đầu đăng ký",
-    "enrollmentEndDate": "Kết thúc đăng ký"
+    "enrollmentEndDate": "Kết thúc đăng ký",
+    "createHackathon": "Tạo hackathon mới",
+    "createHackathonAriaLabel": "Tạo một cuộc thi hackathon mới"
   },
   "pagination": {
     "previousPage": "Trang trước",
