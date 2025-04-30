@@ -261,7 +261,9 @@
     "documentUploadError": "Error uploading documents",
     "documentDeleted": "Document deleted successfully",
     "noDocumentsUploaded": "No documents uploaded yet",
-    "participantDescription": "When enabled, participants will be visible to everyone. If disabled, only organizers can see the participants."
+    "participantDescription": "When enabled, participants will be visible to everyone. If disabled, only organizers can see the participants.",
+    "wordCount": "Word count",
+    "imageCaptionPlaceholder": "Image caption"
   },
   "blogManagement": {
     "unknownAuthor": "Unknown Author",

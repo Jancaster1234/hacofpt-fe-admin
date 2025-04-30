@@ -664,7 +664,9 @@
     "documentUploadError": "Lỗi khi tải tài liệu lên",
     "documentDeleted": "Đã xóa tài liệu thành công",
     "noDocumentsUploaded": "Chưa có tài liệu nào được tải lên",
-    "participantDescription": "Khi được bật, người tham gia sẽ hiển thị với tất cả mọi người. Nếu tắt, chỉ người tổ chức mới có thể xem người tham gia."
+    "participantDescription": "Khi được bật, người tham gia sẽ hiển thị với tất cả mọi người. Nếu tắt, chỉ người tổ chức mới có thể xem người tham gia.",
+    "wordCount": "Số từ",
+    "imageCaptionPlaceholder": "Chú thích hình ảnh"
   },
   "blogManagement": {
     "unknownAuthor": "Tác giả không xác định",
