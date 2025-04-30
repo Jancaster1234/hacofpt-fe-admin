@@ -652,7 +652,7 @@
     },
     "buttons": {
       "cancel": "Hủy",
-      "create": "Tạo Hackathon",
+      "create": "Gửi Hackathon",
       "deleteDocument": "Xóa tài liệu"
     },
     "validations": {

@@ -1,7 +1,6 @@
-// src/app/[locale]/(protected)/organizer-hackathon-management/[id]/edit/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "@/hooks/useTranslations";
 import { hackathonService } from "@/services/hackathon.service";
@@ -15,7 +14,7 @@ export default function EditHackathonPage() {
   const hackathonId = params.id as string;
   const router = useRouter();
   const t = useTranslations("editHackathon");
-  const toast = useToast();
+  const { success, error } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -39,20 +38,33 @@ export default function EditHackathonPage() {
     showParticipants: true,
   });
 
+  // Format dates function - moved outside useEffect to avoid recreation
+  const formatDateForInput = useCallback((dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().slice(0, 16); // format: "YYYY-MM-DDThh:mm"
+  }, []);
+
+  // Handle error display outside of useEffect
+  const handleFetchError = useCallback((errorMessage: string) => {
+    console.error("Error fetching hackathon:", errorMessage);
+    // We're not calling toast.error here to avoid dependency issues
+  }, []);
+
   // Fetch hackathon data when component mounts
+  // Remove toast from dependency array to prevent infinite loops
   useEffect(() => {
+    let isMounted = true;
+
     const fetchHackathon = async () => {
       try {
         const response = await hackathonService.getHackathonById(hackathonId);
+
+        // Only update state if component is still mounted
+        if (!isMounted) return;
+
         if (response.data.length > 0) {
           const hackathon = response.data[0];
-
-          // Format dates to be compatible with datetime-local input
-          const formatDateForInput = (dateString: string) => {
-            if (!dateString) return "";
-            const date = new Date(dateString);
-            return date.toISOString().slice(0, 16); // format: "YYYY-MM-DDThh:mm"
-          };
 
           setFormData({
             title: hackathon.title || "",
@@ -73,19 +85,41 @@ export default function EditHackathonPage() {
             showParticipants: hackathon.showParticipants !== false, // default to true if not specified
           });
         } else {
-          toast.error(t("hackathonNotFound"));
-          router.push("/organizer-hackathon-management");
+          if (isMounted) {
+            // Instead of calling toast in useEffect, set a flag for empty data
+            handleFetchError("hackathonNotFound");
+            router.push("/organizer-hackathon-management");
+          }
         }
-      } catch (error) {
-        console.error("Error fetching hackathon:", error);
-        toast.error(t("errorFetchingHackathon"));
+      } catch (err) {
+        if (isMounted) {
+          handleFetchError(
+            err instanceof Error ? err.message : "Unknown error"
+          );
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchHackathon();
-  }, [hackathonId, router, t, toast]);
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      isMounted = false;
+    };
+  }, [hackathonId, router, formatDateForInput, handleFetchError]);
+
+  // Show error toast after the component has mounted and when the error flag is set
+  useEffect(() => {
+    // This is a separate useEffect specifically for displaying error messages
+    // after rendering, not during the data fetching process
+    if (!isLoading && formData.title === "") {
+      error(t("hackathonNotFound"));
+    }
+  }, [isLoading, formData.title, error, t]);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -104,23 +138,26 @@ export default function EditHackathonPage() {
         contact: formData.contact,
         category: formData.category,
         organization: formData.organization,
+        status: "ACTIVE",
         minimumTeamMembers: formData.minimumTeamMembers,
         maximumTeamMembers: formData.maximumTeamMembers,
         documentation: formData.documentation,
-        showParticipants: formData.showParticipants,
+        //showParticipants: formData.showParticipants,
       };
 
       const result = await hackathonService.updateHackathon(hackathonData);
 
       // Display success toast with message from API response
-      toast.success(result.message || t("successMessage"));
+      // This is fine since it's in response to a user action (submit button click)
+      success(result.message || t("successMessage"));
 
       // Redirect back to the hackathon detail page
       router.push(`/organizer-hackathon-management/${hackathonId}`);
-    } catch (error) {
-      console.error("Error updating hackathon:", error);
+    } catch (err) {
+      console.error("Error updating hackathon:", err);
       // Display error toast with message from API response if available
-      toast.error(error instanceof Error ? error.message : t("errorMessage"));
+      // This is fine since it's in response to a user action (submit button click)
+      error(err instanceof Error ? err.message : t("errorMessage"));
     } finally {
       setIsSubmitting(false);
     }
