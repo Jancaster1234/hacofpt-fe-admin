@@ -173,13 +173,6 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
     }
   };
 
-  // Get word count from editor
-  const getWordCount = () => {
-    return (
-      editorRef.current?.getInstance()?.storage.characterCount.words() ?? 0
-    );
-  };
-
   // Wait until form is ready before rendering
   if (!isFormReady) {
     return (
@@ -323,9 +316,6 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
                     </div>
                   </FormControl>
                   <FormMessage />
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                    {t("wordCount")}: {getWordCount()}
-                  </div>
                 </FormItem>
               )}
             />
