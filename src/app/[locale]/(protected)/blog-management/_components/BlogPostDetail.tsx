@@ -378,9 +378,9 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
 
             <div
               className="grid grid-cols-1 w-full px-2 sm:px-0 
-                           md:grid-cols-[1fr_minmax(650px,_1fr)_1fr] 
-                           lg:grid-cols-[minmax(auto,256px)_minmax(720px,1fr)_minmax(auto,256px)] 
-                           gap-4 md:gap-6 lg:gap-8"
+             md:grid-cols-[1fr_minmax(650px,_1fr)_1fr] 
+             lg:grid-cols-[minmax(auto,256px)_minmax(720px,1fr)_minmax(auto,256px)] 
+             gap-4 md:gap-6 lg:gap-8"
             >
               {/* Left sidebar with sharing links */}
               <div className="hidden md:block">
@@ -388,13 +388,15 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
               </div>
 
               {/* Main content area */}
-              <PostContent>
-                <div className="dark:prose-invert prose-img:rounded prose-headings:scroll-mt-28">
-                  <TiptapRenderer>{blogPost.content}</TiptapRenderer>
-                </div>
-              </PostContent>
+              <div>
+                <PostContent>
+                  <div className="dark:prose-invert prose-img:rounded prose-headings:scroll-mt-28">
+                    <TiptapRenderer>{blogPost.content}</TiptapRenderer>
+                  </div>
+                </PostContent>
+              </div>
 
-              {/* Right sidebar*/}
+              {/* Right sidebar */}
               <div className="hidden md:block">
                 <PostToc />
               </div>
