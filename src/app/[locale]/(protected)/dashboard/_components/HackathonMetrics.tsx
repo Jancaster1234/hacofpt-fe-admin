@@ -1,7 +1,7 @@
 // src/app/[locale]/(protected)/dashboard/_components/HackathonMetrics.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   BarChart,
@@ -15,32 +15,21 @@ import {
 } from "recharts";
 import { Hackathon } from "@/types/entities/hackathon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { hackathonService } from "@/services/hackathon.service";
 
-const HackathonMetrics = () => {
-  const [hackathons, setHackathons] = useState<Hackathon[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+interface HackathonMetricsProps {
+  hackathonsData: Hackathon[];
+  isLoading: boolean;
+}
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const response = await hackathonService.getAllHackathons();
-        setHackathons(response.data || []);
-      } catch (error) {
-        console.error("Error fetching hackathon data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
-
+const HackathonMetrics = ({
+  hackathonsData,
+  isLoading,
+}: HackathonMetricsProps) => {
   // Process data for charts
   const processDataByTimeframe = (
     timeframe: "day" | "week" | "month" | "year"
   ) => {
-    if (hackathons.length === 0) return [];
+    if (hackathonsData.length === 0) return [];
 
     const now = new Date();
     const counts: Record<string, number> = {};
@@ -97,7 +86,7 @@ const HackathonMetrics = () => {
     }
 
     // Count hackathons based on their creation date
-    hackathons.forEach((hackathon) => {
+    hackathonsData.forEach((hackathon) => {
       if (!hackathon.createdAt) return;
 
       const createdDate = new Date(hackathon.createdAt);

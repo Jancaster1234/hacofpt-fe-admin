@@ -2,37 +2,39 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Hackathon } from "@/types/entities/hackathon";
-import { hackathonService } from "@/services/hackathon.service";
 import { teamService } from "@/services/team.service";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const HackathonTeamsList = () => {
-  const [hackathons, setHackathons] = useState<Hackathon[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+interface HackathonTeamsListProps {
+  hackathonsData: Hackathon[];
+  isLoading: boolean;
+}
+
+const HackathonTeamsList = ({
+  hackathonsData,
+  isLoading,
+}: HackathonTeamsListProps) => {
   const [hackathonTeamsCount, setHackathonTeamsCount] = useState<
     Record<string, number>
   >({});
   const [view, setView] = useState<"all" | "active" | "upcoming" | "past">(
     "all"
   );
+  const [teamsLoading, setTeamsLoading] = useState(true);
   const { locale } = useParams();
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadTeamsData = async () => {
       try {
-        // Replace mock function with real service
-        const hackathonsResponse = await hackathonService.getAllHackathons();
-        const hackathonsData = hackathonsResponse.data;
-        setHackathons(hackathonsData);
+        if (hackathonsData.length === 0) return;
 
         // For each hackathon, fetch its teams and count them
         const teamsCountMap: Record<string, number> = {};
 
         for (const hackathon of hackathonsData) {
-          // Replace mock function with real service
           const teamsResponse = await teamService.getTeamsByHackathonId(
             hackathon.id
           );
@@ -41,27 +43,29 @@ const HackathonTeamsList = () => {
 
         setHackathonTeamsCount(teamsCountMap);
       } catch (error) {
-        console.error("Failed to load hackathons or teams data:", error);
+        console.error("Failed to load teams data:", error);
       } finally {
-        setIsLoading(false);
+        setTeamsLoading(false);
       }
     };
 
-    loadData();
-  }, []);
+    if (!isLoading) {
+      loadTeamsData();
+    }
+  }, [hackathonsData, isLoading]);
 
   const filteredHackathons = () => {
     const now = new Date();
 
     switch (view) {
       case "active":
-        return hackathons.filter((h) => h.status === "ACTIVE");
+        return hackathonsData.filter((h) => h.status === "ACTIVE");
       case "upcoming":
-        return hackathons.filter((h) => new Date(h.startDate) > now);
+        return hackathonsData.filter((h) => new Date(h.startDate) > now);
       case "past":
-        return hackathons.filter((h) => new Date(h.endDate) < now);
+        return hackathonsData.filter((h) => new Date(h.endDate) < now);
       default:
-        return hackathons;
+        return hackathonsData;
     }
   };
 
@@ -82,7 +86,7 @@ const HackathonTeamsList = () => {
             <TabsTrigger value="past">Past</TabsTrigger>
           </TabsList>
 
-          {isLoading ? (
+          {isLoading || teamsLoading ? (
             <div className="flex h-60 items-center justify-center">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
             </div>

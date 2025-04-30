@@ -1,6 +1,9 @@
 // src/app/[locale]/(protected)/dashboard/page.tsx
-import type { Metadata } from "next";
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { Hackathon } from "@/types/entities/hackathon";
+import { hackathonService } from "@/services/hackathon.service";
 import HackathonMetrics from "./_components/HackathonMetrics";
 import AccountsCreatedChart from "./_components/AccountsCreatedChart";
 import SponsorshipsStats from "./_components/SponsorshipsStats";
@@ -8,12 +11,25 @@ import MoneySpentStats from "./_components/MoneySpentStats";
 import TeamCreationStats from "./_components/TeamCreationStats";
 import HackathonTeamsList from "./_components/HackathonTeamsList";
 
-export const metadata: Metadata = {
-  title: "Hackathon Platform Dashboard",
-  description: "Dashboard for the FPT University Hackathon Platform",
-};
-
 export default function Dashboard() {
+  const [hackathons, setHackathons] = useState<Hackathon[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadHackathons = async () => {
+      try {
+        const response = await hackathonService.getAllHackathons();
+        setHackathons(response.data || []);
+      } catch (error) {
+        console.error("Error fetching hackathon data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadHackathons();
+  }, []);
+
   return (
     <div className="grid grid-cols-12 gap-4 md:gap-6">
       <div className="col-span-12">
@@ -22,7 +38,7 @@ export default function Dashboard() {
 
       {/* Hackathon Creation Metrics */}
       <div className="col-span-12 xl:col-span-6">
-        <HackathonMetrics />
+        <HackathonMetrics hackathonsData={hackathons} isLoading={isLoading} />
       </div>
 
       {/* Account Creation Metrics */}
@@ -37,7 +53,7 @@ export default function Dashboard() {
 
       {/* Hackathon Team List */}
       <div className="col-span-12">
-        <HackathonTeamsList />
+        <HackathonTeamsList hackathonsData={hackathons} isLoading={isLoading} />
       </div>
 
       {/* Sponsorships Stats */}
