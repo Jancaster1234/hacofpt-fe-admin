@@ -6,7 +6,8 @@ import { User } from "./user";
 export type IndividualRegistrationRequestStatus =
   | "PENDING"
   | "APPROVED"
-  | "REJECTED"; // Update this based on your Status enum if needed
+  | "REJECTED"
+  | "COMPLETED";
 
 export type IndividualRegistrationRequest = {
   id: string;

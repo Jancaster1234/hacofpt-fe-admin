@@ -183,13 +183,13 @@ class IndividualRegistrationRequestService {
     data: Array<{
       hackathonId: string;
       status: "PENDING" | "APPROVED" | "REJECTED";
-      reviewedById?: string;
+      createdByUserId?: string;
     }>
   ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {
     try {
       const response = await apiService.auth.post<
         IndividualRegistrationRequest[]
-      >("/hackathon-service/api/v1/individuals/bulk", { data });
+      >("/hackathon-service/api/v1/individuals/bulk", { data: data });
 
       if (!response || !response.data) {
         throw new Error(
