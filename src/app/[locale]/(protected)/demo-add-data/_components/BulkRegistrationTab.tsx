@@ -1,4 +1,3 @@
-// src/app/[locale]/(protected)/demo-add-data/_components/BulkRegistrationTab.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -10,7 +9,6 @@ import { Hackathon } from "@/types/entities/hackathon";
 import { Team } from "@/types/entities/team";
 import { User } from "@/types/entities/user";
 import { IndividualRegistrationRequest } from "@/types/entities/individualRegistrationRequest";
-import { fetchMockTeams } from "../_mocks/fetchMockTeams"; // For testing
 
 const BulkRegistrationTab: React.FC = () => {
   const [hackathons, setHackathons] = useState<Hackathon[]>([]);
@@ -23,6 +21,7 @@ const BulkRegistrationTab: React.FC = () => {
   const [completedRegistrations, setCompletedRegistrations] = useState<
     IndividualRegistrationRequest[]
   >([]);
+  const [registeredUsers, setRegisteredUsers] = useState<User[]>([]);
   const [availableUsers, setAvailableUsers] = useState<User[]>([]);
   const [numRegistrations, setNumRegistrations] = useState<number>(5);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -67,12 +66,9 @@ const BulkRegistrationTab: React.FC = () => {
         const teamsResponse =
           await teamService.getTeamsByHackathonId(selectedHackathon);
 
-        // For testing, use mock data if API response is empty
-        let fetchedTeams = teamsResponse.data;
-        if (fetchedTeams.length === 0) {
-          fetchedTeams = await fetchMockTeams(selectedHackathon);
+        if (teamsResponse.data && teamsResponse.data.length > 0) {
+          setTeams(teamsResponse.data);
         }
-        setTeams(fetchedTeams);
 
         // Get all team members
         const teamMembersResponse = await userService.getTeamMembers();
@@ -92,6 +88,12 @@ const BulkRegistrationTab: React.FC = () => {
           );
         setCompletedRegistrations(completedResponse.data);
 
+        // Fetch users by usernames for registrations
+        await fetchRegisteredUsers([
+          ...approvedResponse.data,
+          ...completedResponse.data,
+        ]);
+
         setMessage({ text: "Data loaded successfully", type: "success" });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -107,18 +109,42 @@ const BulkRegistrationTab: React.FC = () => {
     fetchData();
   }, [selectedHackathon]);
 
+  // Fetch users by usernames from registrations
+  const fetchRegisteredUsers = async (
+    registrations: IndividualRegistrationRequest[]
+  ) => {
+    try {
+      const uniqueUsernames = Array.from(
+        new Set(
+          registrations
+            .map((reg) => reg.createdByUserName)
+            .filter(Boolean) as string[]
+        )
+      );
+
+      const usersPromises = uniqueUsernames.map((username) =>
+        userService.getUserByUsername(username)
+      );
+
+      const usersResponses = await Promise.all(usersPromises);
+      const users = usersResponses
+        .filter((response) => response.data && response.data.id)
+        .map((response) => response.data);
+
+      setRegisteredUsers(users);
+      return users;
+    } catch (error) {
+      console.error("Error fetching registered users:", error);
+      return [];
+    }
+  };
+
   // Calculate available users whenever dependencies change
   useEffect(() => {
     if (!selectedHackathon || !teams.length || !allTeamMembers.length) return;
 
     calculateAvailableUsers();
-  }, [
-    selectedHackathon,
-    teams,
-    allTeamMembers,
-    approvedRegistrations,
-    completedRegistrations,
-  ]);
+  }, [selectedHackathon, teams, allTeamMembers, registeredUsers]);
 
   const calculateAvailableUsers = () => {
     // Extract all team member IDs from teams
@@ -131,11 +157,11 @@ const BulkRegistrationTab: React.FC = () => {
       });
     });
 
-    // Extract user IDs from existing registrations
+    // Get registered user IDs
     const registeredUserIds = new Set<string>();
-    [...approvedRegistrations, ...completedRegistrations].forEach((reg) => {
-      if (reg.createdById) {
-        registeredUserIds.add(reg.createdById);
+    registeredUsers.forEach((user) => {
+      if (user.id) {
+        registeredUserIds.add(user.id);
       }
     });
 
@@ -201,6 +227,12 @@ const BulkRegistrationTab: React.FC = () => {
           selectedHackathon
         );
       setCompletedRegistrations(completedResponse.data);
+
+      // Fetch updated registered users
+      await fetchRegisteredUsers([
+        ...approvedResponse.data,
+        ...completedResponse.data,
+      ]);
 
       // Recalculate available users
       calculateAvailableUsers();
