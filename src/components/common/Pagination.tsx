@@ -66,7 +66,7 @@ const Pagination: React.FC<PaginationProps> = ({
     <div className="flex flex-col md:flex-row justify-between items-center bg-white p-4 shadow rounded-lg">
       <div className="text-sm text-gray-600 mb-4 md:mb-0">
         Showing {Math.min((currentPage - 1) * pageSize + 1, totalItems)} to{" "}
-        {Math.min(currentPage * pageSize, totalItems)} of {totalItems} users
+        {Math.min(currentPage * pageSize, totalItems)} of {totalItems} results
       </div>
 
       <div className="flex items-center">
