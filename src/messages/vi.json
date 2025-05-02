@@ -1691,6 +1691,7 @@
     "teamsCreatedSuccess": "Đã tạo thành công {count} đội.",
     "failedToCreateTeams": "Không thể tạo đội. Vui lòng thử lại.",
     "teamsGeneratedSuccess": "Đã tạo đội thành công.",
+    "teamsCreatedButRegistrationsNotUpdated": "Đã tạo đội thành công nhưng không thể cập nhật trạng thái đăng ký.",
     "userAddedToTeam": "{name} đã được thêm vào đội {team}.",
     "userRemovedFromTeam": "{name} đã bị xóa khỏi đội {team}.",
     "newTeamLeaderAssigned": "{name} đã trở thành trưởng đội của {team}.",

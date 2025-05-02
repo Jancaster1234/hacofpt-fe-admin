@@ -8,7 +8,7 @@ import { RoundTabs } from "./RoundTabs";
 import { TeamList } from "./TeamList";
 import { NotePopup } from "./NotePopup";
 import { HackathonResultsButton } from "./HackathonResultsButton";
-import { BulkTeamRoundUpdate } from "./BulkTeamRoundUpdate";
+// import { BulkTeamRoundUpdate } from "./BulkTeamRoundUpdate";
 import { Round } from "@/types/entities/round";
 import { TeamRound } from "@/types/entities/teamRound";
 import { Submission } from "@/types/entities/submission";
@@ -182,7 +182,7 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
       </section>
 
       {/* Bulk Team Round Update Section */}
-      {selectedRoundId && (
+      {/* {selectedRoundId && (
         <section className="bg-white dark:bg-gray-900 rounded-lg shadow-sm p-3 sm:p-4 transition-colors duration-300">
           <BulkTeamRoundUpdate
             selectedRoundId={selectedRoundId}
@@ -191,7 +191,7 @@ export default function Submissions({ hackathonId }: { hackathonId: string }) {
             refreshData={fetchData}
           />
         </section>
-      )}
+      )} */}
 
       {/* Team List for Selected Round */}
       <section className="bg-white dark:bg-gray-900 rounded-lg shadow-sm p-3 sm:p-4 transition-colors duration-300">

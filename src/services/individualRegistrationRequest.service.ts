@@ -215,7 +215,7 @@ class IndividualRegistrationRequestService {
     data: Array<{
       id: string;
       hackathonId: string;
-      status: "PENDING" | "APPROVED" | "REJECTED";
+      status: "PENDING" | "APPROVED" | "REJECTED" | "COMPLETED";
       reviewedById?: string;
     }>
   ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {

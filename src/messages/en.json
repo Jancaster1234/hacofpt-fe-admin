@@ -1692,6 +1692,7 @@
     "teamsCreatedSuccess": "Successfully created {count} teams.",
     "failedToCreateTeams": "Failed to create teams. Please try again.",
     "teamsGeneratedSuccess": "Teams generated successfully.",
+    "teamsCreatedButRegistrationsNotUpdated": "Teams created successfully, but registrations were not updated. Please check the registration status.",
     "userAddedToTeam": "{name} has been added to {team}.",
     "userRemovedFromTeam": "{name} has been removed from {team}.",
     "newTeamLeaderAssigned": "{name} is now the leader of {team}.",

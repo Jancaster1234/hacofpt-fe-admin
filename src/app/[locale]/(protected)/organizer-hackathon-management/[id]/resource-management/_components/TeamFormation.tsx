@@ -9,6 +9,7 @@ import { useTranslations } from "@/hooks/useTranslations";
 import { useToast } from "@/hooks/use-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Image from "next/image";
+import { useAuth } from "@/hooks/useAuth_v0";
 
 // Types
 interface TeamMember {
@@ -16,6 +17,7 @@ interface TeamMember {
   fullName: string;
   username: string;
   avatarUrl?: string;
+  registrationId?: string; // Add registration ID for tracking
 }
 
 interface FormattedTeam {
@@ -31,6 +33,7 @@ export default function TeamFormation({
 }) {
   const t = useTranslations("teamFormation");
   const toast = useToast();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [participants, setParticipants] = useState<TeamMember[]>([]);
   const [teams, setTeams] = useState<FormattedTeam[]>([]);
@@ -48,9 +51,8 @@ export default function TeamFormation({
 
         // Get all approved individual registrations for this hackathon
         const approvedRegistrations =
-          await individualRegistrationRequestService.getIndividualRegistrationsByHackathonIdAndStatus(
-            hackathonId,
-            "APPROVED"
+          await individualRegistrationRequestService.getApprovedIndividualRegistrationsByHackathonId(
+            hackathonId
           );
 
         if (
@@ -76,6 +78,7 @@ export default function TeamFormation({
                 reg.createdByUserName,
               username: user?.username || reg.createdByUserName,
               avatarUrl: user?.avatarUrl,
+              registrationId: reg.id, // Store registration ID
             };
           } catch (error) {
             // If user fetch fails, use registration data
@@ -84,6 +87,7 @@ export default function TeamFormation({
               fullName: reg.createdByUserName,
               username: reg.createdByUserName,
               avatarUrl: undefined,
+              registrationId: reg.id, // Store registration ID
             };
           }
         });
@@ -141,42 +145,30 @@ export default function TeamFormation({
       () => Math.random() - 0.5
     );
 
-    const teamCount = Math.ceil(shuffledParticipants.length / maxTeamSize);
     const formattedTeams: FormattedTeam[] = [];
-    const remainingUsers: TeamMember[] = [];
+    let remainingUsers = [...shuffledParticipants];
 
-    // First, try to form teams of max size
-    let currentIndex = 0;
-    for (let i = 0; i < teamCount; i++) {
-      const teamMembers = shuffledParticipants.slice(
-        currentIndex,
-        currentIndex + maxTeamSize
-      );
-      currentIndex += maxTeamSize;
+    // Create complete teams of size between min and max
+    while (remainingUsers.length >= minTeamSize) {
+      // Determine team size - use max size or whatever is available if less than max
+      const teamSize = Math.min(maxTeamSize, remainingUsers.length);
 
-      // If team size is less than minimum, add these users to remaining users
-      if (teamMembers.length < minTeamSize) {
-        remainingUsers.push(...teamMembers);
-      } else {
-        // Randomly select a team leader
-        const leaderIndex = Math.floor(Math.random() * teamMembers.length);
-        const teamLeaderId = teamMembers[leaderIndex].id;
+      // Take the first teamSize users from remainingUsers
+      const teamMembers = remainingUsers.slice(0, teamSize);
+      remainingUsers = remainingUsers.slice(teamSize);
 
-        formattedTeams.push({
-          id: `team-${i + 1}`,
-          teamLeaderId,
-          teamMembers,
-        });
-      }
+      // Randomly select a team leader
+      const leaderIndex = Math.floor(Math.random() * teamMembers.length);
+      const teamLeaderId = teamMembers[leaderIndex].id;
+
+      formattedTeams.push({
+        id: `team-${formattedTeams.length + 1}`,
+        teamLeaderId,
+        teamMembers,
+      });
     }
 
-    // Distribute remaining users to teams
-    let teamIndex = 0;
-    while (remainingUsers.length > 0 && formattedTeams.length > 0) {
-      formattedTeams[teamIndex].teamMembers.push(remainingUsers.pop()!);
-      teamIndex = (teamIndex + 1) % formattedTeams.length;
-    }
-
+    // Any users who couldn't form a complete team remain unassigned
     setTeams(formattedTeams);
     setUnassignedUsers(remainingUsers);
 
@@ -326,6 +318,42 @@ export default function TeamFormation({
       const response = await teamService.createBulkTeams(formattedTeamsForApi);
 
       if (response.data) {
+        // Collect all registrationIds that need to be updated to COMPLETED
+        const assignedRegistrationIds: string[] = [];
+
+        teams.forEach((team) => {
+          team.teamMembers.forEach((member) => {
+            if (member.registrationId) {
+              assignedRegistrationIds.push(member.registrationId);
+            }
+          });
+        });
+
+        // Prepare data for the bulk update
+        const updateData = assignedRegistrationIds.map((id) => ({
+          id,
+          hackathonId,
+          status: "COMPLETED" as const,
+          reviewedById: user?.id,
+        }));
+
+        // Only call if we have registrations to update
+        if (updateData.length > 0) {
+          // Update registration statuses to COMPLETED
+          const updateResponse =
+            await individualRegistrationRequestService.updateBulkIndividualRegistrationRequests(
+              updateData
+            );
+
+          if (!updateResponse.data) {
+            console.warn(
+              "Warning: Failed to update some registration statuses",
+              updateResponse.message
+            );
+            toast.warning(t("teamsCreatedButRegistrationsNotUpdated"));
+          }
+        }
+
         toast.success(
           response.message ||
             t("teamsCreatedSuccess", { count: response.data.length })
