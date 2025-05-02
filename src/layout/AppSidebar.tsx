@@ -48,12 +48,6 @@ const navItems: NavItem[] = [
   },
   // {
   //   icon: <CalenderIcon />,
-  //   name: "Hackathon",
-  //   allowedRoles: ["ADMIN"],
-  //   path: "/admin-hackathon-management",
-  // },
-  // {
-  //   icon: <CalenderIcon />,
   //   name: "User",
   //   allowedRoles: ["ADMIN"],
   //   path: "/user-management",
@@ -71,6 +65,27 @@ const navItems: NavItem[] = [
     translationKey: "userManagement",
     allowedRoles: ["ADMIN"],
     path: "/user-manage",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Role Management",
+    translationKey: "roleManagement",
+    allowedRoles: ["ADMIN"],
+    path: "/role-manage",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Permission Management",
+    translationKey: "permissionManagement",
+    allowedRoles: ["ADMIN"],
+    path: "/permission-manage",
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "Demo Add Data",
+    translationKey: "demoPage",
+    allowedRoles: ["DEMO"],
+    path: "/demo-add-data",
   },
   {
     icon: <CalenderIcon />,
