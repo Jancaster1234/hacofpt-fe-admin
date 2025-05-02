@@ -1,6 +1,6 @@
 // src/types/entities/role.ts
 
-import { AuditUserBase } from "./auditUserBase";
+import { AuditCreatedBase } from "./auditCreatedBase";
 import { UserRole } from "./userRole";
 import { RolePermission } from "./rolePermission";
 
@@ -10,7 +10,7 @@ export type Role = {
   description?: string;
   userRoles?: Partial<UserRole>[];
   rolePermissions?: Partial<RolePermission>[];
-} & AuditUserBase;
+} & AuditCreatedBase;
 
 /**
  * Predefined System Roles:

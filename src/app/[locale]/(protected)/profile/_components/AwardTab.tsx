@@ -1,4 +1,4 @@
-// src/app/profile/_components/AwardTab.tsx
+// src/app/[locale]/(protected)/profile/_components/AwardTab.tsx
 import { User } from "@/types/entities/user";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
