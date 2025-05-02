@@ -142,8 +142,7 @@ const BulkRegistrationTab: React.FC = () => {
 
   // Calculate available users whenever dependencies change
   useEffect(() => {
-    if (!selectedHackathon || !teams.length || !allTeamMembers.length) return;
-
+    if (!selectedHackathon || !allTeamMembers.length) return;
     calculateAvailableUsers();
   }, [selectedHackathon, teams, allTeamMembers, registeredUsers]);
 
