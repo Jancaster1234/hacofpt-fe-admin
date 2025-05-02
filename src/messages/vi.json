@@ -447,7 +447,7 @@
     "descriptionTooltip": "Thông tin bổ sung về việc tham gia của đội này trong vòng thi",
     "noDescriptionProvided": "Chưa có mô tả",
     "assignJudges": "Phân công giám khảo",
-    "cancel": "Hủy",
+    "failed": "Phân công giám khảo cho vòng thi thất bại",
     "assignedJudges": "Giám khảo đã phân công",
     "noJudgesAssigned": "Chưa có giám khảo nào được phân công",
     "availableJudges": "Giám khảo có sẵn",

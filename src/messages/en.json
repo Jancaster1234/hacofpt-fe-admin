@@ -574,6 +574,7 @@
     "descriptionTooltip": "Additional information about this team's participation in the round",
     "noDescriptionProvided": "No description provided",
     "assignJudges": "Assign judges",
+    "failed": "Failed to assign judge to round",
     "cancel": "Cancel",
     "assignedJudges": "Assigned judges",
     "noJudgesAssigned": "No judges assigned yet",
