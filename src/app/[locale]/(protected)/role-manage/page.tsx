@@ -950,7 +950,7 @@ export default function RoleManagementPage() {
                           </tr>
                         )}
                       </React.Fragment>
-                    ))}{" "}
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -971,8 +971,8 @@ export default function RoleManagementPage() {
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <p className="text-gray-500">No roles found.</p>
           </div>
-        )}{" "}
-      </div>{" "}
+        )}
+      </div>
     </div>
   );
 }
