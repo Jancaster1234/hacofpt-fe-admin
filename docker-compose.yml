@@ -16,5 +16,5 @@ services:
       NEXT_PUBLIC_REDIRECT_URI: ${NEXT_PUBLIC_REDIRECT_URI}
       NEXTAUTH_URL: ${NEXTAUTH_URL}
     env_file:
-      - .env.local
+      - .env
     restart: unless-stopped
