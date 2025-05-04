@@ -222,7 +222,7 @@ class IndividualRegistrationRequestService {
     try {
       const response = await apiService.auth.put<
         IndividualRegistrationRequest[]
-      >("/hackathon-service/api/v1/individuals/bulk", { data });
+      >("/hackathon-service/api/v1/individuals/bulk-update", { data });
 
       if (!response || !response.data) {
         throw new Error(
