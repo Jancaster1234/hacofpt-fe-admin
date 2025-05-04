@@ -6,19 +6,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        - NEXT_TELEMETRY_DISABLED=1
     restart: always
     ports:
       - "4000:4000"
     environment:
       - NODE_ENV=production
-      - NEXT_TELEMETRY_DISABLED=1
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:9191}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
       - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - NEXT_PUBLIC_REDIRECT_URI=${NEXT_PUBLIC_REDIRECT_URI:-https://admin.hacof.site/authenticate}
-      - NEXTAUTH_URL=${NEXTAUTH_URL:-https://accounts.google.com/o/oauth2/v2/auth}
+      - NEXT_PUBLIC_REDIRECT_URI=${NEXT_PUBLIC_REDIRECT_URI}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
     volumes:
       - ./public:/app/public
     networks:

@@ -3,9 +3,6 @@ FROM node:18.20.3-alpine AS build
 
 WORKDIR /app
 
-# Install build dependencies required for native modules
-RUN apk add --no-cache python3 make g++ libc6-compat
-
 # Copy package files
 COPY package.json package-lock.json ./
 
@@ -14,9 +11,6 @@ RUN npm ci --legacy-peer-deps
 
 # Copy the rest of the application
 COPY . .
-
-# Fix for lightningcss on Alpine Linux
-RUN npm rebuild lightningcss --platform=linux --arch=x64 --libc=musl
 
 # Build the application
 RUN npm run build
