@@ -65,7 +65,7 @@ class TeamRoundService {
   ): Promise<{ data: TeamRound[]; message?: string }> {
     try {
       const response = await apiService.auth.get<TeamRound[]>(
-        `/hackathon-service/api/v1/team-rounds?teamId=${teamId}&roundId=${roundId}`
+        `/hackathon-service/api/v1/team-rounds/filter-by-team-and-round?teamId=${teamId}&roundId=${roundId}`
       );
 
       if (!response || !response.data) {
