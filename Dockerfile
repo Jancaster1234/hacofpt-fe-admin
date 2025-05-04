@@ -1,5 +1,5 @@
 # Build stage
-FROM --platform=linux/amd64 node:18.20.3 AS build
+FROM node:18.20.3-alpine AS build
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM --platform=linux/amd64 node:18.20.3-slim AS production
+FROM node:18.20.3-alpine AS production
 
 WORKDIR /app
 
