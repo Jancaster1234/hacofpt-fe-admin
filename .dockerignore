@@ -1,0 +1,13 @@
+node_modules
+.next
+Dockerfile
+.dockerignore
+*.log
+.git
+.gitignore
+.vscode
+.env.local
+.env.development
+.env.test
+README.md
+*.tsbuildinfo
