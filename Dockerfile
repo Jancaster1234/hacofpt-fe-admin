@@ -1,31 +1,47 @@
-# Step 1: Base build image
-FROM node:18-alpine AS base
+# Build stage
+FROM node:18.20.3-alpine AS build
 
 WORKDIR /app
 
-# Install dependencies
-COPY package*.json ./
-RUN npm install --legacy-peer-deps
+# Install build dependencies required for native modules
+RUN apk add --no-cache python3 make g++ libc6-compat
 
-# Copy all files needed for building
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies with legacy peer deps flag
+RUN npm ci --legacy-peer-deps
+
+# Copy the rest of the application
 COPY . .
 
-# Build the Next.js app
+# Fix for lightningcss on Alpine Linux
+RUN npm rebuild lightningcss --platform=linux --arch=x64 --libc=musl
+
+# Build the application
 RUN npm run build
 
-# Step 2: Production image
-FROM node:18-alpine AS production
+# Production stage
+FROM node:18.20.3-alpine AS production
 
 WORKDIR /app
 
-# Install only prod dependencies
-COPY package*.json ./
-RUN npm install --legacy-peer-deps --omit=dev
+# Copy necessary files from build stage
+COPY --from=build /app/package.json ./
+COPY --from=build /app/package-lock.json ./
+COPY --from=build /app/next.config.ts ./
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
 
-COPY --from=base /app /app
+# Install only production dependencies with legacy peer deps flag
+RUN npm ci --only=production --legacy-peer-deps
 
-# Set environment variables if needed
+# Set environment variables
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Expose the port the app will run on
 EXPOSE 4000
 
+# Start the application
 CMD ["npm", "start"]
