@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   hacofpt-fe-admin:
     container_name: hacofpt-fe-admin
