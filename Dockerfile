@@ -3,9 +3,6 @@ FROM node:18.20.3-alpine AS build
 
 WORKDIR /app
 
-# Install OS dependencies to build native modules if needed
-RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
-
 # Copy package files
 COPY package.json package-lock.json ./
 
