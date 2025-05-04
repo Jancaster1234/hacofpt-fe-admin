@@ -241,7 +241,6 @@ class UserService {
       );
     }
   }
-  asdsad;
 }
 
 export const userService = new UserService();
