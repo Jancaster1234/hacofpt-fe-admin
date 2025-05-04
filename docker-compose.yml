@@ -17,8 +17,8 @@ services:
     volumes:
       - ./public:/app/public
     networks:
-      - hacofpt-network
+      - hacofpt-network-admin
 
 networks:
-  hacofpt-network:
+  hacofpt-network-admin:
     driver: bridge
