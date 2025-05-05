@@ -46,6 +46,7 @@
     }
   },
   "hackathon": {
+    "enrollmentStatus": "Enrollment Status",
     "hackathonPageTitle": "Explore hackathons",
     "searchPlaceholder": "Search hackathons by title...",
     "searchHackathons": "Search hackathons",

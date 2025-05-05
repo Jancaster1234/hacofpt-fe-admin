@@ -226,8 +226,8 @@ class UserService {
   ): Promise<{ data: User; message?: string }> {
     try {
       const response = await apiService.auth.put<User>(
-        `/identity-service/api/v1/users/${userId}/status`,
-        { data: { status } }
+        `/identity-service/api/v1/users/${userId}/status?status=${status}`,
+        {}
       );
 
       if (!response || !response.data) {

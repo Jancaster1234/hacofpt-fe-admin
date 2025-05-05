@@ -46,6 +46,7 @@
     }
   },
   "hackathon": {
+    "enrollmentStatus": "Trạng thái đăng ký",
     "hackathonPageTitle": "Khám phá hackathon",
     "searchPlaceholder": "Tìm kiếm hackathon theo tiêu đề...",
     "searchHackathons": "Tìm kiếm hackathon",
