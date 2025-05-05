@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { ChatListItem } from "@/types/chat";
+import ImageModal from './ImageModal';
 
 interface ChatListProps {
   chats: ChatListItem[];
@@ -17,6 +18,15 @@ const ChatList: React.FC<ChatListProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const handleImageClick = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
 
   const formatMessageTime = (dateString?: string) => {
     if (!dateString) return "";
@@ -128,6 +138,8 @@ const ChatList: React.FC<ChatListProps> = ({
                 src={getOtherUserAvatar(chat)}
                 alt={chat.name}
                 className="w-10 h-10 rounded-full object-cover"
+                onClick={() => handleImageClick(getOtherUserAvatar(chat))}
+                style={{ cursor: 'pointer' }}
               />
               <div className="ml-3 flex-1 min-w-0">
                 <div className="flex justify-between items-center">
@@ -148,6 +160,13 @@ const ChatList: React.FC<ChatListProps> = ({
           </div>
         ))}
       </div>
+      <img
+        src="image-url.jpg" // Replace with dynamic image URL
+        alt="Chat Image"
+        onClick={() => handleImageClick('image-url.jpg')}
+        style={{ cursor: 'pointer' }}
+      />
+      {selectedImage && <ImageModal imageUrl={selectedImage} onClose={closeModal} />}
     </div>
   );
 };

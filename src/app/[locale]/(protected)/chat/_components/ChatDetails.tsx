@@ -34,6 +34,14 @@ const ChatDetails: React.FC<ChatDetailsProps> = ({ chatId, chats, onSendMessage,
     const emojiPickerRef = useRef<HTMLDivElement>(null);
     const [activeReactionBar, setActiveReactionBar] = useState<string | null>(null);
 
+    // State để quản lý modal hiển thị ảnh
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+    // Hàm đóng modal
+    const closeImageModal = () => {
+        setSelectedImage(null);
+    };
+
     // Fetch users list
     useEffect(() => {
         const fetchUsers = async () => {
@@ -277,7 +285,8 @@ const ChatDetails: React.FC<ChatDetailsProps> = ({ chatId, chats, onSendMessage,
                                                             key={index}
                                                             src={fileUrl}
                                                             alt="attachment"
-                                                            className="rounded-md max-w-[120px] max-h-[120px] object-cover"
+                                                            className="rounded-md max-w-[120px] max-h-[120px] object-cover cursor-pointer"
+                                                            onClick={() => setSelectedImage(fileUrl)} // Mở modal khi click vào ảnh
                                                         />
                                                     ) : (
                                                         <div key={index} className="flex items-center space-x-2 p-2 bg-gray-200 rounded-lg">
@@ -359,6 +368,21 @@ const ChatDetails: React.FC<ChatDetailsProps> = ({ chatId, chats, onSendMessage,
                 })}
                 <div ref={messagesEndRef} />
             </div>
+
+            {/* Modal hiển thị ảnh chi tiết */}
+            {selectedImage && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+                    onClick={closeImageModal} // Đóng modal khi click ra ngoài
+                >
+                    <img
+                        src={selectedImage}
+                        alt="Detail"
+                        className="max-w-full max-h-full rounded-md"
+                        onClick={(e) => e.stopPropagation()} // Ngăn đóng modal khi click vào ảnh
+                    />
+                </div>
+            )}
 
             {/* Message input */}
             <div className="p-4 border-t">
