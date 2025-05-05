@@ -1,4 +1,3 @@
-// src/components/auth/SignInForm.tsx
 "use client";
 import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
@@ -17,6 +16,10 @@ export default function SignInForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<{
+    username?: string;
+    password?: string;
+  }>({});
   const { login } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -24,9 +27,29 @@ export default function SignInForm() {
   const [googleError, setGoogleError] = useState<string | null>(null);
   const toast = useToast();
 
+  const validateForm = () => {
+    const errors: { username?: string; password?: string } = {};
+
+    if (!username.trim()) {
+      errors.username = "Username cannot be blank";
+    }
+
+    if (!password.trim()) {
+      errors.password = "Password cannot be blank";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setValidationErrors({});
+
+    if (!validateForm()) {
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -133,8 +156,17 @@ export default function SignInForm() {
                   placeholder="Enter your username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="mt-1 block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  className={`mt-1 block w-full rounded-lg ${
+                    validationErrors.username
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  } dark:bg-gray-700 dark:text-white`}
                 />
+                {validationErrors.username && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                    {validationErrors.username}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -147,7 +179,11 @@ export default function SignInForm() {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white pr-10"
+                    className={`block w-full rounded-lg pr-10 ${
+                      validationErrors.password
+                        ? "border-red-500"
+                        : "border-gray-300 dark:border-gray-600"
+                    } dark:bg-gray-700 dark:text-white`}
                   />
                   <button
                     type="button"
@@ -161,6 +197,11 @@ export default function SignInForm() {
                     )}
                   </button>
                 </div>
+                {validationErrors.password && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                    {validationErrors.password}
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center justify-between">
