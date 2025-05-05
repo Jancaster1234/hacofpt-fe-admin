@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/chat/_components/ImageModal.tsx
 import React from 'react';
 
 interface ImageModalProps {

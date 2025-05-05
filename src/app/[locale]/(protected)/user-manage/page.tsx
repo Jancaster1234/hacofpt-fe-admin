@@ -10,10 +10,8 @@ import {
   Plus,
   Search,
   RefreshCw,
-  Trash2,
-  Edit,
-  Save,
-  X,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import Pagination from "@/components/common/Pagination";
 import { userService } from "@/services/user.service";
@@ -32,25 +30,17 @@ export default function UserCreationPage() {
     username: "",
     firstName: "",
     lastName: "",
-    roleId: "", // Will be set dynamically after roles are loaded
     password: "12345678", // Default password
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-
-  // Edit user state
-  const [editingUserId, setEditingUserId] = useState<string | null>(null);
-  const [editFormData, setEditFormData] = useState({
-    firstName: "",
-    lastName: "",
-    roleId: "",
-  });
 
   // API Modal state and handlers
   const { modalState, hideModal, showSuccess, showError } = useApiModal();
@@ -81,17 +71,6 @@ export default function UserCreationPage() {
       const response = await roleService.getAllRoles();
       if (response.data && response.data.length > 0) {
         setRoles(response.data);
-
-        // Set default roleId to the first role
-        if (response.data.length > 0) {
-          const mentorRole = response.data.find(
-            (role) => role.name === "MENTOR"
-          );
-          setCreateFormData((prev) => ({
-            ...prev,
-            roleId: mentorRole?.id || response.data[0].id,
-          }));
-        }
       } else {
         console.error("No roles found or error fetching roles");
       }
@@ -116,16 +95,6 @@ export default function UserCreationPage() {
     }));
   };
 
-  const handleEditInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setEditFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -139,6 +108,12 @@ export default function UserCreationPage() {
     setError(null);
 
     try {
+      // Find the ORGANIZER role
+      const organizerRole = roles.find((role) => role.name === "ORGANIZER");
+      if (!organizerRole) {
+        throw new Error("ORGANIZER role not found");
+      }
+
       // Create request body for the API
       const createUserRequestBody = {
         username: createFormData.username,
@@ -146,7 +121,7 @@ export default function UserCreationPage() {
         lastName: createFormData.lastName || "",
         password: createFormData.password,
         userRoles: {
-          roleId: createFormData.roleId,
+          roleId: organizerRole.id, // Always use ORGANIZER role
         },
       };
 
@@ -158,16 +133,15 @@ export default function UserCreationPage() {
         setUsers((prev) => [response.data, ...prev]);
 
         // Reset the form
-        setCreateFormData((prev) => ({
+        setCreateFormData({
           username: "",
           firstName: "",
           lastName: "",
-          roleId: prev.roleId, // Keep the current roleId
           password: "12345678",
-        }));
+        });
 
         setShowCreateForm(false);
-        const successMsg = `User ${response.data.username} created successfully! Default password: 12345678`;
+        const successMsg = `User ${response.data.username} created successfully with ORGANIZER role! Default password: 12345678`;
         setSuccessMessage(successMsg);
         showSuccess("User Created", successMsg);
 
@@ -188,106 +162,42 @@ export default function UserCreationPage() {
     }
   };
 
-  const handleEditUser = async (userId: string) => {
-    const userToEdit = users.find((u) => u.id === userId);
-    if (!userToEdit) return;
-
-    setEditingUserId(userId);
-    setEditFormData({
-      firstName: userToEdit.firstName || "",
-      lastName: userToEdit.lastName || "",
-      roleId: userToEdit.userRoles?.[0]?.role?.id || "",
-    });
-  };
-
-  const handleSaveEdit = async (userId: string) => {
-    setIsSubmitting(true);
+  const handleUpdateUserStatus = async (
+    userId: string,
+    newStatus: "ACTIVE" | "INACTIVE"
+  ) => {
+    setStatusUpdating(userId);
     setError(null);
 
     try {
-      // Get the user we're editing to keep username and other fields
-      const userToUpdate = users.find((u) => u.id === userId);
-      if (!userToUpdate) {
-        throw new Error("User not found");
-      }
-
-      // Create update request body for the API
-      const updateUserRequestBody = {
-        username: userToUpdate.username,
-        firstName: editFormData.firstName,
-        lastName: editFormData.lastName,
-        password: "", // Empty password means don't change it
-        userRoles: [
-          {
-            roleId: editFormData.roleId,
-          },
-        ],
-      };
-
-      // Make API call to update user
-      const response = await userService.updateUser(
-        userId,
-        updateUserRequestBody
-      );
+      // Make API call to update user status
+      const response = await userService.updateUserStatus(userId, newStatus);
 
       if (response.data) {
         // Update user in local state
         setUsers((prevUsers) =>
-          prevUsers.map((u) => (u.id === userId ? response.data : u))
+          prevUsers.map((u) =>
+            u.id === userId ? { ...u, status: newStatus } : u
+          )
         );
 
-        setEditingUserId(null);
-        const successMsg = "User updated successfully!";
+        const successMsg = `User status updated to ${newStatus} successfully!`;
         setSuccessMessage(successMsg);
-        showSuccess("User Updated", successMsg);
+        showSuccess("Status Updated", successMsg);
 
         setTimeout(() => {
           setSuccessMessage(null);
         }, 5000);
       } else {
-        throw new Error(response.message || "Failed to update user");
+        throw new Error(response.message || "Failed to update user status");
       }
     } catch (err: any) {
       const errorMessage =
-        err.message || "Failed to update user. Please try again.";
+        err.message || "Failed to update user status. Please try again.";
       setError(errorMessage);
-      showError("Error Updating User", errorMessage);
+      showError("Error Updating Status", errorMessage);
     } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDeleteUser = async (userId: string) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Note: The provided user service doesn't have a delete method
-      // This would normally be implemented as:
-      const response = await userService.deleteUser(userId);
-
-      // For now, we'll simulate success and just update the UI
-      //console.log("Deleting user with ID:", userId);
-
-      // Update the local state by removing the user
-      setUsers((prevUsers) => prevUsers.filter((u) => u.id !== userId));
-
-      const successMsg = "User deleted successfully!";
-      setSuccessMessage(successMsg);
-      showSuccess("User Deleted", successMsg);
-
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 5000);
-    } catch (err: any) {
-      const errorMessage =
-        err.message || "Failed to delete user. Please try again.";
-      setError(errorMessage);
-      showError("Error Deleting User", errorMessage);
-    } finally {
-      setLoading(false);
+      setStatusUpdating(null);
     }
   };
 
@@ -339,7 +249,7 @@ export default function UserCreationPage() {
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"
           >
             <Plus size={18} className="mr-2" />
-            Create New User
+            Create New Organizer
           </button>
         </div>
 
@@ -369,7 +279,7 @@ export default function UserCreationPage() {
         {/* Create User Form */}
         {showCreateForm && (
           <div className="mb-6 p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Create New User</h2>
+            <h2 className="text-xl font-semibold mb-4">Create New Organizer</h2>
             <form onSubmit={handleCreateUser}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -389,31 +299,6 @@ export default function UserCreationPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Username"
                   />
-                </div>
-                <div>
-                  <label
-                    htmlFor="roleId"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Role <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id="roleId"
-                    name="roleId"
-                    value={createFormData.roleId}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {roles.length === 0 ? (
-                      <option value="">Loading roles...</option>
-                    ) : (
-                      roles.map((role) => (
-                        <option key={role.id} value={role.id}>
-                          {role.name}
-                        </option>
-                      ))
-                    )}
-                  </select>
                 </div>
                 <div>
                   <label
@@ -475,7 +360,7 @@ export default function UserCreationPage() {
                         Creating...
                       </>
                     ) : (
-                      "Create User"
+                      "Create Organizer"
                     )}
                   </button>
                 </div>
@@ -577,58 +462,33 @@ export default function UserCreationPage() {
                     {paginatedUsers.map((user) => (
                       <tr key={user.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {editingUserId === user.id ? (
-                            <div className="flex items-center space-x-3">
-                              <div>
-                                <input
-                                  type="text"
-                                  name="firstName"
-                                  value={editFormData.firstName}
-                                  onChange={handleEditInputChange}
-                                  className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm"
-                                  placeholder="First Name"
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 h-10 w-10">
+                              {user.avatarUrl ? (
+                                <img
+                                  className="h-10 w-10 rounded-full"
+                                  src={user.avatarUrl}
+                                  alt=""
                                 />
-                              </div>
-                              <div>
-                                <input
-                                  type="text"
-                                  name="lastName"
-                                  value={editFormData.lastName}
-                                  onChange={handleEditInputChange}
-                                  className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm"
-                                  placeholder="Last Name"
-                                />
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10">
-                                {user.avatarUrl ? (
-                                  <img
-                                    className="h-10 w-10 rounded-full"
-                                    src={user.avatarUrl}
-                                    alt=""
-                                  />
-                                ) : (
-                                  <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                    {user.firstName && user.lastName
-                                      ? `${user.firstName[0]}${user.lastName[0]}`
-                                      : user.username?.[0] || "U"}
-                                  </div>
-                                )}
-                              </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">
-                                  {user.firstName} {user.lastName}
+                              ) : (
+                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                  {user.firstName && user.lastName
+                                    ? `${user.firstName[0]}${user.lastName[0]}`
+                                    : user.username?.[0] || "U"}
                                 </div>
-                                {user.country && user.city && (
-                                  <div className="text-sm text-gray-500">
-                                    {user.city}, {user.country}
-                                  </div>
-                                )}
-                              </div>
+                              )}
                             </div>
-                          )}
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">
+                                {user.firstName} {user.lastName}
+                              </div>
+                              {user.country && user.city && (
+                                <div className="text-sm text-gray-500">
+                                  {user.city}, {user.country}
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
@@ -644,65 +504,47 @@ export default function UserCreationPage() {
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                             ${
-                              user.status === "Active"
+                              user.status === "ACTIVE"
                                 ? "bg-green-100 text-green-800"
                                 : "bg-red-100 text-red-800"
                             }`}
                           >
-                            {user.status}
+                            {user.status || "ACTIVE"}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {editingUserId === user.id ? (
-                            <select
-                              name="roleId"
-                              value={editFormData.roleId}
-                              onChange={handleEditInputChange}
-                              className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm"
-                            >
-                              {roles.map((role) => (
-                                <option key={role.id} value={role.id}>
-                                  {role.name}
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            user.userRoles?.[0]?.role?.name || "No role"
-                          )}
+                          {user.userRoles?.[0]?.role?.name || "No role"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          {editingUserId === user.id ? (
-                            <div className="flex justify-end space-x-2">
+                          <div className="flex justify-end space-x-2">
+                            {statusUpdating === user.id ? (
+                              <div className="text-gray-400">
+                                <Loader2 size={18} className="animate-spin" />
+                              </div>
+                            ) : user.status === "ACTIVE" ? (
                               <button
-                                onClick={() => handleSaveEdit(user.id)}
-                                className="text-blue-600 hover:text-blue-900"
-                                disabled={isSubmitting}
+                                onClick={() =>
+                                  handleUpdateUserStatus(user.id, "INACTIVE")
+                                }
+                                className="text-red-600 hover:text-red-900 flex items-center"
+                                title="Deactivate User"
                               >
-                                <Save size={18} />
+                                <XCircle size={18} className="mr-1" />
+                                Deactivate
                               </button>
+                            ) : (
                               <button
-                                onClick={() => setEditingUserId(null)}
-                                className="text-gray-600 hover:text-gray-900"
+                                onClick={() =>
+                                  handleUpdateUserStatus(user.id, "ACTIVE")
+                                }
+                                className="text-green-600 hover:text-green-900 flex items-center"
+                                title="Activate User"
                               >
-                                <X size={18} />
+                                <CheckCircle size={18} className="mr-1" />
+                                Activate
                               </button>
-                            </div>
-                          ) : (
-                            <div className="flex justify-end space-x-2">
-                              <button
-                                onClick={() => handleEditUser(user.id)}
-                                className="text-blue-600 hover:text-blue-900"
-                              >
-                                <Edit size={18} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteUser(user.id)}
-                                className="text-red-600 hover:text-red-900"
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            </div>
-                          )}
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
