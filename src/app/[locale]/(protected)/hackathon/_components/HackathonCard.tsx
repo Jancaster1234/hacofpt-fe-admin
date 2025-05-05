@@ -1,4 +1,4 @@
-// src/components/HackathonCard/index.tsx
+// src/app/[locale]/(protected)/hackathon/_components/HackathonCard.tsx
 import Link from "next/link";
 import Image from "next/image";
 import { Hackathon } from "@/types/entities/hackathon";
