@@ -143,7 +143,10 @@
 
   "hackathonCard": {
     "enroll": "Enrollment period",
-    "viewDetails": "View details"
+    "viewDetails": "View details",
+    "event": "Event period",
+    "enrollment": "Enrollment period",
+    "participants": "participants"
   },
 
   "hackathonDetail": {

@@ -302,7 +302,10 @@
 
   "hackathonCard": {
     "enroll": "Thời gian đăng ký",
-    "viewDetails": "Xem chi tiết"
+    "viewDetails": "Xem chi tiết",
+    "event": "Thời gian diễn ra",
+    "enrollment": "Thời gian đăng ký",
+    "participants": "người tham gia"
   },
 
   "hackathonDetail": {
