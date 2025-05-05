@@ -1,6 +1,4 @@
 // src/components/auth/SignInForm.tsx
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// src/components/auth/SignInForm.tsx
 "use client";
 import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
@@ -11,7 +9,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth_v0";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -24,6 +22,7 @@ export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
+  const toast = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,8 +33,8 @@ export default function SignInForm() {
       await login(username, password);
       router.push("/");
     } catch (err: any) {
-      setError("Invalid username or password");
-      toast.error("Invalid username or password");
+      setError(err.message || "Login failed. Please try again.");
+      toast.error(err.message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -47,8 +46,8 @@ export default function SignInForm() {
       setGoogleError(null);
 
       const authUrl = `https://accounts.google.com/o/oauth2/auth/oauthchooseaccount?redirect_uri=${encodeURIComponent(
-        process.env.NEXT_PUBLIC_REDIRECT_URI || ''
-      )}&response_type=code&client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}&scope=openid%20email%20profile&service=lso&o2v=1&ddm=1&flowName=GeneralOAuthFlow`;
+        process.env.NEXT_PUBLIC_REDIRECT_URI || ""
+      )}&response_type=code&client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}&scope=openid%20email%20profile&service=lso&o2v=1&ddm=1&flowName=GeneralOAuthFlow`;
       window.location.href = authUrl;
     } catch (error) {
       console.error("Google sign in error:", error);

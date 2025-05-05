@@ -49,7 +49,8 @@ export function useAuth() {
       // Set error message in the store
       setMessage(error.message || "Login failed", "error");
 
-      return { success: false, message: error.message };
+      // Rethrow the error to be caught by the caller
+      throw error;
     } finally {
       setAuth({ loading: false });
     }
