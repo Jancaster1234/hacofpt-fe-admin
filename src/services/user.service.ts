@@ -220,6 +220,33 @@ class UserService {
     }
   }
 
+  async updateUserStatus(
+    userId: string,
+    status: "ACTIVE" | "INACTIVE"
+  ): Promise<{ data: User; message?: string }> {
+    try {
+      const response = await apiService.auth.put<User>(
+        `/identity-service/api/v1/users/${userId}/status`,
+        { data: { status } }
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to update user status");
+      }
+
+      return {
+        data: response.data,
+        message: response.message || "User status updated successfully",
+      };
+    } catch (error: any) {
+      return handleApiError<User>(
+        error,
+        {} as User,
+        "Error updating user status:"
+      );
+    }
+  }
+
   async deleteUser(userId: string): Promise<{ message?: string }> {
     try {
       const response = await apiService.auth.delete(

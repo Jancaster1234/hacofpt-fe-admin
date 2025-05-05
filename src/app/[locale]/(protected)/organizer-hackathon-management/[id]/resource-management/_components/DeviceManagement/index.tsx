@@ -50,7 +50,7 @@ const DeviceManagement: React.FC<DeviceManagementProps> = ({ hackathonId }) => {
           }
         } else {
           setHackathon(null);
-          setError(t("failedToFetchHackathon"));
+          //setError(t("failedToFetchHackathon"));
         }
       } catch (error: any) {
         console.error("Error fetching hackathon data:", error);
