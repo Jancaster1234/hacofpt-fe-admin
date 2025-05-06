@@ -206,7 +206,7 @@ class ScheduleEventReminderService {
         `/communication-service/api/v1/schedule-event-reminders/by-user-and-schedule-event?userId=${userId}&scheduleEventId=${scheduleEventId}`
       );
 
-      if (!response || !response.data || response.data.length === 0) {
+      if (!response || !response.data) {
         throw new Error(
           "No schedule event reminder found for given scheduleEventId and userId"
         );

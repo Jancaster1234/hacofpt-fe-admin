@@ -9,7 +9,10 @@ class UserHackathonService {
   ): Promise<{ data: UserHackathon[]; message?: string }> {
     try {
       const response = await apiService.auth.get<UserHackathon[]>(
-        `/identity-service/api/v1/user-hackathons/hackathon/${hackathonId}`
+        `/identity-service/api/v1/user-hackathons/hackathon/${hackathonId}`,
+        undefined,
+        30000,
+        false
       );
 
       if (!response || !response.data) {
