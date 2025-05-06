@@ -1,7 +1,7 @@
 // src/app/[locale]/(protected)/grading-submission/layout.tsx
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { RoleGuard } from "@/middleware/auth";
 
 export default function GradingSubmissionLayout({
@@ -9,5 +9,9 @@ export default function GradingSubmissionLayout({
 }: {
   children: ReactNode;
 }) {
-  return <RoleGuard allowedRoles={["JUDGE"]}>{children}</RoleGuard>;
+  return (
+    <Suspense fallback={<div>Loading protected content...</div>}>
+      <RoleGuard allowedRoles={["JUDGE"]}>{children}</RoleGuard>
+    </Suspense>
+  );
 }

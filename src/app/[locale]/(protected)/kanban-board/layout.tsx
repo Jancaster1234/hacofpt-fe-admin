@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/grading-submission/layout.tsx
+// src/app/[locale]/(protected)/kanban-board/layout.tsx
 "use client";
 
 import { ReactNode } from "react";

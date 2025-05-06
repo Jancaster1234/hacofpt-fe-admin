@@ -1,4 +1,4 @@
-// src/app/[locale]/(protected)/grading-submission/layout.tsx
+// src/app/[locale]/(protected)/demo-add-data/layout.tsx
 "use client";
 
 import { ReactNode } from "react";
