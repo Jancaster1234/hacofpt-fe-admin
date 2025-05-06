@@ -56,7 +56,8 @@ export default function KanbanBoardLayout({
       if (userResponse.data) {
         // Check if current user is in the board users list and not deleted
         const currentUserBoardAccess = userResponse.data.find(
-          (boardUser: BoardUser) => boardUser.user?.id === user.id
+          (boardUser: BoardUser) =>
+            boardUser.user?.id === user.id && !boardUser.isDeleted
         );
 
         if (currentUserBoardAccess) {
