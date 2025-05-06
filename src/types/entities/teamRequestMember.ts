@@ -4,10 +4,10 @@ import { TeamRequest } from "./teamRequest";
 import { User } from "./user";
 
 export type TeamRequestMemberStatus =
-  | "pending"
-  | "approved"
-  | "rejected"
-  | "no_response";
+  | "PENDING"
+  | "APPROVED"
+  | "REJECTED"
+  | "NO_RESPONSE";
 
 export type TeamRequestMember = {
   id: string;
