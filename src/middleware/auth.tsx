@@ -15,10 +15,13 @@ export function RoleGuard({
   redirectPath = "/unauthorized",
 }: RoleGuardProps) {
   const { user } = useAuth();
-
+  console.log(
+    " 🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹  🔹 user",
+    user
+  ); // Debugging line to check user object
   // Check if user exists and has roles
   if (!user || !user.userRoles) {
-    redirect("/login");
+    redirect("/signin");
     return null;
   }
 
