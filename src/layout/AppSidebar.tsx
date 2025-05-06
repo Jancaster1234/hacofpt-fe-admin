@@ -56,7 +56,7 @@ const navItems: NavItem[] = [
     icon: <CalenderIcon />,
     name: "Hackathon",
     translationKey: "hackathon",
-    allowedRoles: ["ADMIN", "ORGANIZER", "MENTOR", "JUDGE"],
+    allowedRoles: ["ADMIN"],
     path: "/hackathon",
   },
   {
