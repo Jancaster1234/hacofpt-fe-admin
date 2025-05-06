@@ -5,7 +5,9 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { boardUserService } from "@/services/boardUser.service";
+import { boardService } from "@/services/board.service";
 import { BoardUser } from "@/types/entities/boardUser";
+import { Board } from "@/types/entities/board";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,25 +23,40 @@ export default function KanbanBoardLayout({
   const [loading, setLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
 
-  const boardId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const hackathonId = Array.isArray(params.id) ? params.id[0] : params.id;
 
   // Use useCallback to prevent unnecessary re-renders and to stabilize the function
   const checkUserAccess = useCallback(async () => {
-    if (!user || !boardId) {
+    if (!user || !hackathonId) {
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      // Fetch board users for the current board
-      const response = await boardUserService.getBoardUsersByBoardId(boardId);
 
-      if (response.data) {
+      // Step 1: Get the operating board for this hackathon
+      const boardResponse =
+        await boardService.getOperatingBoardByHackathonId(hackathonId);
+
+      if (!boardResponse.data || !boardResponse.data.id) {
+        toast.error(
+          boardResponse.message || "No operating board found for this hackathon"
+        );
+        setHasAccess(false);
+        return;
+      }
+
+      const boardId = boardResponse.data.id;
+
+      // Step 2: Fetch board users for the retrieved board
+      const userResponse =
+        await boardUserService.getBoardUsersByBoardId(boardId);
+
+      if (userResponse.data) {
         // Check if current user is in the board users list and not deleted
-        const currentUserBoardAccess = response.data.find(
-          (boardUser: BoardUser) =>
-            boardUser.userId === user.id && !boardUser.isDeleted
+        const currentUserBoardAccess = userResponse.data.find(
+          (boardUser: BoardUser) => boardUser.user?.id === user.id
         );
 
         if (currentUserBoardAccess) {
@@ -52,7 +69,7 @@ export default function KanbanBoardLayout({
         }
       } else {
         toast.error(
-          response.message || "Failed to retrieve board access information"
+          userResponse.message || "Failed to retrieve board access information"
         );
         setHasAccess(false);
       }
@@ -61,11 +78,11 @@ export default function KanbanBoardLayout({
       toast.error(
         error.message || "Error checking board access. Please try again later."
       );
-      router.push("/kanban-board");
+      setHasAccess(false);
     } finally {
       setLoading(false);
     }
-  }, [boardId, user, router]); // toast is intentionally excluded from dependencies
+  }, [hackathonId, user, router]); // toast is intentionally excluded from dependencies
 
   useEffect(() => {
     checkUserAccess();
