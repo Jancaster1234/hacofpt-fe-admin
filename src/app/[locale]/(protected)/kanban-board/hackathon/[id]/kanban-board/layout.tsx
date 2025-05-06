@@ -1,3 +1,4 @@
+// src/app/[locale]/(protected)/kanban-board/hackathon/[id]/kanban-board/layout.tsx
 "use client";
 
 import { useEffect, useState, useCallback } from "react";

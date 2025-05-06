@@ -1,9 +1,13 @@
 // src/app/[locale]/(protected)/demo-add-data/layout.tsx
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { RoleGuard } from "@/middleware/auth";
 
 export default function Layout({ children }: { children: ReactNode }) {
-  return <RoleGuard allowedRoles={["DEMO"]}>{children}</RoleGuard>;
+  return (
+    <Suspense fallback={<div>Loading protected content...</div>}>
+      <RoleGuard allowedRoles={["DEMO"]}>{children}</RoleGuard>
+    </Suspense>
+  );
 }
