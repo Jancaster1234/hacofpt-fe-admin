@@ -7,6 +7,7 @@ import { NotificationMethod } from "@/types/entities/notificationDelivery";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { notificationService } from "@/services/notification.service";
+import { useWebSocket } from "@/contexts/WebSocketContext";
 
 enum RoleType {
   ADMIN = "ADMIN",
@@ -75,6 +76,7 @@ export default function SendNotificationPage() {
   const [recipientType, setRecipientType] = useState<"users" | "role">("users");
   const [selectedRole, setSelectedRole] = useState<RoleType>(RoleType.ADMIN);
   const { user } = useAuth();
+  const { client, isConnected } = useWebSocket();
 
   useEffect(() => {
     const loadData = async () => {
@@ -145,6 +147,11 @@ export default function SendNotificationPage() {
       return;
     }
 
+    if (newNotification.metadata && newNotification.metadata.length > 256) {
+      toast.error("Data truncation: Data too long for column 'metadata'");
+      return;
+    }
+
     if (recipientType === "users" && selectedRecipients.length === 0) {
       toast.error("Please select at least one recipient");
       return;
@@ -163,12 +170,42 @@ export default function SendNotificationPage() {
         },
       };
 
-      const { data, message } = await notificationService.createNotification(
-        requestBody
-      );
+      const { data, message } =
+        await notificationService.createNotification(requestBody);
 
       if (data) {
         setNotifications([data, ...notifications]);
+
+        // Send WebSocket notification to each recipient
+        if (recipientType === "users" && notificationMethod === "IN_APP") {
+          selectedRecipients.forEach((recipient) => {
+            // Send via WebSocket instead of direct API call
+            if (client && isConnected) {
+              const notificationBody = {
+                id: data.id,
+                content: newNotification.content,
+                type: newNotification.type,
+                metadata: newNotification.metadata || "{}",
+                isRead: false,
+              };
+
+              console.log(
+                "Sending notification via WebSocket:",
+                notificationBody
+              );
+
+              client.publish({
+                destination: `/app/notifications/${recipient.id}`,
+                body: JSON.stringify(notificationBody),
+              });
+            } else {
+              console.error("WebSocket not connected");
+              toast.error(
+                "Failed to send notification: WebSocket not connected"
+              );
+            }
+          });
+        }
 
         // Reset form
         setNewNotification({
@@ -185,8 +222,9 @@ export default function SendNotificationPage() {
         toast.error(message || "Failed to create notification");
       }
     } catch (error) {
-      console.error("Error creating notification:", error);
-      toast.error("Failed to create notification");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create notification"
+      );
     }
   };
 
@@ -232,8 +270,10 @@ export default function SendNotificationPage() {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      (user.name &&
+        user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.email &&
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -446,17 +486,22 @@ export default function SendNotificationPage() {
                 </div>
               </div>
 
-              <div className="mb-3">
-                <p className="text-gray-800 font-medium">
+              <div className="mb-3 relative group w-full">
+                <p className="text-gray-800 font-medium line-clamp-2 w-full break-all cursor-pointer">
                   {notification.content}
                 </p>
+                <div
+                  className="absolute left-0 z-50 hidden group-hover:block bg-black text-white text-xs rounded px-3 py-2 shadow-lg max-w-xs w-max break-words"
+                  style={{ top: "100%", marginTop: 4 }}
+                >
+                  {notification.content}
+                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm space-y-2 sm:space-y-0">
-                <div className="flex items-center">
-                  <span className="text-gray-600 mr-2">To:</span>
-                  <span className="font-medium text-gray-800">
-                    {[
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    const recipients = [
                       ...new Set(
                         notification.notificationDeliveries.flatMap((d) =>
                           d.recipients.map(
@@ -464,8 +509,46 @@ export default function SendNotificationPage() {
                           )
                         )
                       ),
-                    ].join(", ")}
-                  </span>
+                    ];
+                    const maxTags = 3;
+                    const visibleRecipients = recipients.slice(0, maxTags);
+                    const hiddenRecipients = recipients.slice(maxTags);
+                    const tagColors = [
+                      "bg-blue-100 text-blue-800",
+                      "bg-green-100 text-green-800",
+                      "bg-purple-100 text-purple-800",
+                      "bg-pink-100 text-pink-800",
+                      "bg-yellow-100 text-yellow-800",
+                    ];
+                    return (
+                      <>
+                        {visibleRecipients.map((name, idx) => (
+                          <span
+                            key={idx}
+                            className={`px-2 py-1 rounded text-xs font-medium max-w-[120px] truncate inline-block ${tagColors[idx % tagColors.length]}`}
+                            title={name}
+                          >
+                            {name}
+                          </span>
+                        ))}
+                        {hiddenRecipients.length > 0 && (
+                          <span className="relative group">
+                            <span className="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700 cursor-pointer">
+                              +{hiddenRecipients.length}
+                            </span>
+                            <div
+                              className="absolute left-0 z-50 hidden group-hover:block bg-black text-white text-xs rounded px-3 py-2 shadow-lg max-w-xs w-max break-words"
+                              style={{ top: "100%", marginTop: 4 }}
+                            >
+                              {hiddenRecipients.map((name, idx) => (
+                                <div key={idx}>{name}</div>
+                              ))}
+                            </div>
+                          </span>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
