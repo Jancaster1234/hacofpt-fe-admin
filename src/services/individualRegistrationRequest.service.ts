@@ -291,6 +291,33 @@ class IndividualRegistrationRequestService {
     }
   }
 
+  async getPendingIndividualRegistrationsByHackathonId(
+    hackathonId: string
+  ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {
+    try {
+      const response = await apiService.auth.get<
+        IndividualRegistrationRequest[]
+      >(
+        `/hackathon-service/api/v1/individuals/filter-by-hackathon-and-status-pending?hackathonId=${hackathonId}`
+      );
+
+      if (!response || !response.data) {
+        throw new Error("Failed to retrieve pending registrations");
+      }
+
+      return {
+        data: response.data,
+        message: response.message,
+      };
+    } catch (error: any) {
+      return handleApiError<IndividualRegistrationRequest[]>(
+        error,
+        [],
+        "[Individual Registration Service] Error fetching pending registrations by hackathon ID:"
+      );
+    }
+  }
+
   async getCompletedIndividualRegistrationsByHackathonId(
     hackathonId: string
   ): Promise<{ data: IndividualRegistrationRequest[]; message?: string }> {

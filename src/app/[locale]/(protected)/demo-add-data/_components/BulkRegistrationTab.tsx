@@ -1,13 +1,14 @@
-// src/app/[locale]/(protected)/demo-add-data/_components/BulkRegistrationTab.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { hackathonService } from "@/services/hackathon.service";
 import { teamService } from "@/services/team.service";
+import { teamRequestService } from "@/services/teamRequest.service";
 import { userService } from "@/services/user.service";
 import { individualRegistrationRequestService } from "@/services/individualRegistrationRequest.service";
 import { Hackathon } from "@/types/entities/hackathon";
 import { Team } from "@/types/entities/team";
+import { TeamRequest } from "@/types/entities/teamRequest";
 import { User } from "@/types/entities/user";
 import { IndividualRegistrationRequest } from "@/types/entities/individualRegistrationRequest";
 
@@ -15,7 +16,11 @@ const BulkRegistrationTab: React.FC = () => {
   const [hackathons, setHackathons] = useState<Hackathon[]>([]);
   const [selectedHackathon, setSelectedHackathon] = useState<string>("");
   const [teams, setTeams] = useState<Team[]>([]);
+  const [teamRequests, setTeamRequests] = useState<TeamRequest[]>([]);
   const [allTeamMembers, setAllTeamMembers] = useState<User[]>([]);
+  const [pendingRegistrations, setPendingRegistrations] = useState<
+    IndividualRegistrationRequest[]
+  >([]);
   const [approvedRegistrations, setApprovedRegistrations] = useState<
     IndividualRegistrationRequest[]
   >([]);
@@ -71,9 +76,26 @@ const BulkRegistrationTab: React.FC = () => {
           setTeams(teamsResponse.data);
         }
 
+        // Get team requests for the selected hackathon
+        const teamRequestsResponse =
+          await teamRequestService.getTeamRequestsByHackathon(
+            selectedHackathon
+          );
+
+        if (teamRequestsResponse.data && teamRequestsResponse.data.length > 0) {
+          setTeamRequests(teamRequestsResponse.data);
+        }
+
         // Get all team members
         const teamMembersResponse = await userService.getTeamMembers();
         setAllTeamMembers(teamMembersResponse.data);
+
+        // Get pending registrations
+        const pendingResponse =
+          await individualRegistrationRequestService.getPendingIndividualRegistrationsByHackathonId(
+            selectedHackathon
+          );
+        setPendingRegistrations(pendingResponse.data);
 
         // Get approved registrations
         const approvedResponse =
@@ -89,8 +111,9 @@ const BulkRegistrationTab: React.FC = () => {
           );
         setCompletedRegistrations(completedResponse.data);
 
-        // Fetch users by usernames for registrations
+        // Fetch users by usernames for all registrations
         await fetchRegisteredUsers([
+          ...pendingResponse.data,
           ...approvedResponse.data,
           ...completedResponse.data,
         ]);
@@ -144,7 +167,14 @@ const BulkRegistrationTab: React.FC = () => {
   useEffect(() => {
     if (!selectedHackathon || !allTeamMembers.length) return;
     calculateAvailableUsers();
-  }, [selectedHackathon, teams, allTeamMembers, registeredUsers]);
+  }, [
+    selectedHackathon,
+    teams,
+    teamRequests,
+    pendingRegistrations,
+    allTeamMembers,
+    registeredUsers,
+  ]);
 
   const calculateAvailableUsers = () => {
     // Extract all team member IDs from teams
@@ -157,7 +187,7 @@ const BulkRegistrationTab: React.FC = () => {
       });
     });
 
-    // Get registered user IDs
+    // Get registered user IDs (including pending)
     const registeredUserIds = new Set<string>();
     registeredUsers.forEach((user) => {
       if (user.id) {
@@ -165,12 +195,32 @@ const BulkRegistrationTab: React.FC = () => {
       }
     });
 
-    // Filter team members who are not already in teams or registered
+    // Get pending registration user IDs
+    const pendingRegistrationUserIds = new Set<string>();
+    pendingRegistrations.forEach((reg) => {
+      if (reg.createdByUserId) {
+        pendingRegistrationUserIds.add(reg.createdByUserId);
+      }
+    });
+
+    // Get users in approved team requests
+    const approvedTeamRequestUserIds = new Set<string>();
+    teamRequests.forEach((teamRequest) => {
+      teamRequest.teamRequestMembers.forEach((member) => {
+        if (member.status === "APPROVED" && member.userId) {
+          approvedTeamRequestUserIds.add(member.userId);
+        }
+      });
+    });
+
+    // Filter team members who are not already in teams, registrations, or approved team requests
     const available = allTeamMembers.filter(
       (user) =>
         user.id &&
         !teamMemberIds.has(user.id) &&
         !registeredUserIds.has(user.id) &&
+        !pendingRegistrationUserIds.has(user.id) &&
+        !approvedTeamRequestUserIds.has(user.id) &&
         user.userRoles?.some((role) => role.role?.name === "TEAM_MEMBER")
     );
 
@@ -216,6 +266,12 @@ const BulkRegistrationTab: React.FC = () => {
       });
 
       // Refresh data after creating registrations
+      const pendingResponse =
+        await individualRegistrationRequestService.getPendingIndividualRegistrationsByHackathonId(
+          selectedHackathon
+        );
+      setPendingRegistrations(pendingResponse.data);
+
       const approvedResponse =
         await individualRegistrationRequestService.getApprovedIndividualRegistrationsByHackathonId(
           selectedHackathon
@@ -230,6 +286,7 @@ const BulkRegistrationTab: React.FC = () => {
 
       // Fetch updated registered users
       await fetchRegisteredUsers([
+        ...pendingResponse.data,
         ...approvedResponse.data,
         ...completedResponse.data,
       ]);
@@ -294,7 +351,7 @@ const BulkRegistrationTab: React.FC = () => {
 
       {/* Stats display */}
       {selectedHackathon && (
-        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
           <div className="rounded-lg bg-white p-4 shadow">
             <h3 className="text-sm font-medium text-gray-500">Teams</h3>
             <p className="mt-1 text-2xl font-semibold text-gray-900">
@@ -305,6 +362,14 @@ const BulkRegistrationTab: React.FC = () => {
             <h3 className="text-sm font-medium text-gray-500">Team Members</h3>
             <p className="mt-1 text-2xl font-semibold text-gray-900">
               {teams.reduce((acc, team) => acc + team.teamMembers.length, 0)}
+            </p>
+          </div>
+          <div className="rounded-lg bg-white p-4 shadow">
+            <h3 className="text-sm font-medium text-gray-500">
+              Pending Registrations
+            </h3>
+            <p className="mt-1 text-2xl font-semibold text-gray-900">
+              {pendingRegistrations.length}
             </p>
           </div>
           <div className="rounded-lg bg-white p-4 shadow">
