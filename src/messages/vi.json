@@ -4,6 +4,11 @@
     "languages": {
       "english": "Tiếng Anh",
       "vietnamese": "Tiếng Việt"
+    },
+    "unauthorized": {
+      "title": "Truy cập không được phép",
+      "message": "Bạn không có quyền truy cập trang này. Vui lòng liên hệ quản trị viên nếu bạn nghĩ đây là một sự nhầm lẫn.",
+      "backToHome": "Về trang chủ"
     }
   },
   "navigation": {

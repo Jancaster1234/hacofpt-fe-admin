@@ -82,10 +82,10 @@ export function useAuth() {
     }
   };
 
-  const checkUser = async () => {
+  const checkUser = async (skipIfNoToken = true) => {
     const accessToken = localStorage.getItem("accessToken");
 
-    if (!accessToken) {
+    if (!accessToken && skipIfNoToken) {
       console.warn("❌ No accessToken, skipping checkUser");
       setAuth({ user: null, loading: false });
       return { success: false, message: "No access token found" };
