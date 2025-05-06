@@ -82,7 +82,7 @@ class BlogPostService {
   ): Promise<{ data: BlogPost[]; message?: string }> {
     try {
       const response = await apiService.auth.get<BlogPost[]>(
-        `/analytics-service/api/v1/blog-posts?status=${status}`
+        `/analytics-service/api/v1/blog-posts/published`
       );
 
       if (!response || !response.data) {
