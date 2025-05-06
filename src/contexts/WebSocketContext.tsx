@@ -28,9 +28,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!user?.id) return;
 
     // Use environment variable for WebSocket URL with fallback
-    const wsUrl = `${process.env.COMMUNICATION_SERVICE_URL}/ws`;
-    console.log("Connecting to WebSocket at:", wsUrl);
-
+    const wsUrl = `${process.env.NEXT_PUBLIC_COMMUNICATION_SERVICE_URL}/ws`;
     const socket = new SockJS(wsUrl);
     const stompClient = new Client({
       webSocketFactory: () => socket,
