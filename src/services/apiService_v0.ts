@@ -46,7 +46,12 @@ async function request<T>(
 
   // Add request cancellation
   const requestKey = `${method}-${endpoint}`;
-  if (abortPrevious && controllers.has(requestKey)) {
+
+  // If this is a critical auth request, don't abort previous ones of the same type
+  const isCriticalAuthRequest =
+    endpoint.includes("/users/my-info") && method === "GET";
+
+  if (abortPrevious && !isCriticalAuthRequest && controllers.has(requestKey)) {
     controllers.get(requestKey)?.abort();
     console.log(`[API] Aborting previous request to: ${endpoint}`);
   }

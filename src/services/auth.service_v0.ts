@@ -17,7 +17,10 @@ class AuthService_v0 {
   async getUser(): Promise<{ data: User; message?: string }> {
     try {
       const response = await apiService.auth.get<User>(
-        "/identity-service/api/v1/users/my-info"
+        "/identity-service/api/v1/users/my-info",
+        undefined,
+        30000,
+        false
       );
 
       if (!response || !response.data) {

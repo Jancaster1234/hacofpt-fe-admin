@@ -15,7 +15,7 @@ export function RoleGuard({
   allowedRoles,
   redirectPath = "/unauthorized",
 }: RoleGuardProps) {
-  const { user, checkUser } = useAuth();
+  const { user, checkUser, loading } = useAuth();
 
   // Use our custom hook to prevent double API calls in Strict Mode
   useEffectOnce(() => {
@@ -28,6 +28,11 @@ export function RoleGuard({
 
   // Handle user authentication and authorization
   useEffect(() => {
+    // Wait until loading is complete before making decisions
+    if (loading) {
+      return;
+    }
+
     // If checkUser has completed and there's no user, redirect to signin
     if (user === null) {
       console.log("🔹 RoleGuard: No user found, redirecting to signin");
@@ -35,9 +40,9 @@ export function RoleGuard({
       return;
     }
 
-    // If user exists, check roles
-    if (user) {
-      const hasAllowedRole = user.userRoles?.some((userRole) =>
+    // If user exists, check roles - Ensure user has userRoles property
+    if (user && user.userRoles) {
+      const hasAllowedRole = user.userRoles.some((userRole) =>
         allowedRoles.includes(userRole.role.name)
       );
 
@@ -48,9 +53,15 @@ export function RoleGuard({
         redirect(redirectPath);
         return;
       }
+    } else if (user) {
+      // User exists but has no roles property
+      console.log(
+        `🔹 RoleGuard: User exists but has no roles, redirecting to ${redirectPath}`
+      );
+      redirect(redirectPath);
     }
-  }, [user, allowedRoles, redirectPath]);
+  }, [user, loading, allowedRoles, redirectPath]);
 
-  // Show loading state or children
-  return user ? <>{children}</> : null;
+  // Show loading state or children - wait until loading is complete
+  return !loading && user ? <>{children}</> : null;
 }

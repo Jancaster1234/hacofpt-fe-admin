@@ -1,10 +1,9 @@
 // src/context/AuthProvider.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { useRouter, usePathname } from "next/navigation";
-
 export default function AuthProvider({
   children,
 }: {
@@ -14,6 +13,7 @@ export default function AuthProvider({
   const pathname = usePathname();
   const { checkUser, user, loading } = useAuth();
   const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const authCheckRef = useRef(false);
 
   // Determine if we're on an auth page (signin, signup, etc.)
   const isAuthPage =
@@ -34,8 +34,9 @@ export default function AuthProvider({
       sessionStorage.removeItem("localeChange");
       console.log("🔹 Skipping auth check during locale change");
       setIsAuthChecked(true);
-    } else {
-      // Normal behavior - check user authentication
+    } else if (!authCheckRef.current) {
+      // Normal behavior - check user authentication - but only once
+      authCheckRef.current = true;
       checkUser().finally(() => setIsAuthChecked(true));
     }
   }, []);

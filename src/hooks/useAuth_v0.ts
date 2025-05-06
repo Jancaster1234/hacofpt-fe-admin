@@ -99,7 +99,15 @@ export function useAuth() {
       console.log("🔹 Fetched user:", userData);
       console.log("🔹 API message:", apiMessage);
 
-      setAuth({ user: userData, loading: false });
+      // Most important fix: Check if userData is empty object or actually has properties
+      if (userData && Object.keys(userData).length > 0) {
+        setAuth({ user: userData, loading: false });
+      } else {
+        // If we get an empty object (which happens with aborted requests), don't update user
+        // This prevents treating an empty user object as authenticated but without roles
+        setAuth({ loading: false });
+        return { success: false, message: "Empty user data received" };
+      }
 
       // Only set message if there's something noteworthy
       if (apiMessage) {
