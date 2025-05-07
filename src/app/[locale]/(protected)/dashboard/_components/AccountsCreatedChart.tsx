@@ -230,6 +230,14 @@ const AccountsCreatedChart = () => {
     "#82ca9d",
   ];
 
+  // Calculate total users for a specific timeframe entry
+  const calculateTotalUsers = (entry: Record<string, any>) => {
+    // Only sum numeric values and exclude the "name" property
+    return Object.entries(entry)
+      .filter(([key, value]) => key !== "name" && typeof value === "number")
+      .reduce((sum, [_, value]) => sum + (value as number), 0);
+  };
+
   if (isLoading) {
     return (
       <Card className="h-full w-full">
@@ -294,10 +302,7 @@ const AccountsCreatedChart = () => {
                 <Card key={index} className="p-4">
                   <h3 className="text-sm font-medium">{day.name}</h3>
                   <p className="text-2xl font-bold">
-                    {Object.values(day).reduce(
-                      (a, b) => (typeof b === "number" ? a + b : a),
-                      0
-                    ) - 1}
+                    {calculateTotalUsers(day)}
                   </p>
                   <div className="mt-2 text-xs">
                     {Object.entries(day).map(([key, value]) =>
@@ -319,10 +324,7 @@ const AccountsCreatedChart = () => {
                 <Card key={index} className="p-4">
                   <h3 className="text-sm font-medium">{week.name}</h3>
                   <p className="text-2xl font-bold">
-                    {Object.values(week).reduce(
-                      (a, b) => (typeof b === "number" ? a + b : a),
-                      0
-                    ) - 1}
+                    {calculateTotalUsers(week)}
                   </p>
                   <div className="mt-2 text-xs">
                     {Object.entries(week).map(([key, value]) =>
@@ -344,10 +346,7 @@ const AccountsCreatedChart = () => {
                 <Card key={index} className="p-4">
                   <h3 className="text-sm font-medium">{month.name}</h3>
                   <p className="text-2xl font-bold">
-                    {Object.values(month).reduce(
-                      (a, b) => (typeof b === "number" ? a + b : a),
-                      0
-                    ) - 1}
+                    {calculateTotalUsers(month)}
                   </p>
                   <div className="mt-2 text-xs">
                     {Object.entries(month).map(([key, value]) =>
@@ -369,10 +368,7 @@ const AccountsCreatedChart = () => {
                 <Card key={index} className="p-4">
                   <h3 className="text-sm font-medium">{year.name}</h3>
                   <p className="text-2xl font-bold">
-                    {Object.values(year).reduce(
-                      (a, b) => (typeof b === "number" ? a + b : a),
-                      0
-                    ) - 1}
+                    {calculateTotalUsers(year)}
                   </p>
                   <div className="mt-2 text-xs">
                     {Object.entries(year).map(([key, value]) =>
