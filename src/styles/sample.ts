@@ -15,16 +15,6 @@ const content = `
   Tiptap is built on ProseMirror, providing a modular architecture and headless functionality. This approach gives developers full control over the UI while offering powerful editing capabilities.
 </p>
 
-<figure>
-   <img 
-      src="https://res.cloudinary.com/dmhzdv5kf/image/upload/v1735024108/668464364417bf4b0898c526_docs-v2-blog_s0krle.jpg"
-      alt="Tiptap Editor"
-      data-width="1200"
-      data-height="800"
-   />
-   <figcaption>Tiptap: A powerful combination of technologies</figcaption>
-</figure>
-
 <h3>Key Features</h3>
 
 <ul>
@@ -260,7 +250,7 @@ export const mock = {
   content,
   wordCount: 483,
   cover:
-    "https://res.cloudinary.com/dmhzdv5kf/image/upload/v1733364957/shk91N6yUj_zkms92.jpg",
+    "https://greenscapehub-media.s3.ap-southeast-1.amazonaws.com/hacofpt/504c1e5a-bc1f-4fe7-8905-d3bbbb12cabd_smiling-young-man-illustration_1308-174669.avif",
   author: "ChatGPT",
   createdAt: "Jan, 02 2025",
 };
