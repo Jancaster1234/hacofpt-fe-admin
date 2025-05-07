@@ -28,13 +28,35 @@ export function useAuth() {
         throw new Error("No accessToken received");
       }
 
-      console.log("🔹 Storing accessToken in localStorage:", response.token);
+      // Temporarily store token to fetch user data
+      console.log("🔹 Temporarily storing accessToken to check user data");
       localStorage.setItem("accessToken", response.token);
 
       const { data: userData, message: userMessage } =
         await authService_v0.getUser();
       console.log("🔹 User data after login:", userData);
       console.log("🔹 User API message:", userMessage);
+
+      // Check if user has authorized roles
+      const authorizedRoles = ["ORGANIZER", "JUDGE", "MENTOR", "DEMO", "ADMIN"];
+      const userRoles = userData.userRoles?.map((ur) => ur.role?.name) || [];
+      const hasAuthorizedRole = userRoles.some((role) =>
+        authorizedRoles.includes(role)
+      );
+
+      if (!hasAuthorizedRole) {
+        console.error("❌ User doesn't have required authorization");
+        localStorage.removeItem("accessToken");
+        throw new Error(
+          "You don't have the required authorization to access this application"
+        );
+      }
+
+      // User has proper role, keep the token in localStorage
+      console.log(
+        "🔹 User has authorized role, storing accessToken:",
+        response.token
+      );
 
       // Store user data and display success message
       setAuth({ user: userData });
@@ -99,8 +121,32 @@ export function useAuth() {
       console.log("🔹 Fetched user:", userData);
       console.log("🔹 API message:", apiMessage);
 
-      // Most important fix: Check if userData is empty object or actually has properties
+      // Check if userData is empty object or actually has properties
       if (userData && Object.keys(userData).length > 0) {
+        // Verify user still has authorized role
+        const authorizedRoles = [
+          "ORGANIZER",
+          "JUDGE",
+          "MENTOR",
+          "DEMO",
+          "ADMIN",
+        ];
+        const userRoles = userData.userRoles?.map((ur) => ur.role?.name) || [];
+        const hasAuthorizedRole = userRoles.some((role) =>
+          authorizedRoles.includes(role)
+        );
+
+        if (!hasAuthorizedRole) {
+          console.error("❌ User no longer has required authorization");
+          localStorage.removeItem("accessToken");
+          setAuth({ user: null, loading: false });
+          setMessage(
+            "You don't have the required authorization to access this application",
+            "error"
+          );
+          return { success: false, message: "Unauthorized user role" };
+        }
+
         setAuth({ user: userData, loading: false });
       } else {
         // If we get an empty object (which happens with aborted requests), don't update user
