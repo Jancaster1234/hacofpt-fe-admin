@@ -202,12 +202,8 @@ export default function RoundForm({
       // Submit the form and handle the response
       await onSubmit(roundData);
 
-      // Show success toast after successful submission
-      toast.success(
-        isEditing
-          ? t("notifications.updateSuccess")
-          : t("notifications.createSuccess")
-      );
+      // REMOVED: Success toast here because it's already shown in the parent Rounds component
+      // This prevents duplicate success messages
     } catch (error: any) {
       // Show error toast with the error message
       toast.error(error.message || t("notifications.error"));

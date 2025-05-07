@@ -137,13 +137,10 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
         setRounds([...rounds, response.data]);
 
         // Show success toast
-        toast.success(response.message || t("roundCreatedSuccessfully"));
+        toast.success(t("roundCreatedSuccessfully"));
 
         // Also show in modal for consistency with existing code
-        showSuccess(
-          t("success"),
-          response.message || t("roundCreatedSuccessfully")
-        );
+        showSuccess(t("success"), t("roundCreatedSuccessfully"));
       }
 
       resetForm();
