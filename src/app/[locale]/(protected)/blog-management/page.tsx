@@ -243,7 +243,7 @@ export default function BlogManagement() {
                   setSelectedPost(null);
                   setCurrentView("create");
                 }}
-                className="w-full sm:w-auto text-sm sm:text-base"
+                className="w-full sm:w-auto text-sm sm:text-base bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
                 disabled={isProcessing}
               >
                 {isProcessing ? (

@@ -211,7 +211,7 @@ export default function ThreadPostReportManagement() {
                         <button
                           onClick={() => handleUpdateStatus(report, "REVIEWED")}
                           disabled={updating[report.id]}
-                          className="rounded bg-green-500 dark:bg-green-600 px-3 py-1 text-xs text-white hover:bg-green-600 dark:hover:bg-green-700 disabled:opacity-50 transition-colors duration-200"
+                          className="rounded bg-blue-500 dark:bg-blue-600 px-3 py-1 text-xs text-white hover:bg-blue-600 dark:hover:bg-blue-700 disabled:opacity-50 transition-colors duration-200"
                           aria-label={t("actions.markReviewed")}
                         >
                           {updating[report.id]

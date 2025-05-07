@@ -148,7 +148,7 @@ const HackathonTeamsList = ({
                       <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                         <Link
                           href={`/${locale}/hackathon/${hackathon.id}`}
-                          className="inline-flex items-center justify-center rounded-md border border-primary py-2 px-4 text-center font-medium text-primary hover:bg-primary hover:text-white lg:px-6 xl:px-7"
+                          className="inline-flex items-center justify-center rounded-md bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 border border-primary py-2 px-4 text-center font-medium hover:text-white lg:px-6 xl:px-7"
                         >
                           View Details
                         </Link>

@@ -336,7 +336,7 @@ export default function MentorshipRequestsPage() {
                                 handleApproveRequest(request.id);
                               }}
                               disabled={loading[request.id]}
-                              className="flex items-center justify-center px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 disabled:opacity-50 transition-colors duration-300"
+                              className="flex items-center justify-center bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 px-3 py-1 rounded disabled:opacity-50 transition-colors duration-300"
                             >
                               {loading[request.id] ? (
                                 <Loader2
@@ -354,7 +354,7 @@ export default function MentorshipRequestsPage() {
                                 handleRejectRequest(request.id);
                               }}
                               disabled={loading[request.id]}
-                              className="flex items-center justify-center px-3 py-1 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded hover:bg-red-200 dark:hover:bg-red-800 disabled:opacity-50 transition-colors duration-300"
+                              className="flex items-center justify-center px-3 py-1 bg-red-500 dark:bg-red-600 text-white hover:bg-red-600 dark:hover:bg-red-700  rounded disabled:opacity-50 transition-colors duration-300"
                             >
                               {loading[request.id] ? (
                                 <Loader2

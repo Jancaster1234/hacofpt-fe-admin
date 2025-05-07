@@ -251,6 +251,8 @@ export default function MentorTeamsPage() {
         color = "text-red-600 dark:text-red-400";
       else if (lowerStatus === "completed")
         color = "text-blue-600 dark:text-blue-400";
+      else if (lowerStatus === "deleted")
+        color = "text-gray-600 dark:text-gray-500";
     }
 
     return (
@@ -263,7 +265,9 @@ export default function MentorTeamsPage() {
               ? t("rejected")
               : status?.toLowerCase() === "completed"
                 ? t("completed")
-                : t("unknown")}
+                : status?.toLowerCase() === "deleted"
+                  ? t("deleted")
+                  : t("unknown")}
       </span>
     );
   };
@@ -429,7 +433,7 @@ export default function MentorTeamsPage() {
                                         );
                                       }}
                                       disabled={isUpdating}
-                                      className="px-3 py-1 bg-green-500 dark:bg-green-600 text-white rounded-md hover:bg-green-600 dark:hover:bg-green-700 text-sm transition-colors duration-300 disabled:opacity-50"
+                                      className="px-3 py-1 bg-green-500 dark:bg-green-600 text-white rounded-md hover:bg-green-600 dark:hover:bg-green-700 text-sm transition-colors duration-300 disabled:opacity-50 w-auto"
                                     >
                                       {isUpdating
                                         ? t("processing")
@@ -445,7 +449,7 @@ export default function MentorTeamsPage() {
                                         );
                                       }}
                                       disabled={isUpdating}
-                                      className="px-3 py-1 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-700 text-sm transition-colors duration-300 disabled:opacity-50"
+                                      className="px-3 py-1 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-700 text-sm transition-colors duration-300 disabled:opacity-50 w-auto"
                                     >
                                       {isUpdating
                                         ? t("processing")

@@ -239,7 +239,7 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
                         variant="outline"
                         onClick={triggerFileInput}
                         disabled={isUploading}
-                        className="dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600"
+                        className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
                       >
                         {isUploading ? (
                           <LoadingSpinner size="sm" className="mr-2" />
@@ -354,7 +354,7 @@ const BlogPostForm: React.FC<BlogPostFormProps> = ({ blogPost, onSubmit }) => {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white transition-colors"
+                className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors"
               >
                 {isSubmitting && <LoadingSpinner size="sm" className="mr-2" />}
                 {blogPost ? t("updatePost") : t("createPost")}
