@@ -422,7 +422,7 @@ export default function MentorTeamsPage() {
                                 {/* Action buttons for pending sessions */}
                                 {session.status?.toLowerCase() ===
                                   "pending" && (
-                                  <div className="mt-3 flex flex-col xs:flex-row space-y-2 xs:space-y-0 xs:space-x-2">
+                                  <div className="mt-3 flex justify-center space-x-4">
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -433,7 +433,7 @@ export default function MentorTeamsPage() {
                                         );
                                       }}
                                       disabled={isUpdating}
-                                      className="px-3 py-1 bg-green-500 dark:bg-green-600 text-white rounded-md hover:bg-green-600 dark:hover:bg-green-700 text-sm transition-colors duration-300 disabled:opacity-50 w-auto"
+                                      className="px-4 py-1.5 bg-green-500 dark:bg-green-600 text-white rounded-md hover:bg-green-600 dark:hover:bg-green-700 text-sm transition-colors duration-300 disabled:opacity-50 w-32"
                                     >
                                       {isUpdating
                                         ? t("processing")
@@ -449,7 +449,7 @@ export default function MentorTeamsPage() {
                                         );
                                       }}
                                       disabled={isUpdating}
-                                      className="px-3 py-1 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-700 text-sm transition-colors duration-300 disabled:opacity-50 w-auto"
+                                      className="px-4 py-1.5 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-700 text-sm transition-colors duration-300 disabled:opacity-50 w-32"
                                     >
                                       {isUpdating
                                         ? t("processing")
