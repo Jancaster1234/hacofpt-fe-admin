@@ -32,14 +32,10 @@ async function request<T>(
 ): Promise<ApiResponse<T>> {
   // Modified return type
   const accessToken = tokenService_v0.getAccessToken();
-
-  // For debugging only - remove in production
-  if (useAuthHeader) {
-    console.log(
-      `[API] ${method} ${endpoint} - Using auth: ${accessToken ? "Yes" : "No"}`
-    );
-  }
-
+  console.log(
+    "🔹 accessToken in apiService:",
+    accessToken ? "Present" : "Not present"
+  );
   const headers: HeadersInit = {
     ...customHeaders,
   };
@@ -81,7 +77,9 @@ async function request<T>(
     options.body = payload as FormData;
   }
 
-  console.log(`[API] ${method} ${endpoint} - Initiating request`);
+  console.log(`[API] ${method} ${endpoint} - Initiating request`, {
+    payload: isFormData ? "FormData" : payload,
+  });
 
   // Set timeout
   const timeoutId = setTimeout(() => {
@@ -95,9 +93,9 @@ async function request<T>(
     const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
     clearTimeout(timeoutId); // Clear timeout when response is received
 
-    console.log(
-      `[API] ${method} ${endpoint} - Response status: ${response.status}`
-    );
+    console.log(`[API] ${method} ${endpoint} - Response received`, {
+      status: response.status,
+    });
 
     // Handle 401 Unauthorized (token expired) - only retry once
     if (
@@ -113,7 +111,7 @@ async function request<T>(
       );
 
       // Small delay to avoid race conditions
-      await new Promise((res) => setTimeout(res, 300));
+      await new Promise((res) => setTimeout(res, 500));
 
       try {
         const newToken = await tokenService_v0.refreshToken();
@@ -158,7 +156,19 @@ async function request<T>(
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
       data = await response.json();
+
+      // Log API message if it exists
+      if (data && typeof data === "object" && "message" in data) {
+        console.log(
+          `[API] ${method} ${endpoint} - Message from server: "${data.message}"`
+        );
+      } else {
+        console.log(
+          `[API] ${method} ${endpoint} - No message field in response`
+        );
+      }
     } else {
+      console.log(`[API] ${method} ${endpoint} - Response is not JSON`);
       // For non-JSON responses, create a default response object
       const text = await response.text();
       data = {
@@ -180,6 +190,7 @@ async function request<T>(
       );
     }
 
+    console.log(`[API] ${method} ${endpoint} - Success`, data);
     return data; // Return the entire response object
   } catch (error: any) {
     clearTimeout(timeoutId);
@@ -242,14 +253,12 @@ function handleGlobalError(error: any, method: string, endpoint: string) {
     // If parsing fails, use the original error message
   }
 
-  // Handle specific error types
   if (error.message.includes("Failed to fetch")) {
     console.error("Network error! Please check your internet connection.");
-  } else if (
-    error.message.includes("401") ||
-    error.message.includes("Unauthorized")
-  ) {
-    console.error("Authentication error. Please log in again.");
+  } else if (error.message.includes("401")) {
+    console.error(
+      "Session expired. Refresh token failed. Please log in again."
+    );
   } else if (error.message.includes("Request timed out")) {
     console.error("Request timed out. Please try again.");
   }
