@@ -422,7 +422,7 @@ export default function MentorTeamsPage() {
                                 {/* Action buttons for pending sessions */}
                                 {session.status?.toLowerCase() ===
                                   "pending" && (
-                                  <div className="mt-3 flex justify-center space-x-4">
+                                  <div className="mt-3 flex flex-col sm:flex-row justify-center sm:justify-start gap-2 sm:gap-4">
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -433,7 +433,7 @@ export default function MentorTeamsPage() {
                                         );
                                       }}
                                       disabled={isUpdating}
-                                      className="px-4 py-1.5 bg-green-500 dark:bg-green-600 text-white rounded-md hover:bg-green-600 dark:hover:bg-green-700 text-sm transition-colors duration-300 disabled:opacity-50 w-32"
+                                      className="px-4 py-1.5 bg-blue-500 dark:bg-blue-600 text-white rounded-md hover:bg-blue-600 dark:hover:bg-blue-700 text-sm transition-colors duration-300 disabled:opacity-50 w-full sm:w-auto sm:min-w-24"
                                     >
                                       {isUpdating
                                         ? t("processing")
@@ -449,7 +449,7 @@ export default function MentorTeamsPage() {
                                         );
                                       }}
                                       disabled={isUpdating}
-                                      className="px-4 py-1.5 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-700 text-sm transition-colors duration-300 disabled:opacity-50 w-32"
+                                      className="px-4 py-1.5 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-700 text-sm transition-colors duration-300 disabled:opacity-50 w-full sm:w-auto sm:min-w-24"
                                     >
                                       {isUpdating
                                         ? t("processing")

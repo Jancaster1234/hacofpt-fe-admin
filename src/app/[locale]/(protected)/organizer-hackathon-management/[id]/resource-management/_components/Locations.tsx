@@ -219,7 +219,7 @@ export default function Locations() {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t("latitude")}
@@ -249,7 +249,7 @@ export default function Locations() {
                 className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-200"
               />
             </div>
-          </div>
+          </div> */}
 
           <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3 mt-4">
             <button
@@ -263,7 +263,7 @@ export default function Locations() {
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-700 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 dark:hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 border border-transparent rounded-md shadow-sm hover:bg-blue-700 dark:hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isLoading ? (
                 <>
@@ -301,7 +301,7 @@ export default function Locations() {
         {!showCreateForm && !editingLocation && (
           <button
             onClick={() => setShowCreateForm(true)}
-            className="px-3 py-1 text-sm text-white bg-green-600 dark:bg-green-700 rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors duration-200 shadow-sm"
+            className="px-3 py-1 text-sm text-white bg-blue-600 dark:bg-blue-700 rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors duration-200 shadow-sm"
           >
             {t("addLocation")}
           </button>
@@ -334,10 +334,10 @@ export default function Locations() {
                     <p className="text-gray-600 dark:text-gray-300">
                       {location.address}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {/* <p className="text-sm text-gray-500 dark:text-gray-400">
                       {t("latitude")}: {location.latitude}, {t("longitude")}:{" "}
                       {location.longitude}
-                    </p>
+                    </p> */}
                     <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                       <p>
                         {t("created")}:{" "}
