@@ -296,7 +296,7 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
                 <p className="text-gray-600 dark:text-gray-300">
                   <strong>{t("roundNumber")}:</strong> {round.roundNumber}
                 </p>
-                <span
+                {/* <span
                   className={`ml-2 text-sm px-2 py-1 rounded transition-colors duration-300 ${
                     round.status === "UPCOMING"
                       ? "bg-yellow-300 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200"
@@ -308,7 +308,7 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
                   }`}
                 >
                   {t(`status.${round.status.toLowerCase()}`)}
-                </span>
+                </span> */}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
                 <p className="text-gray-600 dark:text-gray-300">

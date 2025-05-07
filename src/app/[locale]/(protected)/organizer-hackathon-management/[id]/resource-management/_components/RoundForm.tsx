@@ -291,7 +291,7 @@ export default function RoundForm({
               </p>
             )}
           </div>
-          <div>
+          {/* <div>
             <label className="block text-gray-700 dark:text-gray-300 mb-1">
               {t("fields.status")}
             </label>
@@ -308,7 +308,7 @@ export default function RoundForm({
               <option value="COMPLETED">{t("status.completed")}</option>
               <option value="CANCELLED">{t("status.cancelled")}</option>
             </select>
-          </div>
+          </div> */}
           <div>
             <label className="block text-gray-700 dark:text-gray-300 mb-1">
               {t("fields.totalTeam")}

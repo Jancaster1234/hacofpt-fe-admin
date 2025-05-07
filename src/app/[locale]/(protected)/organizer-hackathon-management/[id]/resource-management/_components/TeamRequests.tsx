@@ -464,7 +464,7 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
               variant="destructive"
               disabled={updatingRequest}
               onClick={() => updateTeamRequest("REJECTED")}
-              className="transition-all duration-200 hover:bg-red-600 dark:hover:bg-red-700"
+              className="transition-all duration-200 hover:bg-red-600 dark:hover:bg-red-700 text-white"
             >
               {updatingRequest ? (
                 <>
@@ -482,7 +482,7 @@ export default function TeamRequests({ hackathonId }: TeamRequestsProps) {
               variant="default"
               disabled={updatingRequest}
               onClick={() => updateTeamRequest("APPROVED")}
-              className="transition-all duration-200 hover:bg-green-600 dark:hover:bg-green-700 bg-green-500"
+              className="transition-all duration-200 hover:bg-blue-600 dark:hover:bg-blue-700 bg-blue-500 text-white"
             >
               {updatingRequest ? (
                 <>
