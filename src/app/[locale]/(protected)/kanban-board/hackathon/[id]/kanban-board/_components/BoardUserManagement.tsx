@@ -154,13 +154,13 @@ export default function BoardUserManagement({
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
+          // enterFrom="opacity-0"
+          // enterTo="opacity-100"
           leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
+          // leaveFrom="opacity-100"
+          // leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm" />
+          <div className="fixed inset-0 bg-black/30 dark:bg-black/50" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -168,11 +168,11 @@ export default function BoardUserManagement({
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
+              // enterFrom="opacity-0 scale-95"
+              // enterTo="opacity-100 scale-100"
               leave="ease-in duration-200"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
+              // leaveFrom="opacity-100 scale-100"
+              // leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-md transition-all transform">
                 <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-white">
