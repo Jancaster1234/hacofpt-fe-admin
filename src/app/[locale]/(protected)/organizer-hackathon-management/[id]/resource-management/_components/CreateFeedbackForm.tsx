@@ -255,7 +255,7 @@ export default function CreateFeedbackForm({
                 onClick={handleAddFeedbackDetail}
                 variant="outline"
                 size="sm"
-                className="text-blue-600 dark:text-blue-400 border-blue-600 dark:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors duration-200"
+                className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors duration-200"
               >
                 <Plus size={16} className="mr-1" /> {t("addQuestion")}
               </Button>

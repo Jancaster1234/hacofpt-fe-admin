@@ -102,8 +102,7 @@ const UserDevicesTabs: React.FC<UserDevicesTabsProps> = ({
         </h3>
         {!isAddingUserDevice && isHackathonCreator && (
           <button
-            className="bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 
-                      text-blue-800 dark:text-blue-200 py-1 px-3 rounded text-sm transition-colors duration-200
+            className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 py-1 px-3 rounded text-sm transition-colors duration-200
                       focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             onClick={handleAddUserDeviceClick}
           >

@@ -477,7 +477,7 @@
     "randomlyAssignJudges": "Phân công giám khảo ngẫu nhiên",
     "assigning": "Đang phân công...",
     "noJudgesOrTeamsAvailable": "Không có giám khảo hoặc đội hợp lệ",
-    "randomAssignmentComplete": "Phân công ngẫu nhiên hoàn tất: {{success}} thành công, {{fail}} thất bại",
+    "randomAssignmentComplete": "Phân công ngẫu nhiên hoàn tất: {success} thành công, {fail} thất bại",
     "randomAssignmentFailed": "Phân công ngẫu nhiên thất bại. Vui lòng thử lại",
     "noNewAssignmentsNeeded": "Không cần phân công mới",
     "randomAssignmentError": "Lỗi trong quá trình phân công ngẫu nhiên"

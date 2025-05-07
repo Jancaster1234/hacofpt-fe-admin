@@ -442,7 +442,7 @@ export default function TeamFormation({
           </h3>
           <button
             onClick={createNewTeam}
-            className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white px-2 sm:px-3 py-1 rounded-md text-xs sm:text-sm transition-colors duration-300 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white px-2 sm:px-3 py-1 rounded-md text-xs sm:text-sm transition-colors duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
           >
             {t("createNewTeam")}
           </button>
@@ -610,7 +610,7 @@ export default function TeamFormation({
           className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-md text-sm sm:text-base transition-colors duration-300 focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 ${
             teams.length === 0 || submitLoading
               ? "bg-gray-400 dark:bg-gray-600 cursor-not-allowed text-gray-200"
-              : "bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white focus:ring-green-500"
+              : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white focus:ring-blue-500"
           }`}
         >
           {submitLoading ? t("creatingTeams") : t("submitTeams")}

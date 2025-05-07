@@ -304,7 +304,7 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
           <button
             onClick={handleRandomAssignment}
             disabled={isRandomAssigning}
-            className="ml-2 bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white px-3 py-2 rounded text-sm transition-colors duration-200 whitespace-nowrap flex items-center disabled:opacity-50"
+            className="ml-2 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-3 py-2 rounded text-sm transition-colors duration-200 whitespace-nowrap flex items-center disabled:opacity-50"
           >
             {isRandomAssigning ? (
               <>

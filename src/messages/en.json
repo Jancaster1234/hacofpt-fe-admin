@@ -604,7 +604,7 @@
     "randomlyAssignJudges": "Randomly Assign Judges",
     "assigning": "Assigning...",
     "noJudgesOrTeamsAvailable": "No judges or eligible teams available",
-    "randomAssignmentComplete": "Random assignment complete: {{success}} successes, {{fail}} failures",
+    "randomAssignmentComplete": "Random assignment complete: {success} successes, {fail} failures",
     "randomAssignmentFailed": "Random assignment failed. Please try again",
     "noNewAssignmentsNeeded": "No new assignments needed",
     "randomAssignmentError": "Error during random assignment"

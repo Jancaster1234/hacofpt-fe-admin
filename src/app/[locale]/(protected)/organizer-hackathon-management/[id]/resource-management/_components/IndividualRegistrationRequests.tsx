@@ -229,7 +229,7 @@ export default function IndividualRegistrationRequests({
                   size="sm"
                   variant="outline"
                   disabled={processingBulk}
-                  className="bg-green-50 dark:bg-green-900 text-green-600 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-800 border-green-200 dark:border-green-700 transition-colors duration-150 w-full sm:w-auto"
+                  className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors duration-150 w-full sm:w-auto"
                 >
                   {processingBulk ? (
                     <LoadingSpinner size="sm" className="mr-2" />
@@ -252,7 +252,7 @@ export default function IndividualRegistrationRequests({
                   <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={() => updateBulkRegistrations("APPROVED")}
-                    className="bg-green-500 hover:bg-green-600 text-white"
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
                   >
                     {t("approve")}
                   </AlertDialogAction>
@@ -266,7 +266,7 @@ export default function IndividualRegistrationRequests({
                   size="sm"
                   variant="outline"
                   disabled={processingBulk}
-                  className="bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-800 border-red-200 dark:border-red-700 transition-colors duration-150 w-full sm:w-auto"
+                  className="bg-red-500 dark:bg-red-600 text-white hover:bg-red-600 dark:hover:bg-red-700 transition-colors duration-150 w-full sm:w-auto"
                 >
                   {processingBulk ? (
                     <LoadingSpinner size="sm" className="mr-2" />
@@ -354,7 +354,7 @@ export default function IndividualRegistrationRequests({
                             size="sm"
                             variant="outline"
                             disabled={processingId === registration.id}
-                            className="bg-green-50 dark:bg-green-900 text-green-600 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-800 border-green-200 dark:border-green-700 transition-colors duration-150"
+                            className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors duration-150"
                             onClick={() =>
                               updateRegistrationStatus(
                                 registration.id,
@@ -371,7 +371,7 @@ export default function IndividualRegistrationRequests({
                             size="sm"
                             variant="outline"
                             disabled={processingId === registration.id}
-                            className="bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-800 border-red-200 dark:border-red-700 transition-colors duration-150"
+                            className="bg-red-500 dark:bg-red-600 text-white hover:bg-red-600 dark:hover:bg-red-700 transition-colors duration-150"
                             onClick={() =>
                               updateRegistrationStatus(
                                 registration.id,
