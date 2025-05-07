@@ -12,6 +12,12 @@ export interface ApiResponse<T> {
 }
 
 /**
+ * Global flag to track active refresh process
+ * This helps prevent showing multiple login prompts
+ */
+let isHandlingAuthError = false;
+
+/**
  * Generic function to handle API requests.
  */
 async function request<T>(
@@ -26,10 +32,14 @@ async function request<T>(
 ): Promise<ApiResponse<T>> {
   // Modified return type
   const accessToken = tokenService_v0.getAccessToken();
-  console.log(
-    "🔹 accessToken in apiService:",
-    accessToken ? "Present" : "Not present"
-  );
+
+  // For debugging only - remove in production
+  if (useAuthHeader) {
+    console.log(
+      `[API] ${method} ${endpoint} - Using auth: ${accessToken ? "Yes" : "No"}`
+    );
+  }
+
   const headers: HeadersInit = {
     ...customHeaders,
   };
@@ -49,7 +59,7 @@ async function request<T>(
 
   // If this is a critical auth request, don't abort previous ones of the same type
   const isCriticalAuthRequest =
-    endpoint.includes("/users/my-info") && method === "GET";
+    endpoint.includes("/users/my-info") || endpoint.includes("/auth/refresh");
 
   if (abortPrevious && !isCriticalAuthRequest && controllers.has(requestKey)) {
     controllers.get(requestKey)?.abort();
@@ -71,9 +81,7 @@ async function request<T>(
     options.body = payload as FormData;
   }
 
-  console.log(`[API] ${method} ${endpoint} - Initiating request`, {
-    payload: isFormData ? "FormData" : payload,
-  });
+  console.log(`[API] ${method} ${endpoint} - Initiating request`);
 
   // Set timeout
   const timeoutId = setTimeout(() => {
@@ -87,33 +95,61 @@ async function request<T>(
     const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
     clearTimeout(timeoutId); // Clear timeout when response is received
 
-    console.log(`[API] ${method} ${endpoint} - Response received`, {
-      status: response.status,
-    });
+    console.log(
+      `[API] ${method} ${endpoint} - Response status: ${response.status}`
+    );
 
-    if (useAuthHeader && response.status === 401 && retry) {
-      await new Promise((res) => setTimeout(res, 500));
+    // Handle 401 Unauthorized (token expired) - only retry once
+    if (
+      useAuthHeader &&
+      response.status === 401 &&
+      retry &&
+      !isHandlingAuthError
+    ) {
+      isHandlingAuthError = true; // Prevent multiple parallel refresh attempts
+
       console.warn(
         `[API] Token expired on ${method} ${endpoint}. Attempting refresh...`
       );
 
-      const newToken = await tokenService_v0.refreshToken();
+      // Small delay to avoid race conditions
+      await new Promise((res) => setTimeout(res, 300));
 
-      if (newToken) {
-        console.log(`[API] Retrying ${method} ${endpoint} with new token`);
-        return request<T>(
-          method,
-          endpoint,
-          payload,
-          customHeaders,
-          true,
-          timeoutMs,
-          false,
-          abortPrevious
-        );
-      } else {
-        console.warn("[API] Token refresh failed. User must log in again.");
-        throw new Error("Unauthorized - Token refresh failed.");
+      try {
+        const newToken = await tokenService_v0.refreshToken();
+
+        if (newToken) {
+          console.log(`[API] Retrying ${method} ${endpoint} with new token`);
+          isHandlingAuthError = false;
+
+          // Try the request again with the new token
+          return request<T>(
+            method,
+            endpoint,
+            payload,
+            customHeaders,
+            true,
+            timeoutMs,
+            false, // Don't retry again if it fails
+            abortPrevious
+          );
+        } else {
+          console.warn("[API] Token refresh failed. User must log in again.");
+
+          // Trigger app-wide auth error handling here
+          // For example, redirect to login, show a modal, etc.
+
+          // Reset flag after a short delay to allow future refresh attempts
+          setTimeout(() => {
+            isHandlingAuthError = false;
+          }, 1000);
+
+          throw new Error("Unauthorized - Token refresh failed.");
+        }
+      } catch (refreshError) {
+        console.error("[API] Error during token refresh:", refreshError);
+        isHandlingAuthError = false;
+        throw new Error("Authentication error - Please log in again.");
       }
     }
 
@@ -122,19 +158,7 @@ async function request<T>(
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
       data = await response.json();
-
-      // Log API message if it exists
-      if (data && typeof data === "object" && "message" in data) {
-        console.log(
-          `[API] ${method} ${endpoint} - Message from server: "${data.message}"`
-        );
-      } else {
-        console.log(
-          `[API] ${method} ${endpoint} - No message field in response`
-        );
-      }
     } else {
-      console.log(`[API] ${method} ${endpoint} - Response is not JSON`);
       // For non-JSON responses, create a default response object
       const text = await response.text();
       data = {
@@ -156,7 +180,6 @@ async function request<T>(
       );
     }
 
-    console.log(`[API] ${method} ${endpoint} - Success`, data);
     return data; // Return the entire response object
   } catch (error: any) {
     clearTimeout(timeoutId);
@@ -174,7 +197,7 @@ async function request<T>(
         return {
           data: {} as T,
           message: "Request aborted: component unmounted",
-        }; // Include message
+        };
       }
     } else {
       console.error(`[API] ${method} ${endpoint} - Error: ${error.message}`);
@@ -219,12 +242,14 @@ function handleGlobalError(error: any, method: string, endpoint: string) {
     // If parsing fails, use the original error message
   }
 
+  // Handle specific error types
   if (error.message.includes("Failed to fetch")) {
     console.error("Network error! Please check your internet connection.");
-  } else if (error.message.includes("401")) {
-    console.error(
-      "Session expired. Refresh token failed. Please log in again."
-    );
+  } else if (
+    error.message.includes("401") ||
+    error.message.includes("Unauthorized")
+  ) {
+    console.error("Authentication error. Please log in again.");
   } else if (error.message.includes("Request timed out")) {
     console.error("Request timed out. Please try again.");
   }
