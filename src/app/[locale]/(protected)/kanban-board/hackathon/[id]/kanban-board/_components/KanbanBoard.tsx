@@ -558,7 +558,7 @@ export default function KanbanBoard({
         <button
           onClick={handleAddNewList}
           disabled={isSaving}
-          className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-medium py-2 px-4 rounded-lg flex items-center transition-colors duration-300 disabled:opacity-50"
+          className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 font-medium py-2 px-4 rounded-lg flex items-center transition-colors duration-300 disabled:opacity-50"
           aria-label={t("addNewList")}
         >
           {isSaving ? (
