@@ -18,6 +18,17 @@ import { useAuth } from "@/hooks/useAuth_v0";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useToast } from "@/hooks/use-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface IndividualRegistrationRequestsProps {
   hackathonId: string;
@@ -31,6 +42,7 @@ export default function IndividualRegistrationRequests({
   >([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [processingBulk, setProcessingBulk] = useState(false);
   const { showModal } = useApiModal();
   const { user } = useAuth();
   const t = useTranslations("registrationRequests");
@@ -103,6 +115,63 @@ export default function IndividualRegistrationRequests({
     }
   };
 
+  const updateBulkRegistrations = async (status: "APPROVED" | "REJECTED") => {
+    try {
+      setProcessingBulk(true);
+
+      // Filter only PENDING registrations
+      const pendingRegistrations = registrations.filter(
+        (reg) => reg.status === "PENDING"
+      );
+
+      if (pendingRegistrations.length === 0) {
+        toast.info(t("noPendingRequests"));
+        return;
+      }
+
+      const bulkUpdateData = pendingRegistrations.map((reg) => ({
+        id: reg.id,
+        hackathonId,
+        status,
+        reviewedById: user?.id,
+      }));
+
+      const { data, message } =
+        await individualRegistrationRequestService.updateBulkIndividualRegistrationRequests(
+          bulkUpdateData
+        );
+
+      if (data) {
+        // Update the local state after successful API call
+        const updatedRegistrationIds = data.map((reg) => reg.id);
+
+        setRegistrations((prevRegistrations) =>
+          prevRegistrations.map((reg) =>
+            updatedRegistrationIds.includes(reg.id)
+              ? data.find((updated) => updated.id === reg.id) || reg
+              : reg
+          )
+        );
+
+        // Show toast based on status
+        toast.success(
+          message ||
+            (status === "APPROVED"
+              ? t("bulkApprovalSuccess", { count: data.length })
+              : t("bulkRejectionSuccess", { count: data.length }))
+        );
+      } else {
+        throw new Error(message || t("bulkUpdateStatusFailed"));
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : t("bulkUpdateStatusFailed")
+      );
+    } finally {
+      setProcessingBulk(false);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString() + " " + date.toLocaleTimeString();
@@ -133,6 +202,10 @@ export default function IndividualRegistrationRequests({
     }
   };
 
+  const pendingRegistrationsCount = registrations.filter(
+    (reg) => reg.status === "PENDING"
+  ).length;
+
   if (loading) {
     return (
       <div className="flex justify-center p-8">
@@ -143,9 +216,89 @@ export default function IndividualRegistrationRequests({
 
   return (
     <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 sm:p-6 transition-colors duration-200">
-      <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-        {t("individualRegistrationRequests")}
-      </h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+        <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-0 text-gray-900 dark:text-white">
+          {t("individualRegistrationRequests")}
+        </h2>
+
+        {pendingRegistrationsCount > 0 && (
+          <div className="flex gap-2 w-full sm:w-auto">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={processingBulk}
+                  className="bg-green-50 dark:bg-green-900 text-green-600 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-800 border-green-200 dark:border-green-700 transition-colors duration-150 w-full sm:w-auto"
+                >
+                  {processingBulk ? (
+                    <LoadingSpinner size="sm" className="mr-2" />
+                  ) : null}
+                  {t("approveAll")} ({pendingRegistrationsCount})
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {t("bulkApproveConfirmTitle")}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("bulkApproveConfirmDescription", {
+                      count: pendingRegistrationsCount,
+                    })}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => updateBulkRegistrations("APPROVED")}
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    {t("approve")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={processingBulk}
+                  className="bg-red-50 dark:bg-red-900 text-red-600 dark:text-red-200 hover:bg-red-100 dark:hover:bg-red-800 border-red-200 dark:border-red-700 transition-colors duration-150 w-full sm:w-auto"
+                >
+                  {processingBulk ? (
+                    <LoadingSpinner size="sm" className="mr-2" />
+                  ) : null}
+                  {t("rejectAll")} ({pendingRegistrationsCount})
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {t("bulkRejectConfirmTitle")}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("bulkRejectConfirmDescription", {
+                      count: pendingRegistrationsCount,
+                    })}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => updateBulkRegistrations("REJECTED")}
+                    className="bg-red-500 hover:bg-red-600 text-white"
+                  >
+                    {t("reject")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
+      </div>
 
       {registrations.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400">

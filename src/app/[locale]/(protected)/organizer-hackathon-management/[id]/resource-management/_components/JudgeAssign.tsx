@@ -35,6 +35,7 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
   const [loading, setLoading] = useState<boolean>(true);
   const [isAssigningJudge, setIsAssigningJudge] = useState<boolean>(false);
   const [isRemovingJudge, setIsRemovingJudge] = useState<boolean>(false);
+  const [isRandomAssigning, setIsRandomAssigning] = useState<boolean>(false);
   const { showError, showSuccess } = useApiModal();
   const toast = useToast();
 
@@ -161,9 +162,115 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
     teamRoundId: string
   ): boolean => {
     return (
-      teamRoundJudges[teamRoundId]?.some((trj) => trj.judge.id === judgeId) ||
+      teamRoundJudges[teamRoundId]?.some((trj) => trj.judge?.id === judgeId) ||
       false
     );
+  };
+
+  const handleRandomAssignment = async () => {
+    if (!activeRoundId) return;
+
+    setIsRandomAssigning(true);
+    try {
+      const eligibleTeamRounds = teamRounds[activeRoundId].filter(
+        (tr) => tr.status !== "DISQUALIFIED_DUE_TO_VIOLATION"
+      );
+
+      const judges = availableJudges[activeRoundId] || [];
+      if (judges.length === 0 || eligibleTeamRounds.length === 0) {
+        toast.error(t("noJudgesOrTeamsAvailable"));
+        return;
+      }
+
+      // Count current assignments for each judge
+      const judgeAssignmentCount: Record<string, number> = {};
+      judges.forEach((judge) => {
+        const judgeId = judge.judge?.id;
+        if (judgeId) {
+          judgeAssignmentCount[judgeId] = 0;
+        }
+      });
+
+      // Count existing assignments
+      Object.values(teamRoundJudges).forEach((judgeAssignments) => {
+        judgeAssignments.forEach((assignment) => {
+          const judgeId = assignment.judge?.id;
+          if (judgeId && judgeAssignmentCount[judgeId] !== undefined) {
+            judgeAssignmentCount[judgeId]++;
+          }
+        });
+      });
+
+      // Create a balanced assignment plan
+      const assignments: Array<{ teamRoundId: string; judgeId: string }> = [];
+
+      // Sort judges by current assignment count (ascending)
+      const sortedJudges = [...judges].sort((a, b) => {
+        const countA = judgeAssignmentCount[a.judge?.id || ""] || 0;
+        const countB = judgeAssignmentCount[b.judge?.id || ""] || 0;
+        return countA - countB;
+      });
+
+      // For each team round, assign judges in order of who has fewest assignments
+      for (const teamRound of eligibleTeamRounds) {
+        const alreadyAssignedJudges = new Set(
+          (teamRoundJudges[teamRound.id] || [])
+            .map((trj) => trj.judge?.id)
+            .filter(Boolean)
+        );
+
+        // Find the judge with the fewest assignments who isn't already assigned to this team
+        for (const judge of sortedJudges) {
+          const judgeId = judge.judge?.id;
+          if (!judgeId) continue;
+
+          if (!alreadyAssignedJudges.has(judgeId)) {
+            assignments.push({
+              teamRoundId: teamRound.id,
+              judgeId: judgeId,
+            });
+            judgeAssignmentCount[judgeId]++;
+            break;
+          }
+        }
+      }
+
+      // Execute the assignments in sequence
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const assignment of assignments) {
+        try {
+          await handleAssignJudge(
+            assignment.judgeId,
+            assignment.teamRoundId,
+            activeRoundId
+          );
+          successCount++;
+        } catch (error) {
+          failCount++;
+          console.error("Failed to assign judge:", error);
+        }
+      }
+
+      if (successCount > 0) {
+        toast.success(
+          t("randomAssignmentComplete", {
+            success: successCount,
+            fail: failCount,
+          })
+        );
+      } else if (failCount > 0) {
+        toast.error(t("randomAssignmentFailed"));
+      } else {
+        toast.info(t("noNewAssignmentsNeeded"));
+      }
+    } catch (error) {
+      console.error("Error in random assignment:", error);
+      toast.error(t("randomAssignmentError"));
+    } finally {
+      setIsRandomAssigning(false);
+    }
   };
 
   if (loading) {
@@ -176,20 +283,39 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
 
   return (
     <div className="transition-colors duration-300 dark:bg-gray-800">
-      <div className="flex space-x-2 overflow-x-auto border-b mb-4 dark:border-gray-700 py-2 px-1 md:px-2">
-        {rounds.map((round) => (
+      <div className="flex justify-between items-center mb-4 px-1 md:px-2">
+        <div className="flex space-x-2 overflow-x-auto border-b dark:border-gray-700 py-2 flex-grow">
+          {rounds.map((round) => (
+            <button
+              key={round.id}
+              className={`p-2 whitespace-nowrap transition-colors duration-200 ${
+                activeRoundId === round.id
+                  ? "border-b-2 border-green-500 text-green-500 dark:text-green-400"
+                  : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
+              }`}
+              onClick={() => setActiveRoundId(round.id)}
+            >
+              {round.roundTitle}
+            </button>
+          ))}
+        </div>
+
+        {activeRoundId && (
           <button
-            key={round.id}
-            className={`p-2 whitespace-nowrap transition-colors duration-200 ${
-              activeRoundId === round.id
-                ? "border-b-2 border-green-500 text-green-500 dark:text-green-400"
-                : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
-            }`}
-            onClick={() => setActiveRoundId(round.id)}
+            onClick={handleRandomAssignment}
+            disabled={isRandomAssigning}
+            className="ml-2 bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 text-white px-3 py-2 rounded text-sm transition-colors duration-200 whitespace-nowrap flex items-center disabled:opacity-50"
           >
-            {round.roundTitle}
+            {isRandomAssigning ? (
+              <>
+                <LoadingSpinner size="sm" className="mr-2" />
+                {t("assigning")}
+              </>
+            ) : (
+              t("randomlyAssignJudges")
+            )}
           </button>
-        ))}
+        )}
       </div>
 
       {activeRoundId && (
@@ -266,37 +392,38 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
                   </h4>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {teamRoundJudges[teamRound.id]?.length ? (
-                      teamRoundJudges[teamRound.id].map((judge) => (
+                      teamRoundJudges[teamRound.id].map((teamRoundJudge) => (
                         <div
-                          key={judge.id}
+                          key={teamRoundJudge.id}
                           className="flex items-center bg-gray-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-2 md:px-3 py-1 rounded-full shadow-sm transition-colors duration-200"
                         >
-                          {judge.judge.avatarUrl ? (
+                          {teamRoundJudge.judge?.avatarUrl ? (
                             <Image
-                              src={judge.judge.avatarUrl}
-                              alt={judge.judge.firstName}
+                              src={teamRoundJudge.judge.avatarUrl}
+                              alt={teamRoundJudge.judge.firstName || ""}
                               width={24}
                               height={24}
                               className="w-5 h-5 md:w-6 md:h-6 rounded-full mr-1 md:mr-2"
                             />
                           ) : (
                             <span className="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-gray-300 dark:bg-gray-500 text-xs rounded-full mr-1 md:mr-2">
-                              {judge.judge.firstName[0]}
+                              {teamRoundJudge.judge?.firstName?.[0] || "?"}
                             </span>
                           )}
                           <span className="text-xs md:text-sm font-medium">
-                            {judge.judge.firstName} {judge.judge.lastName}
+                            {teamRoundJudge.judge?.firstName}{" "}
+                            {teamRoundJudge.judge?.lastName}
                           </span>
                           <span className="text-xs text-gray-500 dark:text-gray-400 ml-1 md:ml-2 hidden sm:inline">
-                            {judge.judge.email}
+                            {teamRoundJudge.judge?.email || ""}
                           </span>
                           {!isDisqualified && (
                             <button
                               onClick={() =>
                                 handleRemoveJudge(
-                                  judge.id,
+                                  teamRoundJudge.id,
                                   teamRound.id,
-                                  judge.judgeId
+                                  teamRoundJudge.judge?.id || ""
                                 )
                               }
                               disabled={isRemovingJudge}
@@ -324,10 +451,14 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
                     <div className="flex flex-wrap gap-2">
                       {availableJudges[activeRoundId]?.length > 0 ? (
                         availableJudges[activeRoundId].map((judgeRound) => {
+                          const judgeId = judgeRound.judge?.id;
+                          if (!judgeId) return null;
+
                           const isAssigned = isJudgeAssignedToTeamRound(
-                            judgeRound.judge.id,
+                            judgeId,
                             teamRound.id
                           );
+
                           return (
                             <div
                               key={judgeRound.id}
@@ -337,42 +468,39 @@ export default function JudgeAssign({ hackathonId }: { hackathonId: string }) {
                                   : "bg-gray-50 dark:bg-gray-600/50"
                               } text-gray-800 dark:text-gray-200 px-2 md:px-3 py-1 rounded-full shadow-sm transition-all duration-200`}
                             >
-                              {judgeRound.judge.avatarUrl ? (
+                              {judgeRound.judge?.avatarUrl ? (
                                 <Image
                                   src={judgeRound.judge.avatarUrl}
-                                  alt={judgeRound.judge.firstName}
+                                  alt={judgeRound.judge.firstName || ""}
                                   width={24}
                                   height={24}
                                   className="w-5 h-5 md:w-6 md:h-6 rounded-full mr-1 md:mr-2"
                                 />
                               ) : (
                                 <span className="w-5 h-5 md:w-6 md:h-6 flex items-center justify-center bg-gray-300 dark:bg-gray-500 text-xs rounded-full mr-1 md:mr-2">
-                                  {judgeRound.judge.firstName[0]}
+                                  {judgeRound.judge?.firstName?.[0] || "?"}
                                 </span>
                               )}
                               <span className="text-xs md:text-sm font-medium">
-                                {judgeRound.judge.firstName}{" "}
-                                {judgeRound.judge.lastName}
+                                {judgeRound.judge?.firstName}{" "}
+                                {judgeRound.judge?.lastName}
                               </span>
                               <button
                                 onClick={() => {
                                   if (isAssigned) {
                                     const teamRoundJudge = teamRoundJudges[
                                       teamRound.id
-                                    ]?.find(
-                                      (trj) =>
-                                        trj.judge.id === judgeRound.judge.id
-                                    );
+                                    ]?.find((trj) => trj.judge?.id === judgeId);
                                     if (teamRoundJudge) {
                                       handleRemoveJudge(
                                         teamRoundJudge.id,
                                         teamRound.id,
-                                        judgeRound.judge.id
+                                        judgeId
                                       );
                                     }
                                   } else {
                                     handleAssignJudge(
-                                      judgeRound.judge.id,
+                                      judgeId,
                                       teamRound.id,
                                       activeRoundId
                                     );
