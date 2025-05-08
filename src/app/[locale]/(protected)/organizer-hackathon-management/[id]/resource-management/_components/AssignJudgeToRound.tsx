@@ -42,7 +42,7 @@ export default function AssignJudgeToRound({
         const roundsResponse =
           await roundService.getRoundsByHackathonId(hackathonId);
         if (!roundsResponse.data || roundsResponse.data.length === 0) {
-          toast.info(t("noRoundsFound"));
+          //toast.info(t("noRoundsFound"));
           setLoading(false);
           return;
         }

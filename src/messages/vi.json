@@ -895,6 +895,7 @@
     "close": "Đóng"
   },
   "hackathonResults": {
+    "actions": "Hành động",
     "creating": "Đang tạo...",
     "createHackathonResults": "Tạo kết quả Hackathon",
     "note": "Lưu ý",
@@ -915,7 +916,17 @@
     "noAdditionalMembers": "Không có thành viên bổ sung",
     "loading": "Đang tải kết quả...",
     "resultsErrorTitle": "Lỗi kết quả",
-    "resultsErrorMessage": "Không thể tải kết quả hackathon. Vui lòng thử lại sau."
+    "resultsErrorMessage": "Không thể tải kết quả hackathon. Vui lòng thử lại sau.",
+    "edit": "Sửa",
+    "updateAwardTitle": "Cập nhật giải thưởng",
+    "awardPlaceholder": "Nhập tên giải thưởng",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "updateSuccessTitle": "Đã cập nhật giải thưởng",
+    "updateSuccessMessage": "Giải thưởng đã được cập nhật thành công.",
+    "updateErrorTitle": "Lỗi cập nhật",
+    "updateErrorMessage": "Không thể cập nhật giải thưởng. Vui lòng thử lại sau.",
+    "noAward": "Không có giải thưởng"
   },
   "submissions": {
     "loadingSubmissionsData": "Đang tải dữ liệu bài nộp...",

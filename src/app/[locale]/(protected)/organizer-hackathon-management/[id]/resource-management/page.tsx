@@ -1,6 +1,7 @@
 // src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/page.tsx
 "use client";
 import React, { useState, use, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth_v0";
 import Tabs from "./_components/Tabs";
 import AssignJudgeToRound from "./_components/AssignJudgeToRound";
@@ -24,6 +25,43 @@ import { useTranslations } from "@/hooks/useTranslations";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useToast } from "@/hooks/use-toast";
 
+// Define valid tab types
+type TabType =
+  | "round"
+  | "location"
+  | "roundMarkCriteria"
+  | "teamRequest"
+  | "individualRequest"
+  | "teamFormation"
+  | "userManagement"
+  | "assignJudgeToRound"
+  | "judge"
+  | "submission"
+  | "notification"
+  | "hackathonResult"
+  | "feedback"
+  | "device"
+  | "sponsorship";
+
+// List of all valid tabs for type checking
+const VALID_TABS: TabType[] = [
+  "round",
+  "location",
+  "roundMarkCriteria",
+  "teamRequest",
+  "individualRequest",
+  "teamFormation",
+  "userManagement",
+  "assignJudgeToRound",
+  "judge",
+  "submission",
+  "notification",
+  "hackathonResult",
+  "feedback",
+  "device",
+  "sponsorship",
+];
+
 export default function ResourceManagementPage({
   params,
 }: {
@@ -32,26 +70,26 @@ export default function ResourceManagementPage({
   const { user } = useAuth();
   const { id: hackathonId } = use(params);
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
   const t = useTranslations("resourceManagement");
   const toast = useToast();
-  const [activeTab, setActiveTab] = useState<
-    | "round"
-    | "location"
-    | "roundMarkCriteria"
-    | "teamRequest"
-    | "individualRequest"
-    | "teamFormation"
-    | "userManagement"
-    | "assignJudgeToRound"
-    | "judge"
-    | "submission"
-    | "notification"
-    | "hackathonResult"
-    | "feedback"
-    | "device"
-    | "sponsorship"
-  >("round"); // Default to "round"
   const { modalState, hideModal } = useApiModal();
+
+  // Get tab from URL or default to "round"
+  const initialTab = searchParams.get("tab") as TabType | null;
+  const [activeTab, setActiveTab] = useState<TabType>(
+    VALID_TABS.includes(initialTab as TabType)
+      ? (initialTab as TabType)
+      : "round"
+  );
+
+  // Update tab when URL changes
+  useEffect(() => {
+    const tabFromUrl = searchParams.get("tab") as TabType | null;
+    if (tabFromUrl && VALID_TABS.includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-3 sm:p-4 md:p-6 transition-colors duration-200">

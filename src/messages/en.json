@@ -767,6 +767,7 @@
     "close": "Close"
   },
   "hackathonResults": {
+    "actions": "Actions",
     "creating": "Creating...",
     "createHackathonResults": "Create Hackathon Results",
     "note": "Note",
@@ -787,7 +788,17 @@
     "noAdditionalMembers": "No additional members",
     "loading": "Loading results...",
     "resultsErrorTitle": "Results Error",
-    "resultsErrorMessage": "Failed to load hackathon results. Please try again later."
+    "resultsErrorMessage": "Failed to load hackathon results. Please try again later.",
+    "edit": "Edit",
+    "updateAwardTitle": "Update Award",
+    "awardPlaceholder": "Enter award name",
+    "cancel": "Cancel",
+    "save": "Save",
+    "updateSuccessTitle": "Award Updated",
+    "updateSuccessMessage": "The award has been successfully updated.",
+    "updateErrorTitle": "Update Error",
+    "updateErrorMessage": "Failed to update the award. Please try again later.",
+    "noAward": "No Award"
   },
   "submissions": {
     "loadingSubmissionsData": "Loading submissions data...",
