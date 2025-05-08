@@ -1,5 +1,5 @@
 // src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/Rounds.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Round } from "@/types/entities/round";
 import { Location } from "@/types/entities/location";
 import RoundForm from "./RoundForm";
@@ -17,6 +17,8 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
   const [rounds, setRounds] = useState<Round[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
+  const [importLoading, setImportLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -224,35 +226,141 @@ export default function Rounds({ hackathonId }: { hackathonId: string }) {
     setShowForm(true);
   };
 
+  // Handle JSON file import
+  const handleImportClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImportLoading(true);
+    try {
+      const fileContent = await file.text();
+      const jsonData = JSON.parse(fileContent);
+
+      if (!Array.isArray(jsonData)) {
+        throw new Error("Invalid JSON format. Expected an array of rounds.");
+      }
+
+      // Track created rounds for UI update
+      const createdRounds: Round[] = [];
+      let successCount = 0;
+      let failCount = 0;
+
+      // Create rounds sequentially to maintain order
+      for (const roundData of jsonData) {
+        try {
+          // Ensure hackathonId is set
+          const roundWithHackathonId = {
+            ...roundData,
+            hackathonId: hackathonId,
+            status: roundData.status || "UPCOMING",
+          };
+
+          // Call API to create round
+          const response = await roundService.createRound(roundWithHackathonId);
+          createdRounds.push(response.data);
+          successCount++;
+        } catch (error) {
+          console.error("Failed to create round from imported data:", error);
+          failCount++;
+        }
+      }
+
+      // Update rounds state with newly created rounds
+      if (createdRounds.length > 0) {
+        setRounds([...rounds, ...createdRounds]);
+      }
+
+      // Show success/failure message
+      if (successCount > 0 && failCount === 0) {
+        toast.success(`Successfully imported ${successCount} rounds`);
+        showSuccess(
+          "Import Successful",
+          `Successfully imported ${successCount} rounds`
+        );
+      } else if (successCount > 0 && failCount > 0) {
+        toast.warning(
+          `Imported ${successCount} rounds, but ${failCount} failed`
+        );
+        showSuccess(
+          "Partial Import",
+          `Imported ${successCount} rounds, but ${failCount} failed`
+        );
+      } else {
+        toast.error("Failed to import any rounds");
+        showError("Import Failed", "Failed to import any rounds");
+      }
+
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error: any) {
+      console.error("Error importing JSON:", error);
+      toast.error(error.message || "Failed to parse JSON file");
+      showError("Import Error", error.message || "Failed to parse JSON file");
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
   return (
     <div className="transition-colors duration-300">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
           {t("rounds")}
         </h2>
-        <button
-          onClick={() => (showForm ? resetForm() : openCreateForm())}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 w-full sm:w-auto"
-          disabled={isSubmitting}
-        >
-          {showForm ? t("cancel") : t("addRound")}
-        </button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          {/* Import JSON Button */}
+          <button
+            onClick={handleImportClick}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-400 dark:focus:ring-green-600 w-full sm:w-auto flex items-center justify-center"
+            disabled={importLoading}
+          >
+            {importLoading ? (
+              <span className="flex items-center">
+                <LoadingSpinner size="sm" className="mr-2" />
+                Importing...
+              </span>
+            ) : (
+              "Import JSON"
+            )}
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".json"
+            className="hidden"
+          />
+
+          {/* Add Round Button */}
+          <button
+            onClick={() => (showForm ? resetForm() : openCreateForm())}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-600 w-full sm:w-auto"
+            disabled={isSubmitting}
+          >
+            {showForm ? t("cancel") : t("addRound")}
+          </button>
+        </div>
       </div>
 
       {/* Round Form */}
       {showForm && (
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-6 transition-colors duration-300">
-          <RoundForm
-            isEditing={isEditing}
-            locations={locations}
-            initialData={currentRound}
-            hackathonId={hackathonId}
-            onSubmit={handleFormSubmit}
-            onCancel={resetForm}
-            renderLocationType={renderLocationType}
-            isSubmitting={isSubmitting}
-          />
-        </div>
+        <RoundForm
+          isEditing={isEditing}
+          locations={locations}
+          initialData={currentRound}
+          hackathonId={hackathonId}
+          onSubmit={handleFormSubmit}
+          onCancel={resetForm}
+          renderLocationType={renderLocationType}
+        />
       )}
 
       {/* Rounds List */}
