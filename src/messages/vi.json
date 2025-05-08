@@ -1770,7 +1770,12 @@
     "errorCreateFeedbackDetails": "Không thể tạo chi tiết phản hồi",
     "validationErrorQuestions": "Tất cả các câu hỏi phản hồi phải có nội dung",
     "validationErrorMentorSelection": "Vui lòng chọn người hướng dẫn cho phản hồi của mentor",
-    "errorGeneric": "Đã xảy ra lỗi khi tạo phản hồi"
+    "errorGeneric": "Đã xảy ra lỗi khi tạo phản hồi",
+    "importQuestions": "Nhập câu hỏi",
+    "invalidJsonFormat": "Định dạng JSON không hợp lệ. Mỗi mục phải có các trường content và maxRating.",
+    "importSuccess": "Nhập câu hỏi phản hồi thành công",
+    "invalidJsonData": "Dữ liệu JSON không hợp lệ. Cần một mảng các câu hỏi phản hồi.",
+    "jsonParseError": "Lỗi phân tích tệp JSON"
   },
   "deviceManagement": {
     "allDevices": "Tất cả thiết bị",

@@ -1,11 +1,11 @@
 // src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/CreateFeedbackForm.tsx
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { feedbackService } from "@/services/feedback.service";
 import { feedbackDetailService } from "@/services/feedbackDetail.service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Upload } from "lucide-react";
 import { useHackathonMentors } from "@/hooks/useHackathonMentors";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +31,7 @@ export default function CreateFeedbackForm({
 }: CreateFeedbackFormProps) {
   const t = useTranslations("feedbackForm");
   const toast = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -73,6 +74,67 @@ export default function CreateFeedbackForm({
       [field]: value,
     };
     setFeedbackDetails(updatedDetails);
+  };
+
+  const handleImportJson = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const jsonData = JSON.parse(e.target?.result as string);
+
+        if (Array.isArray(jsonData) && jsonData.length > 0) {
+          // Check if the JSON structure is valid for our needs
+          const isValid = jsonData.every(
+            (item) =>
+              typeof item.content === "string" &&
+              typeof item.maxRating === "number"
+          );
+
+          if (!isValid) {
+            toast.error(
+              t("invalidJsonFormat") ||
+                "Invalid JSON format. Each item should have content and maxRating fields."
+            );
+            return;
+          }
+
+          // Import the feedback details
+          setFeedbackDetails(
+            jsonData.map((item) => ({
+              content: item.content,
+              maxRating: item.maxRating,
+              note: item.note || "",
+            }))
+          );
+          toast.success(
+            t("importSuccess") || "Successfully imported feedback questions"
+          );
+        } else {
+          toast.error(
+            t("invalidJsonData") ||
+              "Invalid JSON data. Expected an array of feedback questions."
+          );
+        }
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+        toast.error(t("jsonParseError") || "Error parsing JSON file");
+      }
+    };
+    reader.readAsText(file);
+
+    // Reset file input so the same file can be selected again
+    if (event.target) {
+      event.target.value = "";
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -250,15 +312,34 @@ export default function CreateFeedbackForm({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t("feedbackQuestions")}
               </label>
-              <Button
-                type="button"
-                onClick={handleAddFeedbackDetail}
-                variant="outline"
-                size="sm"
-                className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors duration-200"
-              >
-                <Plus size={16} className="mr-1" /> {t("addQuestion")}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  onClick={handleImportJson}
+                  variant="outline"
+                  size="sm"
+                  className="border-blue-400 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200"
+                >
+                  <Upload size={16} className="mr-1" />{" "}
+                  {t("importQuestions") || "Import Questions"}
+                </Button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept=".json"
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  onClick={handleAddFeedbackDetail}
+                  variant="outline"
+                  size="sm"
+                  className="bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors duration-200"
+                >
+                  <Plus size={16} className="mr-1" /> {t("addQuestion")}
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -326,25 +407,7 @@ export default function CreateFeedbackForm({
                       </select>
                     </div>
 
-                    {/* Note */}
-                    <div>
-                      <label
-                        htmlFor={`note-${index}`}
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                      >
-                        {t("noteOptional")}
-                      </label>
-                      <Textarea
-                        id={`note-${index}`}
-                        value={detail.note || ""}
-                        onChange={(e) =>
-                          handleDetailChange(index, "note", e.target.value)
-                        }
-                        placeholder={t("notePlaceholder")}
-                        className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-200"
-                        rows={2}
-                      />
-                    </div>
+                    {/* Note field is now hidden as requested */}
                   </div>
                 </div>
               ))}

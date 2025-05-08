@@ -2023,7 +2023,12 @@
     "responses": "Responses",
     "responseFrom": "Response from",
     "rating": "Rating",
-    "noResponsesSubmittedYet": "No responses submitted yet."
+    "noResponsesSubmittedYet": "No responses submitted yet.",
+    "importQuestions": "Import Questions",
+    "invalidJsonFormat": "Invalid JSON format. Each item should have content and maxRating fields.",
+    "importSuccess": "Successfully imported feedback questions",
+    "invalidJsonData": "Invalid JSON data. Expected an array of feedback questions.",
+    "jsonParseError": "Error parsing JSON file"
   },
   "deviceForm": {
     "deviceName": "Device name",
