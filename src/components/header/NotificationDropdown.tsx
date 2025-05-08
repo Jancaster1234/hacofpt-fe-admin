@@ -6,8 +6,8 @@ import { Bell } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { toast } from "sonner";
 import Image from "next/image";
-import { useWebSocket } from '@/contexts/WebSocketContext';
-import { Message, StompSubscription } from '@stomp/stompjs';
+import { useWebSocket } from "@/contexts/WebSocketContext";
+import { Message, StompSubscription } from "@stomp/stompjs";
 import NotificationDetailModal from "./NotificationDetailModal";
 
 interface Notification {
@@ -27,7 +27,8 @@ export default function NotificationDropdown() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  const [selectedNotification, setSelectedNotification] =
+    useState<Notification | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuth();
   const { client, isConnected } = useWebSocket();
@@ -51,7 +52,7 @@ export default function NotificationDropdown() {
 
       try {
         // Wait a short moment to ensure connection is fully established
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
 
         if (client.connected) {
           // Subscribe to the topic that matches the backend's destination
@@ -63,7 +64,7 @@ export default function NotificationDropdown() {
             try {
               const newNotification = JSON.parse(message.body);
               console.log("Received WebSocket notification:", newNotification);
-              setNotifications(prev => [newNotification, ...prev]);
+              setNotifications((prev) => [newNotification, ...prev]);
               toast.info(newNotification.content);
             } catch (error) {
               console.error("Error parsing notification message:", error);
@@ -71,8 +72,8 @@ export default function NotificationDropdown() {
           });
         }
       } catch (error) {
-        console.error('Error setting up WebSocket subscription:', error);
-        toast.error('Failed to connect to notification service');
+        console.error("Error setting up WebSocket subscription:", error);
+        toast.error("Failed to connect to notification service");
       }
     };
 
@@ -110,11 +111,17 @@ export default function NotificationDropdown() {
         setNotifications(data.data || []);
       } else {
         const error = await response.json();
-        toast.error(error instanceof Error ? error.message : "Failed to fetch notifications");
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch notifications"
+        );
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to fetch notifications");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to fetch notifications"
+      );
     } finally {
       setLoading(false);
     }
@@ -140,7 +147,11 @@ export default function NotificationDropdown() {
 
         if (!response.ok) {
           const error = await response.json();
-          toast.error(error instanceof Error ? error.message : 'Failed to mark notification as read');
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : "Failed to mark notification as read"
+          );
         }
 
         // Update local state
@@ -193,17 +204,18 @@ export default function NotificationDropdown() {
                   <div
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`p-3 rounded-lg transition-colors cursor-pointer ${notification.isRead
-                      ? "bg-gray-50 hover:bg-gray-100"
-                      : "bg-blue-50 hover:bg-blue-100 border-l-4 border-blue-500"
-                      }`}
+                    className={`p-3 rounded-lg transition-colors cursor-pointer ${
+                      notification.isRead
+                        ? "bg-gray-50 hover:bg-gray-100"
+                        : "bg-blue-50 hover:bg-blue-100 border-l-4 border-blue-500"
+                    }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex-shrink-0">
                         <Image
                           src={
                             notification.sender.avatarUrl ||
-                            "https://randomuser.me/api/portraits/men/99.jpg"
+                            "https://greenscapehub-media.s3.ap-southeast-1.amazonaws.com/hacofpt/504c1e5a-bc1f-4fe7-8905-d3bbbb12cabd_smiling-young-man-illustration_1308-174669.avif"
                           }
                           alt={`${notification.sender.name}'s avatar`}
                           width={40}
@@ -214,8 +226,11 @@ export default function NotificationDropdown() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start mb-2">
                           <p
-                            className={`text-sm font-medium ${notification.isRead ? "text-gray-900" : "text-blue-900"
-                              }`}
+                            className={`text-sm font-medium ${
+                              notification.isRead
+                                ? "text-gray-900"
+                                : "text-blue-900"
+                            }`}
                           >
                             {notification.sender.name}
                           </p>
@@ -224,8 +239,11 @@ export default function NotificationDropdown() {
                           </span>
                         </div>
                         <p
-                          className={`text-sm break-words ${notification.isRead ? "text-gray-800" : "text-blue-800"
-                            }`}
+                          className={`text-sm break-words ${
+                            notification.isRead
+                              ? "text-gray-800"
+                              : "text-blue-800"
+                          }`}
                         >
                           {truncateContent(notification.content)}
                         </p>
