@@ -1121,7 +1121,9 @@
     "at": "at",
     "overdue": "Overdue",
     "selectDate": "Select date",
-    "selectTime": "Select time"
+    "selectTime": "Select time",
+    "dateAndTime": "Date and Time",
+    "selectDateTime": "Select date and time"
   },
   "taskDescription": {
     "description": "Description",

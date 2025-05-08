@@ -738,7 +738,9 @@
     "at": "lúc",
     "overdue": "Quá hạn",
     "selectDate": "Chọn ngày",
-    "selectTime": "Chọn giờ"
+    "selectTime": "Chọn giờ",
+    "dateAndTime": "Ngày và Giờ",
+    "selectDateTime": "Chọn ngày và giờ"
   },
   "taskDescription": {
     "description": "Mô tả",
