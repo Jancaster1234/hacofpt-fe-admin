@@ -1956,7 +1956,11 @@
     "noRoundsFound": "Không tìm thấy vòng nào",
     "noRoundsAvailable": "Không có vòng nào có sẵn cho hackathon này",
     "errorChangingRound": "Lỗi khi thay đổi vòng",
-    "noTeamsAssigned": "Không có đội nào được giao cho bạn trong vòng này"
+    "noTeamsAssigned": "Không có đội nào được giao cho bạn trong vòng này",
+    "roundStillActive": "Vòng này vẫn đang diễn ra.",
+    "evaluationAvailableAfter": "Đánh giá sẽ khả dụng sau:",
+    "evaluationNotAvailableYet": "Chưa thể đánh giá",
+    "notSpecified": "Chưa xác định"
   },
   "mentorshipRequests": {
     "pageTitle": "Yêu cầu cố vấn",

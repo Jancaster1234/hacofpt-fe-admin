@@ -40,6 +40,35 @@ export default function GradingSubmissionPage() {
 
   const { modalState, hideModal, showError } = useApiModal();
 
+  // Helper function to check if round's end time has passed
+  const hasRoundEnded = (endTime?: string): boolean => {
+    if (!endTime) return false;
+
+    const endDate = new Date(endTime);
+    const now = new Date();
+
+    return now > endDate;
+  };
+
+  // Helper function to format date for display
+  const formatDateTime = (dateTimeStr?: string): string => {
+    if (!dateTimeStr) return t("notSpecified");
+
+    try {
+      const date = new Date(dateTimeStr);
+      return new Intl.DateTimeFormat("default", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(date);
+    } catch (e) {
+      console.error("Error formatting date:", e);
+      return dateTimeStr; // Return original string if formatting fails
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       if (!user || !hackathonId) return;
@@ -176,6 +205,10 @@ export default function GradingSubmissionPage() {
   };
 
   const renderTeamSubmissions = (roundId: string) => {
+    // Find the active round
+    const activeRound = rounds.find((round) => round.id === roundId);
+    const isRoundEnded = hasRoundEnded(activeRound?.endTime);
+
     // Filter team rounds for the active round
     const roundTeams = teamRounds
       .filter((tr) => tr.round.id === roundId)
@@ -190,90 +223,108 @@ export default function GradingSubmissionPage() {
     }
 
     return (
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-700">
-            <tr>
-              <th className="p-3">{t("team")}</th>
-              <th className="p-3">{t("finalScore")}</th>
-              <th className="p-3">{t("yourScore")}</th>
-              <th className="p-3">{t("submission")}</th>
-              <th className="p-3">{t("action")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {roundTeams.map((team) => {
-              // Find the submission for this team
-              const teamSubmissions = submissions[team.id] || [];
-              const submission =
-                teamSubmissions.length > 0 ? teamSubmissions[0] : undefined;
+      <>
+        {!isRoundEnded && activeRound?.endTime && (
+          <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4 mb-4 rounded">
+            <p className="text-yellow-700 dark:text-yellow-300">
+              {t("roundStillActive")} {t("evaluationAvailableAfter")}{" "}
+              {formatDateTime(activeRound.endTime)}
+            </p>
+          </div>
+        )}
 
-              // Find the team round for this team
-              const teamRound = teamRounds.find(
-                (tr) => tr.team.id === team.id && tr.round.id === roundId
-              );
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gray-100 dark:bg-gray-800 border-b dark:border-gray-700">
+              <tr>
+                <th className="p-3">{t("team")}</th>
+                <th className="p-3">{t("finalScore")}</th>
+                <th className="p-3">{t("yourScore")}</th>
+                <th className="p-3">{t("submission")}</th>
+                <th className="p-3">{t("action")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {roundTeams.map((team) => {
+                // Find the submission for this team
+                const teamSubmissions = submissions[team.id] || [];
+                const submission =
+                  teamSubmissions.length > 0 ? teamSubmissions[0] : undefined;
 
-              // Get judges for this team round
-              const judges = teamRound
-                ? teamRoundJudges[teamRound.id] || []
-                : [];
+                // Find the team round for this team
+                const teamRound = teamRounds.find(
+                  (tr) => tr.team.id === team.id && tr.round.id === roundId
+                );
 
-              // Check if current user is a judge for this team round
-              const isJudge = judges.some(
-                (judge) => judge.judge.id === user?.id
-              );
+                // Get judges for this team round
+                const judges = teamRound
+                  ? teamRoundJudges[teamRound.id] || []
+                  : [];
 
-              // Get current judge's score for this submission
-              const currentJudgeScore = submission?.judgeSubmissions?.find(
-                (js) => js.judge.id === user?.id
-              )?.score;
+                // Check if current user is a judge for this team round
+                const isJudge = judges.some(
+                  (judge) => judge.judge.id === user?.id
+                );
 
-              return (
-                <tr
-                  key={team.id}
-                  className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-150"
-                >
-                  <td className="p-3">{team.name}</td>
-                  <td className="p-3">
-                    {submission?.finalScore
-                      ? `${submission.finalScore.toFixed(1)}/100`
-                      : t("pendingFinalScore")}
-                  </td>
-                  <td className="p-3">
-                    {currentJudgeScore !== undefined
-                      ? `${currentJudgeScore.toFixed(1)}/100`
-                      : t("notMarked")}
-                  </td>
-                  <td className="p-3">
-                    {submission?.fileUrls && submission.fileUrls.length > 0 ? (
-                      <FileDownloader
-                        files={submission.fileUrls}
-                        zipName={`${team.name}-submission-files.zip`}
-                      />
-                    ) : (
-                      t("noFiles")
-                    )}
-                  </td>
-                  <td className="p-3">
-                    {submission && isJudge ? (
-                      <Link
-                        href={`/grading-submission/${hackathonId}/round/${roundId}/submission/${submission.id}/judge-submission`}
-                        className="text-blue-600 dark:text-blue-400 hover:underline transition-colors duration-150"
-                      >
-                        {currentJudgeScore !== undefined
-                          ? t("editMark")
-                          : t("mark")}
-                      </Link>
-                    ) : (
-                      t("noSubmissionOrNotAssigned")
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                // Get current judge's score for this submission
+                const currentJudgeScore = submission?.judgeSubmissions?.find(
+                  (js) => js.judge.id === user?.id
+                )?.score;
+
+                return (
+                  <tr
+                    key={team.id}
+                    className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors duration-150"
+                  >
+                    <td className="p-3">{team.name}</td>
+                    <td className="p-3">
+                      {submission?.finalScore
+                        ? `${submission.finalScore.toFixed(1)}/100`
+                        : t("pendingFinalScore")}
+                    </td>
+                    <td className="p-3">
+                      {currentJudgeScore !== undefined
+                        ? `${currentJudgeScore.toFixed(1)}/100`
+                        : t("notMarked")}
+                    </td>
+                    <td className="p-3">
+                      {submission?.fileUrls &&
+                      submission.fileUrls.length > 0 ? (
+                        <FileDownloader
+                          files={submission.fileUrls}
+                          zipName={`${team.name}-submission-files.zip`}
+                        />
+                      ) : (
+                        t("noFiles")
+                      )}
+                    </td>
+                    <td className="p-3">
+                      {submission && isJudge ? (
+                        isRoundEnded ? (
+                          <Link
+                            href={`/grading-submission/${hackathonId}/round/${roundId}/submission/${submission.id}/judge-submission`}
+                            className="text-blue-600 dark:text-blue-400 hover:underline transition-colors duration-150"
+                          >
+                            {currentJudgeScore !== undefined
+                              ? t("editMark")
+                              : t("mark")}
+                          </Link>
+                        ) : (
+                          <span className="text-gray-500 dark:text-gray-400 cursor-not-allowed">
+                            {t("evaluationNotAvailableYet")}
+                          </span>
+                        )
+                      ) : (
+                        t("noSubmissionOrNotAssigned")
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </>
     );
   };
 

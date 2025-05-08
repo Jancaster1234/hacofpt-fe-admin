@@ -1917,7 +1917,11 @@
     "noRoundsFound": "No rounds found",
     "noRoundsAvailable": "No rounds available for this hackathon",
     "errorChangingRound": "Error changing round",
-    "noTeamsAssigned": "No teams assigned to you for this round"
+    "noTeamsAssigned": "No teams assigned to you for this round",
+    "roundStillActive": "This round is still active.",
+    "evaluationAvailableAfter": "Evaluation will be available after:",
+    "evaluationNotAvailableYet": "Evaluation not available yet",
+    "notSpecified": "Not specified"
   },
   "mentorshipRequests": {
     "pageTitle": "Mentorship requests",
