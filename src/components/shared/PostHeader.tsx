@@ -9,15 +9,38 @@ interface PostHeaderProps {
   author: string;
   createdAt: string;
   readingTime: number;
+  avatarUrl?: string; // Added avatarUrl as optional prop
 }
 
-const PostHeader = ({ title, author, cover, createdAt, readingTime }: PostHeaderProps) => {
+const PostHeader = ({
+  title,
+  author,
+  cover,
+  createdAt,
+  readingTime,
+  avatarUrl,
+}: PostHeaderProps) => {
   return (
     <div className="lg:max-w-[45rem] mx-auto">
-      <h1 className="text-3xl leading-snug md:text-4xl md:leading-normal font-bold">{title}</h1>
+      <h1 className="text-3xl leading-snug md:text-4xl md:leading-normal font-bold">
+        {title}
+      </h1>
 
       <div className="flex items-center mt-6 gap-4">
-        <Image src={"/avatar.jpg"} width={50} height={50} alt="" className="rounded-full" />
+        <Image
+          src={
+            avatarUrl ||
+            "https://greenscapehub-media.s3.ap-southeast-1.amazonaws.com/hacofpt/504c1e5a-bc1f-4fe7-8905-d3bbbb12cabd_smiling-young-man-illustration_1308-174669.avif"
+          } // Use avatarUrl if available, otherwise fall back to default
+          width={50}
+          height={50}
+          alt={`${author}'s avatar`}
+          className="rounded-full"
+          onError={(e) => {
+            // Fallback if avatar image fails to load
+            (e.target as HTMLImageElement).src = "/avatar.jpg";
+          }}
+        />
         <div className="">
           <div className="font-semibold mb-3">
             By <u>{author}</u>

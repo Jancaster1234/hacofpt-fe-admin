@@ -3,6 +3,8 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { BlogPost } from "@/types/entities/blogPost";
+import { User } from "@/types/entities/user";
+import { userService } from "@/services/user.service";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/utils/dateFormatter";
 import BlogPostForm from "./BlogPostForm";
@@ -64,20 +66,36 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [operationType, setOperationType] = useState<string | null>(null);
+  const [authorData, setAuthorData] = useState<User | null>(null);
 
   const t = useTranslations("blogManagement");
   const { success, error } = useToast();
-
-  // Create placeholder values for missing fields from post-csr
-  const author = {
-    name: blogPost.createdByUserName || t("unknownAuthor"),
-    avatar: "/placeholder-avatar.png", // Default avatar
-  };
 
   const readingTime = useMemo(() => {
     const wpm = 150;
     return Math.ceil((blogPost.wordCount || 500) / wpm);
   }, [blogPost.wordCount]);
+
+  // Fetch author data when component mounts or blogPost changes
+  useEffect(() => {
+    const fetchAuthorData = async () => {
+      if (!blogPost.createdByUserName) return;
+
+      try {
+        const response = await userService.getUserByUsername(
+          blogPost.createdByUserName
+        );
+        if (response.data) {
+          setAuthorData(response.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch author data:", err);
+        // We don't set an error state as this is not critical functionality
+      }
+    };
+
+    fetchAuthorData();
+  }, [blogPost.createdByUserName]);
 
   const handleUpdate = async (data: any) => {
     try {
@@ -371,9 +389,10 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({
             <PostHeader
               title={blogPost.title}
               author={blogPost.createdByUserName || t("unknownAuthor")}
-              createdAt={blogPost.createdAt || ""}
+              createdAt={formatDate(blogPost.createdAt || "")}
               readingTime={readingTime}
               cover={blogPost.bannerImageUrl}
+              avatarUrl={authorData?.avatarUrl} // Pass the author's avatar URL
             />
 
             <div
