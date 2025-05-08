@@ -247,7 +247,7 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
           htmlFor="userId"
           className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
         >
-          {t("form.assignedUser")}
+          {t("form.assignedUser")} <span className="text-red-500">*</span>
         </label>
 
         {isEditMode ? (
@@ -293,7 +293,7 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
           htmlFor="timeFrom.date"
           className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
         >
-          {t("form.startDateTime")}
+          {t("form.startDateTime")} <span className="text-red-500">*</span>
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <input
@@ -327,7 +327,7 @@ const UserDeviceForm: React.FC<UserDeviceFormProps> = ({
           htmlFor="timeTo.date"
           className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
         >
-          {t("form.endDateTime")}
+          {t("form.endDateTime")} <span className="text-red-500">*</span>
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <input

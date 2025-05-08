@@ -7,7 +7,7 @@ import { NotificationMethod } from "@/types/entities/notificationDelivery";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { notificationService } from "@/services/notification.service";
-import { useWebSocket } from '@/contexts/WebSocketContext';
+import { useWebSocket } from "@/contexts/WebSocketContext";
 
 enum RoleType {
   ADMIN = "ADMIN",
@@ -167,17 +167,15 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
         },
       };
 
-      const { data } = await notificationService.createNotification(
-        requestBody
-      );
+      const { data } =
+        await notificationService.createNotification(requestBody);
 
       if (data) {
         setNotifications([data, ...notifications]);
 
         // Send WebSocket notification to each recipient
         if (recipientType === "users" && notificationMethod === "IN_APP") {
-          selectedRecipients.forEach(recipient => {
-
+          selectedRecipients.forEach((recipient) => {
             // Gửi qua WebSocket thay vì gọi API trực tiếp
             if (client && isConnected) {
               const notificationBody = {
@@ -185,18 +183,23 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
                 content: newNotification.content,
                 type: newNotification.type,
                 metadata: newNotification.metadata || "{}",
-                isRead: false
+                isRead: false,
               };
 
-              console.log('Sending notification via WebSocket:', notificationBody);
+              console.log(
+                "Sending notification via WebSocket:",
+                notificationBody
+              );
 
               client.publish({
                 destination: `/app/notifications/${recipient.id}`,
-                body: JSON.stringify(notificationBody)
+                body: JSON.stringify(notificationBody),
               });
             } else {
-              console.error('WebSocket not connected');
-              toast.error('Failed to send notification: WebSocket not connected');
+              console.error("WebSocket not connected");
+              toast.error(
+                "Failed to send notification: WebSocket not connected"
+              );
             }
           });
         }
@@ -217,7 +220,9 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
         toast.error(errorData.message || "Failed to create notification");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to create notification');
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create notification"
+      );
     }
   };
 
@@ -263,8 +268,10 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
 
   const filteredUsers = users.filter(
     (user) =>
-      (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
+      (user.name &&
+        user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.email &&
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -297,7 +304,7 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Content
+            Content <span className="text-red-500">*</span>
           </label>
           <textarea
             value={newNotification.content}
@@ -313,7 +320,7 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
           ></textarea>
         </div>
 
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Metadata (JSON)
           </label>
@@ -332,7 +339,7 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
           <p className="text-xs text-gray-500 mt-1">
             Optional: Add JSON metadata for this notification
           </p>
-        </div>
+        </div> */}
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -478,14 +485,12 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
               </div>
 
               <div className="mb-3 relative group w-full">
-                <p
-                  className="text-gray-800 font-medium line-clamp-2 w-full break-all cursor-pointer"
-                >
+                <p className="text-gray-800 font-medium line-clamp-2 w-full break-all cursor-pointer">
                   {notification.content}
                 </p>
                 <div
                   className="absolute left-0 z-50 hidden group-hover:block bg-black text-white text-xs rounded px-3 py-2 shadow-lg max-w-xs w-max break-words"
-                  style={{ top: '100%', marginTop: 4 }}
+                  style={{ top: "100%", marginTop: 4 }}
                 >
                   {notification.content}
                 </div>
@@ -497,7 +502,9 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
                     const recipients = [
                       ...new Set(
                         notification.notificationDeliveries.flatMap((d) =>
-                          d.recipients.map((r) => `${r.firstName} ${r.lastName}`)
+                          d.recipients.map(
+                            (r) => `${r.firstName} ${r.lastName}`
+                          )
                         )
                       ),
                     ];
@@ -524,14 +531,12 @@ export default function Notifications({ hackathonId }: NotificationsProps) {
                         ))}
                         {hiddenRecipients.length > 0 && (
                           <span className="relative group">
-                            <span
-                              className="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700 cursor-pointer"
-                            >
+                            <span className="px-2 py-1 rounded text-xs font-medium bg-gray-200 text-gray-700 cursor-pointer">
                               +{hiddenRecipients.length}
                             </span>
                             <div
                               className="absolute left-0 z-50 hidden group-hover:block bg-black text-white text-xs rounded px-3 py-2 shadow-lg max-w-xs w-max break-words"
-                              style={{ top: '100%', marginTop: 4 }}
+                              style={{ top: "100%", marginTop: 4 }}
                             >
                               {hiddenRecipients.map((name, idx) => (
                                 <div key={idx}>{name}</div>

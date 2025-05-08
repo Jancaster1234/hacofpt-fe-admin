@@ -212,7 +212,7 @@ export default function CreateFeedbackForm({
               htmlFor="title"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
-              {t("title")}
+              {t("title")} <span className="text-red-500">*</span>
             </label>
             <Input
               id="title"
@@ -285,7 +285,7 @@ export default function CreateFeedbackForm({
                         htmlFor={`question-${index}`}
                         className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                       >
-                        {t("question")}
+                        {t("question")} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id={`question-${index}`}

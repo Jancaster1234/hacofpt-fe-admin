@@ -108,7 +108,8 @@ export default function RoundMarkCriterionForm({
             type="number"
             value={maxScore}
             onChange={(e) => setMaxScore(parseInt(e.target.value) || 0)}
-            min="1"
+            min="5"
+            max="100"
             className={`w-full p-2 border rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
               errors.maxScore
                 ? "border-red-500 dark:border-red-500"

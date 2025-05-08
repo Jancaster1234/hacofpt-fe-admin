@@ -201,7 +201,7 @@ const DeviceForm: React.FC<DeviceFormProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t("deviceName")}*
+              {t("deviceName")} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -251,6 +251,7 @@ const DeviceForm: React.FC<DeviceFormProps> = ({
               value={formData.quantity}
               onChange={handleInputChange}
               min="1"
+              max="1000"
               className={`w-full px-3 py-2 border ${
                 errors.quantity
                   ? "border-red-500"

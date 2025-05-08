@@ -401,7 +401,7 @@ export default function TeamFormation({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <div>
             <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t("minimumTeamSize")}
+              {t("minimumTeamSize")} <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
@@ -413,11 +413,12 @@ export default function TeamFormation({
           </div>
           <div>
             <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t("maximumTeamSize")}
+              {t("maximumTeamSize")} <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
               min={minTeamSize}
+              max="5"
               value={maxTeamSize}
               onChange={(e) =>
                 setMaxTeamSize(parseInt(e.target.value) || minTeamSize)

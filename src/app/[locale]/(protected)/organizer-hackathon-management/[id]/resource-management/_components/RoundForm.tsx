@@ -222,7 +222,7 @@ export default function RoundForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-gray-700 dark:text-gray-300 mb-1">
-              {t("fields.roundTitle")}
+              {t("fields.roundTitle")} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -236,7 +236,7 @@ export default function RoundForm({
           </div>
           <div>
             <label className="block text-gray-700 dark:text-gray-300 mb-1">
-              {t("fields.roundNumber")}
+              {t("fields.roundNumber")} <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
@@ -251,7 +251,7 @@ export default function RoundForm({
           </div>
           <div>
             <label className="block text-gray-700 dark:text-gray-300 mb-1">
-              {t("fields.startTime")}
+              {t("fields.startTime")} <span className="text-red-500">*</span>
             </label>
             <input
               type="datetime-local"
@@ -272,7 +272,7 @@ export default function RoundForm({
           </div>
           <div>
             <label className="block text-gray-700 dark:text-gray-300 mb-1">
-              {t("fields.endTime")}
+              {t("fields.endTime")} <span className="text-red-500">*</span>
             </label>
             <input
               type="datetime-local"
@@ -311,7 +311,7 @@ export default function RoundForm({
           </div> */}
           <div>
             <label className="block text-gray-700 dark:text-gray-300 mb-1">
-              {t("fields.totalTeam")}
+              {t("fields.totalTeam")} <span className="text-red-500">*</span>
             </label>
             <input
               type="number"

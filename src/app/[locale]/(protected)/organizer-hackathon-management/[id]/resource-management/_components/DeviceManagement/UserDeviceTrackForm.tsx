@@ -9,28 +9,12 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 interface UserDeviceTrackFormProps {
   userDeviceId: string;
   initialData?: {
-    deviceQualityStatus?:
-      | "EXCELLENT"
-      | "GOOD"
-      | "FAIR"
-      | "DAMAGED"
-      | "NEEDS_REPAIR"
-      | "REPAIRING"
-      | "REPAIRED"
-      | "LOST";
+    deviceQualityStatus?: "GOOD" | "FAIR" | "DAMAGED" | "REPAIRED";
     note?: string;
   };
   onSubmit: (formData: {
     userDeviceId: string;
-    deviceQualityStatus:
-      | "EXCELLENT"
-      | "GOOD"
-      | "FAIR"
-      | "DAMAGED"
-      | "NEEDS_REPAIR"
-      | "REPAIRING"
-      | "REPAIRED"
-      | "LOST";
+    deviceQualityStatus: "GOOD" | "FAIR" | "DAMAGED" | "REPAIRED";
     note: string;
     files: File[];
   }) => Promise<void>;
@@ -49,14 +33,7 @@ const UserDeviceTrackForm: React.FC<UserDeviceTrackFormProps> = ({
   const toast = useToast();
 
   const [deviceQualityStatus, setDeviceQualityStatus] = useState<
-    | "EXCELLENT"
-    | "GOOD"
-    | "FAIR"
-    | "DAMAGED"
-    | "NEEDS_REPAIR"
-    | "REPAIRING"
-    | "REPAIRED"
-    | "LOST"
+    "GOOD" | "FAIR" | "DAMAGED" | "REPAIRED"
   >(initialData.deviceQualityStatus || "GOOD");
   const [note, setNote] = useState<string>(initialData.note || "");
   const [files, setFiles] = useState<File[]>([]);
@@ -106,14 +83,10 @@ const UserDeviceTrackForm: React.FC<UserDeviceTrackFormProps> = ({
           transition-colors duration-300"
           required
         >
-          <option value="EXCELLENT">{t("excellent")}</option>
           <option value="GOOD">{t("good")}</option>
           <option value="FAIR">{t("fair")}</option>
           <option value="DAMAGED">{t("damaged")}</option>
-          <option value="NEEDS_REPAIR">{t("needsRepair")}</option>
-          <option value="REPAIRING">{t("repairing")}</option>
           <option value="REPAIRED">{t("repaired")}</option>
-          <option value="LOST">{t("lost")}</option>
         </select>
       </div>
 
