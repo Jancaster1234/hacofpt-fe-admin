@@ -1506,7 +1506,7 @@
   "sponsorshipHackathon": {
     "editAllocation": "Edit allocation",
     "addNewAllocation": "Add new allocation",
-    "totalMoney": "Total money ($)",
+    "totalMoney": "Total money (VND)",
     "moneyHelperText": "Enter the amount of money allocated for this sponsorship",
     "cancel": "Cancel",
     "update": "Update",

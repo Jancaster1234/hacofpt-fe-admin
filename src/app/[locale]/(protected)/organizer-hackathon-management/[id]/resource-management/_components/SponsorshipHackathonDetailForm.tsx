@@ -118,7 +118,7 @@ const SponsorshipHackathonDetailForm: React.FC<
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t("description")}*
+            {t("description")} <span className="text-red-500">*</span>
           </label>
           <textarea
             name="content"
@@ -134,12 +134,9 @@ const SponsorshipHackathonDetailForm: React.FC<
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t("moneySpent")}*
+              {t("moneySpent")} (VND) <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 dark:text-gray-400">
-                $
-              </span>
               <input
                 type="number"
                 name="moneySpent"
@@ -156,7 +153,7 @@ const SponsorshipHackathonDetailForm: React.FC<
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t("status.status")}*
+              {t("status")} <span className="text-red-500">*</span>
             </label>
             <select
               name="status"
@@ -174,7 +171,7 @@ const SponsorshipHackathonDetailForm: React.FC<
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t("fromDateTime")}*
+              {t("fromDateTime")} <span className="text-red-500">*</span>
             </label>
             <input
               type="datetime-local"
@@ -189,7 +186,7 @@ const SponsorshipHackathonDetailForm: React.FC<
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t("toDateTime")}*
+              {t("toDateTime")} <span className="text-red-500">*</span>
             </label>
             <input
               type="datetime-local"

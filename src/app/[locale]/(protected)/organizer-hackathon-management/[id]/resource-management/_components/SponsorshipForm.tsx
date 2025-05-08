@@ -151,7 +151,7 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t("sponsorshipName")}*
+                {t("sponsorshipName")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -166,7 +166,7 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t("brand")}*
+                {t("brand")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -181,7 +181,7 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t("amount")} ($)*
+                {t("amount")} (VND) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -215,7 +215,7 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t("startDateTime")}*
+                {t("startDateTime")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="datetime-local"
@@ -230,7 +230,7 @@ const SponsorshipForm: React.FC<SponsorshipFormProps> = ({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t("endDateTime")}*
+                {t("endDateTime")} <span className="text-red-500">*</span>
               </label>
               <input
                 type="datetime-local"

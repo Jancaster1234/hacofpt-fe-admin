@@ -269,7 +269,7 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
               {t("fields.totalAmount")}
             </p>
             <p className="font-medium text-gray-900 dark:text-white">
-              ${sponsorship.money.toLocaleString()}
+              (VND) {sponsorship.money.toLocaleString()}
             </p>
           </div>
           <div>
@@ -429,7 +429,7 @@ const SponsorshipDetails: React.FC<SponsorshipDetailsProps> = ({
                           {hackathon.hackathonId}
                         </td>
                         <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
-                          ${hackathon.totalMoney?.toLocaleString() || "0"}
+                          (VND) {hackathon.totalMoney?.toLocaleString() || "0"}
                         </td>
                         <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-gray-900 dark:text-white">
                           {hackathon.createdByUserName || t("labels.unknown")}

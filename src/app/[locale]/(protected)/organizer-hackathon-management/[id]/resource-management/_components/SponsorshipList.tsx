@@ -110,7 +110,7 @@ const SponsorshipList: React.FC<SponsorshipListProps> = ({
                       {sponsorship.brand}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                      ${sponsorship.money.toLocaleString()}
+                      VND{sponsorship.money.toLocaleString()}
                     </td>
                     <td className="hidden md:table-cell px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-gray-100">
                       {formatDateTime(sponsorship.timeFrom)} -{" "}

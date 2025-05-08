@@ -275,7 +275,7 @@ const SponsorshipDetailFiles: React.FC<SponsorshipDetailFilesProps> = ({
             {formatDate(detail.timeFrom)} - {formatDate(detail.timeTo)}
           </span>
           <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-            ${detail.moneySpent.toLocaleString()} {t("spent")}
+            (VND) {detail.moneySpent.toLocaleString()} {t("spent")}
           </span>
         </div>
       </div>

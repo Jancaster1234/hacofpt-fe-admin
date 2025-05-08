@@ -339,7 +339,7 @@ const SponsorshipHackathonDetails: React.FC<
                       </div>
                     </td>
                     <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                      ${detail.moneySpent.toLocaleString()}
+                      VND{detail.moneySpent.toLocaleString()}
                     </td>
                     <td className="hidden sm:table-cell px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                       <div className="text-xs md:text-sm">
