@@ -20,22 +20,22 @@ export function useAuth() {
     try {
       const { data: response, message: apiMessage } =
         await authService_v0.login(username, password);
-      console.log("🔹 Login response:", response);
-      console.log("🔹 API message:", apiMessage);
+      // console.log("🔹 Login response:", response);
+      // console.log("🔹 API message:", apiMessage);
 
       if (!response.token) {
-        console.error("❌ No accessToken received from login response");
+        // console.error("❌ No accessToken received from login response");
         throw new Error("No accessToken received");
       }
 
       // Temporarily store token to fetch user data
-      console.log("🔹 Temporarily storing accessToken to check user data");
+      // console.log("🔹 Temporarily storing accessToken to check user data");
       localStorage.setItem("accessToken", response.token);
 
       const { data: userData, message: userMessage } =
         await authService_v0.getUser();
-      console.log("🔹 User data after login:", userData);
-      console.log("🔹 User API message:", userMessage);
+      // console.log("🔹 User data after login:", userData);
+      // console.log("🔹 User API message:", userMessage);
 
       // Check if user has authorized roles
       const authorizedRoles = ["ORGANIZER", "JUDGE", "MENTOR", "DEMO", "ADMIN"];
@@ -45,7 +45,7 @@ export function useAuth() {
       );
 
       if (!hasAuthorizedRole) {
-        console.error("❌ User doesn't have required authorization");
+        // console.error("❌ User doesn't have required authorization");
         localStorage.removeItem("accessToken");
         throw new Error(
           "You don't have the required authorization to access this application"
@@ -53,10 +53,10 @@ export function useAuth() {
       }
 
       // User has proper role, keep the token in localStorage
-      console.log(
-        "🔹 User has authorized role, storing accessToken:",
-        response.token
-      );
+      // console.log(
+      //   "🔹 User has authorized role, storing accessToken:",
+      //   response.token
+      // );
 
       // Store user data and display success message
       setAuth({ user: userData });
@@ -64,7 +64,7 @@ export function useAuth() {
 
       return { success: true, message: apiMessage };
     } catch (error: any) {
-      console.error("❌ Login failed:", error);
+      // console.error("❌ Login failed:", error);
       localStorage.removeItem("accessToken");
       setAuth({ user: null });
 
@@ -87,7 +87,7 @@ export function useAuth() {
       if (accessToken) {
         const { message: apiMessage } =
           await authService_v0.logout(accessToken);
-        console.log("🔹 Logout message:", apiMessage);
+        // console.log("🔹 Logout message:", apiMessage);
         setMessage(apiMessage || "Successfully logged out", "success");
         return { success: true, message: apiMessage };
       }
@@ -108,18 +108,18 @@ export function useAuth() {
     const accessToken = localStorage.getItem("accessToken");
 
     if (!accessToken && skipIfNoToken) {
-      console.warn("❌ No accessToken, skipping checkUser");
+      // console.warn("❌ No accessToken, skipping checkUser");
       setAuth({ user: null, loading: false });
       return { success: false, message: "No access token found" };
     }
 
     setAuth({ loading: true });
     try {
-      console.log("🔹 Fetching user with accessToken:", accessToken);
+      // console.log("🔹 Fetching user with accessToken:", accessToken);
       const { data: userData, message: apiMessage } =
         await authService_v0.getUser();
-      console.log("🔹 Fetched user:", userData);
-      console.log("🔹 API message:", apiMessage);
+      // console.log("🔹 Fetched user:", userData);
+      // console.log("🔹 API message:", apiMessage);
 
       // Check if userData is empty object or actually has properties
       if (userData && Object.keys(userData).length > 0) {
@@ -137,7 +137,7 @@ export function useAuth() {
         );
 
         if (!hasAuthorizedRole) {
-          console.error("❌ User no longer has required authorization");
+          // console.error("❌ User no longer has required authorization");
           localStorage.removeItem("accessToken");
           setAuth({ user: null, loading: false });
           setMessage(
@@ -162,7 +162,7 @@ export function useAuth() {
 
       return { success: true, message: apiMessage };
     } catch (error: any) {
-      console.error("❌ Failed to fetch user:", error);
+      // console.error("❌ Failed to fetch user:", error);
 
       // Only remove accessToken for authentication errors (401 Unauthorized, 403 Forbidden)
       // Don't remove for network errors or other temporary issues
@@ -173,10 +173,10 @@ export function useAuth() {
         error.message?.includes("forbidden") ||
         error.message?.includes("invalid token")
       ) {
-        console.warn("🔹 Authentication error detected, removing token");
+        // console.warn("🔹 Authentication error detected, removing token");
         localStorage.removeItem("accessToken");
       } else {
-        console.warn("🔹 Non-authentication error, preserving token for retry");
+        // console.warn("🔹 Non-authentication error, preserving token for retry");
       }
 
       setAuth({ user: null, loading: false });

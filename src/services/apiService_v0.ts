@@ -32,10 +32,10 @@ async function request<T>(
 ): Promise<ApiResponse<T>> {
   // Modified return type
   const accessToken = tokenService_v0.getAccessToken();
-  console.log(
-    "🔹 accessToken in apiService:",
-    accessToken ? "Present" : "Not present"
-  );
+  // console.log(
+  //   "🔹 accessToken in apiService:",
+  //   accessToken ? "Present" : "Not present"
+  // );
   const headers: HeadersInit = {
     ...customHeaders,
   };
@@ -59,7 +59,7 @@ async function request<T>(
 
   if (abortPrevious && !isCriticalAuthRequest && controllers.has(requestKey)) {
     controllers.get(requestKey)?.abort();
-    console.log(`[API] Aborting previous request to: ${endpoint}`);
+    // console.log(`[API] Aborting previous request to: ${endpoint}`);
   }
 
   const controller = new AbortController();
@@ -77,14 +77,14 @@ async function request<T>(
     options.body = payload as FormData;
   }
 
-  console.log(`[API] ${method} ${endpoint} - Initiating request`, {
-    payload: isFormData ? "FormData" : payload,
-  });
+  // console.log(`[API] ${method} ${endpoint} - Initiating request`, {
+  //   payload: isFormData ? "FormData" : payload,
+  // });
 
   // Set timeout
   const timeoutId = setTimeout(() => {
     if (controllers.has(requestKey)) {
-      console.warn(`[API] Request timeout: ${method} ${endpoint}`);
+      // console.warn(`[API] Request timeout: ${method} ${endpoint}`);
       controller.abort("Request timed out after " + timeoutMs + "ms");
     }
   }, timeoutMs);
@@ -93,9 +93,9 @@ async function request<T>(
     const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
     clearTimeout(timeoutId); // Clear timeout when response is received
 
-    console.log(`[API] ${method} ${endpoint} - Response received`, {
-      status: response.status,
-    });
+    // console.log(`[API] ${method} ${endpoint} - Response received`, {
+    //   status: response.status,
+    // });
 
     // Handle 401 Unauthorized (token expired) - only retry once
     if (
@@ -106,9 +106,9 @@ async function request<T>(
     ) {
       isHandlingAuthError = true; // Prevent multiple parallel refresh attempts
 
-      console.warn(
-        `[API] Token expired on ${method} ${endpoint}. Attempting refresh...`
-      );
+      // console.warn(
+      //   `[API] Token expired on ${method} ${endpoint}. Attempting refresh...`
+      // );
 
       // Small delay to avoid race conditions
       await new Promise((res) => setTimeout(res, 500));
@@ -117,7 +117,7 @@ async function request<T>(
         const newToken = await tokenService_v0.refreshToken();
 
         if (newToken) {
-          console.log(`[API] Retrying ${method} ${endpoint} with new token`);
+          // console.log(`[API] Retrying ${method} ${endpoint} with new token`);
           isHandlingAuthError = false;
 
           // Try the request again with the new token
@@ -132,7 +132,7 @@ async function request<T>(
             abortPrevious
           );
         } else {
-          console.warn("[API] Token refresh failed. User must log in again.");
+          // console.warn("[API] Token refresh failed. User must log in again.");
 
           // Trigger app-wide auth error handling here
           // For example, redirect to login, show a modal, etc.
@@ -145,7 +145,7 @@ async function request<T>(
           throw new Error("Unauthorized - Token refresh failed.");
         }
       } catch (refreshError) {
-        console.error("[API] Error during token refresh:", refreshError);
+        // console.error("[API] Error during token refresh:", refreshError);
         isHandlingAuthError = false;
         throw new Error("Authentication error - Please log in again.");
       }
@@ -159,16 +159,16 @@ async function request<T>(
 
       // Log API message if it exists
       if (data && typeof data === "object" && "message" in data) {
-        console.log(
-          `[API] ${method} ${endpoint} - Message from server: "${data.message}"`
-        );
+        // console.log(
+        //   `[API] ${method} ${endpoint} - Message from server: "${data.message}"`
+        // );
       } else {
-        console.log(
-          `[API] ${method} ${endpoint} - No message field in response`
-        );
+        // console.log(
+        //   `[API] ${method} ${endpoint} - No message field in response`
+        // );
       }
     } else {
-      console.log(`[API] ${method} ${endpoint} - Response is not JSON`);
+      // console.log(`[API] ${method} ${endpoint} - Response is not JSON`);
       // For non-JSON responses, create a default response object
       const text = await response.text();
       data = {
@@ -179,9 +179,9 @@ async function request<T>(
     }
 
     if (!response.ok) {
-      console.error(
-        `[API] ${method} ${endpoint} - HTTP Error ${response.status}`
-      );
+      // console.error(
+      //   `[API] ${method} ${endpoint} - HTTP Error ${response.status}`
+      // );
 
       throw new Error(
         `Request to ${method} ${endpoint} failed with status ${
@@ -190,7 +190,7 @@ async function request<T>(
       );
     }
 
-    console.log(`[API] ${method} ${endpoint} - Success`, data);
+    // console.log(`[API] ${method} ${endpoint} - Success`, data);
     return data; // Return the entire response object
   } catch (error: any) {
     clearTimeout(timeoutId);
@@ -198,13 +198,13 @@ async function request<T>(
     // Distinguish between aborted requests and other errors
     if (error.name === "AbortError") {
       const reason = error.message || "No reason provided";
-      console.warn(`[API] ${method} ${endpoint} - Request aborted: ${reason}`);
+      // console.warn(`[API] ${method} ${endpoint} - Request aborted: ${reason}`);
 
       // Only rethrow if not aborted due to component unmount
       if (reason.includes("component unmounted")) {
-        console.log(
-          `[API] ${method} ${endpoint} - Ignoring abort due to component unmount`
-        );
+        // console.log(
+        //   `[API] ${method} ${endpoint} - Ignoring abort due to component unmount`
+        // );
         return {
           data: {} as T,
           message: "Request aborted: component unmounted",
@@ -218,7 +218,7 @@ async function request<T>(
     throw error;
   } finally {
     controllers.delete(requestKey); // Cleanup
-    console.log(`[API] ${method} ${endpoint} - Request cleanup`);
+    // console.log(`[API] ${method} ${endpoint} - Request cleanup`);
   }
 }
 
@@ -229,14 +229,14 @@ function handleGlobalError(error: any, method: string, endpoint: string) {
   if (error.name === "AbortError") {
     // Handle abort errors differently
     const reason = error.message || "Unknown reason";
-    console.warn(
-      `[API] Request to ${method} ${endpoint} was aborted: ${reason}`
-    );
+    // console.warn(
+    //   `[API] Request to ${method} ${endpoint} was aborted: ${reason}`
+    // );
     // Don't show alert for aborted requests as they're often intentional
     return;
   }
 
-  console.error(`[API] Error in ${method} ${endpoint}: ${error.message}`);
+  // console.error(`[API] Error in ${method} ${endpoint}: ${error.message}`);
 
   // Extract any message from the error if it exists
   let errorMessage = error.message;
