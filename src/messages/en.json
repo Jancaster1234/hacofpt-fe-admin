@@ -1771,7 +1771,12 @@
     "errorCreateFeedbackDetails": "Failed to create feedback details",
     "validationErrorQuestions": "All feedback questions must have content",
     "validationErrorMentorSelection": "Please select a mentor for mentor feedback",
-    "errorGeneric": "An error occurred while creating feedback"
+    "errorGeneric": "An error occurred while creating feedback",
+    "importQuestions": "Import Questions",
+    "invalidJsonFormat": "Invalid JSON format. Each item should have content and maxRating fields.",
+    "importSuccess": "Successfully imported feedback questions",
+    "invalidJsonData": "Invalid JSON data. Expected an array of feedback questions.",
+    "jsonParseError": "Error parsing JSON file"
   },
   "deviceManagement": {
     "allDevices": "All devices",
