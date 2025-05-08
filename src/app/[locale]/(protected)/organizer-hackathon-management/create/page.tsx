@@ -30,7 +30,7 @@ export default function CreateHackathonPage() {
     contact: "",
     category: "CODING",
     organization: "FPTU",
-    minimumTeamMembers: 1,
+    minimumTeamMembers: 2,
     maximumTeamMembers: 5,
     documentation: [] as string[],
     showParticipants: true,

@@ -445,7 +445,7 @@ export default function HackathonCreateForm({
                   <input
                     type="number"
                     className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
-                    min="1"
+                    min="2"
                     value={formData.minimumTeamMembers}
                     onChange={(e) =>
                       setFormData({
@@ -464,6 +464,7 @@ export default function HackathonCreateForm({
                     type="number"
                     className="w-full p-2 border rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-1 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
                     min={formData.minimumTeamMembers}
+                    max="5"
                     value={formData.maximumTeamMembers}
                     onChange={(e) =>
                       setFormData({
@@ -559,7 +560,8 @@ export default function HackathonCreateForm({
         {activeTab === "documentation" && (
           <div>
             <label className="block font-medium mb-2 text-gray-800 dark:text-gray-200">
-              {t("fields.documentation")}
+              {t("fields.documentation")}{" "}
+              <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <input
