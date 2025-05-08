@@ -16,28 +16,28 @@ import React from "react";
 
 export default function ProfilePage() {
   const { user, checkUser } = useAuth();
-  const setAuth = useAuthStore(state => state.setAuth);
+  const setAuth = useAuthStore((state) => state.setAuth);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleUpdateUser = async (updatedUser: Partial<User>) => {
     try {
       const token = localStorage.getItem("accessToken");
       if (!token) {
-        throw new Error('No authentication token found');
+        throw new Error("No authentication token found");
       }
 
-      const response = await fetch('/api/auth/my-info', {
-        method: 'PUT',
+      const response = await fetch("/api/auth/my-info", {
+        method: "PUT",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(updatedUser),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to update user');
+        throw new Error(error.message || "Failed to update user");
       }
 
       const updatedUserData = await response.json();
@@ -48,7 +48,7 @@ export default function ProfilePage() {
       // Refresh user data from server
       await checkUser();
     } catch (error) {
-      console.error('Failed to update user:', error);
+      console.error("Failed to update user:", error);
       throw error;
     }
   };
@@ -67,13 +67,13 @@ export default function ProfilePage() {
 
       const token = localStorage.getItem("accessToken");
       if (!token) {
-        throw new Error('No authentication token found');
+        throw new Error("No authentication token found");
       }
 
       const response = await fetch("/api/auth/upload-avatar", {
         method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
@@ -107,7 +107,10 @@ export default function ProfilePage() {
       <div className="flex gap-8 items-center mb-8">
         <div className="relative group">
           <Image
-            src={user?.avatarUrl || "https://randomuser.me/api/portraits/men/99.jpg"}
+            src={
+              user?.avatarUrl ||
+              "https://greenscapehub-media.s3.ap-southeast-1.amazonaws.com/hacofpt/504c1e5a-bc1f-4fe7-8905-d3bbbb12cabd_smiling-young-man-illustration_1308-174669.avif"
+            }
             alt="Profile Picture"
             width={150}
             height={150}

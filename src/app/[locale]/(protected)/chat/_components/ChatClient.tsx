@@ -56,7 +56,7 @@ export default function ChatClient() {
             name: chat.name,
             avatarUrl:
               chat.avatarUrl ||
-              "https://randomuser.me/api/portraits/men/99.jpg",
+              "https://greenscapehub-media.s3.ap-southeast-1.amazonaws.com/hacofpt/504c1e5a-bc1f-4fe7-8905-d3bbbb12cabd_smiling-young-man-illustration_1308-174669.avif",
             lastMessage: chat.messages[chat.messages.length - 1]?.content,
             lastMessageTime: chat.messages[chat.messages.length - 1]?.createdAt,
             isUnread: false,
@@ -332,7 +332,7 @@ export default function ChatClient() {
             name: newChat.name,
             avatarUrl:
               newChat.avatarUrl ||
-              "https://randomuser.me/api/portraits/men/99.jpg",
+              "https://greenscapehub-media.s3.ap-southeast-1.amazonaws.com/hacofpt/504c1e5a-bc1f-4fe7-8905-d3bbbb12cabd_smiling-young-man-illustration_1308-174669.avif",
             lastMessage:
               newChat.messages?.[newChat.messages.length - 1]?.content,
             lastMessageTime:

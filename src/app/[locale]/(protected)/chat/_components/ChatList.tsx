@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/useAuth_v0";
 import { ChatListItem } from "@/types/chat";
-import ImageModal from './ImageModal';
+import ImageModal from "./ImageModal";
 
 interface ChatListProps {
   chats: ChatListItem[];
@@ -67,7 +67,7 @@ const ChatList: React.FC<ChatListProps> = ({
 
     if (!chat.conversationUsers || !user?.id) {
       console.log("No conversation users or user ID, using default avatar");
-      return "https://randomuser.me/api/portraits/men/99.jpg";
+      return "https://greenscapehub-media.s3.ap-southeast-1.amazonaws.com/hacofpt/504c1e5a-bc1f-4fe7-8905-d3bbbb12cabd_smiling-young-man-illustration_1308-174669.avif";
     }
 
     const otherUser = chat.conversationUsers.find((u) => u.userId !== user.id);
@@ -78,7 +78,8 @@ const ChatList: React.FC<ChatListProps> = ({
     }
 
     return (
-      otherUser?.avatarUrl || "https://randomuser.me/api/portraits/men/99.jpg"
+      otherUser?.avatarUrl ||
+      "https://greenscapehub-media.s3.ap-southeast-1.amazonaws.com/hacofpt/504c1e5a-bc1f-4fe7-8905-d3bbbb12cabd_smiling-young-man-illustration_1308-174669.avif"
     );
   };
 
@@ -139,7 +140,7 @@ const ChatList: React.FC<ChatListProps> = ({
                 alt={chat.name}
                 className="w-10 h-10 rounded-full object-cover"
                 onClick={() => handleImageClick(getOtherUserAvatar(chat))}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               />
               <div className="ml-3 flex-1 min-w-0">
                 <div className="flex justify-between items-center">
@@ -163,10 +164,12 @@ const ChatList: React.FC<ChatListProps> = ({
       <img
         src="image-url.jpg" // Replace with dynamic image URL
         alt="Chat Image"
-        onClick={() => handleImageClick('image-url.jpg')}
-        style={{ cursor: 'pointer' }}
+        onClick={() => handleImageClick("image-url.jpg")}
+        style={{ cursor: "pointer" }}
       />
-      {selectedImage && <ImageModal imageUrl={selectedImage} onClose={closeModal} />}
+      {selectedImage && (
+        <ImageModal imageUrl={selectedImage} onClose={closeModal} />
+      )}
     </div>
   );
 };

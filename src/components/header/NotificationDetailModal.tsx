@@ -68,7 +68,7 @@ export default function NotificationDetailModal({
                       <Image
                         src={
                           notification.sender.avatarUrl ||
-                          "https://randomuser.me/api/portraits/men/99.jpg"
+                          "https://greenscapehub-media.s3.ap-southeast-1.amazonaws.com/hacofpt/504c1e5a-bc1f-4fe7-8905-d3bbbb12cabd_smiling-young-man-illustration_1308-174669.avif"
                         }
                         alt={`${notification.sender.name}'s avatar`}
                         width={48}
