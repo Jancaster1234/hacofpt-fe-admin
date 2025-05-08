@@ -1,9 +1,9 @@
 // src/app/[locale]/(protected)/organizer-hackathon-management/[id]/resource-management/_components/RoundMarkCriteria.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Round } from "@/types/entities/round";
 import { RoundMarkCriterion } from "@/types/entities/roundMarkCriterion";
 import RoundMarkCriterionForm from "./RoundMarkCriterionForm";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Upload } from "lucide-react";
 import { roundService } from "@/services/round.service";
 import { roundMarkCriterionService } from "@/services/roundMarkCriterion.service";
 import { useApiModal } from "@/hooks/useApiModal";
@@ -12,6 +12,13 @@ import { useTranslations } from "@/hooks/useTranslations";
 import { useToast } from "@/hooks/use-toast";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
+interface ImportCriterionData {
+  roundId?: string; // Make roundId optional since we'll use the active round
+  name: string;
+  maxScore: number;
+  note?: string;
+}
+
 export default function RoundMarkCriteria({
   hackathonId,
 }: {
@@ -19,6 +26,7 @@ export default function RoundMarkCriteria({
 }) {
   const t = useTranslations("roundMarkCriteria");
   const toast = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [rounds, setRounds] = useState<Round[]>([]);
   const [activeRoundId, setActiveRoundId] = useState<string | null>(null);
@@ -31,6 +39,7 @@ export default function RoundMarkCriteria({
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingRounds, setIsFetchingRounds] = useState(false);
   const [isFetchingCriteria, setIsFetchingCriteria] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
 
   // Use the API modal hook
   const { modalState, hideModal, showSuccess, showError } = useApiModal();
@@ -202,19 +211,147 @@ export default function RoundMarkCriteria({
     setEditingCriterion(null);
   };
 
+  const handleImportClick = () => {
+    // Trigger file input click
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeRoundId) {
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      // Read the JSON file
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const jsonData = JSON.parse(event.target?.result as string);
+
+          // Validate the JSON data
+          if (!Array.isArray(jsonData)) {
+            throw new Error("Invalid JSON format. Expected an array.");
+          }
+
+          // Track import results
+          let successCount = 0;
+          let errorCount = 0;
+
+          // Process each criterion in the JSON
+          for (const item of jsonData) {
+            try {
+              // Use the active round ID instead of the one in the JSON
+              // This allows for easier demo/testing with sample JSON files
+              const response =
+                await roundMarkCriterionService.createRoundMarkCriterion({
+                  name: item.name,
+                  maxScore: item.maxScore,
+                  note: item.note || "",
+                  roundId: activeRoundId, // Always use the active round ID
+                });
+
+              // Update the state with the new criterion
+              setRoundMarkCriteria((prev) => ({
+                ...prev,
+                [activeRoundId]: [
+                  ...(prev[activeRoundId] || []),
+                  response.data,
+                ],
+              }));
+
+              successCount++;
+            } catch (error) {
+              console.error("Error importing criterion:", error);
+              errorCount++;
+            }
+          }
+
+          // Show results
+          if (successCount > 0) {
+            toast.success(
+              `Successfully imported ${successCount} criteria${errorCount > 0 ? ` (${errorCount} failed)` : ""}`
+            );
+          } else {
+            toast.error(
+              `Failed to import criteria. Please check the format of your JSON file.`
+            );
+          }
+
+          // Reset file input
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+        } catch (error: any) {
+          toast.error(`Error parsing JSON: ${error.message}`);
+          console.error("Error parsing JSON:", error);
+        } finally {
+          setIsImporting(false);
+        }
+      };
+
+      reader.onerror = () => {
+        toast.error("Error reading the file");
+        setIsImporting(false);
+      };
+
+      reader.readAsText(file);
+    } catch (error: any) {
+      toast.error(`Error importing criteria: ${error.message}`);
+      console.error("Error importing criteria:", error);
+      setIsImporting(false);
+    }
+  };
+
   return (
     <div className="transition-colors duration-300 dark:text-gray-100">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h2 className="text-xl font-semibold dark:text-white">{t("title")}</h2>
         {activeRoundId && (
-          <button
-            onClick={openCreateForm}
-            className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-200 flex items-center text-sm shadow-sm dark:bg-blue-600 dark:hover:bg-blue-700"
-            disabled={isLoading || isFetchingRounds || isFetchingCriteria}
-            aria-label={t("buttons.addCriterion")}
-          >
-            <Plus size={16} className="mr-1" /> {t("buttons.addCriterion")}
-          </button>
+          <div className="flex space-x-2">
+            <button
+              onClick={handleImportClick}
+              className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors duration-200 flex items-center text-sm shadow-sm dark:bg-green-600 dark:hover:bg-green-700"
+              disabled={
+                isLoading ||
+                isFetchingRounds ||
+                isFetchingCriteria ||
+                isImporting
+              }
+              aria-label="Import JSON"
+            >
+              <Upload size={16} className="mr-1" /> Import JSON
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".json"
+              className="hidden"
+              disabled={
+                isLoading ||
+                isFetchingRounds ||
+                isFetchingCriteria ||
+                isImporting
+              }
+            />
+            <button
+              onClick={openCreateForm}
+              className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-200 flex items-center text-sm shadow-sm dark:bg-blue-600 dark:hover:bg-blue-700"
+              disabled={
+                isLoading ||
+                isFetchingRounds ||
+                isFetchingCriteria ||
+                isImporting
+              }
+              aria-label={t("buttons.addCriterion")}
+            >
+              <Plus size={16} className="mr-1" /> {t("buttons.addCriterion")}
+            </button>
+          </div>
         )}
       </div>
 
@@ -233,7 +370,7 @@ export default function RoundMarkCriteria({
                   : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
               }`}
               onClick={() => setActiveRoundId(round.id)}
-              disabled={isLoading || isFetchingCriteria}
+              disabled={isLoading || isFetchingCriteria || isImporting}
             >
               {round.roundTitle}
             </button>
@@ -256,9 +393,14 @@ export default function RoundMarkCriteria({
 
       {activeRoundId && (
         <div className="space-y-4">
-          {isFetchingCriteria ? (
+          {isFetchingCriteria || isImporting ? (
             <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center transition-colors duration-300">
               <LoadingSpinner size="md" showText={true} />
+              {isImporting && (
+                <p className="mt-2 text-gray-600 dark:text-gray-400">
+                  Importing criteria...
+                </p>
+              )}
             </div>
           ) : roundMarkCriteria[activeRoundId]?.length > 0 ? (
             <div className="grid gap-4">
@@ -286,7 +428,7 @@ export default function RoundMarkCriteria({
                         onClick={() => openEditForm(criterion)}
                         className="p-1 text-gray-500 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors duration-200"
                         aria-label={t("buttons.edit")}
-                        disabled={isLoading}
+                        disabled={isLoading || isImporting}
                       >
                         <Edit size={18} />
                       </button>
@@ -294,7 +436,7 @@ export default function RoundMarkCriteria({
                         onClick={() => handleDeleteCriterion(criterion.id)}
                         className="p-1 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-200"
                         aria-label={t("buttons.delete")}
-                        disabled={isLoading}
+                        disabled={isLoading || isImporting}
                       >
                         <Trash2 size={18} />
                       </button>
@@ -308,13 +450,22 @@ export default function RoundMarkCriteria({
               <p className="text-gray-500 dark:text-gray-400 mb-4">
                 {t("noCriteria")}
               </p>
-              <button
-                onClick={openCreateForm}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 text-sm shadow-sm dark:bg-blue-600 dark:hover:bg-blue-700"
-                disabled={isLoading}
-              >
-                {t("buttons.addFirstCriterion")}
-              </button>
+              <div className="flex flex-col sm:flex-row justify-center space-y-2 sm:space-y-0 sm:space-x-2">
+                <button
+                  onClick={handleImportClick}
+                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200 text-sm shadow-sm dark:bg-green-600 dark:hover:bg-green-700 flex items-center justify-center"
+                  disabled={isLoading || isImporting}
+                >
+                  <Upload size={16} className="mr-1" /> Import from JSON
+                </button>
+                <button
+                  onClick={openCreateForm}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 text-sm shadow-sm dark:bg-blue-600 dark:hover:bg-blue-700"
+                  disabled={isLoading || isImporting}
+                >
+                  {t("buttons.addFirstCriterion")}
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -330,10 +481,13 @@ export default function RoundMarkCriteria({
       />
 
       {/* Display loading spinner during API operations */}
-      {isLoading && (
+      {(isLoading || isImporting) && (
         <div className="fixed inset-0 bg-black bg-opacity-10 dark:bg-opacity-30 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
             <LoadingSpinner size="lg" showText={true} />
+            {isImporting && (
+              <p className="mt-2 text-center">Importing criteria...</p>
+            )}
           </div>
         </div>
       )}
